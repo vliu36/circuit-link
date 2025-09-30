@@ -26,7 +26,7 @@ const firebaseConfig = {
 
 // Attempt to start firestore db and check that backend server is running
 try {
-    const db = initializeApp(firebaseConfig);
+    const firestore = initializeApp(firebaseConfig);
     console.log("Successfully connected to DB!\n");
 
     app.listen(port, () => {
