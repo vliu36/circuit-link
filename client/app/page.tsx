@@ -7,12 +7,12 @@ export default function Database_Check() {
 
     const handleClick = async () => {
         try {
-            const response = await fetch("/api/all", {
-                method: "POST",
+            const response = await fetch("http://localhost:2400/api/all", {
+                method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ message: "Button clicked!" }),
+                //body: JSON.stringify({ message: "Button clicked!" }),         <-- Error: No body needed for GET request
             });
 
             if (response.ok) {
