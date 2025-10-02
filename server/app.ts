@@ -1,20 +1,24 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { getFirestore, collection, query, getDocs } from "firebase/firestore";
+import { initializeApp, applicationDefault } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// TODO: Make a temporary route for the data modeling assignment
-// Make sure to change to modular routes afterwards
+
+const firebaseApp = initializeApp({
+    credential: applicationDefault(),
+    projectId: "circuit-link"
+});
+const db = getFirestore();
+
+// Make sure to change to proper routes afterwards
 const getAllDocuments = async (req: Request, res: Response) => {
     try {
-        const db = getFirestore();
-        const communitiesRef = collection(db, "Communities");
-
-        const q = query(communitiesRef);
-        const snapshot = await getDocs(q);
+        const communitiesRef = db.collection("Communities");
+        const snapshot = await communitiesRef.get();
         
         res.status(200).send({
             status: "OK",
@@ -22,6 +26,7 @@ const getAllDocuments = async (req: Request, res: Response) => {
         })
     }
     catch (err) {
+        console.log(err);
         res.status(500).send({
             status: "backend error",
             message: err
