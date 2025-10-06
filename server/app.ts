@@ -1,40 +1,20 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { initializeApp, applicationDefault } from "firebase-admin/app";
-import { getFirestore } from "firebase-admin/firestore";
+import commRouter from "./routes/communities.ts";
+import repliesRouter from "./routes/replies.ts";
+import forumsRouter from "./routes/forums.ts";
+import postsRouter from "./routes/posts.ts";
+import usersRouter from "./routes/users.ts";
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-
-const firebaseApp = initializeApp({
-    credential: applicationDefault(),
-    projectId: "circuit-link"
-});
-const db = getFirestore();
-
-// Make sure to change to proper routes afterwards
-const getAllDocuments = async (req: Request, res: Response) => {
-    try {
-        const communitiesRef = db.collection("Communities");
-        const snapshot = await communitiesRef.get();
-        
-        res.status(200).send({
-            status: "OK",
-            message: snapshot.docs.map(doc => doc.data())
-        })
-    }
-    catch (err) {
-        console.log(err);
-        res.status(500).send({
-            status: "backend error",
-            message: err
-        })
-    }
-        
-}
-
-app.get("/api/all", getAllDocuments);
+// Routes
+app.use("/api/comm", commRouter)
+app.use("/api/replies", repliesRouter)
+app.use("/api/forums", forumsRouter)
+app.use("/api/posts", postsRouter)
+app.use("/api/users", usersRouter)
 
 export default app;
