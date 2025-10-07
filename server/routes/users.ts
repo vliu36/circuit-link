@@ -8,4 +8,9 @@ const router = express.Router();
  */
 router.get("/all", users.getAllDocuments)
 
+/** Registers a new user by creating a new document in Users
+ *  @route POST /api/users/register
+ */
+router.post("/register", users.userRegistration)
+
 export default router;
