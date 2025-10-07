@@ -7,16 +7,17 @@ export default function Database_Check() {
 
     const handleClick = async () => {
         try {
-            const response = await fetch("https://circuitlink-160321257010.us-west2.run.app/api/all", {
+            // const response = await fetch("https://circuitlink-160321257010.us-west2.run.app/api/all", {
+            const response = await fetch("http://localhost:2400/api/users/all", {     // for local testing, returns all data in "Users" collection
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                //body: JSON.stringify({ message: "Button clicked!" }),         <-- Error: No body needed for GET request
             });
 
             if (response.ok) {
-                window.location.href = "https://circuitlink-160321257010.us-west2.run.app/api/all";
+                // window.location.href = "https://circuitlink-160321257010.us-west2.run.app/api/all";
+                window.location.href = "http://localhost:2400/api/users/all";       // for local testing, returns all data in "Users" collection
             }
             else {
                 console.error("Request failed due to skill issue:", response.status);
@@ -61,6 +62,23 @@ export default function Database_Check() {
             <footer className="box" style={{ position: "fixed", left: 0, bottom: 0, width: "100%", textAlign: "center" }}>
               © 2025 Blue Circuit inc. All rights reserved.
             </footer>
+          </div>
+
+          {/* -------- Button to register page -------- */}
+          <div style={{ textAlign: "center" }}>
+            <br></br>
+            <button style={{
+              backgroundColor: "#007bff",
+              color: "#fff",
+              border: "none",
+              padding: "10px 20px",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontSize: "16px",
+              transition: "background-color 0.2s",
+            }} onClick={() => router.push("/register")}>
+              Register
+            </button>
           </div>
         </>
     )
