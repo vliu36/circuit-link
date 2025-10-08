@@ -44,12 +44,15 @@ const userRegistration = async (req: Request, res: Response) => {
         const decoded = await getAuth().verifyIdToken(idToken);
 
         // **Accessing Firestore:** Create a reference to the Firestore database using `getFirestore()`, and use this reference to set a new document in the "Users" collection.
-        // 3. Set the new user document with the decoded email, username, role, and creation timestamp.
+        // 3. Set the new user document with the decoded email, username, and creation timestamp.
         const db = getFirestore();
         await db.collection("Users").doc(decoded.uid).set({
             email: decoded.email,
-            //username: req.body.username || '', // default to empty string if not provided
+            password: req.body.password,                // May or may not be secure
+            username: req.body.username,
             createdAt: new Date(),
+            profileDesc: "Hi! I'm still setting up my profile." // Default profile description/bio
+            // TODO: Include default profile picture upon account creation ----------------------------------------------------------------[!]
         });
 
         // **Success Response:** Return a 201 Created response with a success message.
@@ -64,7 +67,35 @@ const userRegistration = async (req: Request, res: Response) => {
     }
 };
 
+// Logging in a user and verifying token
+const userLogin = async (req: Request, res: Response) => {
+    try {
+        // Get authorization header
+        const authHeader = req.headers.authorization;
+        
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            return res.status(401).json({ error: "Missing or invalid authorization header" });
+        } // end if
+        
+        // Extract ID token from header
+        const idToken = authHeader?.split(" ")[1];
+        // Verify ID token with Firebase Admin SDK
+        const decoded = await getAuth().verifyIdToken(idToken);
+
+        // Send success response
+        res.status(200).json({ 
+            status: "success",
+            message: "User logged in successfully"
+        });
+        console.log("Success");
+    } catch (err) {
+        console.error(err);
+        res.status(401).json({ error: "Invalid or expired token" })
+    } // end try catch
+}
+
 export {
     getAllDocuments,
-    userRegistration
+    userRegistration,
+    userLogin
 }
