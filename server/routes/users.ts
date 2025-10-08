@@ -12,5 +12,6 @@ router.get("/all", users.getAllDocuments)
  *  @route POST /api/users/register
  */
 router.post("/register", users.userRegistration)
+router.post("/login", users.userLogin)
 
 export default router;
