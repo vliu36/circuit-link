@@ -5,24 +5,24 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } f
 import React, { useState } from "react";
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ This was used in local testing, will probably delete later ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
-// const firebaseConfig = {
-// apiKey: "",
-// authDomain: "",
-// projectId: "",
-// storageBucket: "",
-// messagingSenderId: "",
-// appId: "",
-// measurementId: ""
-// };
+const firebaseConfig = {
+    apiKey: "AIzaSyAGALHo4fsqbqArtDzZg33983RT7DWOqfY",
+    authDomain: "circuit-link.firebaseapp.com",
+    projectId: "circuit-link",
+    storageBucket: "circuit-link.firebasestorage.app",
+    messagingSenderId: "160321257010",
+    appId: "1:160321257010:web:bfa9843152ab4e36c0862b",
+    measurementId: "G-1WGGFMJB05"
+ };
 
 // const app = initializeApp(firebaseConfig);          // <-------- This is used in local testing, make sure to put credentials in firebaseConfig if you're local testing
-const app = initializeApp();                     
+const app = initializeApp(firebaseConfig);                     
 
 // Creates a user in Firebase Authentication
 export default function SignUp() {
     
     // Get the authentication instance from the Firebase app
-    const auth = getAuth();         
+    const auth = getAuth(app);         
     // Initialize state for the form fields (name, email, password)
     const [username, setName] = useState(""); 
     // The user's email address will be stored in this state variable
@@ -153,42 +153,47 @@ export default function SignUp() {
 
     // ------------------------ HTML ------------------------
     return (
-    <main>
-        <div>
-            <h1>Sign Up</h1>
+    <main background-color = "#322764">
+        <div className = "box">
+            <h1 className = "lblBox">Sign Up</h1>
             <form onSubmit={register}>
                 {/* // TODO: Set username policy [i.e. char length, alphabet, spaces] - I'll leave this to frontend --------------------------------[!] */}
-                <label>
-                    Username:
-                    <input 
+                <label className = "smallBox">
+                    Username
+                    <input
+                    className = "txtBox" 
                     type="text" 
                     name="username"
                     required
                     onChange={(e) => setName(e.target.value)}/>
                 </label>
                 <br />
-                <label>
-                    Email:
+                <label className = "smallBox">
+                    Email
                     <input 
-                    type="email" 
-                    name="email" 
-                    required
-                    onChange={(e) => setEmail(e.target.value)}/>
+                        className = "txtBox"
+                        type="email" 
+                        name="email" 
+                        required
+                            onChange={(e) => setEmail(e.target.value)}/>
                 </label>
                 <br />
                 {/* // TODO: Set password policy - ditto ------------------------------------------------------------------------------------------------[!] */}
-                <label>
-                    Password:
+                <label className = "smallBox">
+                    Password
                     <input 
+                    className="txtBox"
                     type="password" 
                     name="password" 
                     required
                     onChange={(e) => setPassword(e.target.value)}/>
                 </label>
                 <br />
-                <button type="submit">[Sign Up]</button>
+                <button className = "buttonBox" type="submit">[Sign Up]</button>
             </form>
         </div>
+        <button className = "signUpWithGoogleButton">Sign up with Google</button>
+        <a className="transparentButtonBox" href="../signin">Already have an account? Sign In</a>
         <br />
         <div>
             <h1>Login</h1>
