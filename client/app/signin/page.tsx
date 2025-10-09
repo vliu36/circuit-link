@@ -30,9 +30,9 @@ export default function SignUp() {
     // The user's password will be stored in this state variable
     const [password, setPassword] = useState("");
     // A message to display to the user (e.g. "Signup successful!" or "Error: ...")
-    const [message, setMessage] = useState<string | null>(null);
-    // Indicates whether the registration process is currently loading
-    const [loading, setLoading] = useState(false);
+    // const [message, setMessage] = useState<string | null>(null);
+    // // Indicates whether the registration process is currently loading
+    // const [loading, setLoading] = useState(false);
 
     // ---------------------------------------------------------------- BEGINNING OF USER REGISTRATION ---------------------------------------------------------------- //
     // Define a function to handle form submission and create a new user
@@ -40,63 +40,15 @@ export default function SignUp() {
         // Prevent the default form submission behavior (i.e. don't reload the page)
         e.preventDefault();
 
-        // Initial message
-        setMessage("Signing up...");
-        const regFail = "Sign Up Failed.";
-        const regSuccess = "Sign Up Successful!"
+        const res = await fetch("http://localhost:2400/api/users/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password, username }), // <--- include any extra data you want server-side
+        });
+        
+        const data = await res.json();
+        alert(data.message || "User created!");
 
-        // Set loading state to true, indicating that the registration process is underway
-        setLoading(true);
-
-        try {
-            // Call 'createUserWithEmailAndPassword' to create a new user in Firebase Authentication
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-
-            // Get the newly created user object from the 'userCredential'
-            const user = userCredential.user;
-
-            // Important note: call the method ('getIdToken') with parentheses to execute it
-            const idToken = await user.getIdToken();
-
-            // POST to your backend to create a profile, etc.
-            // Use the 'fetch' API to send a request to your server
-            const res = await fetch("http://localhost:2400/api/users/register", {
-                method: "POST",
-                headers: {
-                    // Specify the content type as JSON and include the ID token in the Authorization header
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${idToken}`
-                },
-                body: JSON.stringify({ email, password, username }), // <--- include any extra data you want server-side
-            });
-
-            // Check if the response was successful (200-299)
-            if (!res.ok) {
-                // If not, try to parse the error message from the response body
-                setMessage(regFail);
-                alert(regFail);
-                const errorBody = await res.json().catch(() => ({}));
-                throw new Error(errorBody.error || res.statusText || "Server error");
-            } // end if
-
-            // If the registration was successful, update the UI with a success message
-            setMessage(regSuccess);
-            // Alert user of successful signup
-            alert(regSuccess);
-            // Clear the form fields and redirect to another page
-            setName("");
-            setEmail("");
-            setPassword("");
-            // TODO: Redirect to another page ------------------------------------------------------------------------------------------------[!] 
-        } catch (err) {
-            // If an error occurred during registration, display an error message to the user
-            setMessage(regFail);
-            alert(message);
-            console.error(err);
-        } finally {
-            // Regardless of whether an error occurred or not, set loading state to false
-            setLoading(false);
-        } // end try catch finally
     } // end function register
     // ---------------------------------------------------------------- END OF USER REGISTRATION ---------------------------------------------------------------- //
 
@@ -105,52 +57,37 @@ export default function SignUp() {
         // Prevent the default form submission behavior
         e.preventDefault();
 
-        // Initial message
-        setMessage("Logging in...");
-        const loginFail = "Login failed.";
-        const loginSuccess = "Login successful!";
-        // Set loading state to true while the user is being logged in
-        setLoading(true);
-
-        // Attempt to log in the user with the provided credentials
         try {
-            // Attempt to log in the user with the provided credentials
-            const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-            const idToken = await userCredential.user.getIdToken();
 
-            // Send idToken to backend for verification
+            // Send credentials to backend endpoint
             const res = await fetch("http://localhost:2400/api/users/login", {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": `Bearer ${idToken}`
-                },
-                body: JSON.stringify({ email }) // just in case we need it
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }) 
             });
 
-            // Check if the response is successful
+            // Await response from backend
+            const data = await res.json();
             if (!res.ok) {
-                setMessage(loginFail);
-                alert(loginFail);
-                const errorBody = await res.json().catch(() => ({}));
-                throw new Error(errorBody.error || res.statusText || "Server error");
-            } // end if
+                throw new Error(data.error || "Login failed");
+            }
+            
+            // Backend returns a Firebase ID token
+            const { idToken } = data;
 
-            // Alert user for successful login
-            setMessage(loginSuccess);
-            alert(loginSuccess);
+            // Store ID token in temporary session storage for the duration of the session
+            sessionStorage.setItem("idToken", idToken);
+
+            // Alert the user that they have successfully logged in
+            alert(data.message || "Login success!");
             // TODO: Redirect to another page ------------------------------------------------------------------------------------------------[!] 
         } catch (err) {
-            setMessage("Login failed.");
-            alert(loginFail);
+            // setMessage("Login failed.");
+            alert("Login failed.");
             console.log(err);
-        } finally {
-            setLoading(false);
-        } // end try catch finally
+        } // end try catch 
     } // end function login
     // ---------------------------------------------------------------- END OF USER LOGIN ---------------------------------------------------------------- // 
-
     // ------------------------ HTML ------------------------
     return (
     <main>
