@@ -1,7 +1,12 @@
 import { db } from "../firebase.ts";
 import { Request, Response } from "express";
-import { getAuth } from "firebase-admin/auth";
+import { getAuth as getAdminAuth } from "firebase-admin/auth";
+import { GoogleAuth } from "google-auth-library";
 import { getFirestore } from "firebase-admin/firestore";
+// import { signInWithEmailAndPassword } from "firebase/auth";
+// import {getAuth} from "firebase/auth";
+
+const auth = getAdminAuth();
 
 // Retrieves all documents in Users
 const getAllDocuments = async (req: Request, res: Response) => {
@@ -26,71 +31,115 @@ const getAllDocuments = async (req: Request, res: Response) => {
 // Signs up a user, storing information in the Firestore Database
 const userRegistration = async (req: Request, res: Response) => {
     try {
-        // **Token Validation and Decoding**:
-        // 1. Extract the authentication token from the request headers.
-        const authHeader = req.headers.authorization;
-        
-        // ~~~~ for debugging
-        console.log("Auth header received:", req.headers.authorization);
+        const { email, password, username } = req.body;
 
-        // **Error Handling:** If the `Authorization` header is missing or invalid, return a 401 Unauthorized response with an error message.
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            res.status(401).json({ error: "Missing or invalid authorization header" });
-            return;
-        }
+        // Creates a new Firebase Authentication user 
+        const userCred = auth.createUser({
+            email: email,
+            // emailVerified: false,
+            // phoneNumber: req.body.phoneNumber,
+            password: password,
+            displayName: username,
+            // photoURL: // TODO: Include default profile picture here ---------------------------------------------------------------------------------------------------[!]
+            // disabled: false
+        })
 
-        // 2. Extract the ID token from the `Authorization` header and verify it using Firebase Authentication's `verifyIdToken()` method.
-        const idToken = authHeader.split("Bearer ")[1];
-        const decoded = await getAuth().verifyIdToken(idToken);
+        // Gets the newly created user's ID
+        const userId = (await userCred).uid;
 
-        // **Accessing Firestore:** Create a reference to the Firestore database using `getFirestore()`, and use this reference to set a new document in the "Users" collection.
-        // 3. Set the new user document with the decoded email, username, and creation timestamp.
+        // Creates a new Firestore document for the user with their uid
         const db = getFirestore();
-        await db.collection("Users").doc(decoded.uid).set({
-            email: decoded.email,
-            password: req.body.password,                // May or may not be secure
-            username: req.body.username,
+        await db.collection("Users").doc(userId).set({
+            email: email, 
+            password: password,
+            username: username,
             createdAt: new Date(),
-            profileDesc: "Hi! I'm still setting up my profile." // Default profile description/bio
-            // TODO: Include default profile picture upon account creation ----------------------------------------------------------------[!]
+            profileDesc: "Hi! I'm still setting up my profile."
         });
 
-        // **Success Response:** Return a 201 Created response with a success message.
-        res.status(201).send({ message: "User created successfully" });
+        res.status(201).json({ message: "User created successfully", uid: userId })
     } catch (err) {
-        // **Error Handling:** Catch any errors that occur during the registration process and return a 500 Internal Server Error response with an error message.
-        console.error(err);
+        console.error("Error creating user:", err);
         res.status(500).send({ 
             status: "backend error",
             message: err
-        })
+        });
     }
 };
 
 // Logging in a user and verifying token
 const userLogin = async (req: Request, res: Response) => {
     try {
-        // Get authorization header
-        const authHeader = req.headers.authorization;
-        
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
-            return res.status(401).json({ error: "Missing or invalid authorization header" });
-        } // end if
-        
-        // Extract ID token from header
-        const idToken = authHeader?.split(" ")[1];
-        // Verify ID token with Firebase Admin SDK
-        const decoded = await getAuth().verifyIdToken(idToken);
+        const { email, password } = req.body;
 
-        // Send success response
-        res.status(200).json({ 
-            status: "success",
-            message: "User logged in successfully"
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ NEW METHOD (needs more testing) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // Obtain access token via ADC
+        const auth = new GoogleAuth({
+            scopes: ["https://www.googleapis.com/auth/identitytoolkit"]
         });
-        console.log("Success");
-    } catch (err) {
+        const client = await auth.getClient();
+        const accessToken = await client.getAccessToken();
+
+        // Call Identity Toolkit API with Bearer Token
+        const response = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword", {
+            method: "POST",
+            headers: {
+                Authorization: `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                email,
+                password,
+                returnSecureToken: true
+            }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            return res.status(401).json({ error: data.error?.message || "Invalid credentials"});
+        }
+
+        res.status(200).json({
+            message: "Login successful",
+            uid: data.localId,
+            idToken: data.idToken
+        });
+
+
+
+        
+
+        // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ OLD METHOD (but still works, just needs API key) ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+        // // Fetches the user's profile information from Firestore 
+        // const response = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.FIREBASE_API_KEY}`,
+        //     {                           // --------------------------------------------------------------------- ^ This requires an API key to function -----------------------------------------
+        //         method: "POST",
+        //         headers: { "Content-Type": "application/json" },
+        //         body: JSON.stringify({
+        //             email,
+        //             password,
+        //             returnSecureToken: true // Include the token in the response
+        //     }),
+        // });
+
+        // // Check if the response is successful
+        // const data = await response.json();
+        // if (!response.ok) {
+        //     throw new Error(data.error?.message || "Authentication failed.");
+        // }
+
+        // // Send the token as a response *
+        // res.status(200).json({ 
+        //     status: "success",
+        //     message: "User logged in successfully",
+        //     idToken: data.idToken,
+        //     refreshToken: data.refreshToken,
+        //     localId: data.localId   // UID
+        // });
+    } catch (err: any) {
         console.error(err);
-        res.status(401).json({ error: "Invalid or expired token" })
+        res.status(401).json({ error: err.message })
     } // end try catch
 }
 
