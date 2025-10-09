@@ -1,22 +1,5 @@
 "use client";
-
-import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
-
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ This was used in local testing, will probably delete later ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
-//const firebaseConfig = {
-    //apiKey: "AIzaSyAGALHo4fsqbqArtDzZg33983RT7DWOqfY",
-    //authDomain: "circuit-link.firebaseapp.com",
-    //projectId: "circuit-link",
-    //storageBucket: "circuit-link.firebasestorage.app",
-    //messagingSenderId: "160321257010",
-    //appId: "1:160321257010:web:bfa9843152ab4e36c0862b",
-    //measurementId: "G-1WGGFMJB05"
- //};
-
-// const app = initializeApp(firebaseConfig);          // <-------- This is used in local testing, make sure to put credentials in firebaseConfig if you're local testing
-//const app = initializeApp(firebaseConfig);                     
 
 // Creates a user in Firebase Authentication
 export default function SignUp() {
