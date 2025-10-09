@@ -5,16 +5,24 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } f
 import React, { useState } from "react";
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ This was used in local testing, will probably delete later ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ //
-
+//const firebaseConfig = {
+    //apiKey: "AIzaSyAGALHo4fsqbqArtDzZg33983RT7DWOqfY",
+    //authDomain: "circuit-link.firebaseapp.com",
+    //projectId: "circuit-link",
+    //storageBucket: "circuit-link.firebasestorage.app",
+    //messagingSenderId: "160321257010",
+    //appId: "1:160321257010:web:bfa9843152ab4e36c0862b",
+    //measurementId: "G-1WGGFMJB05"
+ //};
 
 // const app = initializeApp(firebaseConfig);          // <-------- This is used in local testing, make sure to put credentials in firebaseConfig if you're local testing
-const app = initializeApp();                     
+//const app = initializeApp(firebaseConfig);                     
 
 // Creates a user in Firebase Authentication
 export default function SignUp() {
     
     // Get the authentication instance from the Firebase app
-    //const auth = getAuth();         
+    //const auth = getAuth(app);         
     // Initialize state for the form fields (name, email, password)
     const [username, setName] = useState(""); 
     // The user's email address will be stored in this state variable
@@ -80,44 +88,6 @@ export default function SignUp() {
         } // end try catch 
     } // end function login
     // ---------------------------------------------------------------- END OF USER LOGIN ---------------------------------------------------------------- // 
-
-    // ---------------------------------------------------------------- BEGINNING OF USER LOGIN ---------------------------------------------------------------- //
-    async function login(e: React.FormEvent<HTMLFormElement>) {
-        // Prevent the default form submission behavior
-        e.preventDefault();
-
-        try {
-
-            // Send credentials to backend endpoint
-            const res = await fetch("http://localhost:2400/api/users/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }) 
-            });
-
-            // Await response from backend
-            const data = await res.json();
-            if (!res.ok) {
-                throw new Error(data.error || "Login failed");
-            }
-            
-            // Backend returns a Firebase ID token
-            const { idToken } = data;
-
-            // Store ID token in temporary session storage for the duration of the session
-            sessionStorage.setItem("idToken", idToken);
-
-            // Alert the user that they have successfully logged in
-            alert(data.message || "Login success!");
-            // TODO: Redirect to another page ------------------------------------------------------------------------------------------------[!] 
-        } catch (err) {
-            // setMessage("Login failed.");
-            alert("Login failed.");
-            console.log(err);
-        } // end try catch 
-    } // end function login
-    // ---------------------------------------------------------------- END OF USER LOGIN ---------------------------------------------------------------- // 
-
     // ------------------------ HTML ------------------------
     return (
     <main background-color = "#322764">
