@@ -59,7 +59,7 @@ export default function Database_Check() {
             >
               Click here
             </button>
-            <footer className="box" style={{ position: "fixed", left: 0, bottom: 0, width: "100%", textAlign: "center" }}>
+            <footer style={{ position: "fixed", left: 0, bottom: 0, width: "100%", textAlign: "center" }}>
               © 2025 Blue Circuit inc. All rights reserved.
             </footer>
           </div>

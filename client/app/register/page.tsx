@@ -195,31 +195,6 @@ export default function SignUp() {
         <button className = "signUpWithGoogleButton">Sign up with Google</button>
         <a className="transparentButtonBox" href="../signin">Already have an account? Sign In</a>
         <br />
-        <div>
-            <h1>Login</h1>
-            <form onSubmit={login}>
-                <label>
-                    Email:
-                    <input 
-                    type="email" 
-                    name="email"
-                    required
-                    onChange={(e) => setEmail(e.target.value)}/>
-                </label>
-                <br />
-                <label>
-                    Password:
-                    <input 
-                    type="password"
-                    name="password"
-                    required
-                    onChange={(e) => setPassword(e.target.value)}/>
-                </label>
-                <br />
-                <button type="submit">[Login]</button>
-            </form>
-            
-        </div>
     </main>
     );
 }
