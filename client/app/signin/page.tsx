@@ -30,7 +30,7 @@ export default function SignUp() {
             console.log("Signed in as:", user.email);
             alert(`Welcome, ${user.email}`);
             
-            window.location.href = "http://localhost:3000/"
+            window.location.href = "https://circuitlink-160321257010.us-west2.run.app"
             // TODO: Redirect to another page ------------------------------------------------------------------------------------------------[!]
         } catch (err) {
             // setMessage("Login failed.");

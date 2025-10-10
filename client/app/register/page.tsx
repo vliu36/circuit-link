@@ -15,7 +15,7 @@ export default function SignUp() {
         // Prevent the default form submission behavior (i.e. don't reload the page)
         e.preventDefault();
 
-        const res = await fetch("http://localhost:2400/api/users/register", {
+        const res = await fetch("https://api-circuit-link-160321257010.us-west2.run.app/api/users/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password, username }), // <--- include any extra data you want server-side
@@ -23,7 +23,7 @@ export default function SignUp() {
         
         const data = await res.json();
         alert(data.message || "User created!");
-        window.location.href = "http://localhost:3000/"
+        window.location.href = "https://circuitlink-160321257010.us-west2.run.app"
 
     } // end function register
     // ------ User Registration End ------ //
