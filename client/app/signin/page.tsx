@@ -29,6 +29,8 @@ export default function SignUp() {
             const user = userCredentials.user;
             console.log("Signed in as:", user.email);
             alert(`Welcome, ${user.email}`);
+            
+            window.location.href = "http://localhost:3000/"
             // TODO: Redirect to another page ------------------------------------------------------------------------------------------------[!]
         } catch (err) {
             // setMessage("Login failed.");

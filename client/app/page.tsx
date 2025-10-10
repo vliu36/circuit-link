@@ -37,28 +37,7 @@ export default function Database_Check() {
           <div style={{ textAlign: "center" }}>
             <br />
             <h1 style={{ fontFamily: "'Orbitron', Arial, sans-serif", fontSize: 42 }}>Welcome to Circuit Link</h1>
-            <p>
-              Database check for Professor to see...press button to see
-            </p>
             <br />
-            <button
-              type="button"
-              onClick={handleClick}
-              style={{
-              backgroundColor: "#007bff",
-              color: "#fff",
-              border: "none",
-              padding: "10px 20px",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontSize: "16px",
-              transition: "background-color 0.2s"
-              }}
-              onMouseOver={e => (e.currentTarget.style.backgroundColor = "#0056b3")}
-              onMouseOut={e => (e.currentTarget.style.backgroundColor = "#007bff")}
-            >
-              Click here
-            </button>
             <footer style={{ position: "fixed", left: 0, bottom: 0, width: "100%", textAlign: "center" }}>
               © 2025 Blue Circuit inc. All rights reserved.
             </footer>
@@ -68,7 +47,7 @@ export default function Database_Check() {
           <div style={{ textAlign: "center" }}>
             <br></br>
             <button style={{
-              backgroundColor: "#007bff",
+              backgroundColor: "#699DD8",
               color: "#fff",
               border: "none",
               padding: "10px 20px",
@@ -78,6 +57,22 @@ export default function Database_Check() {
               transition: "background-color 0.2s",
             }} onClick={() => router.push("/register")}>
               Register
+            </button>
+          </div>
+
+          <div style={{ textAlign: "center" }}>
+            <br></br>
+            <button style={{
+              backgroundColor: "#699DD8",
+              color: "#fff",
+              border: "none",
+              padding: "10px 20px",
+              borderRadius: "4px",
+              cursor: "pointer",
+              fontSize: "16px",
+              transition: "background-color 0.2s",
+            }} onClick={() => router.push("/signin")}>
+              Sign In
             </button>
           </div>
         </>

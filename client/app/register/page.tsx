@@ -23,13 +23,14 @@ export default function SignUp() {
         
         const data = await res.json();
         alert(data.message || "User created!");
+        window.location.href = "http://localhost:3000/"
 
     } // end function register
     // ------ User Registration End ------ //
 
     // ------------------------ HTML ------------------------
     return (
-    <main background-color = "#322764">
+    <main background-color = "#394153">
         <div className = "box">
             <h1 className = "lblBox">Sign Up</h1>
             <form onSubmit={register}>
