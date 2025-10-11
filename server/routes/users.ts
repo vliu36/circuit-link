@@ -6,7 +6,7 @@ const router = express.Router();
 /** Retrieve all documents in Users
  *  @route GET /api/users/all
  */
-router.get("/all", users.getAllDocuments)
+router.get("/all", users.getAllDocuments);
 
 /** Registers a new user by creating a new document in Users
  *  @route POST /api/users/register

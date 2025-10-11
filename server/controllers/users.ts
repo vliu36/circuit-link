@@ -58,7 +58,8 @@ const userRegistration = async (req: Request, res: Response) => {
         });
 
         res.status(201).json({ message: "User created successfully", uid: userId })
-    } catch (err) {
+    } 
+    catch (err) {
         console.error("Error creating user:", err);
         res.status(500).send({ 
             status: "backend error",
