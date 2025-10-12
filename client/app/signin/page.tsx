@@ -1,51 +1,29 @@
 "use client";
-import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { initializeApp } from "firebase/app";
+import {login, loginWithGoogle} from "./login";
+import React, { useState } from "react";
 
-// TODO: Move this to a separate file. ---------------------------------------------------------------------------------------[!]
-const app = initializeApp({ apiKey: "AIzaSyD3VCMA1MxjtLzXjkEFXr-XEPpkyftPSTo" });
-
-
-// Creates a user in Firebase Authentication
-export default function SignUp() {
-    
-    // Initialize state for the form fields (name, email, password)
-    const [username, setName] = useState(""); 
-    const [email, setEmail] = useState(""); 
+export default function Login() {
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPass, setShowPass] = useState(false);
+    const [error, setError] = useState("");
 
-// ----- User Login Start ------ //
-    async function login(e: React.FormEvent<HTMLFormElement>) {
-        // Prevent the default form submission behavior
+    // handleSubmit function for login
+    async function handleSubmitLog(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-
-        try {
-            
-            const auth = getAuth(app);
-
-            const userCredentials = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredentials.user;
-            console.log("Signed in as:", user.email);
-            alert(`Welcome, ${user.email}`);
-            
-            window.location.href = "https://circuitlink-160321257010.us-west2.run.app"
-            // TODO: Redirect to another page ------------------------------------------------------------------------------------------------[!]
-        } catch (err) {
-            // setMessage("Login failed.");
-            alert("Login failed: " + err);
-            console.log(err);
-        } // end try catch 
-    } // end function login
-    // ------ User Login End ------ // 
-
-    // ------ HTML ------ //
+        const cleanMail = email.trim();
+        const cleanPass = password.trim();
+        
+        await login(cleanMail, cleanPass);
+    } // end handleSubmitLog
+    
+    // ---- HTML ---- //
     return (
     <main>
         <div className = "box">
             <h1 className = "lblBox">Login</h1>
-            <form onSubmit={login}>
+            <form onSubmit={handleSubmitLog}>
                 <label className = "smallBox">
                     Email:
                     <input 
@@ -59,17 +37,29 @@ export default function SignUp() {
                 <label className = "smallBox">
                     Password:
                     <input 
+                    id = "password"
                     className = "txtBox"
-                    type="password"
+                    type={showPass ? "text" : "password"}
                     name="password"
                     required
                     onChange={(e) => setPassword(e.target.value)}/>
                 </label>
+                <label className = "showPasswordBox"> {/* Checkbox to show/hide password */}
+                    <input 
+                    type="checkbox" 
+                    checked={showPass}
+                    onClick={() => setShowPass(!showPass)}/>
+                    Show Password
+                </label>
                 <br />
                 <button type="submit" className = "buttonBox">[Login]</button>
+                <br />
+                <br />
+                {/* This displays an error message in the text if it occurs. */}
+                {error && <p className ="errorMessage">{error}</p>}
             </form>
         </div>
-        <button className = "signUpWithGoogleButton">Sign in with Google</button>
+        <button className = "signUpWithGoogleButton" onClick={loginWithGoogle}>Sign in with Google</button>
         <a className="transparentButtonBox2" href="../register">Don't have an account, sign up for FREE!</a>
     </main>
     );

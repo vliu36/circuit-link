@@ -31,7 +31,7 @@ body {
   color: white;
   
   width: 600px;
-  height: 400px;
+  height: 500px;
   background-color: #5B6680;  
   margin: 0;
   justify-content: center;
@@ -43,14 +43,13 @@ body {
 }
 
 .lblBox{
-  height: 40px;
+  height: 125px;
   width: 100%;
   position: relative;
   left: 50px;
   bottom: 150px;
   font-size: 24px;
   font-weight: bold;
-  
 }
 
 .smallBox{
@@ -192,4 +191,13 @@ body {
    position:relative;
    right:200px;
 }
+}
+
+/* Used in ./register */
+.hint {
+  font-size: 12px;
+  color: #df4141;
+  position: relative;
+  right: 85px;
+  top: 5px;
 }
