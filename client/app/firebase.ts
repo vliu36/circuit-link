@@ -3,11 +3,10 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-// const app = initializeApp({ apiKey: "AIzaSyD3VCMA1MxjtLzXjkEFXr-XEPpkyftPSTo" });
 const app = initializeApp({ 
-    apiKey: "AIzaSyAhF6CQqbNraQ_CYKlev45r3GgEk3j1sVo", // Key for test-f3597
-    authDomain: "test-f3597.firebaseapp.com",
-    projectId: "test-f3597",
+    apiKey: "AIzaSyD3VCMA1MxjtLzXjkEFXr-XEPpkyftPSTo", // Key for test-f3597
+    authDomain: "circuit-link.firebaseapp.com",
+    projectId: "circuit-link",
 });
 
 const auth = getAuth(app);
