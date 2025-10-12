@@ -3,7 +3,8 @@ import { getFirestore } from "firebase-admin/firestore";
 
 const firebaseApp = initializeApp({
     credential: applicationDefault(),
-    projectId: "circuit-link"
+    // projectId: "circuit-link"
+    projectId: "test-f3597"
 });
 const db = getFirestore();
 
