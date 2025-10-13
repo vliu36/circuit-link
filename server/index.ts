@@ -7,6 +7,8 @@ env.config();
 // Do not expose the env stuff ever!!
 const port = process.env.PORT || 2400;
 
+console.log("Attempting to start the server... ");
+
 app.listen(port, () => {
         console.log(`Server is running on http://localhost:${port}`);
     });
