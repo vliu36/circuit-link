@@ -24,7 +24,7 @@ const getAllDocuments = async (req: Request, res: Response) => {
 // Retrieve documents in Communities that contain the prefix value
 const prefixSearch = async (req: Request, res: Response) => {
     try {
-        const query = req.params.query;
+        const query = req.params.query.toLowerCase();
         if (!query) {
             res.status(400).send({
                 status: "Bad Request",
@@ -32,7 +32,7 @@ const prefixSearch = async (req: Request, res: Response) => {
             })
         }
         
-        const communitiesRef = db.collection("Communities").where("name", ">=", query).where("name", "<=", query + "\uf8ff");
+        const communitiesRef = db.collection("Communities").where("nameLower", ">=", query).where("nameLower", "<=", query + "\uf8ff");
         const snapshot = await communitiesRef.get();
         
         res.status(200).send({
