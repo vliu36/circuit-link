@@ -36,12 +36,12 @@ const userRegistration = async (req: Request, res: Response) => {
         // Creates a new Firebase Authentication user 
         const userCred = auth.createUser({
             email: email,
-            // emailVerified: false,
+            emailVerified: false,
             // phoneNumber: req.body.phoneNumber,
             password: password,
+            // photoURL: "https://storage.googleapis.com/circuit-link-images/profiles/default.png", // Swap to this default image later
+            photoURL: "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg",
             displayName: username,
-            // photoURL: // TODO: Include default profile picture here ---------------------------------------------------------------------------------------------------[!]
-            // disabled: false
         })
 
         // Gets the newly created user's ID
@@ -54,7 +54,14 @@ const userRegistration = async (req: Request, res: Response) => {
             password: password,
             username: username,
             createdAt: new Date(),
-            profileDesc: "Hi! I'm still setting up my profile."
+            profileDesc: "Hi! I'm still setting up my profile.",
+            darkMode: true,
+            privateMode: false,
+            restrictedMode: false,
+            textSize: 12,           // TODO: Change to a different default size
+            font: "Arial",          // TODO: Change to a different default font
+            notifications: [],
+            communities: [],
         });
 
         res.status(201).json({ message: "User created successfully", uid: userId })
@@ -63,7 +70,7 @@ const userRegistration = async (req: Request, res: Response) => {
         console.error("Error creating user:", err);
         res.status(500).send({ 
             status: "backend error",
-            message: "Failed to register user. " + err
+            message: "Failed to register user.\n" + err
         }); 
     } // end try catch
 } // end function userRegistration
@@ -79,7 +86,14 @@ const setupGoogleUser = async (req: Request, res: Response) => {
             email: email, 
             username: username,
             createdAt: new Date(),
-            profileDesc: "Hi! I'm still setting up my profile."
+            profileDesc: "Hi! I'm still setting up my profile.",
+            darkMode: true,
+            privateMode: false,
+            restrictedMode: false,
+            textSize: 12,           // TODO: Change to a different default size
+            font: "Arial",          // TODO: Change to a different default font
+            notifications: [],
+            communities: [],
         });
 
         res.status(201).json({ message: "Google user setup successfully", uid: uid })
