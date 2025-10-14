@@ -7,6 +7,7 @@ export default function Registration() {
     const [username, setName] = useState(""); 
     const [email, setEmail] = useState(""); 
     const [password, setPassword] = useState("");
+    
     const [showHintP, setShowHintP] = useState(false);
     const [showHintU, setShowHintU] = useState(false);
     const [showPass, setShowPass] = useState(false);
@@ -73,11 +74,11 @@ export default function Registration() {
                     <input 
                     type="checkbox" 
                     checked={showPass}
-                    onClick={() => setShowPass(!showPass)}/>
+                    onChange={() => setShowPass(!showPass)}/>
                     Show Password
                 </label>
                 <br />
-                <button className = "buttonBox" type="submit">[Sign Up]</button>
+                <button className="buttonBox" type="submit">[Sign Up]</button>
             </form>
         </div>
         <button
