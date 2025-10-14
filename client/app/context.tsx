@@ -9,9 +9,9 @@ import { doc, getDoc } from "firebase/firestore";
 
 // Define the shape of the context value
 interface AuthContextType {
-    user: User | null;
-    userData: any | null; // You can define a more specific type based on your user data structure
-    loading: boolean
+    user: User | null;          // Firebase User object or null if not logged in
+    userData: any | null;       // Additional user data from Firestore, can be typed more specifically if needed
+    loading: boolean            // Indicates if the auth state is still being determined
 } 
 
 // Create the context with default values

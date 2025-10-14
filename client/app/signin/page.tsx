@@ -48,7 +48,7 @@ export default function Login() {
                     <input 
                     type="checkbox" 
                     checked={showPass}
-                    onClick={() => setShowPass(!showPass)}/>
+                    onChange={() => setShowPass(!showPass)}/>
                     Show Password
                 </label>
                 <br />

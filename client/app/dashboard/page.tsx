@@ -20,10 +20,10 @@ export default function Dashboard() {
         <h1>Dashboard</h1>
         <p>Welcome to your dashboard!</p>
         {/* Print user's username */}
-        <p>User: {auth.currentUser?.email}</p>
+        <p>User: {userData?.username}</p>
+        <p>This place is just a placeholder.</p>
         {/* Redirect user to profile page */}
         <button onClick={() => window.location.href = "http://localhost:3000/profile"}><u>&gt; Go to Profile</u></button>
-        {/* Go back */}
         </main>
     );
 }

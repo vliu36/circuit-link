@@ -1,7 +1,8 @@
 // Script for user registration page
 
 import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 const provider = new GoogleAuthProvider();
 
@@ -40,6 +41,14 @@ export async function registerWithGoogle() {
         // This gives you a Google Access Token. You can use it to access the Google API.
         const credential = GoogleAuthProvider.credentialFromResult(result);
         const token = credential?.accessToken;
+
+        // Check if account already exists
+        const docSnap = await getDoc(doc(db, "Users", result.user.uid));
+        if (docSnap.exists()) {
+            console.log("Google user already exists in Firestore: ", result.user.email);
+            window.location.href = "http://localhost:3000/dashboard";
+            return; // Account exists, no need to register
+        } // end if
 
         // Generate a default username since Google sign-in doesn't provide one
         const now = new Date();

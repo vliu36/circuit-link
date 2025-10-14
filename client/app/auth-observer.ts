@@ -12,7 +12,7 @@ export function initAuthListener(): void {
 
         } else {
             // User is signed out
-            console.log("No user signed in.");
+            console.log("No user signed");
 
         } // end if else
     });
