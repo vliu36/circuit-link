@@ -70,7 +70,7 @@ export default function SignUp() {
             </form>
         </div>
         <button className = "signUpWithGoogleButton">Sign in with Google</button>
-        <a className="transparentButtonBox2" href="../register">Don't have an account, sign up for FREE!</a>
+        <a className="transparentButtonBox2" href="../register">{"Don't have an account, sign up for FREE!"}</a>
     </main>
     );
 }
