@@ -23,7 +23,7 @@ export default function SignUp() {
         
         const data = await res.json();
         alert(data.message || "User created!");
-        window.location.href = "https://circuitlink-160321257010.us-west2.run.app"
+        window.location.href = "/landing"
 
     } // end function register
     // ------ User Registration End ------ //
