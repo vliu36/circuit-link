@@ -48,7 +48,7 @@ const userRegistration = async (req: Request, res: Response) => {
         const userId = (await userCred).uid;
 
         // Creates a new Firestore document for the user with their uid
-        const db = getFirestore();
+        // const db = getFirestore();
         await db.collection("Users").doc(userId).set({
             email: email, 
             password: password,
@@ -81,7 +81,7 @@ const setupGoogleUser = async (req: Request, res: Response) => {
     const uid = req.body.uid; // User's Firebase Authentication UID
 
     try {
-        const db = getFirestore();
+        // const db = getFirestore();
         await db.collection("Users").doc(uid).set({
             email: email, 
             username: username,
@@ -107,7 +107,7 @@ const deleteUserDocument = async (req: Request, res: Response) => {
     const uid = req.params.uid;
 
     try {
-        const db = getFirestore();
+        // const db = getFirestore();
         await db.collection("Users").doc(uid).delete();
         res.status(201).json({ message: "Document deleted successfully", uid: uid })
     } catch (err) {
