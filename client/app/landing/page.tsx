@@ -35,16 +35,6 @@ export default function Landing() {
                 <img src="/notification.svg" className={Styles.homelogoBox}></img>
                 <div className = {Styles.buttonTextAlignment}>Notifications</div>
             </button>
-
-            <button className={Styles.ButtonStyle}>
-                <img src="/news.svg" className={Styles.homelogoBox}></img>
-                <div className = {Styles.buttonTextAlignment}>Site News</div>
-            </button>
-
-            <button className={Styles.ButtonStyle}>
-                <img src="/logout.svg" className={Styles.homelogoBox}></img>
-                <div className = {Styles.buttonTextAlignment}>Log Out</div>
-            </button>
         </div>
 
         <div className={Styles.Left}></div>
@@ -56,6 +46,15 @@ export default function Landing() {
         </div>
         
         <img src = "/add.svg" className = {Styles.addIcon}></img>
+        
+        <div className = {Styles.dropdown}>
+            <button className = "dropdownButton"><img src = "/profileIcon.svg" className = {Styles.settingsIcon}></img></button>
+            <div className = {Styles.dropdownMenu}>
+                <button>Profile</button>
+                <button>Settings</button>
+                <button>Log Out</button>
+            </div>
+        </div>
     </div>
     );
 }

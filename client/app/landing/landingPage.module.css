@@ -31,7 +31,7 @@
 
 .Horizontalline {
     position: relative;
-    bottom: 190px;
+    bottom: 230px;
     margin-top: 20px;
     margin-left: -10px;
     width: 325px;
@@ -42,7 +42,7 @@
 
 .HorizontallineOne {
     position: relative;
-    bottom: 500px;
+    bottom: 400px;
     margin-left: -10px;
     width: 325px;
     height: 8px;
@@ -66,9 +66,9 @@
 }
             
 .Searchbar input {
-    background-color: black;
-    color: cyan;
-    border: 3px solid lightblue;
+    background-color: rgb(129, 129, 129);
+    color: rgb(41, 41, 41);
+    border: 3px solid rgb(129, 129, 129);
     border-radius: 4px;
     font-size: 20px;
     width: 800px;
@@ -79,7 +79,7 @@
 }
 
 .Searchbar input::placeholder {
-    color: cyan;
+    color: rgb(41, 41, 41);
 }
 
 .Buttoncontainer {
@@ -90,7 +90,7 @@
     margin-top: 0px;
     margin-left: 15px;
     position: relative;
-    bottom: 180px;
+    bottom: 210px;
 }
 
 .Button {
@@ -106,8 +106,8 @@
 }
             
 .ButtonStyle {
-    background-color: lightskyblue;
-    color: blue;
+    background-color: rgb(24, 72, 134);
+    color: rgb(24, 72, 134);
     border: 2px solid;
     width: 280px;
     height: 50px;
@@ -120,7 +120,7 @@
 }
 
 .textBox{
-    color: lightblue;
+    color: rgb(255, 255, 255);
     text-align: center;
     font-size: 50px;
     position: relative;
@@ -128,7 +128,7 @@
 }
 
 .usernameTextBox{
-    color: lightblue;
+    color: rgb(255, 255, 255);
     text-align: center;
     font-size: 50px;
     position: relative;
@@ -139,7 +139,7 @@
     position: relative;
     width: 300px;
     height: 80px;
-    bottom: 620px;
+    bottom: 510px;
     left: 10px;
 }
 
@@ -155,188 +155,44 @@
     font-size: 20px;
     text-align: left;
     margin-left: 50px;
+    color: white;
 }
 
 .addIcon{
     position: relative;
-    bottom: 250px;
+    bottom: 300px;
     right: 30px;
     font-size: 20px;
     text-align: left;
     margin-left: 50px;
     border-radius: 1em;
     width: 75px;
+    
 }
 
-@media(max-width: 1000px){
-    .Verticalline {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        width: 8px;
-        background-color: lightblue;
-        z-index: 0;
-    }
+.settingsIcon{
+    border-radius: 100%;
+    width: 75px;
+}
 
-    .VerticallineOne {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 215px;
-        width: 8px;
-        background-color: lightblue;
-        z-index: 0;
-    }
+.dropdown {
+    position: relative;
+    left: 1800px;
+    bottom: 650px;
+}
 
-    .VerticallineTwo {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 700px;
-        width: 8px;
-        background-color: lightblue;
-        z-index: 0;
-    }
+.dropdownMenu {
+    position: absolute;
+    left: 10px;
+    opacity: 0;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+}
 
-
-    .Horizontalline {
-        position: relative;
-        bottom: 210px;
-        margin-top: 20px;
-        margin-left: -10px;
-        width: 225px;
-        height: 8px;
-        background-color: lightblue;
-        z-index: 10;
-    }
-
-    .HorizontallineOne {
-        position: relative;
-        bottom: 490px;
-        margin-left: -10px;
-        width: 225px;
-        height: 8px;
-        background-color: lightblue;
-        z-index: 10;
-    }
-
-    .Left {
-        left: 25%;
-    }
-
-    .Right {
-        right: 25%;
-    }
-            
-    .Searchbar {
-        text-align: center;
-        margin-top: 100px;
-        position: relative;
-        top: 500px; 
-    }
-            
-    .Searchbar input {
-        background-color: black;
-        color: cyan;
-        border: 3px solid lightblue;
-        border-radius: 4px;
-        font-size: 20px;
-        width: 400px;
-        height: 50px;
-        border-radius: 1em;
-        position: relative;
-        bottom: 230px;
-        left: 30px;
-    }
-
-    .Searchbar input::placeholder {
-        color: cyan;
-    }
-
-    .Buttoncontainer {
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-        margin-top: 0px;
-        margin-left: 10px;
-        position: relative;
-        bottom: 185px;
-    }
-
-    .Button {
-        position: relative;
-        width: 200px;
-        height: 30px;
-        border: 4px;
-        color: gray;
-        text-align: center;
-        font-size: 12px;
-        transition-duration: 0.5s;
-        cursor: pointer;
-    }
-            
-    .ButtonStyle {
-        background-color: lightskyblue;
-        color: blue;
-        border: 2px solid;
-        width: 200px;
-        height: 50px;
-        border-radius: 1em;
-    }
-
-    .ButtonStyle:hover{
-        background-color: blue;
-        color: lightblue;
-    }
-
-    .textBox{
-        color: lightblue;
-        text-align: center;
-        font-size: 35px;
-        position: relative;
-        left: 30px;
-        top: 300px;
-    }
-
-    .usernameTextBox{
-        color: lightblue;
-        text-align: center;
-        font-size: 35px;
-        position: relative;
-        top: 300px;
-        left: 30px;
-    }
-
-    .logoBox{
-        position: relative;
-        width: 200px;
-        bottom: 580px;
-        left: 10px;
-    }
-
-    .homelogoBox{
-        width: 45px;
-        height: 45px;
-        border-radius: 1em;
-    }
-
-    .buttonTextAlignment{
-        position: relative;
-        bottom: 35px;
-        font-size: 20px;
-        text-align: left;
-        margin-left: 50px;
-    }
-
-    .addIcon{
-        position: relative;
-        bottom: 280px;
-        right: 35px;
-        font-size: 20px;
-        text-align: left;
-        margin-left: 50px;
-        border-radius: 1em;
-        width: 50px;
-    }
+.dropdown:focus-within .dropdownMenu{
+    opacity: 1;
+    pointer-events: auto;
 }
