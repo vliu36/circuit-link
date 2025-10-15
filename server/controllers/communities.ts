@@ -14,7 +14,6 @@ const getAllDocuments = async (req: Request, res: Response) => {
         })
     }
     catch (err) {
-        console.log(err);
         res.status(500).send({
             status: "backend error",
             message: err
@@ -49,11 +48,12 @@ const addDoc = async (req: Request, res: Response) => {
             userList: req.body.userList,
             yayScore: 0
         }
-        const result = await db.collection("Communities").doc().set(data);
+        const result = await db.collection("Communities").add(data);
 
+        console.log("data added")
         res.status(200).send({
             status: "OK",
-            message: "Successfully added to Communities: " + result
+            message: "Successfully added to Communities, " + result.id
         })
     }
     catch (err) {
@@ -119,38 +119,7 @@ const prefixSearch = async (req: Request, res: Response) => {
 }
 
 // Updates the blacklist of an existing document
-const updateBlacklist = async (req: Request, res: Response) => {
-    //TODO: Complete code stub
-}
-
-// Updates the description of an existing document
-const updateDescription = async (req: Request, res: Response) => {
-    //TODO: Complete code stub
-}
-
-// Updates the groups of an existing document
-const updateGroups = async (req: Request, res: Response) => {
-    //TODO: Complete code stub
-}
-
-
-// Updates the mod list of an existing document
-const updateModList = async (req: Request, res: Response) => {
-    //TODO: Complete code stub
-}
-
-// Updates the owner list of an existing document
-const updateOwnerList = async (req: Request, res: Response) => {
-    //TODO: Complete code stub
-}
-
-// Updates the user list of an existing document
-const updateUserList = async (req: Request, res: Response) => {
-    //TODO: Complete code stub
-}
-
-// Updates the yayScore of an existing document
-const updateYayScore = async (req: Request, res: Response) => {
+const updateDoc = async (req: Request, res: Response) => {
     //TODO: Complete code stub
 }
 
@@ -158,5 +127,6 @@ export {
     getAllDocuments,
     prefixSearch,
     addDoc,
-    getDocByName
+    getDocByName,
+    updateDoc
 }
