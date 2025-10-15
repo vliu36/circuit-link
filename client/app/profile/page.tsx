@@ -7,6 +7,7 @@ import * as profileFunctions from "./profile";
 import { doc, getDoc } from "firebase/firestore";
 import { useAuth } from "../context";
 import { profile } from "console";
+import "./profile-styles.css";
 
 export default function Profile() {
     const { user, userData, loading } = useAuth();
@@ -14,7 +15,7 @@ export default function Profile() {
     const [newUsername, setNewUsername] = useState("");
     const [newBio, setNewBio] = useState("");
 
-    const [imageUrl, setImageUrl] = useState("");          
+    // const [imageUrl, setImageUrl] = useState("");          
     const [file, setFile] = useState<File | null>(null);   // For profile picture upload
     const [preview, setPreview] = useState<string | null>(null); // For image preview
     
@@ -24,6 +25,8 @@ export default function Profile() {
     const [privateMode, setPrivateMode] = useState(userData?.privateMode ?? false);
     const [restrictedMode, setRestrictedMode] = useState(userData?.restrictedMode ?? false);
     const [error, setError] = useState("");
+    
+    const [isOpen, setIsOpen] = useState(false);
 
     const MAX_KB = 200;
     const MAX_BYTES = MAX_KB * 1024;
@@ -55,6 +58,11 @@ export default function Profile() {
         await profileFunctions.editProfile(newUsername, newBio, textSize, font, darkMode, privateMode, restrictedMode);
         window.location.reload(); // Reload the page to show updated info
     };
+
+    // Popup Confirmation 
+    const togglePopup = () => {
+        setIsOpen(!isOpen);
+    }
 
     // Handle image file change
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -91,26 +99,49 @@ export default function Profile() {
 
     return (
         <main>
-            <h1>Profile</h1>
-            <p>Welcome to your profile page!</p>
-            <button onClick={() => window.location.href = "http://localhost:3000/dashboard"}><u>&gt; Go to Dashboard</u></button>
-            <br/>
-            {/* Print user's username */}
-            {/* List each user element */}
-            <br/>
-            <img 
-            src={user.photoURL || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
-            alt="Profile Picture" 
-            className="w-16 h-16 rounded-full object-cover border"/>
-            <p>Username: {userData?.username}</p>
-            <p>Email: {user?.email}</p>
-            <p>Bio: {userData?.profileDesc}</p>
-            <p>Email Verified: {user?.emailVerified ? "Yes" : "No"}</p>
-            {/* Show verify email button when user isn't verified */}
+            <div className="profile-card">
+                <h1>Profile</h1>
+                <p>Welcome to your profile page!</p>
+                <button className="go-back-btn" onClick={() => window.location.href = "http://localhost:3000/dashboard"}>Go back</button>
+                <br/>
+                <br/>
+                <div className="profile-header">
+                    <img 
+                    src={user.photoURL || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
+                    alt="Profile Picture" 
+                    className="w-16 h-16 rounded-full object-cover border"/>
+                    <span className="username">{userData?.username}</span>
+                </div>
+                <p>{userData?.profileDesc}</p>
+            </div>
+            <div className="account-info">
+                <p>Email: {user?.email}</p>
+                <p>Email Verified: {user?.emailVerified ? "Yes" : "No"}</p>
+                {/* Show verify email button when user isn't verified */}
+                {!user?.emailVerified && <span><button onClick={profileFunctions.verifyEmail}><u>&gt; Verify Email</u></button></span>}
+                <p>Account Created: {user?.metadata.creationTime}</p>
+                <p>Last Sign-in: {user?.metadata.lastSignInTime}</p>
+            </div>
 
-            {!user?.emailVerified && <span><button onClick={profileFunctions.verifyEmail}><u>&gt; Verify Email</u></button></span>}
-            <p>Account Created: {user?.metadata.creationTime}</p>
-            <p>Last Sign-in: {user?.metadata.lastSignInTime}</p>
+            <div>
+                <br/>
+                <form onSubmit={submitImage} className="flex items-left gap-4">
+                    <label className="cursor-pointer border p-2 rounded-1g">
+                        Change Profile Picture
+                        <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageChange}/>
+                    </label>
+                    {preview && (<img src={preview} alt="Preview" className="w-16 h-16 rounded-full object-cover border"/>)}
+                    <button
+                    type="submit"
+                    disabled={!file}>Upload</button>
+                    <p>File size limit: {MAX_KB} KB</p>
+                </form>
+            </div>
+            
             <br/>
             {/* Edit profile */}
             <div>
@@ -129,7 +160,7 @@ export default function Profile() {
                     <br/>
                     {/* Change profile description */}
                     <label>New Bio (max 200 characters): </label>
-                    <input type="text" name="profileDesc" minLength={0} maxLength={200} onChange={(e) => {setNewBio(e.target.value)}}/>
+                    <textarea className="bio" name="profileDesc" minLength={0} maxLength={200} rows={8} cols={32} onChange={(e) => {setNewBio(e.target.value)}}/>
                     <br/>
                     {/* Change Text Size */}
                     <label>Text Size: </label>
@@ -167,31 +198,29 @@ export default function Profile() {
                     <button type="submit"><u>&gt; Save Changes</u></button>
                 </form>
             </div>
-            <div>
+
+            <br/>
+            <div className="bottom-actions">
+                {/* Delete profile button */}
+                <button className="delete-btn" onClick={togglePopup}>Delete Profile</button>
+                {isOpen && (
+                    <div className="confirm-overlay" onClick={togglePopup}>
+                        <div 
+                        className="confirm-modal"
+                        onClick={(e) => e.stopPropagation()}>
+                            <h2 className="popup-text">Are you sure?</h2>
+                            <div className="confirm-actions">
+                                <button className="btn-cancel" onClick={togglePopup}>Close</button>
+                                <button className="btn-confirm" onClick={() => {profileFunctions.deleteUserAccount()}}>Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
                 <br/>
-                <form onSubmit={submitImage} className="flex items-left gap-4">
-                    <label className="cursor-pointer border p-2 rounded-1g">
-                        Change Profile Picture
-                        <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleImageChange}/>
-                    </label>
-                    {preview && (<img src={preview} alt="Preview" className="w-16 h-16 rounded-full object-cover border"/>)}
-                    <button
-                    type="submit"
-                    disabled={!file}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-1g disabled:opacity-50">Upload</button>
-                </form>
+                <br/>
+                {/* Log out */}
+                <button className="logout-btn" onClick={() => { profileFunctions.logout(); }}>Log Out</button>
             </div>
-            <br/>
-            {/* Delete profile button */}
-            <button onClick={() => { profileFunctions.deleteUserAccount(); }}><u>&gt; Delete Profile</u></button>
-            <br/>
-            <br/>
-            {/* Log out */}
-            <button onClick={() => { profileFunctions.logout(); }}><u>&gt; Log Out</u></button>
         </main>
     );
 }

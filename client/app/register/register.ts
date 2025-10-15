@@ -61,7 +61,7 @@ export async function registerWithGoogle() {
         // The signed-in user info.
         const user = result.user;
         console.log("Google user:", user);
-        // You can send the token to your server for further processing if needed
+        
         const res = await fetch("http://localhost:2400/api/users/register-google", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
