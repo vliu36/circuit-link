@@ -1,8 +1,8 @@
 // This is to initialize the Firebase app for frontend. 
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
+import { connectAuthEmulator, getAuth } from "firebase/auth";
+import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
+import { getStorage, connectStorageEmulator } from "firebase/storage";
 
 const firebaseConfig = {
     apiKey: "AIzaSyD3VCMA1MxjtLzXjkEFXr-XEPpkyftPSTo", // for circuit-link
@@ -18,5 +18,9 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 const storage = getStorage(app, "gs://circuit-link-images"); // This uses our custom bucket
+
+// connectAuthEmulator(auth, "http://localhost:9099/");
+// connectFirestoreEmulator(db, "localhost", 8080);
+// connectStorageEmulator(storage, "localhost", 9199);
 
 export { app, auth, db, storage };

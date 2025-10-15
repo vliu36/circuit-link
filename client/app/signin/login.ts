@@ -1,6 +1,6 @@
 // Script for user login page
 import React, { useState } from "react";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { signInWithEmailAndPassword, signInWithPopup, sendPasswordResetEmail } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
 import { auth } from "../firebase";
 
@@ -37,8 +37,7 @@ export async function loginWithGoogle() {
         const user = result.user;
         console.log("Google user:", user.email);
 
-        // alert("Google sign-in successful!"); // placeholder, replace with better UI feedback
-        window.location.href = "http://localhost:3000/dashboard"
+        window.location.href = "http://localhost:3000/dashboard" // TODO: Redirect to landing page
 
         return user;
     } catch (error: any) {
@@ -50,3 +49,16 @@ export async function loginWithGoogle() {
         console.error("Error during Google sign-in:", errorCode, errorMessage);
     } // end try catch
 }
+
+// Forgot password
+export async function forgotPassword(email: string) {
+    try {
+        await sendPasswordResetEmail(auth, email);
+        alert("Password reset link sent to " + email);  // TODO: Redirect to our own page and enforce password rules
+    } catch (error: any) {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.error(errorCode, errorMessage);
+
+    } // end try catch
+} // end function forgotPassword

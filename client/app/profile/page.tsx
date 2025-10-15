@@ -6,6 +6,7 @@ import { User, onAuthStateChanged } from "firebase/auth";
 import * as profileFunctions from "./profile";
 import { doc, getDoc } from "firebase/firestore";
 import { useAuth } from "../context";
+import { profile } from "console";
 
 export default function Profile() {
     const { user, userData, loading } = useAuth();
@@ -105,6 +106,9 @@ export default function Profile() {
             <p>Email: {user?.email}</p>
             <p>Bio: {userData?.profileDesc}</p>
             <p>Email Verified: {user?.emailVerified ? "Yes" : "No"}</p>
+            {/* Show verify email button when user isn't verified */}
+
+            {!user?.emailVerified && <span><button onClick={profileFunctions.verifyEmail}><u>&gt; Verify Email</u></button></span>}
             <p>Account Created: {user?.metadata.creationTime}</p>
             <p>Last Sign-in: {user?.metadata.lastSignInTime}</p>
             <br/>
@@ -180,8 +184,6 @@ export default function Profile() {
                     disabled={!file}
                     className="bg-blue-600 text-white px-4 py-2 rounded-1g disabled:opacity-50">Upload</button>
                 </form>
-
-                
             </div>
             <br/>
             {/* Delete profile button */}

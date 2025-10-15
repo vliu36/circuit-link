@@ -1,7 +1,7 @@
 "use client";
 import { auth, db, storage } from "../firebase";
 import React from "react";
-import { User, onAuthStateChanged, updateProfile } from "firebase/auth";
+import { User, onAuthStateChanged, updateProfile, sendEmailVerification } from "firebase/auth";
 import { doc, updateDoc, setDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
@@ -113,3 +113,19 @@ export const basicUsernameCheck = (username: string) => {
     }
     return ""; // No errors
 } // end function basicUsernameCheck
+
+// Verify email
+export async function verifyEmail() {
+    try {
+        const user = auth.currentUser;
+        if (!user) {
+            console.log("No user detected.");
+            return;
+        }
+        const emailVerification = await sendEmailVerification(user);
+        alert("Email verification sent. Check your inbox.")
+        console.log("Email verification sent. Check your inbox.");
+    } catch (error) {
+        console.error("Error verifying email:", error);
+    } // end try catch
+} // end function verifyEmail

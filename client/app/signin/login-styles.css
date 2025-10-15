@@ -1,0 +1,142 @@
+
+.login-container{
+  display: flex;
+  font-family: Courier;
+  color: white;
+  
+  width: 600px;
+  height: 500px;
+  background-color: #5B6680;  
+  margin: 0;
+  justify-content: center;
+  position: relative;
+  left: 400px;
+  top: 130px;
+  border-radius: 15%;
+  align-items: center;
+}
+
+.label-box{
+  height: 125px;
+  width: 100%;
+  position: relative;
+  left: 50px;
+  bottom: 150px;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.small-box{
+  height: 25px;
+  font-size: 20px;
+  position: relative;
+  right: 100px;
+  justify-content: left 
+
+}
+
+.text-box{
+   height: 40px;
+   width: 400px;
+   background-color: #699DD8;
+   border-color: white;
+   border-radius: 1em;
+   font-size: 16px;
+   position: relative;
+   overflow: hidden
+}
+
+.button-box{
+   height: 30px;
+   width: 100px;
+   border-radius: 1em;
+   background-color: #699DD8;
+   position:relative;
+   left: 50px;
+   top: 20px;
+}
+
+.forgot-password{
+   height: 40px;
+   width: 200px;
+   position:relative;
+   top: 30px;
+   left: 600px;
+   border-radius: 1em;
+   background-color: #699DD8;
+   font-family: 'Courier New', Courier, monospace;
+}
+
+.sign-with-google{
+   height: 30px;
+   width: 300px;
+   border-radius: 1em;
+   background-color: #f7f7f7;
+   color: black;
+   position:relative;
+   left: 350px;
+   top: 150px;
+}
+
+.transparent-button-box-2{
+   height: 30px;
+   width: 300px;
+   position:relative;
+   justify-content: center;
+   left: 50px;
+   top: 200px;
+}
+
+/* Overlay that darkens the background */
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* The actual popup box */
+.popup-box {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 1em;
+  width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.popup-box form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.open-btn, .close-btn {
+  background-color: #699DD8;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.close-btn {
+  background-color: #555;
+  margin-top: 10px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.popup-text{
+    color: darkgrey;
+}
