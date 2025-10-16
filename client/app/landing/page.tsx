@@ -2,6 +2,7 @@
 import React, {useEffect, useState} from "react";
 import Styles from './landingPage.module.css';
 import { words } from "./searchableData.js"; //Word is a seperate string array I made, its only temporary
+import { useAuth } from "../context.tsx";
 
 //I am stil struggling to make our database a string of arrays to replace word with
 //Send help
@@ -9,6 +10,7 @@ import { words } from "./searchableData.js"; //Word is a seperate string array I
 
 
 export default function Landing() {
+    const { user, userData, loading } = useAuth(); 
     
     const[userInfo, setUserInfo] = useState([]);
     const [input, setInput] = useState("");
@@ -62,7 +64,7 @@ export default function Landing() {
             Welcome to Circuit-Link,
         </h1>
         <h2 className = {Styles.usernameTextBox}>
-            User
+            {user?.displayName}
         </h2>
 
         <form className={Styles.Searchbar} onSubmit={e => e.preventDefault()}>
@@ -105,9 +107,9 @@ export default function Landing() {
         <img src = "/add.svg" className = {Styles.addIcon}></img>
         
         <div className = {Styles.dropdown}>
-            <button className = "dropdownButton"><img src = "/profileIcon.svg" className = {Styles.settingsIcon}></img></button>
+            <button className = "dropdownButton"><img src={user?.photoURL || "/profileIcon.svg"} className = {Styles.settingsIcon}></img></button>
             <div className = {Styles.dropdownMenu}>
-                <button>Profile</button>
+                <button onClick={() => window.location.href = "http://localhost:3000/profile"}>Profile</button>
                 <button>Settings</button>
                 <button>Log Out</button>
             </div>

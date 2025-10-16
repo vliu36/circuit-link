@@ -16,7 +16,7 @@ export async function login(email: string, password: string) {
     console.log("Logged in user:", auth.currentUser?.email);
     // router.push("/dashboard"); // Redirect to home page
     // return user;
-    window.location.href = "http://localhost:3000/dashboard"
+    window.location.href = "http://localhost:3000/landing"
     } catch (err: any) {
         if (err.code === "auth/invalid-email" || err.code === "auth/invalid-credential" || err.code === "auth/user-not-found") {
             alert("Invalid email or password.");
@@ -36,7 +36,7 @@ export async function loginWithGoogle() {
 
         if (docSnap.exists()) {
             console.log("Google user already exists in Firestore: ", result.user.email);
-            window.location.href = "http://localhost:3000/dashboard";   // TODO: Redirect to landing page
+            window.location.href = "http://localhost:3000/landing";   // TODO: Redirect to landing page
             return; // Account exists, no need to register
         } // end if
 
@@ -61,6 +61,7 @@ export async function loginWithGoogle() {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ uid: user.uid, email: user.email, username: defaultUsername }), // <--- include any extra data you want server-side
+            
         });
 
         const data = await res.json();
@@ -71,15 +72,13 @@ export async function loginWithGoogle() {
         } // end if
         
         // alert(data.message); // placeholder, replace with better UI feedback
-        window.location.href = "http://localhost:3000/dashboard"
-        window.location.href = "http://localhost:3000/dashboard" // TODO: Redirect to landing page
+        // window.location.href = "http://localhost:3000/dashboard"
+        window.location.href = "http://localhost:3000/landing" // TODO: Redirect to landing page
 
         return user;
     } catch (error: any) {
         const errorCode = error.code;
         const errorMessage = error.message;
-        // const email = error.customData.email;
-        // const credential = GoogleAuthProvider.credentialFromError(error);
         alert("Google sign-in failed: " + errorMessage);
         console.error("Error during Google sign-in:", errorCode, errorMessage);
     } // end try catch

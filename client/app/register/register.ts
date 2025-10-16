@@ -30,7 +30,7 @@ export async function register(email: string, password: string, username: string
 
     // Redirect to main app page after successful registration and login
     // window.location.href = "https://circuitlink-160321257010.us-west2.run.app" // TODO: uncomment when deployed
-    window.location.href = "http://localhost:3000/dashboard"
+    window.location.href = "http://localhost:3000/landing"
 
 } // end function register
 
@@ -47,7 +47,7 @@ export async function registerWithGoogle() {
         const docSnap = await getDoc(doc(db, "Users", result.user.uid));
         if (docSnap.exists()) {
             console.log("Google user already exists in Firestore: ", result.user.email);
-            window.location.href = "http://localhost:3000/dashboard";
+            window.location.href = "http://localhost:3000/landing";
             return; // Account exists, no need to register
         } // end if
 
@@ -76,7 +76,7 @@ export async function registerWithGoogle() {
         } // end if
         
         // alert(data.message); // placeholder, replace with better UI feedback
-        window.location.href = "http://localhost:3000/dashboard"
+        window.location.href = "http://localhost:3000/landing"
 
     } catch (error: any) {
         const errorCode = error.code;
