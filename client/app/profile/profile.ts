@@ -22,7 +22,7 @@ export async function deleteUserAccount() {
             });
             if (res.ok) {
                 console.log("User document deleted from Firestore.");
-                alert("User document deleted from Firestore.");
+                //alert("User document deleted from Firestore.");
             } else {
                 const data = await res.json();
                 console.error("Error deleting user document:", data.message);
