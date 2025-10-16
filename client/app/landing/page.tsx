@@ -1,25 +1,49 @@
 "use client";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import Styles from './landingPage.module.css';
-import { words } from "./searchableData.js";
+import { words } from "./searchableData.js"; //Word is a seperate string array I made, its only temporary
+
+//I am stil struggling to make our database a string of arrays to replace word with
+//Send help
+//This is the equivilant of being kidnnapped, stored in a basement, being tortured, and then they letting you when you are no use to them. ~Stephan A Smith
 
 
 export default function Landing() {
+    
+    const[userInfo, setUserInfo] = useState([]);
+    const [input, setInput] = useState("");
+    useEffect(()=>{
+        const getData = async() => {
+            const response = await fetch(`http://localhost:2400/api/comm/search/${input}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+            });
+            console.log('response from API: ', response);
+        }
+        getData();
+    },[input]);
+
     const goToPage = (path: string) => {
         window.location.href = path;
     };
 
     const [activeSearch, setActiveSearch] = useState<string[]>([]);
-
+    
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
+        setInput(value);
         if (value === '') {
             setActiveSearch([]);
             return false;
         }
         setActiveSearch(words.filter(w => w.toLowerCase().includes(value.toLowerCase())));
-    };
 
+    };
+    console.log(input);
+
+    
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter') {
             e.preventDefault();
