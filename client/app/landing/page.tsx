@@ -1,8 +1,33 @@
 "use client";
-import React from "react";
+import React, {useState} from "react";
 import Styles from './landingPage.module.css';
+import { words } from "./searchableData.js";
+
 
 export default function Landing() {
+    const goToPage = (path: string) => {
+        window.location.href = path;
+    };
+
+    const [activeSearch, setActiveSearch] = useState<string[]>([]);
+
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        if (value === '') {
+            setActiveSearch([]);
+            return false;
+        }
+        setActiveSearch(words.filter(w => w.toLowerCase().includes(value.toLowerCase())));
+    };
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            const input = e.currentTarget.value.trim();
+            goToPage("/"+input);
+        }
+    };
+
     return (
         <div style={{ backgroundColor: "rgb(7, 17,45)", minHeight: "100vh" }}>
         <div className = {Styles.Verticalline}></div>
@@ -16,9 +41,17 @@ export default function Landing() {
             User
         </h2>
 
-        <div className={Styles.Searchbar}>
-            <input type="text" placeholder="Search..." />
-        </div>
+        <form className={Styles.Searchbar} onSubmit={e => e.preventDefault()}>
+        <input type="text" placeholder="Search..." onKeyDown={handleKeyDown} onChange={(e) => handleSearch(e)}/>
+            {activeSearch.length > 0 && (<div className={Styles.searchOptions}>{
+                activeSearch.map((s, i) => (
+                    <a key={i} href={`/${encodeURIComponent(s)}`}>
+                        {s}
+                    </a>
+                ))}
+            </div>
+        )}
+        </form>
 
         <div className={Styles.Buttoncontainer}>
             <button className={Styles.ButtonStyle}>
