@@ -1,2 +1,2 @@
 # circuit-link
-A live chat messaging service by Blue Circuit Incorporated.
+A live forum service by Blue Circuit Incorporated.
