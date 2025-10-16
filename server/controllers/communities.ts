@@ -95,12 +95,12 @@ const getDocByName = async (req: Request, res: Response) => {
 const prefixSearch = async (req: Request, res: Response) => {
     try {
         const query = req.params.query.toLowerCase();
-        if (!query) {
-            res.status(400).send({
-                status: "Bad Request",
-                message: "Empty query!"
-            })
-        }
+        //if (!query) {
+            ////res.status(400).send({
+                //status: "Bad Request",
+                //message: "Empty query!"
+            //})
+        //}
         
         const communitiesRef = db.collection("Communities").where("nameLower", ">=", query).where("nameLower", "<=", query + "\uf8ff");
         const snapshot = await communitiesRef.get();
