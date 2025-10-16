@@ -7,7 +7,9 @@ import postsRouter from "./routes/posts.ts";
 import usersRouter from "./routes/users.ts";
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:3000"
+}));
 app.use(express.json());
 
 // Routes
