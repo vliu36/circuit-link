@@ -1,76 +1,96 @@
 "use client";
-import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { initializeApp } from "firebase/app";
+import {login, loginWithGoogle, forgotPassword} from "./login";
+import React, { useState } from "react";
+import "./login-styles.css";
 
-// TODO: Move this to a separate file. ---------------------------------------------------------------------------------------[!]
-const app = initializeApp({ apiKey: "AIzaSyD3VCMA1MxjtLzXjkEFXr-XEPpkyftPSTo" });
-
-
-// Creates a user in Firebase Authentication
-export default function SignUp() {
-    
-    // Initialize state for the form fields (name, email, password)
-    const [username, setName] = useState(""); 
-    const [email, setEmail] = useState(""); 
+export default function Login() {
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [showPass, setShowPass] = useState(false);
+    const [error, setError] = useState("");
+    const [isOpen, setIsOpen] = useState(false);
 
-// ----- User Login Start ------ //
-    async function login(e: React.FormEvent<HTMLFormElement>) {
-        // Prevent the default form submission behavior
+    const togglePopup = () => {
+        setIsOpen(!isOpen);
+    }
+
+    // handleSubmit function for login
+    async function handleSubmitLog(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        const cleanMail = email.trim();
+        const cleanPass = password.trim();
+        
+        await login(cleanMail, cleanPass);
+    } // end handleSubmitLog
+    
+    // handleSubmit for forgot password
+    async function handleSubmitForgotPassword(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        const cleanMail = email.trim();
+        await forgotPassword(cleanMail);
+    }
 
-        try {
-            
-            const auth = getAuth(app);
-
-            const userCredentials = await signInWithEmailAndPassword(auth, email, password);
-            const user = userCredentials.user;
-            console.log("Signed in as:", user.email);
-            alert(`Welcome, ${user.email}`);
-            
-            window.location.href = "https://circuitlink-160321257010.us-west2.run.app"
-            // TODO: Redirect to another page ------------------------------------------------------------------------------------------------[!]
-        } catch (err) {
-            // setMessage("Login failed.");
-            alert("Login failed: " + err);
-            console.log(err);
-        } // end try catch 
-    } // end function login
-    // ------ User Login End ------ // 
-
-    // ------ HTML ------ //
+    // ---- HTML ---- //
     return (
     <main>
-        <div className = "box">
-            <h1 className = "lblBox">Login</h1>
-            <form onSubmit={login}>
-                <label className = "smallBox">
+        <div className = "login-container">
+            <h1 className = "label-box">Login</h1>
+            <form onSubmit={handleSubmitLog}>
+                <label className = "small-box">
                     Email:
                     <input 
-                    className = "txtBox"
+                    className = "text-box"
                     type="email" 
                     name="email"
                     required
                     onChange={(e) => setEmail(e.target.value)}/>
                 </label>
                 <br />
-                <label className = "smallBox">
+                <label className = "small-box">
                     Password:
                     <input 
-                    className = "txtBox"
-                    type="password"
+                    id = "password"
+                    className = "text-box"
+                    type={showPass ? "text" : "password"}
                     name="password"
                     required
                     onChange={(e) => setPassword(e.target.value)}/>
                 </label>
+                <label className = "show-password"> {/* Checkbox to show/hide password */}
+                    <input 
+                    type="checkbox" 
+                    checked={showPass}
+                    onChange={() => setShowPass(!showPass)}/>
+                    Show Password
+                </label>
                 <br />
-                <button type="submit" className = "buttonBox">[Login]</button>
+                <button type="submit" className = "button-box">[Login]</button>
+                <br />
+                <br />
+                {/* This displays an error message in the text if it occurs. */}
+                {error && <p className ="errorMessage">{error}</p>}
             </form>
         </div>
-        <button className = "signUpWithGoogleButton">Sign in with Google</button>
-        <a className="transparentButtonBox2" href="../register">Don't have an account, sign up for FREE!</a>
+        <button className="forgot-password" onClick={togglePopup}>Forgot password?</button>
+
+        {isOpen && (
+        <div className="popup-overlay" onClick={togglePopup}>
+            <div 
+            className="popup-box"
+            onClick={(e) => e.stopPropagation()}>
+                <h2 className="popup-text">Reset Password</h2>
+                <form onSubmit={handleSubmitForgotPassword}>
+                    <input type="email" className="popup-text" placeholder="Enter your email" onChange={(e) => setEmail(e.target.value)} required/>
+                    <button type="submit" className="popup-text">Send Reset Link</button>
+                    <br />
+                </form>
+                <button className="close-button popup-text" onClick={togglePopup}>Close</button>
+            </div>
+        </div>
+        )}
+        <button className = "sign-with-google" onClick={loginWithGoogle}>Sign in with Google</button>
+        <a className="transparent-button-box-2" href="../register">Don't have an account, sign up for FREE!</a>
     </main>
     );
 }
