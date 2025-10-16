@@ -3,6 +3,7 @@ import React, {useEffect, useState} from "react";
 import Styles from './landingPage.module.css';
 import { words } from "./searchableData.js"; //Word is a seperate string array I made, its only temporary
 import { useAuth } from "../context.tsx";
+import { logout } from "./landing.ts";
 
 //I am stil struggling to make our database a string of arrays to replace word with
 //Send help
@@ -111,7 +112,7 @@ export default function Landing() {
             <div className = {Styles.dropdownMenu}>
                 <button onClick={() => window.location.href = "http://localhost:3000/profile"}>Profile</button>
                 <button>Settings</button>
-                <button>Log Out</button>
+                <button onClick={logout}>Log Out</button>
             </div>
         </div>
     </div>
