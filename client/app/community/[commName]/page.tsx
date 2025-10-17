@@ -12,7 +12,7 @@ export default function CommunityPage({
  
   return (
     <div>
-      <title>Welcome to the {commName} page!</title>
+      <h1 className={Styles.header}>Welcome to the {commName} community!</h1>
       <p>This page is a work in progress, please come back later!</p>
     </div>
   )

@@ -1,7 +1,7 @@
 "use client"
 
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
-import type { SVGProps } from "react";
+import { useState, type SVGProps } from "react";
 import Styles from "./searchbar.module.css";
 import SearchResult from "./searchResult";
 
@@ -16,7 +16,7 @@ export default function SearchBar() {
     const searchParams = useSearchParams();
     const pathname = usePathname();
     const { replace } = useRouter();
-    let searchList: string[] = [];
+    const [searchList, setSearchList] = useState<string[]>([]);
 
     const handleSearch = async (searchString: string) => {
         const params = new URLSearchParams(searchParams);
@@ -39,9 +39,11 @@ export default function SearchBar() {
                 });
                 const data = res.json().then((result) => {
                     const tempArr = result.message;
+                    let tempRes = [];
                     for (var i = 0; i < tempArr.length; i++) {
-                        searchList.push(tempArr[i].name);
+                        tempRes.push(tempArr[i].name);
                     }
+                    setSearchList(tempRes);
                 });
             }
         }

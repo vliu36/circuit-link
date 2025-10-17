@@ -6,3 +6,13 @@
     left: 400px;
     display: flex;
 }
+
+.searchResult {
+    display: flex;
+    font-size: 20px;
+    top: 100px;
+    right: 700px;
+    text-align: left;
+    position: relative;
+    margin-bottom: 10%;
+}

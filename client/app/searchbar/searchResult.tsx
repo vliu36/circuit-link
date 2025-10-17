@@ -3,10 +3,10 @@ import Styles from "./searchbar.module.css";
 
 export default function SearchResult({items}: any) {
     return (
-        <ul>
+        <ul> 
             {items?.map((item: any) => (
-                <li key={item.id}>
-                    <Link href={`/community/${item.id}`}>{item}</Link>
+                <li className={Styles.searchResult}>
+                    <Link href={`/community/${item}`}>{item}</Link>
                 </li>
             ))}
         </ul>
