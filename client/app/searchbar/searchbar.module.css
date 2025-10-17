@@ -1,0 +1,8 @@
+.searchbar {
+    text-align: center;
+    margin-top: 100px;
+    position: relative;
+    top: 100px; 
+    left: 400px;
+    display: flex;
+}

@@ -31,10 +31,10 @@ router.get("/search/:query", comm.prefixSearch);
 router.post("/", comm.addDoc);
 
 /** Retrieves documents in Communities that match the exact name
- *  @route GET /api/comm/:name
+ *  @route GET /api/comm/get/:name
  *  @param name - String to search for
  *  @returns JSON Object of the matching document, or an error
  */
-router.get("/:name", comm.getDocByName);
+router.get("/get/:name", comm.getDocByName);
 
 export default router;
