@@ -1,3 +1,10 @@
+.background{
+    background-color: rgb(7, 17, 45);
+    height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+}
+
 .Verticalline {
     position: absolute;
     top: 0;
@@ -30,22 +37,21 @@
 
 
 .Horizontalline {
-    position: relative;
-    bottom: 230px;
-    margin-top: 20px;
-    margin-left: -10px;
-    width: 16.5%;
+    position: absolute;
+    width: 16%;
     height: 8px;
+    left: -10px;
+    top: -10px;
     background-color: lightblue;
     z-index: 10;
 }
 
 .HorizontallineOne {
-    position: relative;
-    bottom: 400px;
-    margin-left: -10px;
-    width: 16.5%;
+    position: absolute;
+    top: 170px;
+    width: 16%;
     height: 8px;
+    left: -10px;
     background-color: lightblue;
     z-index: 10;
 }
@@ -62,24 +68,9 @@
     text-align: center;
     margin-top: 100px;
     position: relative;
-    top: 350px; 
-}
-            
-.Searchbar input {
-    background-color: rgb(129, 129, 129);
-    color: rgb(41, 41, 41);
-    border: 3px solid rgb(129, 129, 129);
-    border-radius: 4px;
-    font-size: 20px;
-    width: 40%;
-    height: 50px;
-    border-radius: 1em;
-    position: relative;
-    bottom: 200px;
-}
-
-.Searchbar input::placeholder {
-    color: rgb(41, 41, 41);
+    left: 23vw;
+    top: 150px;
+    width: 75%;
 }
 
 .Buttoncontainer {
@@ -87,7 +78,6 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
-    margin-top: 0px;
     margin-left: 15px;
     position: relative;
     bottom: 210px;
@@ -95,8 +85,6 @@
 
 .Button {
     position: relative;
-    width: 200px;
-    height: 30px;
     border: 4px;
     color: gray;
     text-align: center;
@@ -110,7 +98,7 @@
     color: rgb(24, 72, 134);
     border: 2px solid;
     width: 14.5%;
-    height: 50px;
+    height: 5vh;
     border-radius: 1em;
 }
 
@@ -137,11 +125,9 @@
 }
 
 .logoBox{
-    position: relative;
+    position: absolute;
     width: 15%;
-    height: 80px;
-    bottom: 510px;
-    left: 10px;
+    top: -5vw;
 }
 
 .homelogoBox{
@@ -161,11 +147,9 @@
 
 .addIcon{
     position: relative;
-    bottom: 300px;
-    right: 30px;
+    top: 1vw;
     font-size: 20px;
     text-align: left;
-    margin-left: 50px;
     border-radius: 1em;
     width: 5%;
 }
@@ -176,20 +160,27 @@
 }
 
 .dropdown {
-    position: absolute;
-    right: 2rem;
-    top: 2rem;
+    position: relative;
+    left: 90vw;
+    top: -30vw;
+    width: 30%;
+}
+
+.dropdownIcon{
+    width: 30%;
+    
 }
 
 .dropdownMenu {
     position: absolute;
-    left: 10px;
+    left: 0.5vi;
     opacity: 0;
     pointer-events: none;
     display: flex;
     flex-direction: column;
     align-items: center;
     color: white;
+
 }
 
 .dropdown:focus-within .dropdownMenu{

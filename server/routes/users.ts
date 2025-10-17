@@ -12,7 +12,16 @@ router.get("/all", users.getAllDocuments);
  *  @route POST /api/users/register
  */
 router.post("/register", users.userRegistration)
-//router.post("/login", users.userLogin)
+
+/** Sets up a new user who signed in with Google by creating a new document in Users
+ *  @route POST /api/users/register-google
+ */
+router.post("/register-google", users.setupGoogleUser)
+
+/** Deletes a user document from Users
+ *  @route DELETE /api/users/delete/:uid
+ */
+router.delete("/delete/:uid", users.deleteUserDocument)
 
 export default router;
 

@@ -1,0 +1,27 @@
+.searchbar{
+    position: relative;
+    width: 150%;
+    height: 50px;
+}
+.searchbar input {
+    background-color: rgb(78, 78, 78);
+    color: rgb(255, 255, 255);
+    border: 3px solid rgb(255, 255, 255);
+    border-radius: 4px;
+    font-size: 20px;
+    border-radius: 1em; 
+}
+.searchbar input::placeholder {
+    color: rgb(255, 255, 255);
+}
+
+.searchResult {
+    background-color: rgb(129, 129, 129);
+    color: rgb(0, 0, 0);
+    border: 3px solid rgb(129, 129, 129);
+    border-radius: 4px;
+    font-size: 20px;
+    width: 40%;
+    height: 100px;
+    border-radius: 1em;
+}
