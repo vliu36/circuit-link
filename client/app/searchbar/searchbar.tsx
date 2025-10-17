@@ -45,7 +45,8 @@ export default function SearchBar() {
                     }
                     setSearchList(tempRes);
                 });
-            } else {
+            } 
+            else {
                 setSearchList([]);
             }
         }
