@@ -23,7 +23,7 @@ export default function Dashboard() {
         <p>User: {userData?.username}</p>
         <p>This place is just a placeholder.</p>
         {/* Redirect user to profile page */}
-        <button onClick={() => window.location.href = "http://localhost:3000/profile"}><u>&gt; Go to Profile</u></button>
+        <button onClick={() => window.location.href = "https://circuitlink-160321257010.us-west2.run.app/profile"}><u>&gt; Go to Profile</u></button>
         </main>
     );
 }

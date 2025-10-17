@@ -8,7 +8,7 @@ import usersRouter from "./routes/users.ts";
 
 const app = express();
 app.use(cors({
-    origin: "http://localhost:3000"
+    origin: "https://circuitlink-160321257010.us-west2.run.app"
 }));
 app.use(express.json());
 
