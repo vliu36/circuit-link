@@ -1,18 +1,27 @@
-.searchbar {
-    text-align: center;
-    margin-top: 100px;
+.searchbar{
     position: relative;
-    top: 100px; 
-    left: 400px;
-    display: flex;
+    width: 150%;
+    height: 50px;
+}
+.searchbar input {
+    background-color: rgb(78, 78, 78);
+    color: rgb(255, 255, 255);
+    border: 3px solid rgb(255, 255, 255);
+    border-radius: 4px;
+    font-size: 20px;
+    border-radius: 1em; 
+}
+.searchbar input::placeholder {
+    color: rgb(255, 255, 255);
 }
 
 .searchResult {
-    display: flex;
+    background-color: rgb(129, 129, 129);
+    color: rgb(0, 0, 0);
+    border: 3px solid rgb(129, 129, 129);
+    border-radius: 4px;
     font-size: 20px;
-    top: 100px;
-    right: 700px;
-    text-align: left;
-    position: relative;
-    margin-bottom: 10%;
+    width: 40%;
+    height: 100px;
+    border-radius: 1em;
 }

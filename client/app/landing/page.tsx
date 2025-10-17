@@ -10,7 +10,7 @@ export default function Landing() {
     const { user, userData, loading } = useAuth(); 
 
     return (
-        <div style={{ backgroundColor: "rgb(7, 17,45)", minHeight: "100vh" }}>
+        <div className={Styles.background}>
         <div className = {Styles.Verticalline}></div>
         <div className = {Styles.VerticallineOne}></div>
         <div className = {Styles.VerticallineTwo}></div>
@@ -20,18 +20,24 @@ export default function Landing() {
                 Welcome to Circuit-Link,
             </h1>
             <h2 className = {Styles.usernameTextBox}>
-                {user?.displayName}
+                hi{user?.displayName}
             </h2>
-            <h3>
-                <SearchBar />
+            <h3 className = {Styles.Searchbar}>
+                <SearchBar/>
             </h3>
             <h4> 
                 <SearchResults />
             </h4>
         </div>
 
+        
 
         <div className={Styles.Buttoncontainer}>
+            <div className = {Styles.logoBox}>
+                <img src="/circuitlinklogowback.svg"></img>
+            </div>
+            <div className={Styles.HorizontallineOne}></div>
+            <div className={Styles.Horizontalline}></div>
             <button className={Styles.ButtonStyle}>
                 <img src="/home.svg" className={Styles.homelogoBox}></img>
                 <div className = {Styles.buttonTextAlignment}>Home</div>   
@@ -46,20 +52,18 @@ export default function Landing() {
                 <img src="/notification.svg" className={Styles.homelogoBox}></img>
                 <div className = {Styles.buttonTextAlignment}>Notifications</div>
             </button>
+            <img src = "/add.svg" className = {Styles.addIcon}></img>
         </div>
 
         <div className={Styles.Left}></div>
         <div className={Styles.Right}></div>
-        <div className={Styles.HorizontallineOne}></div>
-        <div className={Styles.Horizontalline}></div>
-        <div className = {Styles.logoBox}>
-            <img src="/circuitlinklogowback.svg"></img>
-        </div>
         
-        <img src = "/add.svg" className = {Styles.addIcon}></img>
+        
+        
+        
         
         <div className = {Styles.dropdown}>
-            <button className = "dropdownButton"><img src={user?.photoURL || "/profileIcon.svg"} className = {Styles.settingsIcon}></img></button>
+            <button className = {Styles.dropdownIcon}><img src={user?.photoURL || "/profileIcon.svg"} className = {Styles.settingsIcon}></img></button>
             <div className = {Styles.dropdownMenu}>
                 <button onClick={() => window.location.href = "https://circuitlink-160321257010.us-west2.run.app/profile"}>Profile</button>
                 <button>Settings</button>
