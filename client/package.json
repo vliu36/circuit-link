@@ -5,9 +5,9 @@
   "main": "./app/page.tsx",
   "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "cross-env CLIENT_URI=http://localhost:3000 SERVER_URI=http://localhost:2400 next dev",
+    "build": "cross-env CLIENT_URI=http://localhost:3000 SERVER_URI=http://localhost:2400 next build",
+    "start": "cross-env CLIENT_URI=http://localhost:3000 SERVER_URI=http://localhost:2400 next start",
     "lint": "eslint"
   },
   "dependencies": {
@@ -24,6 +24,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
     "tailwindcss": "^4",

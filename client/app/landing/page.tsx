@@ -65,7 +65,7 @@ export default function Landing() {
         <div className = {Styles.dropdown}>
             <button className = {Styles.dropdownIcon}><img src={user?.photoURL || "/profileIcon.svg"} className = {Styles.settingsIcon}></img></button>
             <div className = {Styles.dropdownMenu}>
-                <button onClick={() => window.location.href = "http://localhost:3000/profile"}>Profile</button>
+                <button onClick={() => window.location.href = `${process.env.CLIENT_URI}/profile`}>Profile</button>
                 <button>Settings</button>
                 <button onClick={logout}>Log Out</button>
             </div>

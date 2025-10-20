@@ -8,7 +8,7 @@ export default function Database_Check() {
     const handleClick = async () => {
         try {
             // const response = await fetch("https://circuitlink-160321257010.us-west2.run.app/api/users/all"), {
-            const response = await fetch("http://localhost:2400/api/users/all", {     
+            const response = await fetch(`${process.env.SERVER_URI}/api/users/all`, {     
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
@@ -17,7 +17,7 @@ export default function Database_Check() {
 
             if (response.ok) {
                 // window.location.href = "https://circuitlink-160321257010.us-west2.run.app/api/users/all";
-                window.location.href = "http://localhost:2400/api/users/all";
+                window.location.href = `${process.env.SERVER_URI}/api/users/all`;
             }
             else {
                 console.error("Request failed due to skill issue:", response.status);

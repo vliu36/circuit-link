@@ -10,7 +10,7 @@ const port = process.env.PORT || 2400;
 console.log("Attempting to start the server... ");
 
 app.listen(port, () => {
-        console.log(`Server is running on http://localhost:${port}`);
+        console.log(`Server is running on ${process.env.SERVER_URI}`);
     });
 
 if (db.databaseId) {
