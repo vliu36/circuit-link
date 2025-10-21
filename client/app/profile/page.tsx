@@ -102,7 +102,7 @@ export default function Profile() {
             <div className="profile-card">
                 <h1>Profile</h1>
                 <p>Welcome to your profile page!</p>
-                <button className="go-back-btn" onClick={() => window.location.href = `${process.env.CLIENT_URI}/landing`}>Go back</button>
+                <button className="go-back-btn" onClick={() => window.location.href = "http://localhost:3000/landing"}>Go back</button>
                 <br/>
                 <br/>
                 <div className="profile-header">

@@ -31,7 +31,7 @@ export default function SearchBar() {
 
             if (params.get("query")) {
                 const arg = params.get("query")?.toString();
-                const res = await fetch(`${process.env.SERVER_URI}/api/comm/search/${arg}`, {     
+                const res = await fetch(`http://localhost:2400/api/comm/search/${arg}`, {     
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",

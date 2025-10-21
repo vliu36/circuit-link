@@ -6,7 +6,7 @@ export async function logout() {
         await auth.signOut();
         console.log("User signed out.");
         // Redirect to sign-in page after logout
-        window.location.href = `${process.env.CLIENT_URI}/signin`
+        window.location.href = "http://localhost:3000/signin"
     } catch (err) {
         console.error("Error signing out:", err);
     } // end try catch
