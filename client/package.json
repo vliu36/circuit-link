@@ -5,12 +5,13 @@
   "main": "./app/page.tsx",
   "type": "module",
   "scripts": {
-    "dev": "cross-env CLIENT_URI=http://localhost:3000 SERVER_URI=http://localhost:2400 next dev",
-    "build": "cross-env CLIENT_URI=http://localhost:3000 SERVER_URI=http://localhost:2400 next build",
-    "start": "cross-env CLIENT_URI=http://localhost:3000 SERVER_URI=http://localhost:2400 next start",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "dotenv": "^17.2.3",
     "firebase": "^12.4.0",
     "next": "15.5.4",
     "react": "19.1.0",

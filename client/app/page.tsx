@@ -1,6 +1,9 @@
 'use client';
 
 import { useRouter } from "next/navigation";
+import env from "dotenv";
+
+env.config({path: "../"});
 
 export default function Database_Check() {
     const router = useRouter();

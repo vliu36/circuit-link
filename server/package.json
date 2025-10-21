@@ -5,7 +5,7 @@
   "main": "index.ts",
   "type": "module",
   "scripts": {
-    "start": "cross-env CLIENT_URI=http://localhost:3000 SERVER_URI=http://localhost:2400 npx tsx index.ts"
+    "start": "npx tsx index.ts"
   },
   "dependencies": {
     "@google-cloud/storage": "^7.16.0",

@@ -20,7 +20,7 @@ export default function Landing() {
                 Welcome to Circuit-Link,
             </h1>
             <h2 className = {Styles.usernameTextBox}>
-                {user?.displayName}
+                hi{user?.displayName}
             </h2>
             <h3 className = {Styles.Searchbar}>
                 <SearchBar/>
