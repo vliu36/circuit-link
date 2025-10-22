@@ -73,7 +73,7 @@ export default function PostsPage() {
             const formattedPosts = (refreshedData.message || []).map((post: any) => ({
                 ...post,
                 timePosted: post.timePosted
-                    ? new Date(post.timePosted.seconds * 1000).toLocaleString()
+                    ? new Date(post.timePosted).toLocaleString()
                     : "Unknown",
             }));
             setPosts(formattedPosts);
