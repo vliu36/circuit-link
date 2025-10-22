@@ -2,25 +2,60 @@ import { db } from "../firebase.ts"
 import { Request, Response } from "express"
 import { Timestamp } from "firebase-admin/firestore";
 
-// Retrieves all documents in Posts
+// // Retrieves all documents in Posts
+// const getAllDocuments = async (req: Request, res: Response) => {
+//     try {
+//         const postsRef = db.collection("Posts");
+//         const snapshot = await postsRef.get();
+        
+//         res.status(200).send({
+//             status: "OK",
+//             message: snapshot.docs.map(doc => doc.data())
+//         })
+//     }
+//     catch (err) {
+//         console.log(err);
+//         res.status(500).send({
+//             status: "backend error",
+//             message: err
+//         })
+//     }    
+// }
+
+// Retrieves all documents in Posts (modified to get post authors from Users)
 const getAllDocuments = async (req: Request, res: Response) => {
     try {
-        const postsRef = db.collection("Posts");
-        const snapshot = await postsRef.get();
-        
-        res.status(200).send({
-            status: "OK",
-            message: snapshot.docs.map(doc => doc.data())
-        })
-    }
-    catch (err) {
-        console.log(err);
+        const snapshot = await db.collection("Posts").orderBy("timePosted", "desc").get();
+
+        const posts = await Promise.all(
+            snapshot.docs.map(async (doc) => {
+                const data = doc.data();
+
+                // Check if author exists and is a DocumentReference
+                let username = "Unknown";
+                if (data.author?.get) {
+                    const userDoc = await data.author.get(); // dereference the DocumentReference
+                    username = userDoc.exists ? userDoc.data()?.username || "Unknown" : "Unknown";
+                }
+
+                return {
+                    id: doc.id,
+                    ...data,
+                    authorUsername: username,
+                    timePosted: data.timePosted?.toMillis() || null,
+                };
+            })
+        );
+
+        res.status(200).send({ message: posts });
+    } catch (err) {
+        console.error(err);
         res.status(500).send({
             status: "backend error",
-            message: err
-        })
-    }    
-}
+            message: err,
+        });
+    }
+};
 
 // Creates and adds a document in Posts
 const addDoc = async (req: Request, res: Response) => {
