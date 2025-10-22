@@ -1,8 +1,10 @@
 "use client";
 import React, { useState } from "react";
-import {register, registerWithGoogle} from "./register";
+import {register, loginWithGoogle} from "./register";
+// import { useRouter } from "next/router";
 
 export default function Registration() {
+    // const router = useRouter();
 
     const [username, setName] = useState(""); 
     const [email, setEmail] = useState(""); 
@@ -19,10 +21,19 @@ export default function Registration() {
 
     // handleSubmit function for registration
     async function handleSubmitReg(e: React.FormEvent<HTMLFormElement>) {
-        const cleanMail = email.trim();
-        const cleanPass = password.trim();
         e.preventDefault();
-        await register(email, password, username);
+        const user = await register(email, password, username);
+        if (user) {
+            window.location.href="http://localhost:3000/landing"
+        }
+    }
+
+    async function handleSubmitGoogle() {
+        await loginWithGoogle();
+        const user = await register(email, password, username);
+        if (user) {
+            window.location.href="http://localhost:3000/landing"
+        }
     }
 
     return (
@@ -83,7 +94,7 @@ export default function Registration() {
         </div>
         <button
         className = "signUpWithGoogleButton"
-        onClick={registerWithGoogle}>Sign up with Google</button>
+        onClick={loginWithGoogle}>Sign up with Google</button>
         <a className="transparentButtonBox" href="../signin">Already have an account? Sign In</a>
         <br />
     </main>

@@ -10,19 +10,26 @@ export default function Login() {
     const [showPass, setShowPass] = useState(false);
     const [error, setError] = useState("");
     const [isOpen, setIsOpen] = useState(false);
+    // const router = useRouter();
 
     const togglePopup = () => {
         setIsOpen(!isOpen);
     }
 
     // handleSubmit function for login
-    async function handleSubmitLog(e: React.FormEvent<HTMLFormElement>) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
-        const cleanMail = email.trim();
-        const cleanPass = password.trim();
-        
-        await login(cleanMail, cleanPass);
+        const res = await login(email.trim(), password.trim());
+        if (res.ok) window.location.href = "http://localhost:3000/landing";
     } // end handleSubmitLog
+
+    // handleSubmit function for Google login
+    async function handleGoogle() {
+        const login = await loginWithGoogle();
+        if (login) {
+            window.location.href="http://localhost:3000/landing";
+        }
+    }
     
     // handleSubmit for forgot password
     async function handleSubmitForgotPassword(e: React.FormEvent<HTMLFormElement>) {
@@ -36,7 +43,7 @@ export default function Login() {
     <main>
         <div className = "login-container">
             <h1 className = "label-box">Login</h1>
-            <form onSubmit={handleSubmitLog}>
+            <form onSubmit={handleSubmit}>
                 <label className = "small-box">
                     Email:
                     <input 
@@ -89,7 +96,7 @@ export default function Login() {
             </div>
         </div>
         )}
-        <button className = "sign-with-google" onClick={loginWithGoogle}>Sign in with Google</button>
+        <button className = "sign-with-google" onClick={handleGoogle}>Sign in with Google</button>
         <a className="transparent-button-box-2" href="../register">Don't have an account, sign up for FREE!</a>
     </main>
     );

@@ -1,5 +1,5 @@
 /** This makes the logged in user available app-wide via React Context so we don't have to keep calling onAuthStateChanged in every component
- *  
+ * 
  */
 "use client";
 import React, { createContext, use, useContext, useEffect, useState, ReactNode } from "react";

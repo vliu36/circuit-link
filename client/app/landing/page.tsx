@@ -1,16 +1,28 @@
-"use client";
-import React, {useEffect, useState} from "react";
+
 import Styles from './landingPage.module.css';
-import { useAuth } from "../context.tsx";
 import { logout } from "./landing.ts";
 import SearchBar from "../searchbar/searchbar.tsx";
 import SearchResults from "../searchbar/searchResult.tsx";
+import { cookies } from "next/headers";
 
-export default function Landing() {
-    const { user, userData, loading } = useAuth(); 
+export default async function Landing() {
+    const cookieStore = await cookies();
+
+    const res = await fetch("http://localhost:2400/api/users/me", {
+        method: "GET",
+        headers: {
+        // Pass the cookie manually for SSR
+        Cookie: cookieStore.toString(),
+        },
+        cache: "no-store", // prevents caching SSR results per user
+    });
+    if (!res.ok) {
+        return <p>Not logged in</p>;
+    }
+    const { user } = await res.json();
 
     return (
-        <div className={Styles.background}>
+        <div style={{ backgroundColor: "rgb(7, 17,45)", minHeight: "100vh" }}>
         <div className = {Styles.Verticalline}></div>
         <div className = {Styles.VerticallineOne}></div>
         <div className = {Styles.VerticallineTwo}></div>
@@ -20,24 +32,19 @@ export default function Landing() {
                 Welcome to Circuit-Link,
             </h1>
             <h2 className = {Styles.usernameTextBox}>
-                {user?.displayName}
+                {user?.username}
+
             </h2>
-            <h3 className = {Styles.Searchbar}>
-                <SearchBar/>
+            <h3>
+                <SearchBar />
             </h3>
             <h4> 
                 <SearchResults />
             </h4>
         </div>
 
-        
 
         <div className={Styles.Buttoncontainer}>
-            <div className = {Styles.logoBox}>
-                <img src="/circuitlinklogowback.svg"></img>
-            </div>
-            <div className={Styles.HorizontallineOne}></div>
-            <div className={Styles.Horizontalline}></div>
             <button className={Styles.ButtonStyle}>
                 <img src="/home.svg" className={Styles.homelogoBox}></img>
                 <div className = {Styles.buttonTextAlignment}>Home</div>   
@@ -52,22 +59,26 @@ export default function Landing() {
                 <img src="/notification.svg" className={Styles.homelogoBox}></img>
                 <div className = {Styles.buttonTextAlignment}>Notifications</div>
             </button>
-            <img src = "/add.svg" className = {Styles.addIcon}></img>
         </div>
 
         <div className={Styles.Left}></div>
         <div className={Styles.Right}></div>
+        <div className={Styles.HorizontallineOne}></div>
+        <div className={Styles.Horizontalline}></div>
+        <div className = {Styles.logoBox}>
+            <img src="/circuitlinklogowback.svg"></img>
+        </div>
         
-        
-        
-        
+        <img src = "/add.svg" className = {Styles.addIcon}></img>
         
         <div className = {Styles.dropdown}>
-            <button className = {Styles.dropdownIcon}><img src={user?.photoURL || "/profileIcon.svg"} className = {Styles.settingsIcon}></img></button>
+            <button className = "dropdownButton"><img src={user.picture || "/profileIcon.svg"} className = {Styles.settingsIcon}></img></button>
             <div className = {Styles.dropdownMenu}>
-                <button onClick={() => window.location.href = `${process.env.CLIENT_URI}/profile`}>Profile</button>
+                {/* <button onClick={() => window.location.href = "http://localhost:3000/profile"}>Profile</button> */}
+                <button>Profile</button>
                 <button>Settings</button>
-                <button onClick={logout}>Log Out</button>
+                {/* <button onClick={logout}>Log Out</button> */}
+                <button>Log Out</button>
             </div>
         </div>
     </div>
