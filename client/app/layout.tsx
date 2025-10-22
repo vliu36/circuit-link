@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { initAuthListener } from "./auth-observer";
+import { AuthProvider } from "./context";
+
+// Initialize the auth listener to monitor auth state changes
+initAuthListener();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,9 +31,12 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+        >
+        <AuthProvider>
+            {children}
+        </AuthProvider>
       </body>
     </html>
   );
 }
+
