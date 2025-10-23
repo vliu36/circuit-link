@@ -13,16 +13,20 @@
   "dependencies": {
     "dotenv": "^17.2.3",
     "firebase": "^12.4.0",
+    "imagetracerjs": "^1.2.6",
     "next": "15.5.4",
+    "potrace": "^2.1.8",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-icons": "^5.5.0",
-    "react-router-dom": "^7.9.4"
+    "react-router-dom": "^7.9.4",
+    "sharp": "^0.34.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
+    "@types/potrace": "^2.1.5",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
