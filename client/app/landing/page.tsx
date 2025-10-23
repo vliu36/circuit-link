@@ -3,8 +3,8 @@ import React, {useEffect, useState} from "react";
 import Styles from './landingPage.module.css';
 import { useAuth } from "../context.tsx";
 import { logout } from "./landing.ts";
-import SearchBar from "../searchbar/searchbar.tsx";
-import SearchResults from "../searchbar/searchResult.tsx";
+import SearchBar from "../search/searchbar.tsx";
+import SearchResults from "../search/searchResult.tsx";
 
 export default function Landing() {
     const { user, userData, loading } = useAuth();
