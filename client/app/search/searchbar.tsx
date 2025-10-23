@@ -61,7 +61,7 @@ export default function SearchBar() {
                 Find your community...
             </label>
             <input 
-                className="peer block w-1/2 rounded-md border border-gray-200 py-2 pl-10 pr-2 text-sm outline-2 placeholder:text-gray-300"
+                className="peer block w-1/2 rounded-md border py-2 pl-10 pr-2 text-sm outline-2"
                 placeholder="Find your community..."
                 defaultValue={searchParams.get("query")?.toString()}
                 onChange={(e) => {
