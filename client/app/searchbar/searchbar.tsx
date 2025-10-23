@@ -72,19 +72,20 @@ export default function SearchBar() {
             {searchList.length > 0 && (
                 <div style={{
                     // TODO: Move this to css file
-                    position: "absolute",
-                    top: "100%",
-                    left: 0,
+                    position: "relative",
+                    top: "0%",
+                    left: "0%",
                     width: "50%",
                     zIndex: 50,
-                    border: "1px solid #ccc",
-                    borderRadius: "0 0 0.375rem 0.375rem",
+                    border: "1px solid #98C5F8",
+                    borderRadius: "0em 0em 1em 1em",
                     maxHeight: "200px",
                     overflowY: "auto",
+                    backgroundColor: "#5B6680"
                 }}>
                     <SearchResult items={searchList}/>
                 </div>)}
-            <MagnifyingGlassIcon className="absolute left top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-300 peer-focus:text-gray-300"/>
+            <MagnifyingGlassIcon className="absolute left-2 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-300 peer-focus:text-gray-300"/>
         </div>
     );
 }

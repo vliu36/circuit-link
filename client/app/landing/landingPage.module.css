@@ -29,7 +29,7 @@
 }
 
 .logInSignUpButton{
-    background-color: rgb(0, 102, 197);
+    background-color: #3F6DA1;
     height: 30px;
     width: 60px;
     border-radius: 1em;
@@ -45,22 +45,24 @@
 }
 
 .notificationButton{
-    height: 40px;
-    width: 40px;
+    height: 30px;
+    width: 30px;
     border-radius: 1em;
-    background-color: rgb(58, 58, 71);
+    background-color: #394153;
     margin-left: 10px;
 }
 
 .settingsIcon{
-    height: 50px;
-    width: 50px;
-    border-radius: 1em;
+    height: 40px;
+    width: 40px;
+    border-radius: 50%;
+    background-color: #B8B8B8;
 }
 
 .dropdownMenu {
-    background-color: rgb(11, 11, 44);
-    width: 100px;
+    background-color: #5B6680;
+    width: 150px;
+    height: 150px;
     right: 0px;
     border-radius: 1em;
     position: absolute;
@@ -70,7 +72,10 @@
     flex-direction: column;
     align-items: center;
     color: white;
-    border: 1px solid rgb(255, 255, 255);
+}
+
+.dropdownMenu:hover{
+    background-color: #828FAF;
 }
 
 .dropdown:focus-within .dropdownMenu{
@@ -86,8 +91,9 @@
     flex-direction: column;
     position: absolute;
     top: 51px;
-    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: Inria Sans;
     color: gray;
+    text-indent: 3%;
 }
 
 .resourcesBar{
@@ -98,14 +104,16 @@
     flex-direction: column;
     position: absolute;
     bottom: 0vw;
-    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: Inria Sans;
     color: gray;
+    text-indent: 3%;
 }
 
 .horizontalLine{
-    background-color: white;
-    width: 100%;
+    background-color: #AAAAAA;
+    width: 95%;
     height: 1px;
+    margin-left: 8px;
 }
 
 .resourcesBarButtons{
@@ -119,7 +127,7 @@
 }
 
 .resourcesBarButtons:hover{
-    background-color: rgb(24, 24, 94);
+    background-color: #394153;
 }
 
 .aboutUsIcon{
@@ -132,7 +140,7 @@
     text-align: left;
     margin-top: 11px;
     margin-left: 1px;
-    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: Inria Sans;
     color: rgb(255, 255, 255);
     position: relative;
     font-size: 0.8rem;
@@ -159,14 +167,14 @@
     text-align: left;
     margin-top: 15px;
     margin-left: 10px;
-    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: Inria Sans;
     color: rgb(255, 255, 255);
     position: relative;
     font-size: 0.8rem;
 }
 
 .communitiesButtons:hover{
-    background-color: rgb(24, 24, 94);
+    background-color: #394153;
 }
 
 .topUsersBar{
@@ -178,8 +186,9 @@
     position: absolute;
     top: 51px;
     right: 0px;
-    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: Inria Sans;
     color: gray;
+    text-indent: 3%;
 }
 
 .topCommunitiesBar{
@@ -191,8 +200,9 @@
     position: absolute;
     right: 0px;
     bottom: 0vw;
-    font-family:'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: Inria Sans;
     color: gray;
+    text-indent: 3%;
 }
 
 .searchBarArea{

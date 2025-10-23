@@ -16,7 +16,7 @@ export default function Landing() {
         <div className = {Styles.background}>
 
             <div className = {Styles.yourCommunitiesBar}>
-                <h1>Your Communities</h1>
+                <h1>  Your Communities</h1>
                 <button className = {Styles.communitiesButtons}>
                     <img src = "plus.svg" className = {Styles.addIcon}></img>
                     <h1 className = {Styles.buttonTextforCommunities}>Add a Community</h1>
@@ -25,7 +25,7 @@ export default function Landing() {
 
             <div className = {Styles.resourcesBar}>
                 <div className = {Styles.horizontalLine}></div>
-                <h1>Resources</h1>
+                <h1>  Resources</h1>
                 <button className ={Styles.resourcesBarButtons}>
                     <img src = "/aboutUs.svg" className = {Styles.aboutUsIcon}></img>
                     <h1 className = {Styles.buttonText}>About Circuit Link</h1>
@@ -50,7 +50,7 @@ export default function Landing() {
 
             <div className = {Styles.topCommunitiesBar}>
                 <div className = {Styles.horizontalLine}></div>
-                <h1>Top Communities</h1>
+                <h1>  Top Communities</h1>
             </div>
 
 
