@@ -22,7 +22,7 @@ export default function PostsPage() {
     useEffect(() => {
         const fetchPosts = async () => {
         try {
-            const res = await fetch("http://localhost:2400/api/posts/all");
+            const res = await fetch("https://api-circuit-link-160321257010.us-west2.run.app/api/posts/all");
             const data = await res.json();
 
             // Convert Firestore Timestamp to readable string
@@ -53,7 +53,7 @@ export default function PostsPage() {
         }
 
         try {
-            const res = await fetch("http://localhost:2400/api/posts/make-post", {
+            const res = await fetch("https://api-circuit-link-160321257010.us-west2.run.app/api/posts/make-post", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -68,7 +68,7 @@ export default function PostsPage() {
             setContents("");
 
             // Refresh posts
-            const refreshed = await fetch("http://localhost:2400/api/posts/all");
+            const refreshed = await fetch("https://api-circuit-link-160321257010.us-west2.run.app/api/posts/all");
             const refreshedData = await refreshed.json();
             const formattedPosts = (refreshedData.message || []).map((post: any) => ({
                 ...post,

@@ -66,7 +66,7 @@ export default function Landing() {
                     <div className = {Styles.dropdown}>
                         <button><img src = {user?.photoURL || "/circleUser.svg"} className = {Styles.settingsIcon}></img></button>
                         <div className = {Styles.dropdownMenu}>
-                            <button onClick={() => window.location.href = "http://localhost:3000/profile"}>Profile</button>
+                            <button onClick={() => window.location.href = "https://circuitlink-160321257010.us-west2.run.app/profile"}>Profile</button>
                             <button>Settings</button>
                             <button onClick={logout}>Log Out</button>
                         </div>
