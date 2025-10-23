@@ -20,12 +20,28 @@
 
 .logInInfo{
     height: 50px;
-    width: 120px;
+    width: 150px;
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
     margin-left: 20px;
     margin-right: 20px;
+}
+
+.logInSignUpButton{
+    background-color: rgb(0, 102, 197);
+    height: 30px;
+    width: 60px;
+    border-radius: 1em;
+    margin-top: 10px;
+}
+
+.orText{
+    height: 50px;
+    width: 10px;
+    position: absolute;
+    top: 12px;
+    right: 95px;
 }
 
 .notificationButton{
@@ -206,19 +222,4 @@
     top: 200px;
     left: 5vw;
     width: 100%;
-}
-
-@media(max-width: 1100px){
-    .usernameText{
-        margin-top: 60px;
-    }
-}
-
-@media(max-width: 520px){
-    .usernameText{
-        margin-top: 120px;
-    }
-    .searchBarAlignment{
-        top: 250px;
-    }
 }
