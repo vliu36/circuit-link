@@ -12,47 +12,17 @@ const MagnifyingGlassIcon = (props: SVGProps<SVGSVGElement>) => (
     </svg>
 );
 
-export default function SearchBar() {
-    const searchParams = useSearchParams();
-    const pathname = usePathname();
-    const { replace } = useRouter();
-    const [searchList, setSearchList] = useState<string[]>([]);
+export default function SearchBar({ initialQuery = "" }: { initialQuery?: string }) {
+    const [value, setValue] = useState(initialQuery);   //Local state for storage of current input
+    const pathname = usePathname(); //Get current path for navigation
+    const router = useRouter(); //Next.js router for navigation on the client side (Not sure if this is right)
 
-    const handleSearch = async (searchString: string) => {
-        const params = new URLSearchParams(searchParams);
-        if (searchString) {
-            params.set("query", searchString);
-        }
-        else {
-            params.delete("query");
-        }
-        replace(`${pathname}?${params.toString()}`);
-        try {
-
-            if (params.get("query")) {
-                const arg = params.get("query")?.toString();
-                const res = await fetch(`http://localhost:2400/api/comm/search/${arg}`, {     
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
-                const data = res.json().then((result) => {
-                    const tempArr = result.message;
-                    let tempRes = [];
-                    for (var i = 0; i < tempArr.length; i++) {
-                        tempRes.push(tempArr[i].name);
-                    }
-                    setSearchList(tempRes);
-                });
-            } 
-            else {
-                setSearchList([]);
-            }
-        }
-        catch (err) {
-            console.log(err);
-        }
+    const handleSearch = (searchString: string) => {
+        setValue(searchString);
+        //Create new URLSearchParams for building the query string
+        const params = new URLSearchParams();
+        if (searchString) params.set("query", searchString);
+        router.replace(`${pathname}?${params.toString()}`); //Replace current URl with the new query without eloading the page
     };
 
     return (
@@ -63,27 +33,9 @@ export default function SearchBar() {
             <input 
                 className="peer block w-1/2 rounded-md border border-gray-200 py-2 pl-10 pr-2 text-sm outline-2 placeholder:text-gray-300"
                 placeholder="Find your community..."
-                defaultValue={searchParams.get("query")?.toString()}
-                onChange={(e) => {
-                    handleSearch(e.target.value);
-                    console.log(searchList);
-                }}
-            />
-            {searchList.length > 0 && (
-                <div style={{
-                    // TODO: Move this to css file
-                    position: "absolute",
-                    top: "100%",
-                    left: 0,
-                    width: "50%",
-                    zIndex: 50,
-                    border: "1px solid #ccc",
-                    borderRadius: "0 0 0.375rem 0.375rem",
-                    maxHeight: "200px",
-                    overflowY: "auto",
-                }}>
-                    <SearchResult items={searchList}/>
-                </div>)}
+                value={value}
+                onChange={(e) => handleSearch(e.target.value)}
+                />
             <MagnifyingGlassIcon className="absolute left top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-300 peer-focus:text-gray-300"/>
         </div>
     );
