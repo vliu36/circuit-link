@@ -26,7 +26,7 @@ export default function PostsPage() {
             const data = await res.json();
 
             // Convert Firestore Timestamp to readable string
-            const formattedPosts = (data.message || []).map((post: any) => ({
+            const formattedPosts = (data.message || []).map((post: Post) => ({
                 ...post,
                 timePosted: post.timePosted
                     ? new Date(post.timePosted).toLocaleString()
@@ -70,7 +70,7 @@ export default function PostsPage() {
             // Refresh posts
             const refreshed = await fetch("http://localhost:2400/api/posts/all");
             const refreshedData = await refreshed.json();
-            const formattedPosts = (refreshedData.message || []).map((post: any) => ({
+            const formattedPosts = (refreshedData.message || []).map((post: Post) => ({
                 ...post,
                 timePosted: post.timePosted
                     ? new Date(post.timePosted).toLocaleString()

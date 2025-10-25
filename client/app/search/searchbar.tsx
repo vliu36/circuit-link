@@ -37,12 +37,13 @@ export default function SearchBar() {
                         "Content-Type": "application/json",
                     },
                 });
-                const data = res.json().then((result) => {
+                res.json().then((result) => {
                     const tempArr = result.message;
-                    let tempRes = [];
-                    for (var i = 0; i < tempArr.length; i++) {
-                        tempRes.push(tempArr[i].name);
-                    }
+                    // const tempRes = [];
+                    // for (let i = 0; i < tempArr.length; i++) {
+                    //     tempRes.push(tempArr[i].name);
+                    // }
+                    const tempRes = tempArr.map((item: { name: string }) => item.name);
                     setSearchList(tempRes);
                 });
             } 

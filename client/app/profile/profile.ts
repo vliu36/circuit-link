@@ -1,9 +1,18 @@
-"use client";
 import { auth, db, storage } from "../firebase";
-import React from "react";
-import { User, onAuthStateChanged, updateProfile, sendEmailVerification } from "firebase/auth";
-import { doc, updateDoc, setDoc } from "firebase/firestore";
+import { updateProfile, sendEmailVerification } from "firebase/auth";
+import { doc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+// Interface for updatedData in function editProfile
+interface updatedData {
+    username?: string;
+    profileDesc?: string;
+    textSize?: number;
+    font?: string;
+    darkMode?: boolean;
+    privateMode?: boolean;
+    restrictedMode?: boolean;
+}
 
 // Delete user 
 export async function deleteUserAccount() {
@@ -34,13 +43,17 @@ export async function deleteUserAccount() {
             await user.delete();
             alert("User account deleted successfully.");
             window.location.href = "http://localhost:3000/signin"; // Redirect to sign-in page
-        } catch (error: any) {
-            if (error.code === "auth/requires-recent-login") {
-                alert("Please log in again to delete your account.");
-                // Optionally, redirect to login page
-                window.location.href = "http://localhost:3000/signin";
+        } catch (error) {
+            if (error instanceof Error) {
+                const firebaseAuthError = error as { code?: string; message: string};
+                if (firebaseAuthError.code === "auth/requires-recent-login") {
+                    alert("Please log in again to delete your account."); 
+                    window.location.href = "http://localhost:3000/signin";
+                } else {
+                    alert("Error deleting user: " + firebaseAuthError.message);
+                } // end if else
             } else {
-                alert("Error deleting user: " + error.message);
+                alert("An unknown error occurred while deleting your account.");
             } // end if else
         } // end try catch
     } else {
@@ -71,7 +84,7 @@ export async function editProfile(username: string, profileDesc: string, textSiz
             });
             // Update Firestore document with new profile data
             const userDocRef = doc(db, "Users", user.uid);
-            const updatedData: any = {};
+            const updatedData: Partial<updatedData> = {};
             if (username) updatedData.username = username;
             if (profileDesc) updatedData.profileDesc = profileDesc;
             if (textSize) updatedData.textSize = textSize;
@@ -81,8 +94,12 @@ export async function editProfile(username: string, profileDesc: string, textSiz
             updatedData.restrictedMode = restrictedMode;
             await updateDoc(userDocRef, updatedData);
             alert("Profile updated successfully.");
-        } catch (error: any) {
-            alert("Error updating profile: " + error.message);
+        } catch (error) {
+            if (error instanceof Error) {
+                alert("Error updating profile: " + error.message);
+            } else {
+                alert("An unknown error occurred.");
+            } // end if else
         } // end try catch
     } else {
         console.error("User not logged in");
@@ -122,7 +139,7 @@ export async function verifyEmail() {
             console.log("No user detected.");
             return;
         }
-        const emailVerification = await sendEmailVerification(user);
+        await sendEmailVerification(user);
         alert("Email verification sent. Check your inbox.")
         console.log("Email verification sent. Check your inbox.");
     } catch (error) {

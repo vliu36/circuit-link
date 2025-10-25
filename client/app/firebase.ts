@@ -1,8 +1,11 @@
 // This is to initialize the Firebase app for frontend. 
 import { initializeApp } from "firebase/app";
-import { connectAuthEmulator, getAuth } from "firebase/auth";
-import { getFirestore, connectFirestoreEmulator } from "firebase/firestore";
-import { getStorage, connectStorageEmulator } from "firebase/storage";
+import { getAuth } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
+// import { connectAuthEmulator } from "firebase/auth";
+// import { connectFirestoreEmulator } from "firebase/firestore";
+// import { connectStorageEmulator } from "firebase/storage";
 
 const firebaseConfig = {
     apiKey: "AIzaSyD3VCMA1MxjtLzXjkEFXr-XEPpkyftPSTo", // for circuit-link

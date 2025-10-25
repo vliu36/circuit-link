@@ -1,42 +1,43 @@
 "use client";
-import React, {useEffect, useState} from "react";
+// import React, {useEffect, useState} from "react";
 import Styles from './landingPage.module.css';
-import { useAuth } from "./context.tsx";
-import { logout } from "./landing.ts";
+// import { useAuth } from "./context.tsx";
+// import { logout } from "./landing.ts";
 import SearchBar from "./search/searchbar.tsx";
 import SearchResults from "./search/searchResult.tsx";
 import { useRouter } from "next/navigation";
-import env from "dotenv";
+import { Suspense } from 'react';
+// import env from "dotenv";
 
 export default function Landing() {
-    const { user, userData, loading } = useAuth();
+    // const { user, userData, loading } = useAuth();
     const router = useRouter();
     
-        const handleClick = async () => {
-            try {
-                // const response = await fetch("https://circuitlink-160321257010.us-west2.run.app/api/users/all"), {
-                const response = await fetch("http://localhost:2400/api/users/all", {     
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
+        // const handleClick = async () => {
+        //     try {
+        //         // const response = await fetch("https://circuitlink-160321257010.us-west2.run.app/api/users/all"), {
+        //         const response = await fetch("http://localhost:2400/api/users/all", {     
+        //             method: "GET",
+        //             headers: {
+        //                 "Content-Type": "application/json",
+        //             },
+        //         });
     
-                if (response.ok) {
-                    // window.location.href = "https://circuitlink-160321257010.us-west2.run.app/api/users/all";
-                    window.location.href = "http://localhost:2400/api/users/all";
-                }
-                else {
-                    console.error("Request failed due to skill issue:", response.status);
-                }
-            }
-            catch (error) {
-                console.error("Error sending request:", error);
-            }
-        };
+        //         if (response.ok) {
+        //             // window.location.href = "https://circuitlink-160321257010.us-west2.run.app/api/users/all";
+        //             window.location.href = "http://localhost:2400/api/users/all";
+        //         }
+        //         else {
+        //             console.error("Request failed due to skill issue:", response.status);
+        //         }
+        //     }
+        //     catch (error) {
+        //         console.error("Error sending request:", error);
+        //     }
+        // };
 
     return (
-       
+    
         <div className = {Styles.background}>
 
             <div className = {Styles.yourCommunitiesBar}>
@@ -95,7 +96,9 @@ export default function Landing() {
                     Welcome to Circuit-Link
                 </div>
                 <h3 className = {Styles.searchBarAlignment}>
-                    <SearchBar/>
+                    <Suspense>
+                        <SearchBar/>
+                    </Suspense>
                 </h3>
                 <h4> 
                     <SearchResults />

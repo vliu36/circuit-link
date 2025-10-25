@@ -13,16 +13,29 @@ export default function Registration() {
     const [showPass, setShowPass] = useState(false);
     const [loading, setLoading] = useState(false);
 
-    if (loading) {
-        return <p>Loading...</p>;
-    }
-
     // handleSubmit function for registration
     async function handleSubmitReg(e: React.FormEvent<HTMLFormElement>) {
-        const cleanMail = email.trim();
-        const cleanPass = password.trim();
         e.preventDefault();
-        await register(email, password, username);
+        setLoading(true);
+        try {
+            await register(email.trim(), password.trim(), username);
+        } finally {
+            setLoading(false);
+        } // end try finally
+    } // end function handleSubmitReg
+
+    // handleGoogleReg function for Google signup
+    async function handleGoogleReg() {
+        setLoading(true);
+        try {
+            await registerWithGoogle();
+        } finally {
+            setLoading(false);
+        } // end try finally
+    } // end function handleGoogleReg
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
     return (
@@ -83,7 +96,7 @@ export default function Registration() {
         </div>
         <button
         className = "signUpWithGoogleButton"
-        onClick={registerWithGoogle}>Sign up with Google</button>
+        onClick={handleGoogleReg}>Sign up with Google</button>
         <a className="transparentButtonBox" href="../signin">Already have an account? Sign In</a>
         <br />
     </main>

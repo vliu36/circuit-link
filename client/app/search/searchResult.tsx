@@ -1,10 +1,17 @@
 import Link from "next/link";
 import Styles from "./searchbar.module.css";
 
-export default function SearchResult({items}: any) {
+/** Used to resolve the typing for SearchResult
+ * Initially, SearchResult had ({items}: any), this interface gives it a proper type
+ */
+interface SearchResultProps {
+    items?: string[],
+}
+
+export default function SearchResult({items}: SearchResultProps) {
     return (
         <ul> 
-            {items?.map((item: any) => (
+            {items?.map((item: string) => (
                 <li className={Styles.searchResult} key={item}>
                     <Link href={`/community/${item}`}>{item}</Link>
                 </li>

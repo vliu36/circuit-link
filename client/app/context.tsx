@@ -2,15 +2,30 @@
  *  
  */
 "use client";
-import React, { createContext, use, useContext, useEffect, useState, ReactNode } from "react";
+import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "./firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, DocumentData, getDoc } from "firebase/firestore";
+
+// Define the shape of userData
+// interface userData {
+//     communities: [],
+//     createdAt: Date,
+//     darkMode: boolean,
+//     email: string,
+//     font: string,
+//     notifications: [],
+//     privateMode: boolean,
+//     profileDesc: string,
+//     restrictedMode: boolean,
+//     textSize: number,
+//     username: string,
+// }
 
 // Define the shape of the context value
 interface AuthContextType {
     user: User | null;          // Firebase User object or null if not logged in
-    userData: any | null;       // Additional user data from Firestore, can be typed more specifically if needed
+    userData: DocumentData | null;       // Additional user data from Firestore, can be typed more specifically if needed
     loading: boolean            // Indicates if the auth state is still being determined
 } 
 
@@ -29,7 +44,7 @@ interface AuthProviderProps {
 // AuthProvider component to wrap the app and provide auth state
 export function AuthProvider({ children }: AuthProviderProps) {
     const [user, setUser] = useState<User | null>(null);
-    const [userData, setUserData] = useState<any | null>(null);
+    const [userData, setUserData] = useState<DocumentData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
