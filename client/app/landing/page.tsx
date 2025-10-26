@@ -6,9 +6,11 @@ import { logout } from "./landing.ts";
 import { Suspense } from 'react';
 import SearchBar from "../search/searchbar.tsx";
 import SearchResults from "../search/searchResult.tsx";
+import { useRouter } from "next/navigation";
 
 export default function Landing() {
     const { user } = useAuth();
+    const router = useRouter();
     
     
     
@@ -31,7 +33,7 @@ export default function Landing() {
                     <img src = "/aboutUs.svg" className = {Styles.aboutUsIcon} alt="About us icon"></img>
                     <h1 className = {Styles.buttonText}>About Circuit Link</h1>
                 </button>
-                <button className ={Styles.resourcesBarButtons}>
+                <button className ={Styles.resourcesBarButtons} onClick={() => router.push("/help")}>
                     <img src = "/helpbutton.svg" className = {Styles.aboutUsIcon} alt="Question mark"></img>
                     <h1 className = {Styles.buttonText}>Get Help</h1>
                 </button>
@@ -39,7 +41,7 @@ export default function Landing() {
                     <img src = "/bug.svg" className = {Styles.aboutUsIcon} alt="Bug icon"></img>
                     <h1 className = {Styles.buttonText}>Report A Bug</h1>
                 </button>
-                <button className ={Styles.resourcesBarButtons}>
+                <button className ={Styles.resourcesBarButtons} onClick={() => router.push("/siterules")}>
                     <img src = "/rules.svg" className = {Styles.aboutUsIcon} alt="Book icon"></img>
                     <h1 className = {Styles.buttonText}>Circuit Link Rules</h1>
                 </button>
