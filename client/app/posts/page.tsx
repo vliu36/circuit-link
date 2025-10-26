@@ -32,7 +32,7 @@ export default function PostsPage() {
             const res = await fetch("http://localhost:2400/api/posts/all");
             const data = await res.json();
 
-            const formattedPosts = (data.message || []).map((post: any) => ({
+            const formattedPosts = (data.message || []).map((post: Post) => ({
                 ...post,
                 timePosted: post.timePosted
                     ? new Date(post.timePosted).toLocaleString()
