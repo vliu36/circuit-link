@@ -1,9 +1,10 @@
 // Script for user login page
-import React, { useState } from "react";
+// import React, { useState } from "react";
 import { signInWithEmailAndPassword, signInWithPopup, sendPasswordResetEmail } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
+import { FirebaseError } from "firebase/app";
 
 const provider = new GoogleAuthProvider();
 
@@ -17,14 +18,22 @@ export async function login(email: string, password: string) {
     // router.push("/dashboard"); // Redirect to home page
     // return user;
     window.location.href = "http://localhost:3000/landing"
-    } catch (err: any) {
-        if (err.code === "auth/invalid-email" || err.code === "auth/invalid-credential" || err.code === "auth/user-not-found") {
-            alert("Invalid email or password.");
+    } catch (error) {
+        if (error instanceof FirebaseError) {
+            if (error.code === "auth/invalid-email" || 
+                error.code === "auth/invalid-credential" || 
+                error.code === "auth/user-not-found"
+            ) {
+                alert("Invalid email or password.");
+            } else {
+                alert("An unexpected error occurred: " + error.message);
+            } // end if else
+            console.error(error);
         } else {
+            console.error("Unknown error: ", error);
             alert("An unexpected error occurred.");
         } // end if else
-        console.error(err);
-        } // end try catch
+    } // end try catch
 } // end function login
 
 // ---- Login with Google ---- //
@@ -51,17 +60,18 @@ export async function loginWithGoogle() {
         // The signed-in user info.
         const user = result.user;
         console.log("Google user:", user);
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential?.accessToken;
+
+        // These weren't used
+        // // This gives you a Google Access Token. You can use it to access the Google API.
+        // const credential = GoogleAuthProvider.credentialFromResult(result);
         // The signed-in user info.
+        // const token = credential?.accessToken;
         
         console.log("Google user:", user.email);
         const res = await fetch("http://localhost:2400/api/users/register-google", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ uid: user.uid, email: user.email, username: defaultUsername }), // <--- include any extra data you want server-side
-            
         });
 
         const data = await res.json();
@@ -76,23 +86,34 @@ export async function loginWithGoogle() {
         window.location.href = "http://localhost:3000/landing" // TODO: Redirect to landing page
 
         return user;
-    } catch (error: any) {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        alert("Google sign-in failed: " + errorMessage);
-        console.error("Error during Google sign-in:", errorCode, errorMessage);
+    } catch (error) {
+        if (error instanceof FirebaseError) {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            const email = (error.customData as { email?: string })?.email; // Email of the user's account used
+            const credential = GoogleAuthProvider.credentialFromError(error); // AuthCredential type that was used
+            
+            console.error("Error during Google sign-in:", errorCode, errorMessage, email, credential);
+            alert("Error during Google sign-in: " + errorMessage);
+        } else {
+            console.error("Unexpected error during Google sign-in:", error);
+            alert("An unexpected error occurred during sign-in.");
+        }
     } // end try catch
-}
+} // end loginWithGoogle
 
 // Forgot password
 export async function forgotPassword(email: string) {
     try {
         await sendPasswordResetEmail(auth, email);
         alert("Password reset link sent to " + email);  // TODO: Redirect to our own page and enforce password rules
-    } catch (error: any) {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.error(errorCode, errorMessage);
-
+    } catch (error) {
+        if (error instanceof FirebaseError) {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            console.error(errorCode, errorMessage);
+        } else {
+            console.error("Unexpected error during password reset: ", error);
+        } // end if else 
     } // end try catch
 } // end function forgotPassword

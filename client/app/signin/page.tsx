@@ -1,5 +1,5 @@
 "use client";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import {login, loginWithGoogle, forgotPassword} from "./login";
 import React, { useState } from "react";
 import "./login-styles.css";
@@ -8,7 +8,7 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPass, setShowPass] = useState(false);
-    const [error, setError] = useState("");
+    // const [error, setError] = useState("");
     const [isOpen, setIsOpen] = useState(false);
 
     const togglePopup = () => {
@@ -69,7 +69,7 @@ export default function Login() {
                 <br />
                 <br />
                 {/* This displays an error message in the text if it occurs. */}
-                {error && <p className ="errorMessage">{error}</p>}
+                {/* {error && <p className ="errorMessage">{error}</p>} */}
             </form>
         </div>
         <button className="forgot-password" onClick={togglePopup}>Forgot password?</button>
@@ -90,7 +90,7 @@ export default function Login() {
         </div>
         )}
         <button className = "sign-with-google" onClick={loginWithGoogle}>Sign in with Google</button>
-        <a className="transparent-button-box-2" href="../register">Don't have an account, sign up for FREE!</a>
+        <a className="transparent-button-box-2" href="../register">Don&apos;t have an account, sign up for FREE!</a>
     </main>
     );
 }

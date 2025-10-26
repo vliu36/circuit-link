@@ -1,1 +1,0 @@
-// A temporary page to show posts functionality

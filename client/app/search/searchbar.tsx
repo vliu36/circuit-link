@@ -37,12 +37,13 @@ export default function SearchBar() {
                         "Content-Type": "application/json",
                     },
                 });
-                const data = res.json().then((result) => {
+                res.json().then((result) => {
                     const tempArr = result.message;
-                    let tempRes = [];
-                    for (var i = 0; i < tempArr.length; i++) {
-                        tempRes.push(tempArr[i].name);
-                    }
+                    // const tempRes = [];
+                    // for (let i = 0; i < tempArr.length; i++) {
+                    //     tempRes.push(tempArr[i].name);
+                    // }
+                    const tempRes = tempArr.map((item: { name: string }) => item.name);
                     setSearchList(tempRes);
                 });
             } 
@@ -61,7 +62,7 @@ export default function SearchBar() {
                 Find your community...
             </label>
             <input 
-                className="peer block w-1/2 rounded-md border border-gray-200 py-2 pl-10 pr-2 text-sm outline-2 placeholder:text-gray-300"
+                className="peer block w-1/2 rounded-md border py-2 pl-10 pr-2 text-sm outline-2"
                 placeholder="Find your community..."
                 defaultValue={searchParams.get("query")?.toString()}
                 onChange={(e) => {
@@ -72,19 +73,20 @@ export default function SearchBar() {
             {searchList.length > 0 && (
                 <div style={{
                     // TODO: Move this to css file
-                    position: "absolute",
-                    top: "100%",
-                    left: 0,
+                    position: "relative",
+                    top: "0%",
+                    left: "0%",
                     width: "50%",
                     zIndex: 50,
-                    border: "1px solid #ccc",
-                    borderRadius: "0 0 0.375rem 0.375rem",
+                    border: "1px solid #98C5F8",
+                    borderRadius: "0em 0em 1em 1em",
                     maxHeight: "200px",
                     overflowY: "auto",
+                    backgroundColor: "#5B6680"
                 }}>
                     <SearchResult items={searchList}/>
                 </div>)}
-            <MagnifyingGlassIcon className="absolute left top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-300 peer-focus:text-gray-300"/>
+            <MagnifyingGlassIcon className="absolute left-2 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-300 peer-focus:text-gray-300"/>
         </div>
     );
 }
