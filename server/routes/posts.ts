@@ -24,4 +24,11 @@ router.get("/all", posts.getAllDocuments)
 */
 router.post("/make-post", posts.addDoc);
 
+/** Adds a reply to an existing post
+ *  @route PATCH /api/posts/reply/:id
+ *  @param id - The document id of the post
+ *  @body replyId - The document id of the reply
+*/
+router.patch("/reply/:id", posts.replyToPost);
+
 export default router;
