@@ -6,7 +6,7 @@
 }
 .searchbar input {
     background-color: #5B6680;
-    color: ##D9D9D9;
+    color: #D9D9D9;
     border: 3px solid #98C5F8;
     border-radius: 4px;
     font-size: 20px;
@@ -27,4 +27,17 @@
     height: 100px;
     border-radius: 1em;
     vertical-align: middle;
+}
+
+.movetoCSS{
+    position: "relative";
+    top: "0%";
+    left: "0%";
+    width: "50%";
+    z-Index: 50;
+    border: "1px solid #98C5F8";
+    border-Radius: "0em 0em 1em 1em";
+    max-Height: "200px";
+    overflow-y: "auto";
+    background-color: "#5B6680";
 }

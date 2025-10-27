@@ -13,7 +13,7 @@ export default function Landing() {
     
     
     return (
-    
+        
         <div className = {Styles.background}>
 
             <div className = {Styles.yourCommunitiesBar}>

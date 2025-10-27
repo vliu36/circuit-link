@@ -6,14 +6,17 @@ import { logout } from "../../landing/landing.ts";
 import { Suspense } from 'react';
 import SearchBar from "../../search/searchbar.tsx";
 import SearchResults from "../../search/searchResult.tsx";
+import { useRouter} from "next/navigation";
 
 export default function CommunityPage({
   params,
 }: {
-  params: Promise<{ commName: string }>
+  params: Promise<{ commName: string}>
 }) {
   const { commName } = use(params);
   const { user } = useAuth();
+  const router = useRouter();
+  
  
   return (
     <div className = {Styles.background}>
@@ -44,13 +47,11 @@ export default function CommunityPage({
       </div>
       
       <div>
-        <h1 className = {Styles.line}>{commName}</h1>
+        <h1 className = {Styles.line}>{commName}AAA</h1>
       </div>
 
-      <div className = {Styles.communityImage}></div>
-
       <div>
-        <h2 className = {Styles.bigBox}> Look at these amazing posts, coming soon(+2 weeks) to a forum near you</h2>
+        <h2 className = {Styles.bigBox}> Look at these amazing posts, coming soon(+2 weeks) to a forum near you.</h2>
       </div>
 
       <div>
