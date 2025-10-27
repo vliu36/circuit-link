@@ -1,6 +1,6 @@
 import { Timestamp } from "firebase-admin/firestore";
-import { db } from "../firebase.ts"
-import { Request, Response } from "express"
+import { db } from "../firebase.ts";
+import { Request, Response } from "express";
 
 // Retrieves all documents in Communities
 const getAllDocuments = async (req: Request, res: Response) => {
@@ -50,10 +50,10 @@ const addDoc = async (req: Request, res: Response) => {
         }
         const result = await db.collection("Communities").add(data);
 
-        console.log("data added")
-        res.status(200).send({
+        res.status(201).send({
             status: "OK",
-            message: "Successfully added to Communities, " + result.id
+            message: "Successfully added to Communities, " + result.id,
+            docId: result.id
         })
     }
     catch (err) {
