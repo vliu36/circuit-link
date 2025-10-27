@@ -30,7 +30,7 @@ export default function Landing() {
                 <div className = {Styles.horizontalLine}></div>
                 <h1>  Resources</h1>
                 <button className ={Styles.resourcesBarButtons}>
-                    <img src = "/aboutUs.svg" className = {Styles.aboutUsIcon} alt="About us icon"></img>
+                    <img src = "/aboutUs.svg" className = {Styles.aboutUsIcon} alt="About us icon" onClick={() => router.push("/aboutus")}></img>
                     <h1 className = {Styles.buttonText}>About Circuit Link</h1>
                 </button>
                 <button className ={Styles.resourcesBarButtons} onClick={() => router.push("/help")}>
@@ -38,7 +38,7 @@ export default function Landing() {
                     <h1 className = {Styles.buttonText}>Get Help</h1>
                 </button>
                 <button className ={Styles.resourcesBarButtons}>
-                    <img src = "/bug.svg" className = {Styles.aboutUsIcon} alt="Bug icon"></img>
+                    <img src = "/bug.svg" className = {Styles.aboutUsIcon} alt="Bug icon" onClick={() => router.push("/bugreports")}></img>
                     <h1 className = {Styles.buttonText}>Report A Bug</h1>
                 </button>
                 <button className ={Styles.resourcesBarButtons} onClick={() => router.push("/siterules")}>
