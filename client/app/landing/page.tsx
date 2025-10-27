@@ -54,8 +54,6 @@ export default function Landing() {
                 <h1>  Top Communities</h1>
             </div>
 
-
-
             <div className = {Styles.navBox}>
                 <div className = {Styles.homeLogo}>
                     <img src="./circuitlinklogowback.svg" alt="Logo"></img>
@@ -65,7 +63,7 @@ export default function Landing() {
                         <img src = "./notifBell.svg" className = {Styles.notificationButton}></img>
                     </button>
                     <div className = {Styles.dropdown}>
-                        <button><img src = {user?.photoURL || "/circleUser.svg"} className = {Styles.settingsIcon} alt="User profile"></img></button>
+                    <button><img src = {user?.photoURL || "/circleUser.svg"} className = {Styles.settingsIcon} alt="User profile"></img></button>
                         <div className = {Styles.dropdownMenu}>
                             <button onClick={() => window.location.href = "http://localhost:3000/profile"}>Profile</button>
                             <button>Settings</button>

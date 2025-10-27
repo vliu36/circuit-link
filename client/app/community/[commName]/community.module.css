@@ -29,36 +29,27 @@
     width: 200px;
 }
 
-.dropdownMenu {
-    background-color: #5B6680;
-    width: 150px;
-    height: 150px;
-    right: 0px;
-    border-radius: 1em;
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: white;
-}
-
 .line{
     background-color:rgb(255,255,255);
     color:rgb(255,255,255);
     height:1px;
-    width:195px;
+    width:495px;
     margin:100px;
     position:relative;
-    right:145px;
+    right:470px;
 }
 
-.blueButton{
-    background-color:rgb(0,0,255);
-    width:50px;
-    height:25px;
-    border-radius:0.8rem;
+.channelList{
+    background-color: rgb(255,255,255);
+}
+
+.communityImage{
+    background-color: rgb(0,0,0);
+    height:40px;
+    width:40px;
+    border-radius:1em;
+    position:relative;
+
 }
 
 .bigBox{
@@ -67,7 +58,7 @@
     position: relative;
     width: 700px;
     height: 85vh;
-    left: 450px;
+    left: -450px;
     top:15vh;
     display: flex;
     justify-content: center;
@@ -76,7 +67,7 @@
 .banner{
     background-color: rgb(255,255,255);
     position: relative;
-    right:250px;
+    right:1150px;
     top:5vh;
     height: 10vh;
     width: 700px;
@@ -97,7 +88,8 @@
     margin:1px;
     width:80px;
     height:30px;
-    left:1255px;
+    left:1150px;
+    margin-left:30px;
 }
 
 .notificationButton{
@@ -106,4 +98,31 @@
     border-radius: 1em;
     background-color: rgb(57,65,83);
     margin: 0px;
+}
+
+.dropdownMenu {
+    background-color: #5B6680;
+    width: 150px;
+    height: 150px;
+    right: 0px;
+    border-radius: 1em;
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: white;
+}
+
+.dropdown:focus-within .dropdownMenu{
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.settingsIcon{
+    height: 30px;
+    width: 30px;
+    border-radius: 1em;
+    background-color: #B8B8B8;
 }

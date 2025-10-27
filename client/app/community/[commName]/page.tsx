@@ -29,9 +29,28 @@ export default function CommunityPage({
           <img src = "../notifBell.svg" className = {Styles.notificationButton} onClick = {() => window.location.href = "https:www.youtube.com/watch?v=dQw4w9WgXcQ"}></img>
         </button>
       </div>
+
+      <div className = {Styles.dropdown}>
+        <div className = {Styles.pfpSection}>
+          <button>
+            <img src = {user?.photoURL || "../circleUser.svg"} className = {Styles.settingsIcon} alt="User profile"></img>
+          </button>
+          <div className = {Styles.dropdownMenu}>
+            <button onClick={() => window.location.href = "http://localhost:3000/profile"}>Profile</button>
+            <button>Settings</button>
+            <button onClick={logout}>Log Out</button>
+          </div>
+        </div>
+      </div>
       
       <div>
-        <h2 className = {Styles.bigBox}> Look at these amazing posts</h2>
+        <h1 className = {Styles.line}>{commName}</h1>
+      </div>
+
+      <div className = {Styles.communityImage}></div>
+
+      <div>
+        <h2 className = {Styles.bigBox}> Look at these amazing posts, coming soon(+2 weeks) to a forum near you</h2>
       </div>
 
       <div>
