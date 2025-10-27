@@ -3,6 +3,9 @@ import React, { use } from "react";
 import Styles from "./community.module.css";
 import { useAuth } from "../../context.tsx";
 import { logout } from "../../landing/landing.ts";
+import { Suspense } from 'react';
+import SearchBar from "../../search/searchbar.tsx";
+import SearchResults from "../../search/searchResult.tsx";
 
 export default function CommunityPage({
   params,
@@ -14,28 +17,19 @@ export default function CommunityPage({
  
   return (
     <div className = {Styles.background}>
-      <div className = {Styles.homeLogo}>
-        <img src="./circuitlinklogowback.svg" alt="Logo"></img>
-      </div>
-
-      <div className = {Styles.logInInfo}>
-        <button>
-          <img src = "./notifBell.svg" className = {Styles.notificationButton}></img>
+      
+      <div className = {Styles.navBox}>
+        <button className = {Styles.homeLogo} onClick = {() => window.location.href = "http://localhost:3000/landing"}>
+          <img src="../circuitlinklogowback.svg" alt="Logo"></img>
         </button>
-        <div className = {Styles.dropdown}>
-          <button><img src = {user?.photoURL || "/circleUser.svg"} className = {Styles.settingsIcon} alt="User profile"></img></button>
-            <div className = {Styles.dropdownMenu}>
-              <button onClick={() => window.location.href = "http://localhost:3000/profile"}>Profile</button>
-              <button>Settings</button>
-              <button onClick={logout}>Log Out</button>
-            </div>
-        </div>
       </div>
 
-      <div>
-        <h1 className = {Styles.sideBox}> {commName}</h1>
+      <div className = {Styles.pfpSection}>
+        <button className = {Styles.notificationButton}>
+          <img src = "../notifBell.svg" className = {Styles.notificationButton} onClick = {() => window.location.href = "https:www.youtube.com/watch?v=dQw4w9WgXcQ"}></img>
+        </button>
       </div>
-
+      
       <div>
         <h2 className = {Styles.bigBox}> Look at these amazing posts</h2>
       </div>
