@@ -1,0 +1,142 @@
+@font-face {
+  font-family: Jura;
+  src: url('../../public/fonts/Jura-Light.ttf');
+}
+
+.hint {
+  font-size: 12px;
+  color: #df4141;
+}
+
+.background{
+  background-color: rgba(57, 65, 83, 1);
+  height: 100%;
+  width: 100%;
+}
+
+.box{
+  display: flex;
+  color: white;
+  flex-direction: column;
+  width: 40%;
+  height: 80%;
+  background-color: rgba(91, 102, 128, 1); 
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 5%;
+}
+
+
+.lblBox{
+  height: 100px;
+  width: 100%;
+  font-size: 40px;
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+  font-family: 'Jura';
+
+}
+
+.smallBox{
+  height: 20%;
+  width: 80%;
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  margin-left: 10%;
+  font-family: 'Jura';
+  font-size: 24px;
+}
+
+.txtBox{
+   height: 50px;
+   width: 100%;
+   background-color: #699DD8;
+   border-color: white;
+   border-radius: 1em;
+   font-size: 16px;
+   position: relative;
+   font-family: 'Courier New', Courier, monospace;
+   overflow: hidden
+}
+
+.checkBox{
+  height: 30px;
+  width: 50%;
+  margin-left: 12.5%;
+  font-family: 'Jura';
+}
+
+.buttonBox{
+   height: 40px;
+   width: 30%;
+   margin-left: 35%;
+   border-radius: 1em;
+   background-color: #699DD8;
+   font-family: 'Jura';
+   font-size: 23px;
+   border: 1px solid white;
+}
+
+.lineBox{
+  height: 4%;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.lefthorizontalLine{
+  height: 2px;
+  width: 37%;
+  margin-top: 20px;
+  margin-left: 5%;
+  background-color: #ffffff;
+
+}
+
+.righthorizontalLine{
+  height: 2px;
+  width: 37%;
+  margin-top: 20px;
+  margin-left: 5%;
+  background-color: #ffffff;
+
+}
+
+.orBox{
+  width: 5%;
+  height: 2px;
+  font-size: 30px;
+  color:white;
+  margin-left: 5%;
+  font-family: 'Jura';
+}
+
+.signUpWithGoogleButton{
+   height: 50px;
+   width: 80%;
+   border-radius: 1em;
+   background-color: #f7f7f7;
+   color: black;
+   margin-left: 10%;
+   font-size: 20px;
+   font-family: 'Jura';
+   display: flex;
+}
+
+.signUpWithGoogleText{
+  margin-left: 27.5%;
+  margin-top: 1.5%;
+
+}
+
+.transparentButtonBox{
+   height: 30px;
+   width: 30%;
+   margin-left: 35%;
+  font-family: 'Jura';
+}

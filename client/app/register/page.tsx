@@ -1,6 +1,9 @@
 "use client";
 import React, { useState } from "react";
 import {register, registerWithGoogle} from "./register";
+import Styles from './register.module.css';
+import Image from 'next/image';
+import googleIcon from '../../public/googleIcon.png'
 
 export default function Registration() {
 
@@ -39,14 +42,15 @@ export default function Registration() {
     }
 
     return (
-    <main background-color = "#394153">
-        <div className = "box">
-            <h1 className = "lblBox">Sign Up</h1>
+    <div className = {Styles.background}>
+
+        <div className = {Styles.box}>
+            <h1 className = {Styles.lblBox}>Sign Up</h1>
             <form onSubmit={handleSubmitReg}>
-                <label className = "smallBox">
+                <label className = {Styles.smallBox}>
                     Username
                     <input
-                    className = "txtBox" 
+                    className = {Styles.txtBox} 
                     type="text" 
                     name="username"
                     minLength={1}
@@ -55,24 +59,24 @@ export default function Registration() {
                     required
                     onChange={(e) => setName(e.target.value)}
                     onFocus={() => setShowHintU(true)}/>
+                    {showHintU && <p className={Styles.hint}><strong>Username can only contain letters, numbers, and underscores, and be within 1-20 characters.</strong></p>}
                 </label>
-                {showHintU && <p className="hint"><strong>Username can only contain letters, numbers, and underscores, and be within 1-20 characters.</strong></p>}
-                <br />
-                <label className = "smallBox">
+                    
+                
+                <label className = {Styles.smallBox}>
                     Email
                     <input 
-                    className = "txtBox"
+                    className = {Styles.txtBox}
                     type="email" 
                     name="email" 
                     required
                     onChange={(e) => setEmail(e.target.value)}/>
                 </label>
-                <br />
-                <label className = "smallBox">
+                <label className = {Styles.smallBox}>
                     Password
                     <input 
                     id = "password"
-                    className="txtBox"
+                    className={Styles.txtBox}
                     type={showPass ? "text" : "password"}
                     name="password" 
                     minLength={8}
@@ -81,9 +85,10 @@ export default function Registration() {
                     required
                     onChange={(e) => setPassword(e.target.value)}
                     onFocus={() => setShowHintP(true)}/>
+                    {showHintP && <p className={Styles.hint}><strong>8-20 chars, at least one uppercase, one lowercase, one number and one symbol. No leading or trailing spaces.</strong></p>}
                 </label>
-                {showHintP && <p className="hint"><strong>8-20 chars, at least one uppercase, one lowercase, one number and one symbol. No leading or trailing spaces.</strong></p>}
-                <label className = "showPasswordBox"> {/* Checkbox to show/hide password */}
+                
+                <label className = {Styles.checkBox}> {/* Checkbox to show/hide password */}
                     <input 
                     type="checkbox" 
                     checked={showPass}
@@ -91,15 +96,35 @@ export default function Registration() {
                     Show Password
                 </label>
                 <br />
-                <button className="buttonBox" type="submit">[Sign Up]</button>
+                <button className={Styles.buttonBox} type="submit">Sign Up</button>
+                <br />
+                <br />
+                <div className = {Styles.lineBox}>
+                    <div className = {Styles.lefthorizontalLine}></div>
+                    <div className = {Styles.orBox}>OR</div>
+                    <div className = {Styles.righthorizontalLine}></div>
+                </div>
+                <br />
+                <br />
+                <button
+                    className = {Styles.signUpWithGoogleButton}
+                    onClick={handleGoogleReg}>
+                    <Image
+                        src={googleIcon}
+                        width={50}
+                        height={50}
+                        alt="Sign up with Google"
+                    />
+                    <h1 className = {Styles.signUpWithGoogleText}>Sign up with Google</h1>
+                    </button>
+                <br /> 
+                <br />
+                <a className={Styles.transparentButtonBox} href="../signin">Already have an account? Sign In</a>
+                <br />
             </form>
+            
         </div>
-        <button
-        className = "signUpWithGoogleButton"
-        onClick={handleGoogleReg}>Sign up with Google</button>
-        <a className="transparentButtonBox" href="../signin">Already have an account? Sign In</a>
-        <br />
-    </main>
+    </div>
     );
 }
 
