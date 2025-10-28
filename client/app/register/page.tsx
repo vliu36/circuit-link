@@ -71,6 +71,7 @@ export default function Registration() {
                     name="email" 
                     required
                     onChange={(e) => setEmail(e.target.value)}/>
+                    <p className={Styles.blankHint}>   </p>
                 </label>
                 <label className = {Styles.smallBox}>
                     Password
@@ -88,42 +89,35 @@ export default function Registration() {
                     {showHintP && <p className={Styles.hint}><strong>8-20 chars, at least one uppercase, one lowercase, one number and one symbol. No leading or trailing spaces.</strong></p>}
                 </label>
                 
-                <label className = {Styles.checkBox}> {/* Checkbox to show/hide password */}
+                <div className = {Styles.checkBox}> {/* Checkbox to show/hide password */}
                     <input 
                     type="checkbox" 
                     checked={showPass}
                     onChange={() => setShowPass(!showPass)}/>
                     Show Password
-                </label>
-                <br />
+                </div>
+
                 <button className={Styles.buttonBox} type="submit">Sign Up</button>
-                <br />
-                <br />
                 <div className = {Styles.lineBox}>
                     <div className = {Styles.lefthorizontalLine}></div>
                     <div className = {Styles.orBox}>OR</div>
                     <div className = {Styles.righthorizontalLine}></div>
                 </div>
-                <br />
-                <br />
                 <button
                     className = {Styles.signUpWithGoogleButton}
                     onClick={handleGoogleReg}>
                     <Image
                         src={googleIcon}
-                        width={50}
-                        height={50}
+                        width={40}
+                        height={40}
                         alt="Sign up with Google"
                     />
                     <h1 className = {Styles.signUpWithGoogleText}>Sign up with Google</h1>
                     </button>
-                <br /> 
-                <br />
-                <a className={Styles.transparentButtonBox} href="../signin">Already have an account? Sign In</a>
-                <br />
             </form>
             
         </div>
+        <a className={Styles.transparentButtonBox} href="../signin">Already have an account? Sign In</a>
     </div>
     );
 }

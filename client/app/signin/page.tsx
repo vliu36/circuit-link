@@ -2,7 +2,9 @@
 // import { useRouter } from "next/navigation";
 import {login, loginWithGoogle, forgotPassword} from "./login";
 import React, { useState } from "react";
-import Styles from "./login-styles.css";
+import Styles from "./login.module.css";
+import Image from 'next/image';
+import googleIcon from '../../public/googleIcon.png'
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -35,10 +37,10 @@ export default function Login() {
     return (
     <main>
         <div className={Styles.background}>
-            <div className="loginContainer">
-            <h1 className="title">Login</h1>
+            <div className={Styles.loginContainer}>
+            <h1 className={Styles.title}>Login</h1>
             <form onSubmit={handleSubmitLog}>
-                <div className="emailBox">
+                <div className={Styles.emailBox}>
                     <label>Email:</label>
                     <input
                     type="email"
@@ -49,7 +51,7 @@ export default function Login() {
                     />
                 </div>
 
-                <div className="passwordBox">
+                <div className={Styles.passwordBox}>
                     <label>Password:</label>
                     <input
                     type={showPass ? "text" : "password"}
@@ -60,7 +62,7 @@ export default function Login() {
                     />
                 </div>
 
-                <div className="showpasswordSection">
+                <div className={Styles.showpasswordSection}>
                     <label>
                         <input
                         type="checkbox"
@@ -71,10 +73,11 @@ export default function Login() {
                     </label>
                 </div>
 
-                <div className="loginButton">
+                <div className={Styles.loginButton}>
                     <button type="submit">Login</button>
                 </div>
             </form>
+
 
             <div className="forgotPasswordBox">
                 <button type="button" onClick={togglePopup}>
@@ -106,9 +109,21 @@ export default function Login() {
                     </div>
                 </div>
             )}
-
-            <div className="googleButton">
-                <button onClick={loginWithGoogle}>Log in with Google</button>
+            
+            <div className = {Styles.lineBox}>
+                <div className = {Styles.lefthorizontalLine}></div>
+                <div className = {Styles.orBox}>OR</div>
+                <div className = {Styles.righthorizontalLine}></div>
+            </div>
+            <br/>
+            <div className={Styles.googleButton}>
+                <Image
+                        src={googleIcon}
+                        width={40}
+                        height={40}
+                        alt="Sign up with Google"
+                />
+                <button className = {Styles.signUpWithGoogleText} onClick={loginWithGoogle}>Log in with Google</button>
             </div>
 
             <div className="registerLink">

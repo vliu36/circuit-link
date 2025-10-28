@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "dotenv": "^17.2.3",
+    "fire": "^0.55.1",
     "firebase": "^12.4.0",
     "imagetracerjs": "^1.2.6",
     "next": "15.5.4",
