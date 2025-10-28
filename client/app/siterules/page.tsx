@@ -3,7 +3,7 @@ import React from "react";
 import Styles from "./siterulse.module.css";
 import { useRouter } from "next/navigation";
 
-export default function RulesPage() {
+export default function siterules() {
     const router = useRouter();
     
     return (
