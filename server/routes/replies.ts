@@ -8,4 +8,18 @@ const router = express.Router();
  */
 router.get("/all", replies.getAllDocuments)
 
+/** Creates and adds a document to Replies
+ *  @route POST /api/replies/
+ *  @body author - The document id for the User that created the reply
+ *  @body contents - String representing the contents of the reply (can be text or a url to the cloud storage location of the media)
+*/
+router.post("/", replies.createReply)
+
+/** Adds a reply to an existing reply
+ *  @route PATCH /api/replies/reply/:id
+ *  @param id - The document id of the reply that is being replied to
+ *  @body replyId - The document id of the reply that is being added to the reply
+*/
+router.patch("/reply/:id", replies.replyToReply);
+
 export default router;

@@ -1,6 +1,6 @@
 import { db } from "../firebase.ts"
 import { Request, Response } from "express"
-import { Timestamp } from "firebase-admin/firestore";
+import { FieldValue, Timestamp } from "firebase-admin/firestore";
 
 // // Retrieves all documents in Posts
 // const getAllDocuments = async (req: Request, res: Response) => {
@@ -86,7 +86,8 @@ const addDoc = async (req: Request, res: Response) => {
 
         res.status(200).send({
             status: "OK",
-            message: "Successfully added to Posts, " + result.id
+            message: "Successfully added to Posts, " + result.id,
+            docId: result.id
         })
     }
     catch (err) {
@@ -97,7 +98,40 @@ const addDoc = async (req: Request, res: Response) => {
     }
 }
 
+// Adds a reply to an existing post
+const replyToPost = async (req: Request, res: Response) => {
+    try {
+        const id = req.params.id;
+        const reply = req.body.replyId;
+        const replyRef = await db.collection("Replies").doc(reply);
+
+        if (!replyRef) {
+            res.send(400).send({
+                status: "Bad Request",
+                message: "Reply document reference does not exist in Replies"
+            });
+        }
+
+        const post = await db.collection("Posts").doc(id);
+        const result = await post.update({
+            listOfReplies: FieldValue.arrayUnion(db.doc(`/Replies/${reply}`))
+        });
+
+        res.status(200).send({
+            status: "OK",
+            message: result
+        })
+    }
+    catch (err) {
+        res.status(500).send({
+            status: "Backend error",
+            message: err
+        })
+    }
+}
+
 export {
     getAllDocuments,
-    addDoc
+    addDoc,
+    replyToPost
 }

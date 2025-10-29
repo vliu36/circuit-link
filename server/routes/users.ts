@@ -23,5 +23,12 @@ router.post("/register-google", users.setupGoogleUser)
  */
 router.delete("/delete/:uid", users.deleteUserDocument)
 
+/** Updates the communities field of a User 
+ *  @route PATCH /api/users/update-comm/:uid
+ *  @body mode - Boolean value where true = add, false = remove
+ *  @body community - Document id for community to add or remove
+*/
+router.patch("/update-comm/:uid", users.updateCommunityField)
+
 export default router;
 
