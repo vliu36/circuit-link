@@ -53,25 +53,9 @@ export default async function Landing(props: {
                 <h1>Top Communities</h1>
             </div>
 
-
-
-            <div className = {Styles.navBox}>
-                <div className = {Styles.homeLogo}>
-                    <img src="./circuitlinklogowback.svg"></img>
-                </div>
-                <div className = {Styles.logInInfo}>
-                    {/* <button className = {Styles.logInSignUpButton} onClick={() => router.push("./signin")}>Log In</button>
-                    <h1 className = {Styles.orText}>or</h1>
-                    <button className = {Styles.logInSignUpButton} onClick={() => router.push("./register")}> Sign up</button> */}
-                    <Link className = {Styles.logInSignUpButton} href="./signin" replace> Log In </Link>
-                    <h1 className = {Styles.orText}> or </h1>
-                    <Link className = {Styles.logInSignUpButton} href="./register" replace> Sign In </Link>
-                </div>
-            </div>
-
             <div className = {Styles.searchBarArea}>
                 <div className = {Styles.welcomeText}>
-                    Welcome to Circuit-Link
+                    Welcome to Circuit Link
                 </div>
                 <div className= {Styles.searchBarAlignment}>
                     <SearchBar/>
