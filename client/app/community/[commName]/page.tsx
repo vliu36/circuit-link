@@ -1,5 +1,5 @@
 "use client"
-import React, { use } from "react";
+import React, { use, useState, useEffect } from "react";
 import Styles from "./community.module.css";
 import { useAuth } from "../../context.tsx";
 import { logout } from "../../landing/landing.ts";
@@ -15,9 +15,23 @@ export default function CommunityPage({
 }) {
   const { commName } = use(params);
   const { user } = useAuth();
+  const [ numUsers, setNumUsers] = useState(null);
   const router = useRouter();
+  useEffect(() => {
+  async function fetchData(){
+  const res = await fetch(`http://localhost:2400/api/comm/${commName}`, {     
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const data = await res.json();
+  setNumUsers(data.numUsers);
+  }
+  fetchData();
+  }, [commName]);
   
- 
+
   return (
     <div className = {Styles.background}>
       
@@ -47,7 +61,7 @@ export default function CommunityPage({
       </div>
       
       <div>
-        <h1 className = {Styles.line}>{commName}AAA</h1>
+        <h1 className = {Styles.line}> Members: {numUsers}</h1>
       </div>
 
       <div>
