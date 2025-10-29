@@ -1,0 +1,150 @@
+.container {
+    padding: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.createSection {
+    margin-bottom: 40px;
+}
+
+.input,
+.textarea {
+    display: block;
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.textarea {
+    min-height: 100px;
+}
+
+.primaryButton {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #0070f3;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.primaryButton:hover {
+    background-color: #005bb5;
+}
+
+.postCard {
+    border: 1px solid #999;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    background-color: #5b6680;
+    color: #fff;
+    position: relative;
+    transition: transform 0.15s ease;
+}
+
+.postCard:hover {
+    transform: scale(1.02);
+}
+
+.meta {
+    font-size: 14px;
+    color: #ccc;
+}
+
+.time {
+    font-size: 14px;
+    color: #ccc;
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.actions {
+    margin-top: 10px;
+}
+
+.button {
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.editButton {
+    background-color: #f0ad4e;
+}
+
+.editButton:hover {
+    background-color: #ec971f;
+}
+
+.deleteButton {
+    background-color: #d9534f;
+}
+
+.deleteButton:hover {
+    background-color: #c9302c;
+}
+
+.saveButton {
+    background-color: #4caf50;
+}
+
+.saveButton:hover {
+    background-color: #45a049;
+}
+
+.cancelButton {
+    background-color: #888;
+}
+
+.cancelButton:hover {
+    background-color: #666;
+}
+
+.voteButton {
+    background-color: #6c757d;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.voteButton:hover {
+    background-color: #5a6268;
+}
+
+.yayActive {
+    background-color: #4caf50;
+}
+
+.yayActive:hover {
+    background-color: #45a049;
+}
+
+.nayActive {
+    background-color: #d9534f;
+}
+
+.nayActive:hover {
+    background-color: #c9302c;
+}

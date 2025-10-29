@@ -15,6 +15,16 @@ interface Post {
     edited: boolean;
 }
 
+interface Reply {
+    id: string,
+    authorUsername: string,
+    authorId: string,
+    yayList: string[],
+    nayList: string[],
+    timeReply: Timestamp;
+    listOfReplies: Reply[];
+}
+
 // // Retrieves all documents in Posts
 // const getAllDocuments = async (req: Request, res: Response) => {
 //     try {
@@ -185,7 +195,7 @@ const deleteDoc = async (req: Request, res: Response) => {
         const userId = req.body.userId;     // userId of the user requesting deletion
         // TODO: ↓↓↓ Fix this up once forums are implemented ↓↓↓
         const communityId = req.body.communityId; // the forum/community this post belongs to
-        
+
 
         const postRef = db.collection("Posts").doc(postId);
         const postDoc = await postRef.get();
@@ -244,9 +254,10 @@ const deleteDoc = async (req: Request, res: Response) => {
     } // end try catch
 } // end deletePost
 
+// Yays and Nays
 const votePost = async (req: Request, res: Response) => {
     try {
-        const { postId, userId, type } = req.body; // type: "yay" | "nay"
+        const { id, userId, type } = req.body; // type: "yay" | "nay"
         if (!["yay", "nay"].includes(type)) {
             return res.status(400).send({
                 status: "error", 
@@ -254,7 +265,7 @@ const votePost = async (req: Request, res: Response) => {
             });
         }
 
-        const postRef = db.collection("Posts").doc(postId);
+        const postRef = db.collection("Posts").doc(id);
         const postSnap = await postRef.get();
         if (!postSnap.exists) return res.status(404).send({
             status: "error", 
@@ -321,7 +332,7 @@ const votePost = async (req: Request, res: Response) => {
 // Adds a reply to an existing post
 const replyToPost = async (req: Request, res: Response) => {
     try {
-        const id = req.params.id;
+        const id = req.params.id;       // post id
         const reply = req.body.replyId;
         const replyRef = await db.collection("Replies").doc(reply);
 
@@ -350,6 +361,115 @@ const replyToPost = async (req: Request, res: Response) => {
     }
 }
 
+// Helper function for getPostById to retrieve replies for a post
+const fetchRepliesRecursively = async (replyRefs: DocumentReference[] = []): Promise<Reply[]> => {
+    if (!replyRefs || replyRefs.length === 0) {
+        return [];
+    }
+    const replies: Reply[] = [];
+
+    for (const ref of replyRefs) {
+        const replySnap = await ref.get();
+        if (!replySnap.exists) continue;
+
+        const replyData = replySnap.data();
+
+        // Dereference reply author
+        let replyAuthorUsername = "Unknown";
+        let replyAuthorId = "Unknown";
+        if (replyData?.author?.get) {
+            const authorSnap = await replyData.author.get();
+            replyAuthorUsername = authorSnap.exists ? authorSnap.data()?.username || "Unknown" : "Unknown";
+            replyAuthorId = replyData.author.path.split("/").pop() || "Unknown";
+        }
+
+        // Convert yayList/nayList references to user IDs
+        const yayList: string[] = (replyData?.yayList || []).map((ref: DocumentReference | string) =>
+            typeof ref === "string" ? ref : ref.path.split("/").pop() || "Unknown"
+        );
+        const nayList: string[] = (replyData?.nayList || []).map((ref: DocumentReference | string) =>
+            typeof ref === "string" ? ref : ref.path.split("/").pop() || "Unknown"
+        );
+
+        // Recursively fetch nested replies
+        const nestedReplies = await fetchRepliesRecursively(replyData?.listOfReplies || []);
+
+        replies.push({
+            id: replySnap.id,
+            ...replyData,
+            authorUsername: replyAuthorUsername,
+            authorId: replyAuthorId,
+            yayList,
+            nayList,
+            timeReply: replyData?.timeReply?.toMillis(),
+            listOfReplies: nestedReplies,
+        });
+    } // end for
+    
+    return replies;
+};
+
+// Retrieve a post by its ID
+const getPostById = async (req: Request, res: Response) => {
+    try {
+        const postId = req.params.id;
+        const postRef = db.collection("Posts").doc(postId);
+        const postSnap = await postRef.get();
+        
+        if (!postSnap.exists) {
+            return res.status(404).send({
+                status: "Not Found",
+                message: "Post not found",
+            });
+        }
+
+        const data = postSnap.data();
+
+        // Dereference author
+        let authorUsername = "Unknown";
+        let authorId = "Unknown";
+        if (data?.author?.get) {
+            const authorSnap = await data.author.get();
+            authorUsername = authorSnap.exists ? authorSnap.data()?.username || "Unknown" : "Unknown";
+            authorId = data.author.path.split("/").pop() || "Unknown";
+        }
+
+        // Convert yayList/nayList references to user IDs
+        const yayList: string[] = (data?.yayList || []).map((ref: DocumentReference | string) =>
+            typeof ref === "string" ? ref : ref.path.split("/").pop() || "Unknown"
+        );
+        const nayList: string[] = (data?.nayList || []).map((ref: DocumentReference | string) =>
+            typeof ref === "string" ? ref : ref.path.split("/").pop() || "Unknown"
+        );
+
+        // Fetch all replies
+        const listOfReplies = await fetchRepliesRecursively(data?.listOfReplies || []);
+
+        const formattedPost = {
+            id: postSnap.id,
+            ...data,
+            authorUsername,
+            authorId,
+            yayList,
+            nayList,
+            listOfReplies,
+            timePosted: data?.timePosted?.toMillis() || null,
+            timeUpdated: data?.timeUpdated?.toMillis() || null,
+        };
+
+        res.status(200).send({
+            status: "OK",
+            message: formattedPost,
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({
+            status: "Backend error",
+            message: err,
+        });
+    }
+} // end getPostById
+
 export {
     getAllDocuments,
     addDoc,
@@ -357,4 +477,5 @@ export {
     editDoc,
     deleteDoc,
     votePost,
+    getPostById,
 }

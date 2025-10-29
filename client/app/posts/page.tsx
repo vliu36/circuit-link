@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "../context";
+import Link from "next/link";
+import { fetchAllPosts, createPost, editPost, deletePostById, votePost } from "./posts.ts";
+import styles from "./postsPage.module.css";
 
 type Post = {
     id: string;
@@ -26,19 +29,16 @@ export default function PostsPage() {
     const [editTitle, setEditTitle] = useState("");
     const [editContents, setEditContents] = useState("");
 
-    // ---- Fetch Posts ---- //
+    // Fetch posts from backend
     const fetchPosts = async () => {
         try {
-            const res = await fetch("http://localhost:2400/api/posts/all");
-            const data = await res.json();
-
-            const formattedPosts = (data.message || []).map((post: Post) => ({
+            const data = await fetchAllPosts();
+            const formattedPosts = (data || []).map((post: Post) => ({
                 ...post,
                 timePosted: post.timePosted
                     ? new Date(post.timePosted).toLocaleString()
                     : "Unknown",
             }));
-
             setPosts(formattedPosts);
         } catch (err) {
             console.error("Failed to fetch posts:", err);
@@ -49,19 +49,13 @@ export default function PostsPage() {
         fetchPosts();
     }, []);
 
-    // ---- Add Post ---- //
-    const addPost = async () => {
+    const handleAddPost = async () => {
         if (!user) return alert("Sign in to post!");
-        if (!title || !contents) return alert("Fill title and contents");
+        if (!title || !contents) return alert("Please fill out title and contents");
 
         try {
-            const res = await fetch("http://localhost:2400/api/posts/make-post", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ author: user.uid, title, contents }),
-            });
-            const data = await res.json();
-            alert(data.message || "Post added!");
+            const msg = await createPost(user.uid, title, contents);
+            alert(msg);
             setTitle("");
             setContents("");
             fetchPosts();
@@ -70,11 +64,15 @@ export default function PostsPage() {
         }
     };
 
-    // ---- Edit Post ---- //
-    const startEditing = (post: Post) => {
-        setEditingPostId(post.id);
-        setEditTitle(post.title);
-        setEditContents(post.contents);
+    const handleSaveEdit = async (postId: string) => {
+        try {
+            const msg = await editPost(postId, user?.uid, editTitle, editContents);
+            alert(msg);
+            cancelEditing();
+            fetchPosts();
+        } catch (err) {
+            console.error("Failed to edit post:", err);
+        }
     };
 
     const cancelEditing = () => {
@@ -83,54 +81,21 @@ export default function PostsPage() {
         setEditContents("");
     };
 
-    const saveEdit = async (postId: string) => {
-        try {
-            const res = await fetch(`http://localhost:2400/api/posts/edit/${postId}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    title: editTitle,
-                    contents: editContents,
-                    userId: user?.uid,
-                }),
-            });
-            const data = await res.json();
-            alert(data.message || "Post updated!");
-            cancelEditing();
-            fetchPosts();
-        } catch (err) {
-            console.error("Failed to edit post:", err);
-        }
-    };
-
-    // ---- Delete Post ---- //
-    const deletePost = async (postId: string) => {
+    const handleDeletePost = async (postId: string) => {
         if (!confirm("Are you sure you want to delete this post?")) return;
-
         try {
-            const res = await fetch(`http://localhost:2400/api/posts/delete/${postId}`, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ userId: user?.uid }),
-            });
-            const data = await res.json();
-            alert(data.message || "Post deleted!");
+            const msg = await deletePostById(postId, user?.uid);
+            alert(msg);
             fetchPosts();
         } catch (err) {
             console.error(err);
         }
     };
 
-    // ---- Vote Post ---- //
     const handleVote = async (postId: string, type: "yay" | "nay") => {
         if (!user) return alert("Sign in to vote!");
-
         try {
-            await fetch("http://localhost:2400/api/posts/vote", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ postId, userId: user.uid, type }),
-            });
+            await votePost(postId, user.uid, type);
             fetchPosts();
         } catch (err) {
             console.error(err);
@@ -141,128 +106,99 @@ export default function PostsPage() {
     if (!user) return <div>Sign in to view posts!</div>;
 
     return (
-        <div style={{ padding: "40px", maxWidth: "800px", margin: "0 auto", fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif" }}>
-            <h1 style={{ textAlign: "center", marginBottom: "30px" }}>Posts Demo</h1>
+        <div className={styles.container}>
+            <h1 className={styles.header}>Posts Demo</h1>
 
-            <div style={{ marginBottom: "40px" }}>
+            {/* --- New Post Section --- */}
+            <div className={styles.createSection}>
                 <h2>Create New Post</h2>
                 <input
                     placeholder="Post Title"
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    style={{ display: "block", marginBottom: "10px", width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc" }}
+                    className={styles.input}
                 />
                 <textarea
                     placeholder="Post Contents"
                     value={contents}
                     onChange={(e) => setContents(e.target.value)}
-                    style={{ display: "block", marginBottom: "10px", width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ccc", minHeight: "100px" }}
+                    className={styles.textarea}
                 />
-                <button
-                    onClick={addPost}
-                    style={{ padding: "10px 20px", borderRadius: "8px", border: "none", backgroundColor: "#0070f3", color: "#fff", cursor: "pointer" }}
-                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#005bb5")}
-                    onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#0070f3")}
-                >
+                <button className={styles.primaryButton} onClick={handleAddPost}>
                     Add Post
                 </button>
             </div>
 
+            {/* --- Posts List --- */}
             <h2>All Posts</h2>
             {posts.length === 0 ? (
                 <p>No posts found.</p>
             ) : (
                 posts.map((post) => {
                     const isAuthor = post.authorId === user.uid;
+                    const isEditing = editingPostId === post.id;
+
                     return (
                         <div
                             key={post.id}
-                            style={{
-                                border: "1px solid #999",
-                                borderRadius: "12px",
-                                padding: "20px",
-                                marginBottom: "20px",
-                                boxShadow: "0 4px 8px rgba(0,0,0,0.05)",
-                                backgroundColor: "#5B6680",
-                                color: "#fff",
-                                transition: "transform 0.15s ease",
-                                position: "relative",
-                            }}
-                            onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
-                            onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                            className={styles.postCard}
                         >
-                            {editingPostId === post.id ? (
+                            {isEditing ? (
                                 <>
                                     <input
                                         value={editTitle}
                                         onChange={(e) => setEditTitle(e.target.value)}
-                                        style={{ width: "100%", padding: "8px", marginBottom: "10px", borderRadius: "6px", border: "1px solid #ccc" }}
+                                        className={styles.input}
                                     />
                                     <textarea
                                         value={editContents}
                                         onChange={(e) => setEditContents(e.target.value)}
-                                        style={{ width: "100%", padding: "8px", minHeight: "80px", marginBottom: "10px", borderRadius: "6px", border: "1px solid #ccc" }}
+                                        className={styles.textarea}
                                     />
                                     <button
-                                        onClick={() => saveEdit(post.id)}
-                                        style={{ marginRight: "10px", backgroundColor: "#4CAF50", color: "white", padding: "6px 12px", border: "none", borderRadius: "6px", cursor: "pointer" }}
-                                        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#45a049")}
-                                        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#4CAF50")}
+                                        onClick={() => handleSaveEdit(post.id)}
+                                        className={`${styles.button} ${styles.saveButton}`}
                                     >
                                         Save
                                     </button>
                                     <button
                                         onClick={cancelEditing}
-                                        style={{ backgroundColor: "#888", color: "white", padding: "6px 12px", border: "none", borderRadius: "6px", cursor: "pointer" }}
-                                        onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#666")}
-                                        onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#888")}
+                                        className={`${styles.button} ${styles.cancelButton}`}
                                     >
                                         Cancel
                                     </button>
                                 </>
                             ) : (
                                 <>
-                                    <h3>{post.title}</h3>
-                                    <p>{post.contents}</p>
-                                    <p style={{ fontSize: "14px", color: "#ccc" }}>
+                                    {/* Wrap clickable area for the post */}
+                                    <Link href={`/posts/${post.id}`}>
+                                        <h3>{post.title}</h3>
+                                        <p>{post.contents}</p>
+                                    </Link>
+                                    <p className={styles.meta}>
                                         <strong>Author:</strong> {post.authorUsername}
                                     </p>
-                                    <p style={{ fontSize: "14px", color: "#ccc", position: "absolute", top: "20px", right: "20px" }}>
+                                    <p className={styles.time}>
                                         {post.timePosted} {post.edited && "(edited)"}
                                     </p>
-                                    <p style={{ fontSize: "14px", color: "#ccc" }}>
+                                    <p className={styles.meta}>
                                         <strong>Yay Score:</strong> {post.yayScore}
                                     </p>
 
-                                    <div style={{ marginTop: "10px" }}>
+                                    <div className={styles.actions}>
                                         <button
                                             onClick={() => handleVote(post.id, "yay")}
-                                            style={{
-                                                marginRight: "10px",
-                                                backgroundColor: post.yayList.includes(user.uid) ? "#4CAF50" : "#6c757d",
-                                                color: "white",
-                                                padding: "5px 10px",
-                                                border: "none",
-                                                borderRadius: "6px",
-                                                cursor: "pointer",
-                                            }}
-                                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = post.yayList.includes(user.uid) ? "#45a049" : "#5a6268")}
-                                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = post.yayList.includes(user.uid) ? "#4CAF50" : "#6c757d")}
+                                            className={`${styles.voteButton} ${
+                                                post.yayList.includes(user.uid) ? styles.yayActive : ""
+                                            }`}
                                         >
                                             👍 Yay
                                         </button>
                                         <button
                                             onClick={() => handleVote(post.id, "nay")}
-                                            style={{
-                                                backgroundColor: post.nayList.includes(user.uid) ? "#d9534f" : "#6c757d",
-                                                color: "white",
-                                                padding: "5px 10px",
-                                                border: "none",
-                                                borderRadius: "6px",
-                                                cursor: "pointer",
-                                            }}
-                                            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = post.nayList.includes(user.uid) ? "#c9302c" : "#5a6268")}
-                                            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = post.nayList.includes(user.uid) ? "#d9534f" : "#6c757d")}
+                                            className={`${styles.voteButton} ${
+                                                post.nayList.includes(user.uid) ? styles.nayActive : ""
+                                            }`}
                                         >
                                             👎 Nay
                                         </button>
@@ -270,18 +206,18 @@ export default function PostsPage() {
                                         {isAuthor && (
                                             <>
                                                 <button
-                                                    onClick={() => startEditing(post)}
-                                                    style={{ marginLeft: "10px", backgroundColor: "#f0ad4e", color: "white", padding: "5px 10px", border: "none", borderRadius: "6px", cursor: "pointer" }}
-                                                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#ec971f")}
-                                                    onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#f0ad4e")}
+                                                    onClick={() => {
+                                                        setEditingPostId(post.id);
+                                                        setEditTitle(post.title);
+                                                        setEditContents(post.contents);
+                                                    }}
+                                                    className={`${styles.button} ${styles.editButton}`}
                                                 >
                                                     Edit
                                                 </button>
                                                 <button
-                                                    onClick={() => deletePost(post.id)}
-                                                    style={{ marginLeft: "10px", backgroundColor: "#d9534f", color: "white", padding: "5px 10px", border: "none", borderRadius: "6px", cursor: "pointer" }}
-                                                    onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#c9302c")}
-                                                    onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#d9534f")}
+                                                    onClick={() => handleDeletePost(post.id)}
+                                                    className={`${styles.button} ${styles.deleteButton}`}
                                                 >
                                                     Delete
                                                 </button>

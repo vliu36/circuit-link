@@ -22,4 +22,14 @@ router.post("/", replies.createReply)
 */
 router.patch("/reply/:id", replies.replyToReply);
 
+/** Likes/Dislikes a post
+ *  @route POST /api/replies/vote
+ *  @body postId - Id of the post that is being voted
+ *  @body userId - Id of the user that is voting
+ *  @body type - Type of vote the user is casting (yay/nay)
+ */
+router.post("/vote", replies.voteReply);
+
+
+
 export default router;

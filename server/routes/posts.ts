@@ -51,4 +51,10 @@ router.delete("/delete/:id", posts.deleteDoc);
  */
 router.post("/vote", posts.votePost);
 
+/** Gets a post by its id
+ *  @route GET /api/posts/get/:id
+ *  @params id - The id of the document to be edited
+ */
+router.get("/get/:id", posts.getPostById);
+
 export default router;
