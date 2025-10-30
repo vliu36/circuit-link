@@ -172,8 +172,8 @@ export default function PostsPage() {
                                 <>
                                     {/* Wrap clickable area for the post */}
                                     <Link href={`/posts/${post.id}`}>
-                                        <h3>{post.title}</h3>
-                                        <p>{post.contents}</p>
+                                        <h3 className={styles.title}>{post.title}</h3>
+                                        <p className={styles.contents}>{post.contents}</p>
                                     </Link>
                                     <p className={styles.meta}>
                                         <strong>Author:</strong> {post.authorUsername}

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+// import { deletePostById, editPost } from "../posts.ts";
 
 export type Reply = {
     id: string;
@@ -12,10 +13,8 @@ export type Reply = {
     nayList: string[];
     listOfReplies: Reply[];
     timeReply: string;
-    edited?: boolean;
+    edited: boolean;
 };
-
-
 
 export type Post = {
     id: string;
@@ -28,18 +27,19 @@ export type Post = {
     nayList: string[];
     listOfReplies: Reply[];
     timePosted: string;
+    edited: boolean;
 };
 
 export const useReplies = (postId: string, userId?: string) => {
     const [post, setPost] = useState<Post | null>(null);
     const [loading, setLoading] = useState(true);
-
+    const BASE_URL = "http://localhost:2400/api";
 
 
     const fetchPost = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:2400/api/posts/get/${postId}`);
+            const res = await fetch(`${BASE_URL}/posts/get/${postId}`);
             const data = await res.json();
             const p: Post = data.message;
 
@@ -113,7 +113,7 @@ export const useReplies = (postId: string, userId?: string) => {
         });
 
         try {
-            await fetch(isReply ? `http://localhost:2400/api/replies/vote` : `http://localhost:2400/api/posts/vote`, {
+            await fetch(isReply ? `${BASE_URL}/replies/vote` : `${BASE_URL}/posts/vote`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ id, userId, type }),
@@ -129,7 +129,7 @@ export const useReplies = (postId: string, userId?: string) => {
         if (!userId || !contents.trim()) return;
 
         try {
-            const res = await fetch(`http://localhost:2400/api/replies/`, {
+            const res = await fetch(`${BASE_URL}/replies/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ author: userId, contents }),
@@ -138,8 +138,8 @@ export const useReplies = (postId: string, userId?: string) => {
             const newReplyId = data.docId;
 
             const patchUrl = isReply
-                ? `http://localhost:2400/api/replies/reply/${parentId}`
-                : `http://localhost:2400/api/posts/reply/${parentId}`;
+                ? `${BASE_URL}/replies/reply/${parentId}`
+                : `${BASE_URL}/posts/reply/${parentId}`;
 
             await fetch(patchUrl, {
                 method: "PATCH",
@@ -153,5 +153,45 @@ export const useReplies = (postId: string, userId?: string) => {
         }
     };
 
-    return { post, handleVote, addReply, loading };
+    const editReply = async (replyId: string, userId: string | undefined, contents: string) => {
+        const res = await fetch(`${BASE_URL}/replies/edit/${replyId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ contents, userId }), 
+        });
+        const data = await res.json();
+        return data.message || "Post updated!";
+    }
+    
+    const deleteReplyById = async (replyId: string, userId: string | undefined) => {
+        const res = await fetch(`${BASE_URL}/replies/delete/${replyId}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId }), 
+        });
+        const data = await res.json();
+        return data.message || "Post deleted!";
+    }
+
+    const editPost = async (postId: string, userId: string | undefined, title: string, contents: string) => {
+        const res = await fetch(`${BASE_URL}/posts/edit/${postId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ title, contents, userId }), 
+        });
+        const data = await res.json();
+        return data.message || "Post updated!";
+    }
+    
+    const deletePostById = async (postId: string, userId: string | undefined) => {
+        const res = await fetch(`${BASE_URL}/posts/delete/${postId}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userId }), // TODO: ditto as createPost
+        });
+        const data = await res.json();
+        return data.message || "Post deleted!";
+    }
+
+    return { post, handleVote, addReply, loading, editReply, deleteReplyById, editPost, deletePostById, fetchPost };
 };

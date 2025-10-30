@@ -45,6 +45,8 @@
 
 .postCard {
     border: 1px solid #999;
+    white-space: pre-wrap;
+    word-wrap: break-word;
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 20px;
@@ -59,9 +61,21 @@
     transform: scale(1.02);
 }
 
+.title {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.contents {
+    font-size: 16px;
+    font-weight: 400;
+}
+
 .meta {
     font-size: 14px;
+    font-weight: 100;
     color: #ccc;
+    margin-top: 5px;
 }
 
 .time {

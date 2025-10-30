@@ -32,12 +32,29 @@
     transition: transform 0.15s ease;
 }
 
+.replyCard p,
+.postCard p {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
 .replyCard:hover {
     transform: scale(1.02);
 }
 
+.title {
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.contents {
+    font-size: 16px;
+    font-weight: 400;
+}
+
 .meta {
     font-size: 14px;
+    font-weight: 100;
     color: #ccc;
     margin-top: 5px;
 }
@@ -54,6 +71,7 @@
 
 .voteButton {
     background-color: #6c757d;
+    font-size: 14px;
     color: white;
     padding: 5px 10px;
     border: none;
@@ -75,14 +93,33 @@
     background-color: #d9534f;
 }
 
-.editButton {
-    background-color: #f0ad4e;
+.replyButton {
+    background-color: #699DD8;
+    font-size: 14px;
     color: #fff;
     padding: 5px 10px;
     border: none;
     border-radius: 6px;
     cursor: pointer;
     margin-top: 10px;
+    margin-right: 32px;
+    transition: background-color 0.2s ease;
+}
+
+.replyButton:hover {
+    background-color: #517cad;
+}
+
+.editButton {
+    background-color: #f0ad4e;
+    font-size: 14px;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+    margin-right: 10px;
     transition: background-color 0.2s ease;
 }
 
@@ -98,5 +135,20 @@
     border-radius: 8px;
     border: 1px solid #ccc;
     font-size: 14px;
+}
+
+.deleteButton {
+    background-color: #d9534f;
+    font-size: 14px;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 5px 10px;
+    margin-right: 10px;
+    cursor: pointer;
+}
+
+.deleteButton:hover {
+    background-color: #c9302c;
 }
 

@@ -23,6 +23,8 @@ interface Reply {
     nayList: string[],
     timeReply: Timestamp;
     listOfReplies: Reply[];
+    edited: boolean;
+    contents: string;
 }
 
 // // Retrieves all documents in Posts
@@ -44,6 +46,20 @@ interface Reply {
 //         })
 //     }    
 // }
+
+const deleteRepliesRecursive = async (replyRefs: FirebaseFirestore.DocumentReference[]) => {
+    for (const replyRef of replyRefs) {
+        const replyDoc = await replyRef.get();
+        if (!replyDoc.exists) continue;
+
+        const replyData = replyDoc.data();
+        if (replyData?.listOfReplies?.length) {
+            await deleteRepliesRecursive(replyData.listOfReplies);
+        }
+
+        await replyRef.delete();
+    } // end for
+} // end helper function deleteRepliesRecursive
 
 // Retrieves all documents in Posts sorted by date posted (modified to get post authors from Users)
 const getAllDocuments = async (req: Request, res: Response) => {
@@ -238,6 +254,10 @@ const deleteDoc = async (req: Request, res: Response) => {
             });
         }
 
+        // Delete all replies recursively
+        const replyRefs: FirebaseFirestore.DocumentReference[] = postData?.listOfReplies || [];
+        await deleteRepliesRecursive(replyRefs);
+
         // Delete the document from Firestore
         await postRef.delete();
 
@@ -396,6 +416,8 @@ const fetchRepliesRecursively = async (replyRefs: DocumentReference[] = []): Pro
 
         replies.push({
             id: replySnap.id,
+            contents: replyData?.contents || "",
+            edited: replyData?.edited,
             ...replyData,
             authorUsername: replyAuthorUsername,
             authorId: replyAuthorId,
