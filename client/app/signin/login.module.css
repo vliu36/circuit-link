@@ -64,6 +64,10 @@
   margin-left: 35%;
 }
 
+.loginButton:hover {
+  transform: scale(1.1);
+}
+
 .forgotPasswordBox {
   width: 100px;
   margin-bottom: 20px;
@@ -76,6 +80,10 @@
 
 .googleButton {
   margin-right: 65%;
+}
+
+.googleButton:hover {
+  transform: scale(1.1);
 }
 
 .registerLink {

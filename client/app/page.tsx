@@ -1,9 +1,11 @@
-"use server";
+"use server"
 
 import Styles from './landingPage.module.css';
 import SearchBar from "./_components/searchbar/search.tsx";
 // import { useRouter } from "next/navigation";
 import Link from "next/link";
+import AuthButtons from './_components/navbar/authbuttons.tsx';
+import Image from "next/image";
 
 export default async function Landing(props: {
     searchParams?: Promise<{
@@ -53,6 +55,16 @@ export default async function Landing(props: {
                 <h1>Top Communities</h1>
             </div>
 
+            <div className = {Styles.navBox}>
+                <Link href="/">
+                    <Image className = {Styles.homeLogo} src="/circuitlinklogowback.svg" width={200} height={50} alt="Circuit Link Logo"/>
+                </Link>
+                <div className = {Styles.logInInfo}>
+                    <Link className = {Styles.logInSignUpButton} href="./signin" replace> Log In </Link>
+                    <h1 className = {Styles.orText}> or </h1>
+                    <Link className = {Styles.logInSignUpButton} href="./register" replace> Sign Up </Link>
+                </div>
+            </div>
             <div className = {Styles.searchBarArea}>
                 <div className = {Styles.welcomeText}>
                     Welcome to Circuit Link

@@ -7,6 +7,7 @@ import AuthButtons from "./authbuttons.tsx";
 import { useEffect, useState } from "react";
 import { User } from "firebase/auth";
 import { authStateCallback } from "@/app/auth-observer.ts";
+import { useAuth } from "@/app/context.tsx";
            
 export default function NavBar() {
     const [user, setUser] = useState<User | null>(null);
@@ -19,11 +20,11 @@ export default function NavBar() {
     }, []);
 
     return (
-        <nav className = {Styles.navBox}>
+        <div className = {Styles.navBox}>
             <Link href="/">
                 <Image className = {Styles.homeLogo} src="/circuitlinklogowback.svg" width={200} height={50} alt="Circuit Link Logo"/>
             </Link>
             <AuthButtons user={user}/>
-        </nav>
+        </div>
     )
 }
