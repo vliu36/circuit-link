@@ -1,13 +1,14 @@
 "use client";
-import { auth, db } from "../firebase";
 import React, { useState, useEffect } from "react";
-import { User, onAuthStateChanged } from "firebase/auth";
-// import { deleteUserAccount, logout, editProfile } from "./profile";
 import * as profileFunctions from "./profile";
-import { doc, getDoc } from "firebase/firestore";
 import { useAuth } from "../context";
-import { profile } from "console";
 import "./profile-styles.css";
+// import { auth, db } from "../firebase";
+// import { User, onAuthStateChanged } from "firebase/auth";
+// import { deleteUserAccount, logout, editProfile } from "./profile";
+// import { doc, getDoc } from "firebase/firestore";
+// import { profile } from "console";
+
 
 export default function Profile() {
     const { user, userData, loading } = useAuth();
@@ -34,13 +35,15 @@ export default function Profile() {
     // Live username validation
     useEffect(() => {
         if (!newUsername) {
-            if (error) setError("");
+            // if (error) setError("");
+            setError("");
             return;
         }
         const localError = profileFunctions.basicUsernameCheck(newUsername);
-        if (error !== localError) {
-            setError(localError);
-        }
+        setError(localError);
+        // if (error !== localError) {
+        //     setError(localError);
+        // }
     }, [newUsername]); // end useEffect
 
     // Show loading message while auth state is being determined
@@ -164,12 +167,12 @@ export default function Profile() {
                     <br/>
                     {/* Change Text Size */}
                     <label>Text Size: </label>
-                    <input type="number" name="textSize" defaultValue={userData.textSize} min={8} max={72} onChange={(e) => {setTextSize(e.target.value)}}/>
+                    <input type="number" name="textSize" defaultValue={userData?.textSize} min={8} max={72} onChange={(e) => {setTextSize(Number(e.target.value))}}/>
                     <em> -  effect to be implemented </em>
                     <br/>
                     {/* Change Font */}
                     <label>Font: </label>
-                    <select id="font" name="font" defaultValue={userData.font} onChange={(e) => {setFont(e.target.value)}}>
+                    <select id="font" name="font" defaultValue={userData?.font} onChange={(e) => {setFont(e.target.value)}}>
                         <option value="Arial">Arial</option>
                         <option value="Verdana">Verdana</option>
                         <option value="Helvetica">Helvetica</option>
@@ -182,17 +185,17 @@ export default function Profile() {
                     <br/>
                     {/* Dark Mode */}
                     <label>Dark Mode: </label>
-                    <input type="checkbox" name="darkMode" defaultChecked={userData.darkMode} onChange={(e) => {setDarkMode(e.target.checked)}}/>
+                    <input type="checkbox" name="darkMode" defaultChecked={userData?.darkMode} onChange={(e) => {setDarkMode(e.target.checked)}}/>
                     <em> -  effect to be implemented </em>
                     <br/>
                     {/* Private Mode */}
                     <label>Private Mode: </label>
-                    <input type="checkbox" name="privateMode" defaultChecked={userData.privateMode} onChange={(e) => {setPrivateMode(e.target.checked)}} />
+                    <input type="checkbox" name="privateMode" defaultChecked={userData?.privateMode} onChange={(e) => {setPrivateMode(e.target.checked)}} />
                     <em> -  effect to be implemented </em>
                     <br/>
                     {/* Restricted Mode */}
                     <label>Restricted Mode: </label>
-                    <input type="checkbox" name="restrictedMode" defaultChecked={userData.restrictedMode} onChange={(e) => {setRestrictedMode(e.target.checked)}} />
+                    <input type="checkbox" name="restrictedMode" defaultChecked={userData?.restrictedMode} onChange={(e) => {setRestrictedMode(e.target.checked)}} />
                     <em> -  effect to be implemented </em>
                     <br/>
                     <button type="submit"><u>&gt; Save Changes</u></button>

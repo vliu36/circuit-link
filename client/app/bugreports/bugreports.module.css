@@ -1,0 +1,125 @@
+.background {
+    background-color: rgba(57, 65, 83, 1);
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    justify-content: center;
+}
+
+.pageDoc{
+    display: flex;
+    position: sticky;
+    width: 70%;
+    height: 80vh;
+    background-color:rgba(109, 115, 130, 1);
+    margin-top: 80px;
+    flex-direction: column;
+    border-radius: 1em;
+}
+
+.responseBox{
+    display:flex;
+    flex-direction: column;
+    width: 90%;
+    height: 50px;
+    position: absolute;
+    top: 100px;
+}
+
+.responseBox2{
+    display:flex;
+    flex-direction: column;
+    width: 90%;
+    height: 50px;
+    position: absolute;
+    top: 200px;
+}
+
+.heading1{
+    font-family: 'Courier New', Courier, monospace;
+    color: white;
+    font-size: 20px;
+    margin-left: 25px;
+}
+
+.heading2{
+    font-family: 'Courier New', Courier, monospace;
+    color: white;
+    font-size: 12px;
+    margin-left: 25px;
+}
+
+.returnButton {
+    position: absolute;
+    background-color: #3F6DA1;
+    height: 30px;
+    width: 80px;
+    border-radius: 1em;
+    top: 25px;
+    left: 10px;
+}
+
+.returnButton:hover {
+  background-color: blue;
+}
+
+.returnButtonText {
+    margin-top: 0px;
+    margin-left: 10px;
+    font-family: Courier;
+    color: white;
+    position: relative;
+    font-size: 0.8rem;
+    text-align: center;
+}
+
+.dropdownBar{
+    display:flex;
+    background-color: rgba(217, 217, 217, 1);
+    width: 90%;
+    height: 25px;
+    position: absolute;
+    left: 3vw;
+    top: 20px;
+    border-radius: 1em;
+}
+
+.responseBar{
+    display:flex;
+    background-color: rgba(217, 217, 217, 1);
+    width: 90%;
+    height: 300px;
+    position: absolute;
+    left: 3vw;
+    top: 20px;
+    border-radius: 1em;
+    color: black;
+    justify-content: flex-start;
+    align-items: flex-start;
+    text-align: left;
+    padding: 10px;
+}
+
+.submitButton {
+    position: absolute;
+    background-color: #3F6DA1;
+    height: 30px;
+    width: 120px;
+    border-radius: 1em;
+    bottom: 5vw;
+    margin-left: 25vw;
+}
+
+.submitButton:hover {
+  background-color: blue;
+}
+
+.submitButtonText {
+    margin-top: 0px;
+    margin-left: 10px;
+    font-family: Courier;
+    color: white;
+    position: relative;
+    font-size: 0.8rem;
+    text-align: center;
+}

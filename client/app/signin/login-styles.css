@@ -1,4 +1,8 @@
 
+:root {
+  overflow: hidden;
+}
+
 .login-container{
   display: flex;
   font-family: Courier;
@@ -11,7 +15,7 @@
   justify-content: center;
   position: relative;
   left: 400px;
-  top: 130px;
+  top: 100px;
   border-radius: 15%;
   align-items: center;
 }
@@ -56,6 +60,10 @@
    top: 20px;
 }
 
+.button-box:hover {
+  transform: scale(1.1);
+}
+
 .forgot-password{
    height: 40px;
    width: 200px;
@@ -67,6 +75,10 @@
    font-family: 'Courier New', Courier, monospace;
 }
 
+.forgot-password:hover {
+  transform: scale(1.1);
+}
+
 .sign-with-google{
    height: 30px;
    width: 300px;
@@ -75,7 +87,11 @@
    color: black;
    position:relative;
    left: 350px;
-   top: 150px;
+   top: 110px;
+}
+
+.sign-with-google:hover {
+  transform: scale(1.1);
 }
 
 .transparent-button-box-2{

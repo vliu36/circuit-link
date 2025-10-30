@@ -2,7 +2,7 @@ import { db } from "../firebase.ts";
 import { Request, Response } from "express";
 import { getAuth as getAdminAuth } from "firebase-admin/auth";
 // import { GoogleAuth } from "google-auth-library";
-import { getFirestore } from "firebase-admin/firestore";
+import { FieldValue, getFirestore } from "firebase-admin/firestore";
 // import { signInWithEmailAndPassword } from "firebase/auth";
 // import {getAuth} from "firebase/auth";
 
@@ -62,6 +62,7 @@ const userRegistration = async (req: Request, res: Response) => {
             font: "Arial",          // TODO: Change to a different default font
             notifications: [],
             communities: [],
+            friends: []
         });
 
         res.status(201).json({ message: "User created successfully", uid: userId })
@@ -94,6 +95,7 @@ const setupGoogleUser = async (req: Request, res: Response) => {
             font: "Arial",          // TODO: Change to a different default font
             notifications: [],
             communities: [],
+            friends: []
         });
 
         res.status(201).json({ message: "Google user setup successfully", uid: uid })
@@ -119,9 +121,43 @@ const deleteUserDocument = async (req: Request, res: Response) => {
     } // end try catch
 } // end function deleteUserDocument
 
+// Update user document communities field
+const updateCommunityField = async (req: Request, res: Response) => {
+    try {
+        const uid = req.params.uid;
+        const mode = req.body.mode;
+        const commRef = req.body.community;
+
+        if (mode) {
+            const user = await db.collection("Users").doc(uid);
+            await user.update({
+                communities: FieldValue.arrayUnion(db.doc(`/Communities/${commRef}`))
+            });
+        }
+        else {
+            const user = await db.collection("Users").doc(uid);
+            await user.update({
+                communities: FieldValue.arrayRemove(db.doc(`/Communities/${commRef}`))
+            });
+        }
+
+        res.status(200).send({
+            status: "OK",
+            message: `Successfully updated community field in document: ${uid}`
+        })
+    }
+    catch (err) {
+        res.status(500).send({
+            status: "Backend error",
+            message: err
+        })
+    }
+}
+
 export {
     getAllDocuments,
     userRegistration,
     setupGoogleUser,
-    deleteUserDocument
+    deleteUserDocument,
+    updateCommunityField
 }

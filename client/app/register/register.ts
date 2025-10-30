@@ -3,7 +3,8 @@
 import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
 import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
-import "./register-styles.css";
+import { FirebaseError } from "firebase/app";
+import "./register.module.css";
 
 const provider = new GoogleAuthProvider();
 
@@ -39,9 +40,10 @@ export async function registerWithGoogle() {
     try {
         const result = await signInWithPopup(auth, provider);
         
-        // This gives you a Google Access Token. You can use it to access the Google API.
-        const credential = GoogleAuthProvider.credentialFromResult(result);
-        const token = credential?.accessToken;
+        // These weren't used
+        // // This gives you a Google Access Token. You can use it to access the Google API.
+        // const credential = GoogleAuthProvider.credentialFromResult(result);
+        // const token = credential?.accessToken;
 
         // Check if account already exists
         const docSnap = await getDoc(doc(db, "Users", result.user.uid));
@@ -78,17 +80,18 @@ export async function registerWithGoogle() {
         // alert(data.message); // placeholder, replace with better UI feedback
         window.location.href = "http://localhost:3000/landing"
 
-    } catch (error: any) {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // The email of the user's account used.
-        const email = error.customData.email;
-        // The AuthCredential type that was used.
-        const credential = GoogleAuthProvider.credentialFromError(error);
-        console.error("Error during Google sign-in:", errorCode, errorMessage, email, credential);
-        alert("Error during Google sign-in: " + errorMessage);
+    } catch (error) {
+        if (error instanceof FirebaseError) {
+            const errorCode = error.code;
+            const errorMessage = error.message;
+            const email = (error.customData as { email?: string })?.email; // Email of the user's account used
+            const credential = GoogleAuthProvider.credentialFromError(error); // AuthCredential type that was used
+            
+            console.error("Error during Google sign-in:", errorCode, errorMessage, email, credential);
+            alert("Error during Google sign-in: " + errorMessage);
+        } else {
+            console.error("Unexpected error during Google sign-in:", error);
+            alert("An unexpected error occurred during sign-in.");
+        }
     } // end try catch
 } // end function registerWithGoogle
-
-
-// TODO: implement function that hides email/password hints when input is satisfactory, highlight textbox green

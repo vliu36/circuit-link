@@ -1,4 +1,6 @@
-FROM node:24
+FROM node:20
+
+ENV NODE_ENV=production
 
 WORKDIR /client
 

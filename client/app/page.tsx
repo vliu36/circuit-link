@@ -1,42 +1,20 @@
-"use client";
-import React, {useEffect, useState} from "react";
-import Styles from './landingPage.module.css';
-import { useAuth } from "./context.tsx";
-import { logout } from "./landing.ts";
-import SearchBar from "./search/searchbar.tsx";
-import SearchResults from "./search/searchResult.tsx";
-import { useRouter } from "next/navigation";
-import env from "dotenv";
+"use server"
 
-export default function Landing() {
-    const { user, userData, loading } = useAuth();
-    const router = useRouter();
-    
-        const handleClick = async () => {
-            try {
-                // const response = await fetch("https://circuitlink-160321257010.us-west2.run.app/api/users/all"), {
-                const response = await fetch("http://localhost:2400/api/users/all", {     
-                    method: "GET",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                });
-    
-                if (response.ok) {
-                    // window.location.href = "https://circuitlink-160321257010.us-west2.run.app/api/users/all";
-                    window.location.href = "http://localhost:2400/api/users/all";
-                }
-                else {
-                    console.error("Request failed due to skill issue:", response.status);
-                }
-            }
-            catch (error) {
-                console.error("Error sending request:", error);
-            }
-        };
+import Styles from './landingPage.module.css';
+import SearchBar from "./_components/searchbar/search.tsx";
+// import { useRouter } from "next/navigation";
+import Link from "next/link";
+import AuthButtons from './_components/navbar/authbuttons.tsx';
+import Image from "next/image";
+
+export default async function Landing(props: {
+    searchParams?: Promise<{
+        query?: string;
+        page?: string;
+    }>;
+}) {
 
     return (
-       
         <div className = {Styles.background}>
 
             <div className = {Styles.yourCommunitiesBar}>
@@ -77,29 +55,23 @@ export default function Landing() {
                 <h1>Top Communities</h1>
             </div>
 
-
-
             <div className = {Styles.navBox}>
-                <div className = {Styles.homeLogo}>
-                    <img src="./circuitlinklogowback.svg"></img>
-                </div>
+                <Link href="/">
+                    <Image className = {Styles.homeLogo} src="/circuitlinklogowback.svg" width={200} height={50} alt="Circuit Link Logo"/>
+                </Link>
                 <div className = {Styles.logInInfo}>
-                    <button className = {Styles.logInSignUpButton} onClick={() => router.push("./signin")}>Log In</button>
-                    <h1 className = {Styles.orText}>or</h1>
-                    <button className = {Styles.logInSignUpButton} onClick={() => router.push("./register")}> Sign up</button>
+                    <Link className = {Styles.logInSignUpButton} href="./signin" replace> Log In </Link>
+                    <h1 className = {Styles.orText}> or </h1>
+                    <Link className = {Styles.logInSignUpButton} href="./register" replace> Sign Up </Link>
                 </div>
             </div>
-
             <div className = {Styles.searchBarArea}>
                 <div className = {Styles.welcomeText}>
-                    Welcome to Circuit-Link
+                    Welcome to Circuit Link
                 </div>
-                <h3 className = {Styles.searchBarAlignment}>
+                <div className= {Styles.searchBarAlignment}>
                     <SearchBar/>
-                </h3>
-                <h4> 
-                    <SearchResults />
-                </h4>
+                </div>
             </div>
         </div>
         

@@ -1,6 +1,8 @@
 
 FROM node:24
 
+ENV NODE_ENV=production
+
 WORKDIR /server
 
 COPY package*.json ./

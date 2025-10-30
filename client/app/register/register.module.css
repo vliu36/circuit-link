@@ -1,0 +1,193 @@
+@font-face {
+  font-family: Jura;
+  src: url('../../public/fonts/Jura-Light.ttf');
+}
+
+.hint {
+  font-size: 9px;
+  color: #ffffff;
+}
+
+.blackHint{
+  height: 9px;
+  width: 100%;
+}
+
+.background{
+  background-color: rgba(57, 65, 83, 1);
+  height: 100%;
+  width: 100%;
+}
+
+.box{
+  display: flex;
+  color: white;
+  flex-direction: column;
+  width: 30%;
+  height: 60%;
+  background-color: rgba(91, 102, 128, 1); 
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 5%;
+}
+
+
+.lblBox{
+  height: 10%;
+  width: 100%;
+  font-size: 32px;
+  text-align: center;
+  margin-top: 10px;
+  font-weight: bold;
+  font-family: 'Jura';
+}
+
+.smallBox{
+  height: 25%;
+  width: 80%;
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  margin-left: 10%;
+  font-family: 'Jura';
+  font-size: 16px;
+}
+
+.txtBox{
+   height: 50%;
+   width: 100%;
+   background-color: #699DD8;
+   border: 1px solid white;
+   border-radius: 2em;
+   text-indent: 5px;
+   font-size: 16px;
+   position: relative;
+   font-family: 'Courier New', Courier, monospace;
+   overflow: hidden;
+}
+
+.checkBox{
+  height: 10%;
+  width: 40%;
+  margin-left: 10%;
+  font-family: 'Jura';
+  font-size: 12px;
+}
+
+.buttonBox{
+   height: 40px;
+   width: 30%;
+   margin-left: 35%;
+   border-radius: 1em;
+   background-color: #699DD8;
+   font-family: 'Jura';
+   font-size: 23px;
+   border: 1px solid white;
+}
+
+.lineBox{
+  margin-top: 5%;
+  height: 25%;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+}
+
+.lefthorizontalLine{
+  height: 2px;
+  width: 37%;
+  margin-top: 20px;
+  margin-left: 5%;
+  background-color: #ffffff;
+
+}
+
+.righthorizontalLine{
+  height: 2px;
+  width: 37%;
+  margin-top: 20px;
+  margin-left: 5%;
+  background-color: #ffffff;
+
+}
+
+.orBox{
+  width: 5%;
+  height: 2px;
+  font-size: 30px;
+  color:white;
+  margin-left: 5%;
+  font-family: 'Jura';
+}
+
+.signUpWithGoogleButton{
+   height: 15%;
+   width: 80%;
+   border-radius: 1em;
+   background-color: #f7f7f7;
+   color: black;
+   margin-left: 10%;
+   font-size: 22px;
+   font-family: 'Jura';
+   display: flex;
+   margin-top: 10px;
+}
+
+.signUpWithGoogleText{
+  margin-left: 10%;
+  margin-top: 1.5%;
+
+}
+
+.transparentButtonBox{
+   height: 30px;
+   width: 50%;
+   position:absolute;
+   left: 43.75%;
+   bottom: 15%;
+   font-family: 'Jura';
+}
+
+@media(max-height: 800px){
+  .hint {
+    font-size: 0px;
+    color: #ffffff00;
+  }
+  .lineBox{
+    margin-top: 0%;
+    height: 17%;
+  }
+  .orBox{
+    margin-left: 0%;
+  }
+  .lefthorizontalLine{
+    width: 32.5%;
+    margin-right: 5%;
+  }
+
+  .righthorizontalLine{
+    width: 32.5%;
+    margin-left: 10%;
+  }
+
+  .signUpWithGoogleButton{
+   height: 12.5%;
+   font-size: 12px;
+  }
+
+  .transparentButtonBox{
+   height: 30px;
+   width: 50%;
+   position:absolute;
+   left: 38%;
+   bottom: 15%;
+  }
+
+  .buttonBox{
+    margin-left: 32.5%;
+    font-size: 15px;
+  }
+}

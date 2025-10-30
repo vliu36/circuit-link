@@ -1,5 +1,5 @@
 // This is to observe auth state changes (login/logout) across the app
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, User } from "firebase/auth";
 import { auth } from "./firebase";
 
 // Initialize the auth state observer
@@ -17,3 +17,7 @@ export function initAuthListener(): void {
         } // end if else
     });
 } // end function initAuthListener
+
+export function authStateCallback(callback: (user: User | null) => void) {
+  return onAuthStateChanged(auth, callback);
+}
