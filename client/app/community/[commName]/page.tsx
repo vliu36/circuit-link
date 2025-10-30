@@ -4,7 +4,6 @@ import Styles from "./community.module.css";
 import { useAuth } from "../../context.tsx";
 import { logout } from "../../landing/landing.ts";
 import { Suspense } from 'react';
-import SearchResults from "../../search/searchResult.tsx";
 import { useRouter} from "next/navigation";
 
 export default function CommunityPage({
