@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { initAuthListener } from "./auth-observer";
 import { AuthProvider } from "./context";
+import NavBar from "./_components/navbar/navbar.tsx";
 
 // Initialize the auth listener to monitor auth state changes
 initAuthListener();
@@ -32,6 +33,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         >
+        <NavBar/>
         <AuthProvider>
             {children}
         </AuthProvider>

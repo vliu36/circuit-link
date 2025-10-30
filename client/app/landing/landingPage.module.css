@@ -57,45 +57,6 @@
     right: 95px;
 }
 
-.notificationButton{
-    height: 30px;
-    width: 30px;
-    border-radius: 1em;
-    background-color: #394153;
-    margin-left: 10px;
-}
-
-.settingsIcon{
-    height: 40px;
-    width: 40px;
-    border-radius: 50%;
-    background-color: #B8B8B8;
-}
-
-.dropdownMenu {
-    background-color: #5B6680;
-    width: 150px;
-    height: 150px;
-    right: 0px;
-    border-radius: 1em;
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: white;
-}
-
-.dropdownMenu:hover{
-    background-color: #828FAF;
-}
-
-.dropdown:focus-within .dropdownMenu{
-    opacity: 1;
-    pointer-events: auto;
-}
-
 .yourCommunitiesBar{
     background-color: rgb(11, 11, 44);
     width: 20%;

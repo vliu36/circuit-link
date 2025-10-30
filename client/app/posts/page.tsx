@@ -2,179 +2,234 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "../context";
+import Link from "next/link";
+import { fetchAllPosts, createPost, editPost, deletePostById, votePost } from "./posts.ts";
+import styles from "./postsPage.module.css";
 
 type Post = {
     id: string;
     title: string;
     contents: string;
     authorUsername: string;
+    authorId: string;
     yayScore: number;
-    timePosted: string; // formatted timestamp
+    yayList: string[];
+    nayList: string[];
+    timePosted: string;
+    edited: boolean;
 };
 
 export default function PostsPage() {
-    const { user, userData, loading } = useAuth();
+    const { user, loading } = useAuth();
     const [posts, setPosts] = useState<Post[]>([]);
     const [title, setTitle] = useState("");
     const [contents, setContents] = useState("");
 
-    // Fetch all posts
-    useEffect(() => {
-        const fetchPosts = async () => {
-        try {
-            const res = await fetch("http://localhost:2400/api/posts/all");
-            const data = await res.json();
+    const [editingPostId, setEditingPostId] = useState<string | null>(null);
+    const [editTitle, setEditTitle] = useState("");
+    const [editContents, setEditContents] = useState("");
 
-            // Convert Firestore Timestamp to readable string
-            const formattedPosts = (data.message || []).map((post: Post) => ({
+    // Fetch posts from backend
+    const fetchPosts = async () => {
+        try {
+            const data = await fetchAllPosts();
+            const formattedPosts = (data || []).map((post: Post) => ({
                 ...post,
                 timePosted: post.timePosted
                     ? new Date(post.timePosted).toLocaleString()
                     : "Unknown",
             }));
-
             setPosts(formattedPosts);
         } catch (err) {
             console.error("Failed to fetch posts:", err);
         }
-        };
+    };
+
+    useEffect(() => {
         fetchPosts();
     }, []);
 
-    // Add a new post
-    const addPost = async () => {
-        if (!user || !userData) {
-        alert("You must be signed in to post!");
-        return;
-        }
-        if (!title || !contents) {
-        alert("Please fill title and contents");
-        return;
-        }
+    const handleAddPost = async () => {
+        if (!user) return alert("Sign in to post!");
+        if (!title || !contents) return alert("Please fill out title and contents");
 
         try {
-            const res = await fetch("http://localhost:2400/api/posts/make-post", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                author: user.uid,
-                title,
-                contents,
-                }),
-            });
-            const data = await res.json();
-            alert(data.message || "Post added!");
+            const msg = await createPost(user.uid, title, contents);
+            alert(msg);
             setTitle("");
             setContents("");
-
-            // Refresh posts
-            const refreshed = await fetch("http://localhost:2400/api/posts/all");
-            const refreshedData = await refreshed.json();
-            const formattedPosts = (refreshedData.message || []).map((post: Post) => ({
-                ...post,
-                timePosted: post.timePosted
-                    ? new Date(post.timePosted).toLocaleString()
-                    : "Unknown",
-            }));
-            setPosts(formattedPosts);
+            fetchPosts();
         } catch (err) {
-        console.error("Failed to add post:", err);
+            console.error(err);
+        }
+    };
+
+    const handleSaveEdit = async (postId: string) => {
+        try {
+            const msg = await editPost(postId, user?.uid, editTitle, editContents);
+            alert(msg);
+            cancelEditing();
+            fetchPosts();
+        } catch (err) {
+            console.error("Failed to edit post:", err);
+        }
+    };
+
+    const cancelEditing = () => {
+        setEditingPostId(null);
+        setEditTitle("");
+        setEditContents("");
+    };
+
+    const handleDeletePost = async (postId: string) => {
+        if (!confirm("Are you sure you want to delete this post?")) return;
+        try {
+            const msg = await deletePostById(postId, user?.uid);
+            alert(msg);
+            fetchPosts();
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const handleVote = async (postId: string, type: "yay" | "nay") => {
+        if (!user) return alert("Sign in to vote!");
+        try {
+            await votePost(postId, user.uid, type);
+            fetchPosts();
+        } catch (err) {
+            console.error(err);
         }
     };
 
     if (loading) return <div>Loading...</div>;
-    if (!user || !userData) return <div>You must be signed in to view posts!</div>;
+    if (!user) return <div>Sign in to view posts!</div>;
 
     return (
-        <div style={{ padding: "40px", fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif", maxWidth: "800px", margin: "0 auto" }}>
-        <h1 style={{ textAlign: "center", marginBottom: "30px" }}>Posts Demo (Signed-in User)</h1>
+        <div className={styles.container}>
+            <h1 className={styles.header}>Posts Demo</h1>
 
-        <div style={{ marginBottom: "40px" }}>
-            <h2 style={{ marginBottom: "15px" }}>Create New Post</h2>
-            <input
-            placeholder="Post Title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            style={{
-                display: "block",
-                marginBottom: "15px",
-                width: "100%",
-                padding: "10px",
-                fontSize: "16px",
-                borderRadius: "8px",
-                border: "1px solid #ccc",
-                boxSizing: "border-box",
-            }}
-            />
-            <textarea
-            placeholder="Post Contents"
-            value={contents}
-            onChange={(e) => setContents(e.target.value)}
-            style={{
-                display: "block",
-                marginBottom: "15px",
-                width: "100%",
-                padding: "10px",
-                fontSize: "16px",
-                borderRadius: "8px",
-                border: "1px solid #ccc",
-                boxSizing: "border-box",
-                minHeight: "100px",
-            }}
-            />
-            <button
-            onClick={addPost}
-            style={{
-                padding: "10px 20px",
-                fontSize: "16px",
-                borderRadius: "8px",
-                border: "none",
-                backgroundColor: "#0070f3",
-                color: "#fff",
-                cursor: "pointer",
-                transition: "background-color 0.2s ease",
-            }}
-            onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#005bb5")}
-            onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#0070f3")}
-            >
-            Add Post
-            </button>
-        </div>
-
-        <h2 style={{ marginBottom: "20px" }}>All Posts</h2>
-        {posts.length === 0 ? (
-            <p>No posts found.</p>
-        ) : (
-            posts.map((post) => (
-            <div
-                key={post.id}
-                style={{
-                border: "1px solid #999",
-                borderRadius: "12px",
-                padding: "20px",
-                marginBottom: "20px",
-                boxShadow: "0 4px 8px rgba(0,0,0,0.05)",
-                backgroundColor: "#5B6680",
-                transition: "transform 0.1s ease",
-                position: "relative",
-                }}
-                onMouseOver={(e) => (e.currentTarget.style.transform = "scale(1.01)")}
-                onMouseOut={(e) => (e.currentTarget.style.transform = "scale(1)")}
-            >
-                <h3 style={{ marginBottom: "10px", color: "#eee" }}>{post.title}</h3>
-                <p style={{ marginBottom: "10px" }}>{post.contents}</p>
-                <p style={{ fontSize: "14px", color: "#ccc" }}>
-                <strong>Author:</strong> {post.authorUsername}
-                </p>
-                <p style={{ fontSize: "14px", color: "#ccc", position: "absolute", top: "20px", right: "20px" }}>
-                {post.timePosted}
-                </p>
-                <p style={{ fontSize: "14px", color: "#ccc" }}>
-                <strong>Yay Score:</strong> {post.yayScore}
-                </p>
+            {/* --- New Post Section --- */}
+            <div className={styles.createSection}>
+                <h2>Create New Post</h2>
+                <input
+                    placeholder="Post Title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className={styles.input}
+                />
+                <textarea
+                    placeholder="Post Contents"
+                    value={contents}
+                    onChange={(e) => setContents(e.target.value)}
+                    className={styles.textarea}
+                />
+                <button className={styles.primaryButton} onClick={handleAddPost}>
+                    Add Post
+                </button>
             </div>
-            ))
-        )}
+
+            {/* --- Posts List --- */}
+            <h2>All Posts</h2>
+            {posts.length === 0 ? (
+                <p>No posts found.</p>
+            ) : (
+                posts.map((post) => {
+                    const isAuthor = post.authorId === user.uid;
+                    const isEditing = editingPostId === post.id;
+
+                    return (
+                        <div
+                            key={post.id}
+                            className={styles.postCard}
+                        >
+                            {isEditing ? (
+                                <>
+                                    <input
+                                        value={editTitle}
+                                        onChange={(e) => setEditTitle(e.target.value)}
+                                        className={styles.input}
+                                    />
+                                    <textarea
+                                        value={editContents}
+                                        onChange={(e) => setEditContents(e.target.value)}
+                                        className={styles.textarea}
+                                    />
+                                    <button
+                                        onClick={() => handleSaveEdit(post.id)}
+                                        className={`${styles.button} ${styles.saveButton}`}
+                                    >
+                                        Save
+                                    </button>
+                                    <button
+                                        onClick={cancelEditing}
+                                        className={`${styles.button} ${styles.cancelButton}`}
+                                    >
+                                        Cancel
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    {/* Wrap clickable area for the post */}
+                                    <Link href={`/posts/${post.id}`}>
+                                        <h3 className={styles.title}>{post.title}</h3>
+                                        <p className={styles.contents}>{post.contents}</p>
+                                    </Link>
+                                    <p className={styles.meta}>
+                                        <strong>Author:</strong> {post.authorUsername}
+                                    </p>
+                                    <p className={styles.time}>
+                                        {post.timePosted} {post.edited && "(edited)"}
+                                    </p>
+                                    <p className={styles.meta}>
+                                        <strong>Yay Score:</strong> {post.yayScore}
+                                    </p>
+
+                                    <div className={styles.actions}>
+                                        <button
+                                            onClick={() => handleVote(post.id, "yay")}
+                                            className={`${styles.voteButton} ${
+                                                post.yayList.includes(user.uid) ? styles.yayActive : ""
+                                            }`}
+                                        >
+                                            👍 Yay
+                                        </button>
+                                        <button
+                                            onClick={() => handleVote(post.id, "nay")}
+                                            className={`${styles.voteButton} ${
+                                                post.nayList.includes(user.uid) ? styles.nayActive : ""
+                                            }`}
+                                        >
+                                            👎 Nay
+                                        </button>
+
+                                        {isAuthor && (
+                                            <>
+                                                <button
+                                                    onClick={() => {
+                                                        setEditingPostId(post.id);
+                                                        setEditTitle(post.title);
+                                                        setEditContents(post.contents);
+                                                    }}
+                                                    className={`${styles.button} ${styles.editButton}`}
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDeletePost(post.id)}
+                                                    className={`${styles.button} ${styles.deleteButton}`}
+                                                >
+                                                    Delete
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    );
+                })
+            )}
         </div>
     );
 }

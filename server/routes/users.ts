@@ -10,18 +10,33 @@ router.get("/all", users.getAllDocuments);
 
 /** Registers a new user by creating a new document in Users
  *  @route POST /api/users/register
+ *  @body email - The email provided by the user
+ *  @body password - The password provided by the user
+ *  @body username - The username provided by the user
+ *  @returns JSON containing a success message with the new user's id, or an error message
  */
 router.post("/register", users.userRegistration)
 
 /** Sets up a new user who signed in with Google by creating a new document in Users
  *  @route POST /api/users/register-google
+ *  @body email - The email provided by the user
+ *  @body username - The username generated from frontend
+ *  @returns JSON containing a success message with the new user's id, or an error message
  */
 router.post("/register-google", users.setupGoogleUser)
 
 /** Deletes a user document from Users
  *  @route DELETE /api/users/delete/:uid
+ *  @params uid - The id of the User to be deleted
  */
 router.delete("/delete/:uid", users.deleteUserDocument)
+
+/** Updates the communities field of a User 
+ *  @route PATCH /api/users/update-comm/:uid
+ *  @body mode - Boolean value where true = add, false = remove
+ *  @body community - Document id for community to add or remove
+*/
+router.patch("/update-comm/:uid", users.updateCommunityField)
 
 export default router;
 
