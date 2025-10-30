@@ -15,9 +15,9 @@ export default function CommunityPage({
 }) {
   const { commName } = use(params);
   const { user } = useAuth();
-  const [ numUsers, setNumUsers] = useState(null);
+  /*const [ numUsers, setNumUsers] = useState(null);*/
   const router = useRouter();
-  useEffect(() => {
+  /*useEffect(() => {
   async function fetchData(){
   const res = await fetch(`http://localhost:2400/api/comm/${commName}`, {     
     method: "GET",
@@ -29,7 +29,7 @@ export default function CommunityPage({
   setNumUsers(data.numUsers);
   }
   fetchData();
-  }, [commName]);
+  }, [commName]);*/
   
 
   return (
@@ -61,7 +61,7 @@ export default function CommunityPage({
       </div>
       
       <div>
-        <h1 className = {Styles.line}> Members: {numUsers}</h1>
+        <h1 className = {Styles.line}>Welcome to the {commName} community.</h1>
       </div>
 
       <div>

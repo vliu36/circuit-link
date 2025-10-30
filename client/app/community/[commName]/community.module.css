@@ -72,6 +72,7 @@
     height: 10vh;
     width: 700px;
     text-align:center;
+    font-size:24px;
 }
 
 .navBox{
@@ -124,5 +125,5 @@
     height: 30px;
     width: 30px;
     border-radius: 1em;
-    background-color: #B8B8B8;
+    background-color: rgb(184,184,184);
 }

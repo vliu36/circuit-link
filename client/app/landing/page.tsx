@@ -1,6 +1,6 @@
 "use client";
 // import React, {useEffect, useState} from "react";
-import Styles from './landingPage.module.css';
+import Styles from "./landingPage.module.css";
 import { useAuth } from "../context.tsx";
 import { logout } from "./landing.ts";
 import { Suspense } from 'react';
