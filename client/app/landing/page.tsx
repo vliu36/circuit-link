@@ -2,15 +2,12 @@
 // import React, {useEffect, useState} from "react";
 import Styles from './landingPage.module.css';
 import { useAuth } from "../context.tsx";
-import { logout } from "./landing.ts";
 import { Suspense } from 'react';
 import SearchBar from "../_components/searchbar/search.tsx";
 import SearchResults from "../_components/searchbar/table.tsx";
 
 export default function Landing() {
     const { user } = useAuth();
-    
-    
     
     return (
     
@@ -56,7 +53,7 @@ export default function Landing() {
 
 
 
-            <div className = {Styles.navBox}>
+            {/* <div className = {Styles.navBox}>
                 <div className = {Styles.homeLogo}>
                     <img src="./circuitlinklogowback.svg" alt="Logo"></img>
                 </div>
@@ -73,7 +70,7 @@ export default function Landing() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
 
             <div className = {Styles.searchBarArea}>
                 <div className = {Styles.welcomeText}>
