@@ -6,6 +6,7 @@ import { logout } from "./landing.ts";
 import { Suspense } from 'react';
 import SearchBar from "../_components/searchbar/search.tsx";
 import SearchResults from "../_components/searchbar/table.tsx";
+import { useRouter } from 'next/navigation';
 
 export default function Landing() {
     const { user } = useAuth();
