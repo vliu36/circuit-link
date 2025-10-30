@@ -4,9 +4,8 @@ import Styles from './landingPage.module.css';
 import { useAuth } from "../context.tsx";
 import { logout } from "./landing.ts";
 import { Suspense } from 'react';
-import SearchBar from "../search/searchbar.tsx";
-import SearchResults from "../search/searchResult.tsx";
-import { useRouter } from "next/navigation";
+import SearchBar from "../_components/searchbar/search.tsx";
+import SearchResults from "../_components/searchbar/table.tsx";
 
 export default function Landing() {
     const { user } = useAuth();
