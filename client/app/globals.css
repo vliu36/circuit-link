@@ -37,7 +37,7 @@ body {
   
   width: 600px;
   height: 500px;
-  background-color: #5B6680;  
+   background-color: rgba(91, 102, 128, 1); 
   margin: 0;
   justify-content: center;
   position: relative;

@@ -2,7 +2,9 @@
 // import { useRouter } from "next/navigation";
 import {login, loginWithGoogle, forgotPassword} from "./login";
 import React, { useState } from "react";
-import "./login-styles.css";
+import Styles from "./login.module.css";
+import Image from 'next/image';
+import googleIcon from '../../public/googleIcon.png'
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -34,63 +36,99 @@ export default function Login() {
     // ---- HTML ---- //
     return (
     <main>
-        <div className = "login-container">
-            <h1 className = "label-box">Login</h1>
+        <div className={Styles.background}>
+            <div className={Styles.loginContainer}>
+            <h1 className={Styles.title}>Login</h1>
             <form onSubmit={handleSubmitLog}>
-                <label className = "small-box">
-                    Email:
-                    <input 
-                    className = "text-box"
-                    type="email" 
+                <div className={Styles.emailBox}>
+                    <label>Email:</label>
+                    <input
+                    type="email"
                     name="email"
                     required
-                    onChange={(e) => setEmail(e.target.value)}/>
-                </label>
-                <br />
-                <label className = "small-box">
-                    Password:
-                    <input 
-                    id = "password"
-                    className = "text-box"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    />
+                </div>
+
+                <div className={Styles.passwordBox}>
+                    <label>Password:</label>
+                    <input
                     type={showPass ? "text" : "password"}
                     name="password"
                     required
-                    onChange={(e) => setPassword(e.target.value)}/>
-                </label>
-                <label className = "show-password"> {/* Checkbox to show/hide password */}
-                    <input 
-                    type="checkbox" 
-                    checked={showPass}
-                    onChange={() => setShowPass(!showPass)}/>
-                    Show Password
-                </label>
-                <br />
-                <button type="submit" className = "button-box">[Login]</button>
-                <br />
-                <br />
-                {/* This displays an error message in the text if it occurs. */}
-                {/* {error && <p className ="errorMessage">{error}</p>} */}
-            </form>
-        </div>
-        <button className="forgot-password" onClick={togglePopup}>Forgot password?</button>
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    />
+                </div>
 
-        {isOpen && (
-        <div className="popup-overlay" onClick={togglePopup}>
-            <div 
-            className="popup-box"
-            onClick={(e) => e.stopPropagation()}>
-                <h2 className="popup-text">Reset Password</h2>
-                <form onSubmit={handleSubmitForgotPassword}>
-                    <input type="email" className="popup-text" placeholder="Enter your email" onChange={(e) => setEmail(e.target.value)} required/>
-                    <button type="submit" className="popup-text">Send Reset Link</button>
-                    <br />
-                </form>
-                <button className="close-button popup-text" onClick={togglePopup}>Close</button>
+                <div className={Styles.showpasswordSection}>
+                    <label>
+                        <input
+                        type="checkbox"
+                        checked={showPass}
+                        onChange={() => setShowPass(!showPass)}
+                        />
+                        Show Password
+                    </label>
+                </div>
+
+                <div className={Styles.loginButton}>
+                    <button type="submit">Login</button>
+                </div>
+            </form>
+
+
+            <div className="forgotPasswordBox">
+                <button type="button" onClick={togglePopup}>
+                    Forgot Password?
+                </button>
+            </div>
+
+            {isOpen && (
+                <div className="popup-overlay" onClick={togglePopup}>
+                    <div className="popup-box" onClick={(e) => e.stopPropagation()}>
+                        <h2 className="popup-text">Reset Password</h2>
+                        <form onSubmit={handleSubmitForgotPassword}>
+                            <input
+                            type="email"
+                            className="popup-text"
+                            placeholder="Enter your email"
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            />
+
+                            <button type="submit" className="popup-text">
+                                Send Reset Link
+                            </button>
+                        </form>
+
+                        <button className="close-button popup-text" onClick={togglePopup}>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
+            
+            <div className = {Styles.lineBox}>
+                <div className = {Styles.lefthorizontalLine}></div>
+                <div className = {Styles.orBox}>OR</div>
+                <div className = {Styles.righthorizontalLine}></div>
+            </div>
+            <br/>
+            <div className={Styles.googleButton}>
+                <Image
+                        src={googleIcon}
+                        width={40}
+                        height={40}
+                        alt="Sign up with Google"
+                />
+                <button className = {Styles.signUpWithGoogleText} onClick={loginWithGoogle}>Log in with Google</button>
+            </div>
+
+            <div className="registerLink">
+                <a href="/register"></a>
             </div>
         </div>
-        )}
-        <button className = "sign-with-google" onClick={loginWithGoogle}>Sign in with Google</button>
-        <a className="transparent-button-box-2" href="../register">Don&apos;t have an account, sign up for FREE!</a>
-    </main>
-    );
-}
+    </div> 
+</main>)}

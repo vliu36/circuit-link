@@ -4,7 +4,7 @@ import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from 
 import { auth, db } from "../firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { FirebaseError } from "firebase/app";
-import "./register-styles.css";
+import "./register.module.css";
 
 const provider = new GoogleAuthProvider();
 

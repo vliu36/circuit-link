@@ -24,19 +24,19 @@ export default function Landing() {
             <div className = {Styles.resourcesBar}>
                 <div className = {Styles.horizontalLine}></div>
                 <h1>  Resources</h1>
-                <button className ={Styles.resourcesBarButtons}>
+                <button className ={Styles.resourcesBarButtons} onClick={() => router.push("/aboutus")}>
                     <img src = "/aboutUs.svg" className = {Styles.aboutUsIcon} alt="About us icon"></img>
                     <h1 className = {Styles.buttonText}>About Circuit Link</h1>
                 </button>
-                <button className ={Styles.resourcesBarButtons}>
+                <button className ={Styles.resourcesBarButtons} onClick={() => router.push("/help")}>
                     <img src = "/helpbutton.svg" className = {Styles.aboutUsIcon} alt="Question mark"></img>
                     <h1 className = {Styles.buttonText}>Get Help</h1>
                 </button>
-                <button className ={Styles.resourcesBarButtons}>
+                <button className ={Styles.resourcesBarButtons} onClick={() => router.push("/bugreports")}>
                     <img src = "/bug.svg" className = {Styles.aboutUsIcon} alt="Bug icon"></img>
                     <h1 className = {Styles.buttonText}>Report A Bug</h1>
                 </button>
-                <button className ={Styles.resourcesBarButtons}>
+                <button className ={Styles.resourcesBarButtons} onClick={() => router.push("/siterules")}>
                     <img src = "/rules.svg" className = {Styles.aboutUsIcon} alt="Book icon"></img>
                     <h1 className = {Styles.buttonText}>Circuit Link Rules</h1>
                 </button>
