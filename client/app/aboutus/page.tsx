@@ -3,7 +3,7 @@ import React from "react";
 import Styles from "./aboutus.module.css";
 import { useRouter } from "next/navigation";
 
-export default function aboutus() {
+export default function AboutUs() {
     const router = useRouter();
     
     return (
