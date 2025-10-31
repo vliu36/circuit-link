@@ -13,7 +13,7 @@ export async function register(email: string, password: string, username: string
     // e.preventDefault();
 
     // const res = await fetch("https://api-circuit-link-160321257010.us-west2.run.app/api/users/register", {
-    const res = await fetch("http://localhost:2400/api/users/register", {
+    const res = await fetch("https://api-circuit-link-160321257010.us-west2.run.app/api/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, username }), // <--- include any extra data you want server-side
@@ -31,7 +31,7 @@ export async function register(email: string, password: string, username: string
 
     // Redirect to main app page after successful registration and login
     // window.location.href = "https://circuitlink-160321257010.us-west2.run.app" // TODO: uncomment when deployed
-    window.location.href = "http://localhost:3000/landing"
+    window.location.href = "https://circuitlink-160321257010.us-west2.run.app/landing"
 
 } // end function register
 
@@ -49,7 +49,7 @@ export async function registerWithGoogle() {
         const docSnap = await getDoc(doc(db, "Users", result.user.uid));
         if (docSnap.exists()) {
             console.log("Google user already exists in Firestore: ", result.user.email);
-            window.location.href = "http://localhost:3000/landing";
+            window.location.href = "https://circuitlink-160321257010.us-west2.run.app/landing";
             return; // Account exists, no need to register
         } // end if
 
@@ -64,7 +64,7 @@ export async function registerWithGoogle() {
         const user = result.user;
         console.log("Google user:", user);
         
-        const res = await fetch("http://localhost:2400/api/users/register-google", {
+        const res = await fetch("https://api-circuit-link-160321257010.us-west2.run.app/api/users/register-google", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ uid: user.uid, email: user.email, username: defaultUsername }), // <--- include any extra data you want server-side
@@ -78,7 +78,7 @@ export async function registerWithGoogle() {
         } // end if
         
         // alert(data.message); // placeholder, replace with better UI feedback
-        window.location.href = "http://localhost:3000/landing"
+        window.location.href = "https://circuitlink-160321257010.us-west2.run.app/landing"
 
     } catch (error) {
         if (error instanceof FirebaseError) {

@@ -21,7 +21,7 @@ export async function deleteUserAccount() {
         try {
             const idToken = await user.getIdToken();
             // Delete user's document from Firestore first via backend
-            const res = await fetch(`http://localhost:2400/api/users/delete/${user.uid}`, {
+            const res = await fetch(`https://api-circuit-link-160321257010.us-west2.run.app/api/users/delete/${user.uid}`, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -42,13 +42,13 @@ export async function deleteUserAccount() {
             // Now delete the user from Firebase Authentication
             await user.delete();
             alert("User account deleted successfully.");
-            window.location.href = "http://localhost:3000/signin"; // Redirect to sign-in page
+            window.location.href = "https://circuitlink-160321257010.us-west2.run.app/signin"; // Redirect to sign-in page
         } catch (error) {
             if (error instanceof Error) {
                 const firebaseAuthError = error as { code?: string; message: string};
                 if (firebaseAuthError.code === "auth/requires-recent-login") {
                     alert("Please log in again to delete your account."); 
-                    window.location.href = "http://localhost:3000/signin";
+                    window.location.href = "https://circuitlink-160321257010.us-west2.run.app/signin";
                 } else {
                     alert("Error deleting user: " + firebaseAuthError.message);
                 } // end if else
@@ -67,7 +67,7 @@ export async function logout() {
         await auth.signOut();
         console.log("User signed out.");
         // Redirect to sign-in page after logout
-        window.location.href = "http://localhost:3000/signin"
+        window.location.href = "https://circuitlink-160321257010.us-west2.run.app/signin"
     } catch (err) {
         console.error("Error signing out:", err);
     } // end try catch

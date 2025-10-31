@@ -17,7 +17,7 @@ export default function CommunityPage({
   const router = useRouter();
   /*useEffect(() => {
   async function fetchData(){
-  const res = await fetch(`http://localhost:2400/api/comm/${commName}`, {     
+  const res = await fetch(`https://api-circuit-link-160321257010.us-west2.run.app/api/comm/${commName}`, {     
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -34,7 +34,7 @@ export default function CommunityPage({
     <div className = {Styles.background}>
       
       <div className = {Styles.navBox}>
-        <button className = {Styles.homeLogo} onClick = {() => window.location.href = "http://localhost:3000/landing"}>
+        <button className = {Styles.homeLogo} onClick = {() => window.location.href = "https://circuitlink-160321257010.us-west2.run.app/landing"}>
           <img src="../circuitlinklogowback.svg" alt="Logo"></img>
         </button>
       </div>
@@ -51,7 +51,7 @@ export default function CommunityPage({
             <img src = {user?.photoURL || "../circleUser.svg"} className = {Styles.settingsIcon} alt="User profile"></img>
           </button>
           <div className = {Styles.dropdownMenu}>
-            <button onClick={() => window.location.href = "http://localhost:3000/profile"}>Profile</button>
+            <button onClick={() => window.location.href = "https://circuitlink-160321257010.us-west2.run.app/profile"}>Profile</button>
             <button>Settings</button>
             <button onClick={logout}>Log Out</button>
           </div>

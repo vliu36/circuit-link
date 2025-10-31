@@ -23,7 +23,7 @@ export default function AuthButtons({ user }: { user: User | null}) {
                 <div className = {Styles.dropdown}>
                     <button><img src = {"/circleUser.svg"} className = {Styles.settingsIcon} alt="User profile"></img></button>
                     <div className = {Styles.dropdownMenu}>
-                        <button onClick={() => window.location.href = "http://localhost:3000/profile"}>Profile</button>
+                        <button onClick={() => window.location.href = "https://circuitlink-160321257010.us-west2.run.app/profile"}>Profile</button>
                         <button>Settings</button>
                         <button onClick={logout}>Log Out</button>
                         </div>
