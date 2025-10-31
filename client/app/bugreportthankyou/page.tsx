@@ -3,7 +3,7 @@ import React from "react";
 import Styles from "./bugreports.module.css";
 import { useRouter } from "next/navigation";
 
-export default function bugreportthankyou() {
+export default function BugReportThankYou() {
     const router = useRouter();
     
     return (
