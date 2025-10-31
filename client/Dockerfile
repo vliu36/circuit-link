@@ -1,7 +1,5 @@
 FROM node:20
 
-ENV NODE_ENV=production
-
 WORKDIR /client
 
 COPY package*.json ./
