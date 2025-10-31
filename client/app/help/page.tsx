@@ -3,7 +3,7 @@ import React from "react";
 import Styles from "./help.module.css";
 import { useRouter } from "next/navigation";
 
-export default function help() {{/*function RulesPage*/}
+export default function Help() {{/*function RulesPage*/}
     const router = useRouter();
     
     return (
