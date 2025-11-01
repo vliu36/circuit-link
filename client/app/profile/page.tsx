@@ -3,12 +3,6 @@ import React, { useState, useEffect } from "react";
 import * as profileFunctions from "./profile";
 import { useAuth } from "../context";
 import "./profile-styles.css";
-// import { auth, db } from "../firebase";
-// import { User, onAuthStateChanged } from "firebase/auth";
-// import { deleteUserAccount, logout, editProfile } from "./profile";
-// import { doc, getDoc } from "firebase/firestore";
-// import { profile } from "console";
-
 
 export default function Profile() {
     const { user, userData, loading } = useAuth();
@@ -91,7 +85,7 @@ export default function Profile() {
             return;
         }
         try {
-            const url = await profileFunctions.uploadProfilePicture(file, "profile/");
+            const url = await profileFunctions.uploadProfilePicture(file);
             alert("Profile picture uploaded successfully.");
             console.log("File URL: ", url);
             window.location.reload();
@@ -198,7 +192,7 @@ export default function Profile() {
                     <input type="checkbox" name="restrictedMode" defaultChecked={userData?.restrictedMode} onChange={(e) => {setRestrictedMode(e.target.checked)}} />
                     <em> -  effect to be implemented </em>
                     <br/>
-                    <button type="submit"><u>&gt; Save Changes</u></button>
+                    <button type="submit">Save Changes</button>
                 </form>
             </div>
 
@@ -214,7 +208,7 @@ export default function Profile() {
                             <h2 className="popup-text">Are you sure?</h2>
                             <div className="confirm-actions">
                                 <button className="btn-cancel" onClick={togglePopup}>Close</button>
-                                <button className="btn-confirm" onClick={() => {profileFunctions.deleteUserAccount()}}>Delete</button>
+                                <button className="btn-confirm" onClick={() => {profileFunctions.deleteAccount()}}>Delete</button>
                             </div>
                         </div>
                     </div>

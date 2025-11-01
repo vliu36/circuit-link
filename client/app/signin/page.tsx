@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import Styles from "./login.module.css";
 import Image from 'next/image';
 import googleIcon from '../../public/googleIcon.png'
+import { useRouter } from "next/navigation";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -12,6 +13,8 @@ export default function Login() {
     const [showPass, setShowPass] = useState(false);
     // const [error, setError] = useState("");
     const [isOpen, setIsOpen] = useState(false);
+
+    const router = useRouter();
 
     const togglePopup = () => {
         setIsOpen(!isOpen);
@@ -24,6 +27,7 @@ export default function Login() {
         const cleanPass = password.trim();
         
         await login(cleanMail, cleanPass);
+        router.replace("/landing");
     } // end handleSubmitLog
     
     // handleSubmit for forgot password
