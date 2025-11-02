@@ -2,8 +2,7 @@
 // import React, { useState } from "react";
 import { signInWithEmailAndPassword, signInWithPopup, sendPasswordResetEmail } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
-import { auth, db } from "../firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { auth } from "../firebase";
 import { FirebaseError } from "firebase/app";
 
 const provider = new GoogleAuthProvider();
@@ -21,12 +20,35 @@ export async function login(email: string, password: string) {
             headers: { "Content-Type": "application/json"},
             body: JSON.stringify({ idToken }),
         })
-        console.log("")
-        return res;
-    } catch (error: any) {
 
-        console.error("Login failed:", error);
-        return { ok: false };
+        if (!res.ok) {
+            console.log("Login failed.");
+            // alert("Login failed after registration.");
+            return { status: "error", message: "Login failed after registration" };
+        }
+
+        console.log("")
+        return { status: "ok", message: "Login success."};
+    } catch (error) {
+        let msg: string;
+        if (error instanceof FirebaseError) {
+            if (error.code === "auth/invalid-email" || 
+                error.code === "auth/invalid-credential" || 
+                error.code === "auth/user-not-found"
+            ) {
+                alert("Invalid email or password.");
+                msg = "Invalid email or password.";
+            } else {
+                alert("An unexpected error occurred: " + error.message);
+                msg = "An unexpected error occurred: " + error.message;
+            } // end if else
+            console.error(error);
+        } else {
+            console.error("Unknown error: ", error);
+            alert("An unexpected error occurred.");
+            msg = "Unknown error: " + error;
+        } // end if else
+        return { status: "error", message: msg };
     } // end try catch
 } // end function login
 
@@ -79,11 +101,11 @@ export async function loginWithGoogle() {
         if (!res.ok) {
             console.error("Google sign in failed:", data);
 
-            alert(data.message || "Failed to sign in user with Google.");
-            return;
+            // alert(data.message || "Failed to sign in user with Google.");
+            return { status: "error", message: data.message || "Failed to sign in user with Google" };
         } // end if
         console.log("Google user signed in successfully:", data);
-        return user; //TODO Redirect
+        return { status: "ok", message: "Google login successful", user};
     } catch (error) {
         // console.error("Error during Google sign-in:", error.code, error.message);
         // alert("Google sign-in failed: " + error.message);

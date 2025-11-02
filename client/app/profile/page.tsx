@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import * as profileFunctions from "./profile";
 import { useAuth } from "../context";
 import "./profile-styles.css";
+import { useRouter } from "next/navigation";
 
 export default function Profile() {
     const { user, userData, loading } = useAuth();
@@ -14,30 +15,29 @@ export default function Profile() {
     const [file, setFile] = useState<File | null>(null);   // For profile picture upload
     const [preview, setPreview] = useState<string | null>(null); // For image preview
     
-    const [textSize, setTextSize] = useState(userData?.textSize ?? 12);     
-    const [font, setFont] = useState(userData?.font ?? "Arial");
-    const [darkMode, setDarkMode] = useState(userData?.darkMode ?? true); 
-    const [privateMode, setPrivateMode] = useState(userData?.privateMode ?? false);
-    const [restrictedMode, setRestrictedMode] = useState(userData?.restrictedMode ?? false);
+    const [settings, setSettings] = useState({
+        textSize: userData?.textSize ?? 12,
+        font: userData?.font ?? "Arial",
+        darkMode: userData?.darkMode ?? true,
+        privateMode: userData?.privateMode ?? false,
+        restrictedMode: userData?.restrictedMode ?? false
+    })
     const [error, setError] = useState("");
-    
     const [isOpen, setIsOpen] = useState(false);
+
+    const router = useRouter();
 
     const MAX_KB = 200;
     const MAX_BYTES = MAX_KB * 1024;
 
     // Live username validation
     useEffect(() => {
-        if (!newUsername) {
-            // if (error) setError("");
-            setError("");
-            return;
-        }
-        const localError = profileFunctions.basicUsernameCheck(newUsername);
-        setError(localError);
-        // if (error !== localError) {
-        //     setError(localError);
-        // }
+        const handler = setTimeout(() => {
+            if (newUsername) {
+                setError(profileFunctions.basicUsernameCheck(newUsername));
+            }
+        }, 400);
+        return () => clearTimeout(handler);
     }, [newUsername]); // end useEffect
 
     // Show loading message while auth state is being determined
@@ -52,7 +52,7 @@ export default function Profile() {
     // Handle form submission for editing profile
     const handleEditProfile = async (e: React.FormEvent) => {
         e.preventDefault();
-        await profileFunctions.editProfile(newUsername, newBio, textSize, font, darkMode, privateMode, restrictedMode);
+        await profileFunctions.editProfile(newUsername, newBio, settings.textSize, settings.font, settings.darkMode, settings.privateMode, settings.restrictedMode);
         window.location.reload(); // Reload the page to show updated info
     };
 
@@ -94,12 +94,32 @@ export default function Profile() {
         } // end try catch
     } // end submitImage
 
+    // handleDelete
+    const handleDelete = async () => {
+        const res = await profileFunctions.deleteAccount();
+        if (res?.status === "ok") {
+            router.push("/");
+        } else {
+            console.log(res?.message || "An error occurred while deleting your account.");
+        } // end if else
+    } // end handleDelete
+
+    // handleLogout
+    const handleLogout = async () => {
+        const res = await profileFunctions.logout();
+        if (res?.status === "ok") {
+            router.push("/");
+        } else {
+            console.log(res?.message || "An error occurred while signing out.");
+        } // end if else
+    } // end handleLogout
+
     return (
         <main>
             <div className="profile-card">
                 <h1>Profile</h1>
                 <p>Welcome to your profile page!</p>
-                <button className="go-back-btn" onClick={() => window.location.href = "http://localhost:3000/landing"}>Go back</button>
+                <button className="go-back-btn" onClick={() => router.push("/landing")}>Go back</button>
                 <br/>
                 <br/>
                 <div className="profile-header">
@@ -161,12 +181,12 @@ export default function Profile() {
                     <br/>
                     {/* Change Text Size */}
                     <label>Text Size: </label>
-                    <input type="number" name="textSize" defaultValue={userData?.textSize} min={8} max={72} onChange={(e) => {setTextSize(Number(e.target.value))}}/>
+                    <input type="number" name="textSize" defaultValue={userData?.textSize} min={8} max={72} onChange={(e) => {setSettings({...settings, textSize: parseInt(e.target.value)})}}/>
                     <em> -  effect to be implemented </em>
                     <br/>
                     {/* Change Font */}
                     <label>Font: </label>
-                    <select id="font" name="font" defaultValue={userData?.font} onChange={(e) => {setFont(e.target.value)}}>
+                    <select id="font" name="font" defaultValue={userData?.font} onChange={(e) => {setSettings({...settings, font: e.target.value})}}>
                         <option value="Arial">Arial</option>
                         <option value="Verdana">Verdana</option>
                         <option value="Helvetica">Helvetica</option>
@@ -179,17 +199,17 @@ export default function Profile() {
                     <br/>
                     {/* Dark Mode */}
                     <label>Dark Mode: </label>
-                    <input type="checkbox" name="darkMode" defaultChecked={userData?.darkMode} onChange={(e) => {setDarkMode(e.target.checked)}}/>
+                    <input type="checkbox" name="darkMode" defaultChecked={userData?.darkMode} onChange={(e) => {setSettings({...settings, darkMode: e.target.checked})}}/>
                     <em> -  effect to be implemented </em>
                     <br/>
                     {/* Private Mode */}
                     <label>Private Mode: </label>
-                    <input type="checkbox" name="privateMode" defaultChecked={userData?.privateMode} onChange={(e) => {setPrivateMode(e.target.checked)}} />
+                    <input type="checkbox" name="privateMode" defaultChecked={userData?.privateMode} onChange={(e) => {setSettings({...settings, privateMode: e.target.checked})}} />
                     <em> -  effect to be implemented </em>
                     <br/>
                     {/* Restricted Mode */}
                     <label>Restricted Mode: </label>
-                    <input type="checkbox" name="restrictedMode" defaultChecked={userData?.restrictedMode} onChange={(e) => {setRestrictedMode(e.target.checked)}} />
+                    <input type="checkbox" name="restrictedMode" defaultChecked={userData?.restrictedMode} onChange={(e) => {setSettings({...settings, restrictedMode: e.target.checked})}} />
                     <em> -  effect to be implemented </em>
                     <br/>
                     <button type="submit">Save Changes</button>
@@ -208,7 +228,7 @@ export default function Profile() {
                             <h2 className="popup-text">Are you sure?</h2>
                             <div className="confirm-actions">
                                 <button className="btn-cancel" onClick={togglePopup}>Close</button>
-                                <button className="btn-confirm" onClick={() => {profileFunctions.deleteAccount()}}>Delete</button>
+                                <button className="btn-confirm" onClick={() => {handleDelete()}}>Delete</button>
                             </div>
                         </div>
                     </div>
@@ -216,7 +236,7 @@ export default function Profile() {
                 <br/>
                 <br/>
                 {/* Log out */}
-                <button className="logout-btn" onClick={() => { profileFunctions.logout(); }}>Log Out</button>
+                <button className="logout-btn" onClick={() => {handleLogout()}}>Log Out</button>
             </div>
         </main>
     );

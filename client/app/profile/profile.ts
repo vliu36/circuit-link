@@ -3,16 +3,16 @@ import { updateProfile, sendEmailVerification } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
-// Interface for updatedData in function editProfile
-interface updatedData {
-    username?: string;
-    profileDesc?: string;
-    textSize?: number;
-    font?: string;
-    darkMode?: boolean;
-    privateMode?: boolean;
-    restrictedMode?: boolean;
-}
+// // Interface for updatedData in function editProfile
+// interface updatedData {
+//     username?: string;
+//     profileDesc?: string;
+//     textSize?: number;
+//     font?: string;
+//     darkMode?: boolean;
+//     privateMode?: boolean;
+//     restrictedMode?: boolean;
+// }
 
 // Delete account (revised)
 export async function deleteAccount() {
@@ -37,19 +37,24 @@ export async function deleteAccount() {
 
     console.log("Account deleted successfully.");
     // alert("Account deleted successfully."); 
-    window.location.href = "/";
-    } catch (error: any) {
+    // window.location.href = "/";
+    return { status: "ok", message: "Your account has been deleted." };
+    } catch (error) {
+        let msg: string;
         if (error instanceof Error) {
             const firebaseAuthError = error as { code?: string; message: string};
             if (firebaseAuthError.code === "auth/requires-recent-login") {
                 alert("Please log in again to delete your account."); 
-                window.location.href = "http://localhost:3000/signin";
+                // window.location.href = "http://localhost:3000/signin";
             } else {
                 alert("Error deleting user: " + firebaseAuthError.message);
             } // end if else
+            msg = firebaseAuthError.message;
         } else {
+            msg = "An unknown error occurred while deleting your account.";
             alert("An unknown error occurred while deleting your account.");
         } // end if else
+        return { status: "error", message: msg };
     } // end try catch
 } // end deleteAccount
 
@@ -113,10 +118,11 @@ export async function logout() {
         const data = await res.json();
         console.log( data.message );
 
-        window.location.href = "http://localhost:3000/"
+        // window.location.href = "http://localhost:3000/"
         return { status: "ok", message: "User signed out successfully", };
     } catch (err) {
         console.error("Error signing out:", err);
+        return { status: "error", message: "An error occurred while signing out.", };
     } // end try catch
 } // end function logout
 
@@ -176,9 +182,17 @@ export async function editProfile(
             throw new Error(data.message || "Failed to update profile.");
         }
 
-        alert("Profile updated successfully.");
-    } catch (error: any) {
-        alert("Error updating profile: " + error.message);
+        // alert("Profile updated successfully.");
+        console.log("Profile updated successfully.");
+        return { status: "ok", message: "Profile updated successfully" };
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error("Error updating profile:", error.message);
+            return { status: "error", message: error.message };
+        } else {
+            console.error(error);
+            return { status: "error", message: error };
+        } // end if else
     } // end try catch
 } // end editProfile
 

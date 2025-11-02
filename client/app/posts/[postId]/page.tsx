@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { useAuth } from "../../context.tsx";
 import { useReplies, Reply, Post } from "./replies.ts";
 import styles from "./repliesPage.module.css";
-import { fetchAllPosts } from "../posts.ts";
+// import { fetchAllPosts } from "../posts.ts";
 
 export default function RepliesPage() {
     const MAX_DEPTH = 5;

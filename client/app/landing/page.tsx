@@ -12,6 +12,16 @@ import Image from 'next/image';
 export default function Landing() {
     const { user } = useAuth();
     const router = useRouter();
+
+    // handleLogout
+    const handleLogout = async () => {
+        const res = await logout();
+        if (res?.status === "ok") {
+            router.push("/");
+        } else {
+            console.log(res?.message || "An error occurred while signing out.");
+        } // end if else
+    } // end handleLogout
     
     return (
     
@@ -70,7 +80,7 @@ export default function Landing() {
                         <div className = {Styles.dropdownMenu}>
                             <button onClick={() => window.location.href = "http://localhost:3000/profile"}>Profile</button>
                             <button>Settings</button>
-                            <button onClick={logout}>Log Out</button>
+                            <button onClick={() => {handleLogout()}}>Log Out</button>
                         </div>
                     </div>
                 </div>

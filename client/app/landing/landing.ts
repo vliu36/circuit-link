@@ -13,10 +13,11 @@ export async function logout() {
         const data = await res.json();
         console.log( data.message );
 
-        window.location.href = "http://localhost:3000/"
+        // window.location.href = "http://localhost:3000/"
         return { status: "ok", message: "User signed out successfully", };
     } catch (err) {
         console.error("Error signing out:", err);
+        return { status: "error", message: "An error occurred while signing out.", };
     } // end try catch
 } // end function logout
 

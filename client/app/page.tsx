@@ -6,6 +6,7 @@ import SearchBar from "./_components/searchbar/search.tsx";
 import Link from "next/link";
 import AuthButtons from './_components/navbar/authbuttons.tsx';
 import Image from "next/image";
+import { Suspense } from 'react';
 
 export default async function Landing(props: {
     searchParams?: Promise<{
@@ -70,7 +71,9 @@ export default async function Landing(props: {
                     Welcome to Circuit Link
                 </div>
                 <div className= {Styles.searchBarAlignment}>
-                    <SearchBar/>
+                    <Suspense fallback={<div>Loading search bar...</div>}>
+                        <SearchBar/>
+                    </Suspense>
                 </div>
             </div>
         </div>

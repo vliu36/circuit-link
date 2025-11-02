@@ -11,6 +11,7 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPass, setShowPass] = useState(false);
+    const [loading, setLoading] = useState(false);
     // const [error, setError] = useState("");
     const [isOpen, setIsOpen] = useState(false);
 
@@ -27,14 +28,35 @@ export default function Login() {
         const cleanPass = password.trim();
         
         await login(cleanMail, cleanPass);
-        router.replace("/landing");
+        router.push("/landing");
     } // end handleSubmitLog
+
+    // handleGoogleReg function for Google signup
+    async function handleSubmitGoogle() {
+        setLoading(true);
+        try {
+            const res = await loginWithGoogle();
+            if (res.status === "ok") {
+                router.push("/landing");
+            } else {
+                console.log(res.message);
+            } // end if else
+        } catch (err) {
+            console.error("Unexpected error:", err);
+        } finally {
+            setLoading(false);
+        } // end try catch finally
+    } // end function handleSubmitGoogle
     
     // handleSubmit for forgot password
     async function handleSubmitForgotPassword(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         const cleanMail = email.trim();
         await forgotPassword(cleanMail);
+    }
+
+    if (loading) {
+        return <div>Loading...</div>;
     }
 
     // ---- HTML ---- //
@@ -127,7 +149,7 @@ export default function Login() {
                         height={40}
                         alt="Sign up with Google"
                 />
-                <button className = {Styles.signUpWithGoogleText} onClick={loginWithGoogle}>Log in with Google</button>
+                <button className = {Styles.signUpWithGoogleText} onClick={handleSubmitGoogle}>Log in with Google</button>
             </div>
 
             <div className="registerLink">
