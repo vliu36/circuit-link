@@ -37,4 +37,11 @@ router.post("/", comm.addDoc);
  */
 router.get("/get/:name", comm.getDocByName);
 
+/** Retrieves the document in Communities as well as all Group and Forum documents that match the name
+ *  @route GET /api/comm/get-structure/:name
+ *  @param slug - String to search for
+ *  @body 
+ */
+router.get("/get-structure/:name", comm.getCommunityStructure);
+
 export default router;

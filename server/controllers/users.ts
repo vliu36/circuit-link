@@ -1,10 +1,8 @@
-import { db } from "../firebase.ts";
+import { db, auth } from "../firebase.ts";
 import { Request, Response } from "express";
-import { getAuth as getAdminAuth, PhoneMultiFactorInfo } from "firebase-admin/auth";
-import { FieldValue, getFirestore } from "firebase-admin/firestore";
-import { maxHeaderSize } from "http";
-
-const auth = getAdminAuth();
+// import { getAuth as getAdminAuth } from "firebase-admin/auth";
+import { FieldValue } from "firebase-admin/firestore";
+// import { maxHeaderSize } from "http";
 
 // ------------------ Helper functions ------------------ //
 // Function to assist in parsing session cookie

@@ -1,6 +1,19 @@
-import { Timestamp } from "firebase-admin/firestore";
+import { DocumentReference, Timestamp } from "firebase-admin/firestore";
 import { db } from "../firebase.ts";
 import { Request, Response } from "express";
+
+interface Forum {
+    id: string,
+    name: string,
+    slug: string,
+    description?: string,
+}
+
+interface Group {
+    id: string,
+    name: string,
+    forums: Forum[],
+}
 
 // Retrieves all documents in Communities
 const getAllDocuments = async (req: Request, res: Response) => {
@@ -72,8 +85,8 @@ const getDocByName = async (req: Request, res: Response) => {
         const snapshot = await communitiesRef.where("name", "==", query).get();
 
         if (snapshot.empty) {
-            res.status(500).send({
-                status: "Backend error",
+            res.status(404).send({
+                status: "Not found",
                 message: "Cannot find document with name: " + query
             })
         }
@@ -123,10 +136,72 @@ const updateDoc = async (req: Request, res: Response) => {
     //TODO: Complete code stub
 }
 
+const getCommunityStructure = async (req: Request, res: Response) => {
+    try {
+        const communityName = req.params.name;
+
+        // Get community document
+        const communitiesRef = db.collection("Communities");
+        const snapshot = await communitiesRef.where("name", "==", communityName).get();
+
+        if (snapshot.empty) {
+            return res.status(404).send({
+                status: "Not found",
+                message: `Community of name "${communityName}" not found.`,
+            });
+        }
+
+        const communityDoc = snapshot.docs[0];
+        const communityData = communityDoc.data();
+        const groupsRefs = communityData.groupsInCommunity || [];
+
+        // Fetch all groups
+        const groupsInCommunity: Group[] = [];
+        for (const groupRef of groupsRefs) {
+            const groupSnap = await groupRef.get();
+            if (!groupSnap.exists) continue;
+
+            const groupData = groupSnap.data();
+            const forumsRefs = groupData.forumsInGroup || [];
+
+            // Fetch all forums for the current group
+            const forumsInGroup: Forum[] = [];
+            for (const forumRef of forumsRefs) {
+                const forumSnap = await forumRef.get();
+                if (!forumSnap.exists) continue;
+                forumsInGroup.push({ id: forumSnap.id, ...forumSnap.data() }); // TODO: Attempt to omit sending posts
+            } // end for forumsRefs
+
+            groupsInCommunity.push({
+                id: groupSnap.id,
+                ...groupData,
+                forumsInGroup,
+            });
+        } // end for groupsRefs
+
+        res.status(200).send({
+            status: "ok",
+            community: {
+                id: communityDoc.id,
+                name: communityData.name,
+                description: communityData.description,
+                groupsInCommunity,
+            },
+        });
+    } catch (err) {
+        console.error("Error fetching community structure:", err);
+        res.status(500).send({
+            status: "Backend error",
+            message: err instanceof Error? err.message : err,
+        });
+    } // end try catch
+} // end getCommunityStructure
+
 export {
     getAllDocuments,
     prefixSearch,
     addDoc,
     getDocByName,
-    updateDoc
+    updateDoc,
+    getCommunityStructure
 }

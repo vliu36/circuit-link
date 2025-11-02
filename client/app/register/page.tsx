@@ -26,7 +26,7 @@ export default function Registration() {
         try {
             const res = await register(email.trim(), password.trim(), username);
             if (res?.status === "ok") {
-                router.replace("/landing");
+                router.push("/landing");
             } else {
                 console.log(res?.message);
             } // end if else
@@ -43,7 +43,7 @@ export default function Registration() {
         try {
             const res = await loginWithGoogle();
             if (res.status === "ok") {
-                router.replace("/landing");
+                router.push("/landing");
             } else {
                 console.log(res.message);
             } // end if else
@@ -78,8 +78,6 @@ export default function Registration() {
                     onFocus={() => setShowHintU(true)}/>
                     {showHintU && <p className={Styles.hint}><strong>Username can only contain letters, numbers, and underscores, and be within 1-20 characters.</strong></p>}
                 </label>
-                    
-                
                 <label className = {Styles.smallBox}>
                     Email
                     <input 
