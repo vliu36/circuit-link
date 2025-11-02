@@ -10,6 +10,7 @@ type Post = {
     id: string;
     title: string;
     contents: string;
+    media: string;
     authorUsername: string;
     authorId: string;
     yayScore: number;
