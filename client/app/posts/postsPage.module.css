@@ -162,3 +162,28 @@
 .nayActive:hover {
     background-color: #c9302c;
 }
+
+.backButton {
+    position: absolute;
+    left: 20px;
+    background-color: #0070f3;
+    height: 30px;
+    width: 70px;
+    border-radius: 1em;
+    margin-top: 10px;
+    margin-left: 20px;
+}
+
+.backButton:hover {
+  background-color: #005bb5;
+}
+.backButtonText {
+    text-align: center;
+    right: 5px;
+    margin-top: 5px;
+    margin-left: 10px;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: white;
+    position: relative;
+    font-size: 0.8rem;
+}

@@ -107,6 +107,9 @@ export default function PostsPage() {
 
     return (
         <div className={styles.container}>
+            <Link href="/landing" className={styles.backButton}>
+            <h1 className={styles.backButtonText}>Back</h1>
+            </Link>
             <h1 className={styles.header}>Posts Demo</h1>
 
             {/* --- New Post Section --- */}
