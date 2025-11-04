@@ -7,21 +7,7 @@ import Link from "next/link";
 // import { useAuth } from "../../../context.tsx";
 import { fetchPostsByForum, createPost, editPost, deletePostById, votePost } from "./forum.ts";
 import styles from "./forumPage.module.css";
-
-export type Post = {
-    id: string;
-    title: string;
-    contents: string;
-    media: string;
-    authorUsername: string;
-    authorId: string;
-    yayScore: number;
-    replyCount: number;
-    yayList: string[];
-    nayList: string[];
-    timePosted: string;
-    edited: boolean;
-};
+import { Post, Forum } from "../../../_types/types";
 
 export default function ForumPage({
     params,
@@ -38,7 +24,7 @@ export default function ForumPage({
     const [editTitle, setEditTitle] = useState("");
     const [editContents, setEditContents] = useState("");
 
-    const [forum, setForum] = useState<any>(null);
+    const [forum, setForum] = useState<Forum | null>(null);
     const [loading, setLoading] = useState(true);
 
     /** Fetch posts by forum

@@ -1,36 +1,7 @@
 import { DocumentReference } from "firebase/firestore";
 
 const BASE_URL = "http://localhost:2400/api"; // adjust as needed
-
-// Types
-export interface User {
-    id: string;
-    username: string;
-    email: string;
-    // photoUrl: string;
-}
-export interface Forum {
-    id: string;
-    name: string;
-    slug: string;
-    description: string;
-}
-
-export interface Group {
-    id: string;
-    name: string;
-    forumsInGroup: Forum[];
-}
-
-export interface Community {
-    id: string;
-    name: string;
-    description: string;
-    groupsInCommunity: Group[];
-    userList: User[];
-    ownerList: User[];
-    modList: User[];
-}
+import { Community } from "../../_types/types";
 
 interface CreateForumParams {
     name: string;

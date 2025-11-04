@@ -5,7 +5,8 @@ import { useAuth } from "../../_firebase/context.tsx";
 import { logout } from "../../landing/landing.ts";
 // import { Suspense } from 'react';
 // import { useRouter} from "next/navigation";
-import { Community, fetchStructure, createGroup, deleteGroup, createForum, deleteForum } from "./community.ts";
+import { fetchStructure, createGroup, deleteGroup, createForum, deleteForum } from "./community.ts";
+import { Community } from "../../_types/types.ts";
 import Link from "next/link";
 
 export default function CommunityPage({
