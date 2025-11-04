@@ -14,7 +14,9 @@ router.get("/all", posts.getAllDocuments)
  *  @body author - The document id for the User that created the post
  *  @body title - String representing the title of the post
  *  @body contents - String representing the contents of the post (can be text or a url to the cloud storage location of the media)
-*/
+ *  @body forumSlug - The slug of the forum that the post is being made in
+ *  @body commName - The name of the community that the post is being made in
+ */
 router.post("/make-post", posts.addDoc);
 
 /** Adds a reply to an existing post

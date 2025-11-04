@@ -8,4 +8,26 @@ const router = express.Router();
  */
 router.get("/all", forums.getAllDocuments)
 
+/** Create a document in Forums
+ *  @route POST /api/forums/create
+ *  @body name - The name of the forum being made
+ *  @body description - A description of the forum
+ *  @body userId - The user ID of the user making the request
+ */
+router.post("/create", forums.addDoc);
+
+/** Retrieve a forum by its slug within a specified community
+ *  @route GET /api/forums/get/:commName/:forumSlug
+ *  @param commName - The name of the community the forum belongs to
+ *  @param forumSlug - The slug of the forum to retrieve
+ */
+router.get("/get/:commName/:forumSlug", forums.getForumBySlug);
+
+/** Delete a forum by its ID
+ *  @route DELETE /api/forums/delete/:forumId
+ *  @param forumId - The ID of the forum to delete
+ */
+router.delete("/delete/:forumId", forums.deleteForum);
+
+
 export default router;

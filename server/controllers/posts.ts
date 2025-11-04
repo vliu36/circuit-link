@@ -7,6 +7,7 @@ interface Post {
     title: string;
     contents: string;
     yayScore: number;
+    replyCount: number;
     yayList: DocumentReference[];
     nayList: DocumentReference[];
     timePosted: Timestamp;
@@ -27,40 +28,7 @@ interface Reply {
     contents: string;
 }
 
-// // Retrieves all documents in Posts
-// const getAllDocuments = async (req: Request, res: Response) => {
-//     try {
-//         const postsRef = db.collection("Posts");
-//         const snapshot = await postsRef.get();
-        
-//         res.status(200).send({
-//             status: "OK",
-//             message: snapshot.docs.map(doc => doc.data())
-//         })
-//     }
-//     catch (err) {
-//         console.log(err);
-//         res.status(500).send({
-//             status: "backend error",
-//             message: err
-//         })
-//     }    
-// }
-
-const deleteRepliesRecursive = async (replyRefs: FirebaseFirestore.DocumentReference[]) => {
-    for (const replyRef of replyRefs) {
-        const replyDoc = await replyRef.get();
-        if (!replyDoc.exists) continue;
-
-        const replyData = replyDoc.data();
-        if (replyData?.listOfReplies?.length) {
-            await deleteRepliesRecursive(replyData.listOfReplies);
-        }
-
-        await replyRef.delete();
-    } // end for
-} // end helper function deleteRepliesRecursive
-
+// -------------------------------- Controller functions -------------------------------- //
 // Retrieves all documents in Posts sorted by date posted (modified to get post authors from Users)
 const getAllDocuments = async (req: Request, res: Response) => {
     try {
@@ -110,50 +78,124 @@ const getAllDocuments = async (req: Request, res: Response) => {
 };
 
 // Creates and adds a document in Posts
-const addDoc = async (req: Request, res: Response) => {
+const addDoc = async (req: Request, res: Response) => {         // TODO: Split this function into smaller helper functions
     try {
-        const postsRef = await db.collection("Posts");
-        const authorRef = db.doc("/Users/" + req.body.author);
+        const {
+            author,     // User ID of post author
+            title,
+            contents,
+            commName,   // Community name
+            forumSlug,  // Forum slug
+        } = req.body;
 
-        const data = {
-            yayScore: 1,
-            author: authorRef,
-            listOfReplies: [],
-            timePosted: Timestamp.fromDate(new Date()),
-            timeUpdated: Timestamp.fromDate(new Date()),
-            title: req.body.title,
-            contents: req.body.contents,
-            edited: false,
-            yayList: [authorRef],   // author automatically likes posts
-            nayList: [],
-        }
+        const authorRef = db.doc(`/Users/${author}`);
+        const postsRef = db.collection("Posts");
 
-        const snapshot = await postsRef.where("author", "==", data.author)
-                                        .where("title", "==", data.title)
-                                        .where("contents", "==", data.contents)
-                                        .get();
-
-        if (!snapshot.empty) {
-            res.send(400).send({
+        // Validate required fields
+        if (!author || !title || !contents || !commName || !forumSlug) {
+            return res.status(400).send({
                 status: "Bad Request",
-                message: "A similar post from the same user already exists!"
-            })
+                message: "Missing required fields: author, title, contents, commName, or forumSlug",
+            });
         }
-        const result = await db.collection("Posts").add(data);
 
-        res.status(200).send({
+        // Get the Community document
+        const commQuery = await db.collection("Communities")
+            .where("name", "==", commName)
+            .limit(1)
+            .get();
+
+        if (commQuery.empty) {
+            return res.status(404).send({
+                status: "Not Found",
+                message: `Community "${commName}" not found.`,
+            });
+        }
+        const commDoc = commQuery.docs[0];
+        const commRef = commDoc.ref;
+        const forumsInCommunity = commDoc.data().forumsInCommunity || [];
+
+        // Find the Forum by slug
+        let forumRef: DocumentReference | null = null;
+        let parentGroupRef: DocumentReference | null = null;
+        for (const fRef of forumsInCommunity) {
+            const fSnap = await fRef.get();
+            const fData = fSnap.data();
+            if (fData?.slug === forumSlug) {
+                forumRef = fRef;
+                parentGroupRef = fData.parentGroup;
+                break;
+            }
+        }
+
+        if (!forumRef) {
+            return res.status(404).send({
+                status: "Not Found",
+                message: `Forum with slug "${forumSlug}" not found in community "${commName}".`,
+            });
+        }
+        if (!parentGroupRef) {
+            return res.status(404).send({
+                status: "Not Found",
+                message: `Parent group for forum "${forumSlug}" not found.`,
+            });
+        }
+
+        // Check for duplicate post by the same author
+        const existingPostQuery = await postsRef
+            .where("author", "==", authorRef)
+            .where("title", "==", title)
+            .where("contents", "==", contents)
+            .get();
+        if (!existingPostQuery.empty) {
+            return res.status(400).send({
+                status: "Bad Request",
+                message: "A similar post from the same user already exists!",
+            });
+        }
+
+        // Create post data
+        const now = Timestamp.fromDate(new Date());
+        const postData = {
+            title,
+            contents,
+            author: authorRef,
+            yayScore: 1,
+            replyCount: 0,
+            yayList: [authorRef],
+            nayList: [],
+            listOfReplies: [],
+            timePosted: now,
+            timeUpdated: now,
+            edited: false,
+            parentCommunity: commRef,
+            parentGroup: parentGroupRef,
+            parentForum: forumRef,
+        };
+
+        // Add to Posts collection
+        const newPostRef = await postsRef.add(postData);
+
+        // Update related collections
+        await Promise.all([
+            forumRef.update({
+                postsInForum: FieldValue.arrayUnion(newPostRef),
+            }),
+        ]);
+
+        return res.status(201).send({
             status: "OK",
-            message: "Successfully added to Posts, " + result.id,
-            docId: result.id
-        })
-    }
-    catch (err) {
+            message: `Successfully added post ${newPostRef.id}`,
+            docId: newPostRef.id,
+        });
+    } catch (err) {
+        console.error("Error creating post:", err);
         res.status(500).send({
             status: "Backend error: Could not add document to Posts",
-            message: err
-        })
+            message: err instanceof Error ? err.message : err,
+        });
     }
-} // end addDoc
+};
 
 // Edit post (only author can edit)
 const editDoc = async (req: Request, res: Response) => {
@@ -204,6 +246,51 @@ const editDoc = async (req: Request, res: Response) => {
     }
 }
 
+
+// -------- Helper functions for deleteDoc -------- //
+// --- Helper function for deleteDoc that recursively deletes replies and their nested replies --- //
+const deleteRepliesRecursive = async (replyRefs: FirebaseFirestore.DocumentReference[]) => {
+    for (const replyRef of replyRefs) {
+        const replyDoc = await replyRef.get();
+        if (!replyDoc.exists) continue;
+
+        const replyData = replyDoc.data();
+        if (replyData?.listOfReplies?.length) {
+            await deleteRepliesRecursive(replyData.listOfReplies);
+        }
+
+        await replyRef.delete();
+    } // end for
+} // end helper function deleteRepliesRecursive
+
+// --- Helper function for deleteDoc to check if user is authorized to delete a post --- //
+const isUserAuthorizedToDeletePost = async ( userId: string, postData: FirebaseFirestore.DocumentData, communityId?: string ): Promise<boolean> => {
+    const authorPath = postData?.author?.path;
+    const authorId = authorPath?.split("/")[1];
+
+    // Author can always delete
+    if (authorId === userId) return true;
+
+    // If not author, check if user is mod/owner of community
+    if (communityId) {
+        const communityRef = db.collection("Community").doc(communityId);
+        const communityDoc = await communityRef.get();
+        if (communityDoc.exists) {
+            const communityData = communityDoc.data();
+            const userRef = db.doc(`/Users/${userId}`);
+            const ownerList: FirebaseFirestore.DocumentReference[] = communityData?.ownerList || [];
+            const modList: FirebaseFirestore.DocumentReference[] = communityData?.modList || [];
+
+            const isOwner = ownerList.some(ref => ref.path === userRef.path);
+            const isMod = modList.some(ref => ref.path === userRef.path);
+
+            if (isOwner || isMod) return true;
+        }
+    }
+
+    return false;
+};
+
 // Delete post (Can only be done by author or community mods)
 const deleteDoc = async (req: Request, res: Response) => {
     try {
@@ -211,7 +298,6 @@ const deleteDoc = async (req: Request, res: Response) => {
         const userId = req.body.userId;     // userId of the user requesting deletion
         // TODO: ↓↓↓ Fix this up once forums are implemented ↓↓↓
         const communityId = req.body.communityId; // the forum/community this post belongs to
-
 
         const postRef = db.collection("Posts").doc(postId);
         const postDoc = await postRef.get();
@@ -221,32 +307,10 @@ const deleteDoc = async (req: Request, res: Response) => {
         }
 
         const postData = postDoc.data();
-        const authorPath = postData?.author?.path; // "Users/<uid>"
-        const authorId = authorPath?.split("/")[1];
+        // const authorPath = postData?.author?.path; // "Users/<uid>"
 
         // Default: only the author can delete --- checks if the requestor is the author 
-        let authorized = authorId === userId;
-
-        // If not author, check if user is mod/owner of community
-        if (!authorized && communityId) {
-            const communityRef = db.collection("Community").doc(communityId);
-            const communityDoc = await communityRef.get();
-
-            if (communityDoc.exists) {
-                const communityData = communityDoc.data();
-
-                const userRef = db.doc(`/Users/${userId}`);
-
-                const ownerList: FirebaseFirestore.DocumentReference[] = communityData?.ownerList || [];
-                const modList: FirebaseFirestore.DocumentReference[] = communityData?.modList || [];
-
-                const isOwner = ownerList.some(ref => ref.path === userRef.path);
-                const isMod = modList.some(ref => ref.path === userRef.path);
-
-                if (isOwner || isMod) authorized = true;
-            } // end if
-        } // end if
-
+        const authorized = await isUserAuthorizedToDeletePost(userId, postData!, communityId);
         if (!authorized) {
             return res.status(403).send({
                 status: "Forbidden",
@@ -255,14 +319,30 @@ const deleteDoc = async (req: Request, res: Response) => {
         }
 
         // Delete all replies recursively
+        console.log("Deleting replies...");
         const replyRefs: FirebaseFirestore.DocumentReference[] = postData?.listOfReplies || [];
         await deleteRepliesRecursive(replyRefs);
+        console.log("All replies deleted.");
+
+        // Dereference post from parent forum
+        console.log("Dereferencing post from parent forum...");
+        const parentForumRef: DocumentReference = postData?.parentForum;
+        if (parentForumRef) {
+            console.log("Dereferencing post from parent forum...");
+            await parentForumRef.update({
+                postsInForum: FieldValue.arrayRemove(postRef),
+            });
+            console.log("Dereferencing complete.");
+        }
+        console.log("Dereferencing complete.");
 
         // Delete the document from Firestore
+        console.log("Deleting post...");
         await postRef.delete();
+        console.log("Post deleted.");
 
         return res.status(200).send({
-            status: "OK",
+            status: "ok",
             message: `Post ${postId} deleted successfully.`,
         });
     } catch (err) {
@@ -352,9 +432,10 @@ const votePost = async (req: Request, res: Response) => {
 // Adds a reply to an existing post
 const replyToPost = async (req: Request, res: Response) => {
     try {
-        const id = req.params.id;       // post id
-        const reply = req.body.replyId;
-        const replyRef = await db.collection("Replies").doc(reply);
+        const { id } = req.params; // id of the post being replied to
+        const { replyId } = req.body;
+
+        const replyRef = await db.collection("Replies").doc(replyId);
 
         if (!replyRef) {
             res.send(400).send({
@@ -363,9 +444,11 @@ const replyToPost = async (req: Request, res: Response) => {
             });
         }
 
+        // Update the post's listOfReplies and increment replyCount
         const post = await db.collection("Posts").doc(id);
         const result = await post.update({
-            listOfReplies: FieldValue.arrayUnion(db.doc(`/Replies/${reply}`))
+            listOfReplies: FieldValue.arrayUnion(db.doc(`/Replies/${replyId}`)),
+            replyCount: FieldValue.increment(1),
         });
 
         res.status(200).send({
