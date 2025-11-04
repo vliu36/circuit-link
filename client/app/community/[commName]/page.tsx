@@ -83,8 +83,17 @@ export default function CommunityPage({
 
       // Refresh community structure
       fetchStructure(commName).then((data) => data && setCommunity(data));
-    } catch (err: any) {
-      setForumInputs((prev) => ({ ...prev, [groupId]: { ...prev[groupId], message: err.message || "Failed to create forum." } }));
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to create forum.";
+
+      setForumInputs((prev) => ({
+        ...prev,
+        [groupId]: {
+          ...prev[groupId],
+          message,
+        },
+      }));
     }
   };
 

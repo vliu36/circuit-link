@@ -116,7 +116,7 @@ export async function createForum({ name, description, userId, groupId, commName
         }
 
         return data.docId; // return the newly created forum's ID
-    } catch (err: any) {
+    } catch (err) {
         console.error("Error creating forum:", err);
         throw err;
     } // end try catch
