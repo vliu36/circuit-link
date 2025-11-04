@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import * as profileFunctions from "./profile";
-import { useAuth } from "../context";
+import { useAuth } from "../_firebase/context";
 import "./profile-styles.css";
 import { useRouter } from "next/navigation";
 

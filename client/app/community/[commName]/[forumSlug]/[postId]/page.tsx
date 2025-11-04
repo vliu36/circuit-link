@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth } from "@/app/context";
+import { useAuth } from "../../../../_firebase/context.tsx";
 import { Post, Reply, useReplies } from "./post.ts";
 import { use, useEffect, useState } from "react";
 import styles from "./postPage.module.css";

@@ -1,7 +1,7 @@
 "use client"
 // import React, {useEffect, useState} from "react";
 import Styles from './landingPage.module.css';
-import { useAuth } from "../context.tsx";
+import { useAuth } from "../_firebase/context.tsx";
 import { Suspense } from 'react';
 import SearchBar from "../_components/searchbar/search.tsx";
 import SearchResults from "../_components/searchbar/table.tsx";

@@ -1,7 +1,8 @@
 // Script for user registration page
 
 import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, db } from "../_firebase/firebase";
+import { doc, getDoc } from "firebase/firestore";
 import { FirebaseError } from "firebase/app";
 import "./register.module.css";
 

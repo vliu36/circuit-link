@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-// import { initAuthListener } from "./auth-observer";
-import { AuthProvider } from "./context";
+// import { initAuthListener } from "./_firebase/auth-observer.ts";
+import { AuthProvider } from "./_firebase/context.tsx";
 import NavBar from "./_components/navbar/navbar.tsx";
 
 // Removed because this is supposed to run on the clientside

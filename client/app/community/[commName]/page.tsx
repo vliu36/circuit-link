@@ -1,7 +1,7 @@
 "use client"
 import React, { use, useState, useEffect } from "react";
 import Styles from "./community.module.css";
-import { useAuth } from "../../context.tsx";
+import { useAuth } from "../../_firebase/context.tsx";
 import { logout } from "../../landing/landing.ts";
 // import { Suspense } from 'react';
 // import { useRouter} from "next/navigation";

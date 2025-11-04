@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useAuth } from "../../../_firebase/context.tsx";
 import { use } from "react";
 import Link from "next/link";
-import { useAuth } from "../../../context.tsx";
+// import { useAuth } from "../../../context.tsx";
 import { fetchPostsByForum, createPost, editPost, deletePostById, votePost } from "./forum.ts";
 import styles from "./forumPage.module.css";
 
@@ -11,6 +12,7 @@ export type Post = {
     id: string;
     title: string;
     contents: string;
+    media: string;
     authorUsername: string;
     authorId: string;
     yayScore: number;

@@ -1,4 +1,4 @@
-import { auth } from "../firebase";
+import { auth } from "../_firebase/firebase";
 
 // Log user out (revised)
 export async function logout() {
