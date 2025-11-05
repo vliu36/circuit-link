@@ -51,7 +51,7 @@ export default function NavBar() {
                         <div className = {Styles.dropdownMenu}>
                             <Link href = "./profile" replace>Profile</Link>
                             <button>Settings</button>
-                            <script onClick={logout}>Log Out</script>
+                            <button onClick={logout}>Log Out</button>
                         </div>
                     </div>
                 </div>
