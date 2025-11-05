@@ -111,10 +111,10 @@ export default function Profile() {
                 <br/>
                 <br/>
                 <div className="profile-header">
-                    <Image
+                    <img
                     src={user.photoURL || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
-                    alt="Profile Picture" 
-                    className="w-16 h-16 rounded-full object-cover border"></Image>
+                    alt="Profile Picture"
+                    className="w-16 h-16 rounded-full object-cover border"></img>
                     <span className="username">{userData?.username}</span>
                 </div>
                 <p>{userData?.profileDesc}</p>
