@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import {register, registerWithGoogle} from "./register";
 import Styles from './register.module.css';
 import Image from 'next/image';
-import googleIcon from '../../public/googleIcon.png'
+import googleIcon from '../../public/googleIcon.png';
 
 export default function Registration() {
 
@@ -103,7 +103,7 @@ export default function Registration() {
                     <div className = {Styles.orBox}>OR</div>
                     <div className = {Styles.righthorizontalLine}></div>
                 </div>
-                <button
+                <script
                     className = {Styles.signUpWithGoogleButton}
                     onClick={handleGoogleReg}>
                     <Image
@@ -111,9 +111,9 @@ export default function Registration() {
                         width={40}
                         height={40}
                         alt="Sign up with Google"
-                    />
+                    ></Image>
                     <h1 className = {Styles.signUpWithGoogleText}>Sign up with Google</h1>
-                    </button>
+                    </script>
             </form>
             
         </div>
@@ -121,5 +121,3 @@ export default function Registration() {
     </div>
     );
 }
-
-

@@ -1,16 +1,15 @@
 "use client";
 import React from "react";
 import Styles from "./help.module.css";
-import { useRouter } from "next/navigation";
+import Link from 'next/link';
 
 export default function Help() {{/*function RulesPage*/}
-    const router = useRouter();
     
     return (
         <div className = {Styles.background}>
-            <button className = {Styles.returnButton} onClick={() => router.push("/landing")}>
+            <Link className = {Styles.returnButton} href = "./landing" replace>
                 <h1 className = {Styles.returnButtonText}>Return</h1>
-            </button>
+            </Link>
             <div className = {Styles.mainBox}>
                 <div className = {Styles.titleBox}>
                     <h1 className={Styles.titleText}>Help</h1>
