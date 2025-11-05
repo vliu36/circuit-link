@@ -66,7 +66,9 @@ function convertVideo(filepath: string) {
 export async function downloadMedia(path: string) {
     try {
         const mediaRef = ref(storage, path);
-        return await getBytes(mediaRef);
+        await getBytes(mediaRef).then((result) => {
+            return result;
+        });
     }
     catch (err) {
         console.error(err);
