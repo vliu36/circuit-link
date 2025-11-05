@@ -149,7 +149,7 @@ const userRegistrationGoogle = async (req: Request, res: Response) => {
         const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
         res.cookie("session", sessionCookie, {
             httpOnly: true,
-            secure: true,
+            //secure: true,
             maxAge: expiresIn,
             sameSite: "lax",
         });
