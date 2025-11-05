@@ -8,6 +8,8 @@ COPY package*.json ./
 
 RUN npm install
 
+RUN rm -rf .next
+
 COPY . .
 
 EXPOSE 2400
