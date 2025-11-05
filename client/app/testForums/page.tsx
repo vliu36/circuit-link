@@ -65,6 +65,11 @@ export default async function Landing(props: {
                 <NavBar/>
             </div>
             
+            <div className = {Styles.communnitiesPage}>
+                <button>
+                    
+                </button>
+            </div>
         </div>
         
     );

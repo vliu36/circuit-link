@@ -1,3 +1,13 @@
+@font-face {
+  font-family: Jura;
+  src: url('../../public/fonts/Jura-Light.ttf');
+}
+
+@font-face {
+  font-family: Inria Sans;
+  src: url('../../public/fonts/InriaSans-Light.ttf');
+}
+
 .background {
     background-color: rgb(28, 38, 66);
     display: flex;
@@ -55,6 +65,8 @@
     font-family: Inria Sans;
     color: gray;
     text-indent: 3%;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .serverBar{
@@ -69,6 +81,8 @@
     font-family: Inria Sans;
     font-size: 25px;
     color: rgb(255, 255, 255);
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .serverContainer{
@@ -143,6 +157,8 @@
     font-family: Inria Sans;
     color: gray;
     text-indent: 3%;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .channelInfoh1{
@@ -184,6 +200,8 @@
     color: rgb(255, 255, 255);
     font-size: 25px;
     text-indent: 3%;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .usersBar{
@@ -199,6 +217,8 @@
     color: rgb(255, 255, 255);
     font-size: 25px;
     text-indent: 3%;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
 
 .navBox{
@@ -209,3 +229,20 @@
     justify-content: space-between;
 }
 
+.communnitiesPage{
+    width: 60%;
+    height: calc(100vh - 51px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: absolute;
+    left:20vw;
+    top: 2.5vw;
+    display: flex;
+    flex-direction: column;
+    color: gray;
+    font-size: 20px;  
+}
+
+.backButton{
+
+}
