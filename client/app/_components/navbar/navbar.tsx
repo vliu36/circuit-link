@@ -21,11 +21,12 @@ export default function NavBar() {
     }, []);
 
     return (
+        <script>
+        if(!user?){
         <div className = {Styles.navBox}>
             <Link href="/">
                 <Image className = {Styles.homeLogo} src="/circuitlinklogowback.svg" width={200} height={50} alt="Circuit Link Logo"/>
             </Link>
-            if(!user?){
                 <div className = {Styles.navBox}>
                 <Link href="/" replace>
                     <Image className = {Styles.homeLogo} src="/circuitlinklogowback.svg" width={200} height={50} alt="Circuit Link Logo"/>
@@ -35,6 +36,7 @@ export default function NavBar() {
                     <h1 className = {Styles.orText}> or </h1>
                     <Link className = {Styles.logInSignUpButton} href="./register" replace> Sign Up </Link>
                 </div>
+            </div>
             </div>
             }
             else{
@@ -57,6 +59,6 @@ export default function NavBar() {
                 </div>
             </div>
             }
-        </div>
+        </script>
     )
 }
