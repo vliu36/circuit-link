@@ -3,11 +3,10 @@ import React, { use, useState, useEffect } from "react";
 import Styles from "./community.module.css";
 import { useAuth } from "../../_firebase/context.tsx";
 import { logout } from "../../landing/landing.ts";
-// import { Suspense } from 'react';
-// import { useRouter} from "next/navigation";
-import { fetchStructure, createGroup, deleteGroup, createForum, deleteForum } from "./community.ts";
-import { Community } from "../../_types/types.ts";
-import Link from "next/link";
+import { Suspense } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+
 
 export default function CommunityPage({
   params,
@@ -109,7 +108,6 @@ export default function CommunityPage({
   };
 
   /*const [ numUsers, setNumUsers] = useState(null);*/
-  // const router = useRouter();
   /*useEffect(() => {
   async function fetchData(){
   const res = await fetch(`http://localhost:2400/api/comm/${commName}`, {     
@@ -132,30 +130,30 @@ export default function CommunityPage({
     
     // <div className = {Styles.background}>
       
-    //   <div className = {Styles.navBox}>
-    //     <button className = {Styles.homeLogo} onClick = {() => window.location.href = "http://localhost:3000/landing"}>
-    //       <img src="../circuitlinklogowback.svg" alt="Logo"></img>
-    //     </button>
-    //   </div>
+      <div className = {Styles.navBox}>
+        <Link className = {Styles.homeLogo} href = "./landing" replace>
+          <Image src="../circuitlinklogowback.svg" alt="Logo" width={200} height = {200}></Image>
+        </Link>
+      </div>
 
-    //   <div className = {Styles.pfpSection}>
-    //     <button className = {Styles.notificationButton}>
-    //       <img src = "../notifBell.svg" className = {Styles.notificationButton} onClick = {() => window.location.href = "https:www.youtube.com/watch?v=dQw4w9WgXcQ"}></img>
-    //     </button>
-    //   </div>
+      <div className = {Styles.pfpSection}>
+        <button className = {Styles.notificationButton}>
+          <Image src = "../notifBell.svg" alt = "Notif" width = {5} height = {5}></Image>
+        </button>
+      </div>
 
-    //   <div className = {Styles.dropdown}>
-    //     <div className = {Styles.pfpSection}>
-    //       <button>
-    //         <img src = {user?.photoURL || "../circleUser.svg"} className = {Styles.settingsIcon} alt="User profile"></img>
-    //       </button>
-    //       <div className = {Styles.dropdownMenu}>
-    //         <button onClick={() => window.location.href = "http://localhost:3000/profile"}>Profile</button>
-    //         <button>Settings</button>
-    //         <button onClick={logout}>Log Out</button>
-    //       </div>
-    //     </div>
-    //   </div>
+      <div className = {Styles.dropdown}>
+        <div className = {Styles.pfpSection}>
+          <button>
+            <Image src = {user?.photoURL || "../circleUser.svg"} className = {Styles.settingsIcon} width = {5} height = {5} alt="User profile"></Image>
+          </button>
+          <div className = {Styles.dropdownMenu}>
+            <Link href = "./profile" replace>Profile</Link>
+            <button>Settings</button>
+            <button onClick={logout}>Log Out</button>
+          </div>
+        </div>
+      </div>
       
     //   <div>
     //     <h1 className = {Styles.line}>Welcome to the {commName} community.</h1>

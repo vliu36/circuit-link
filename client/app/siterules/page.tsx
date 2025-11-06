@@ -1,23 +1,23 @@
 "use client";
 import React from "react";
 import Styles from "./siterulse.module.css";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function SiteRules() {
-    const router = useRouter();
     
     return (
         <div className = {Styles.background}>
-            <button className = {Styles.returnButton} onClick={() => router.push("/landing")}>
+            <Link className = {Styles.returnButton} href = "./landing" replace>
                 <h1 className = {Styles.returnButtonText}>Return</h1>
-            </button>
+            </Link>
             <div className = {Styles.rulesBox}>
                 <div className = {Styles.titleBox}>
                     <h1 className={Styles.titleText}>Circuit Link Rules</h1>
                     <div className = {Styles.titleBoxLine}></div>
                 </div>
                 <div className = {Styles.innerBox}>
-                    <p>This is a placeholder, rules will soon be made.</p>
+                    <p>0. Please be nice, don't be rude.
+                    The first rule of Circuit Link is to never talk about Circuit Link.</p>
                 </div>
             </div>
         </div>

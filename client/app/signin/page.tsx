@@ -1,11 +1,10 @@
 "use client";
-// import { useRouter } from "next/navigation";
 import {login, loginWithGoogle, forgotPassword} from "./login";
 import React, { useState } from "react";
 import Styles from "./login.module.css";
 import Image from 'next/image';
-import googleIcon from '../../public/googleIcon.png'
-import { useRouter } from "next/navigation";
+import Link from 'next/link';
+import googleIcon from '../../public/googleIcon.png';
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -64,7 +63,7 @@ export default function Login() {
     <main>
         <div className={Styles.background}>
             <div className={Styles.loginContainer}>
-            <h1 className={Styles.title}>Login</h1>
+            <h1 className={Styles.title}>Log in</h1>
             <form onSubmit={handleSubmitLog}>
                 <div className={Styles.emailBox}>
                     <label>Email:</label>
@@ -99,17 +98,16 @@ export default function Login() {
                     </label>
                 </div>
 
+                <div className={Styles.forgotPasswordBox}>
+                    <button type="button" onClick={togglePopup}>
+                        Forgot Password?
+                    </button>
+                </div>
+
                 <div className={Styles.loginButton}>
                     <button type="submit">Login</button>
                 </div>
             </form>
-
-
-            <div className="forgotPasswordBox">
-                <button type="button" onClick={togglePopup}>
-                    Forgot Password?
-                </button>
-            </div>
 
             {isOpen && (
                 <div className="popup-overlay" onClick={togglePopup}>
@@ -148,12 +146,12 @@ export default function Login() {
                         width={40}
                         height={40}
                         alt="Sign up with Google"
-                />
-                <button className = {Styles.signUpWithGoogleText} onClick={handleSubmitGoogle}>Log in with Google</button>
+                ></Image>
+                <button className = {Styles.signUpWithGoogleText} onClick={loginWithGoogle}>Log in with Google</button>
             </div>
 
             <div className="registerLink">
-                <a href="/register"></a>
+                <Link href="./register" replace></Link>
             </div>
         </div>
     </div> 

@@ -3,7 +3,14 @@ import React, { useState, useEffect } from "react";
 import * as profileFunctions from "./profile";
 import { useAuth } from "../_firebase/context";
 import "./profile-styles.css";
-import { useRouter } from "next/navigation";
+import Image from 'next/image';
+import Link from 'next/link';
+// import { auth, db } from "../firebase";
+// import { User, onAuthStateChanged } from "firebase/auth";
+// import { deleteUserAccount, logout, editProfile } from "./profile";
+// import { doc, getDoc } from "firebase/firestore";
+// import { profile } from "console";
+
 
 export default function Profile() {
     const { user, userData, loading } = useAuth();
@@ -119,14 +126,14 @@ export default function Profile() {
             <div className="profile-card">
                 <h1>Profile</h1>
                 <p>Welcome to your profile page!</p>
-                <button className="go-back-btn" onClick={() => router.push("/landing")}>Go back</button>
+                <Link className="go-back-btn" href = "./landing" replace>Go back</Link>
                 <br/>
                 <br/>
                 <div className="profile-header">
-                    <img 
+                    <img
                     src={user.photoURL || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
-                    alt="Profile Picture" 
-                    className="w-16 h-16 rounded-full object-cover border"/>
+                    alt="Profile Picture"
+                    className="w-16 h-16 rounded-full object-cover border"></img>
                     <span className="username">{userData?.username}</span>
                 </div>
                 <p>{userData?.profileDesc}</p>
@@ -151,10 +158,11 @@ export default function Profile() {
                         className="hidden"
                         onChange={handleImageChange}/>
                     </label>
-                    {preview && (<img src={preview} alt="Preview" className="w-16 h-16 rounded-full object-cover border"/>)}
+                    {preview && (<Image src={preview} alt="Preview" className="w-16 h-16 rounded-full object-cover border"></Image>)}
                     <button
-                    type="submit"
-                    disabled={!file}>Upload</button>
+                        type="submit"
+                        disabled={!file}>Upload
+                    </button>
                     <p>File size limit: {MAX_KB} KB</p>
                 </form>
             </div>
@@ -236,7 +244,7 @@ export default function Profile() {
                 <br/>
                 <br/>
                 {/* Log out */}
-                <button className="logout-btn" onClick={() => {handleLogout()}}>Log Out</button>
+                <script className="logout-btn" onClick={() => { profileFunctions.logout(); }}>Log Out</script>
             </div>
         </main>
     );

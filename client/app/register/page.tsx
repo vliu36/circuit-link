@@ -3,8 +3,8 @@ import React, { useState } from "react";
 import {register, loginWithGoogle} from "./register";
 import Styles from './register.module.css';
 import Image from 'next/image';
-import googleIcon from '../../public/googleIcon.png'
-import { useRouter } from "next/navigation";
+import googleIcon from '../../public/googleIcon.png';
+import Link from "next/link";
 
 export default function Registration() {
 
@@ -60,7 +60,6 @@ export default function Registration() {
 
     return (
     <div className = {Styles.background}>
-
         <div className = {Styles.box}>
             <h1 className = {Styles.lblBox}>Sign Up</h1>
             <form onSubmit={handleSubmitReg}>
@@ -126,15 +125,13 @@ export default function Registration() {
                         width={40}
                         height={40}
                         alt="Sign up with Google"
-                    />
+                    ></Image>
                     <h1 className = {Styles.signUpWithGoogleText}>Sign up with Google</h1>
                     </button>
             </form>
             
         </div>
-        <a className={Styles.transparentButtonBox} href="../signin">Already have an account? Sign In</a>
+        <Link className={Styles.transparentButtonBox} href="../signin">Already have an account? Sign In</Link>
     </div>
     );
 }
-
-

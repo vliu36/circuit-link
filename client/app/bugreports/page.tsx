@@ -1,10 +1,9 @@
 "use client";
 import React from "react";
 import Styles from "./bugreports.module.css";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function BugReports() {
-    const router = useRouter();
     
     return (
         <div className = {Styles.background}>
@@ -20,14 +19,14 @@ export default function BugReports() {
                     <input className = {Styles.responseBar} type="text" id="report message"></input>
                 </div>
 
-                <button className = {Styles.submitButton} onClick={() => router.push("/bugreportthankyou")}>
+                <Link className = {Styles.submitButton} href = "./bugreportthankyou" replace>
                     <h1 className = {Styles.submitButtonText}>Submit</h1>
-                </button>
+                </Link>
             </div> 
 
-            <button className = {Styles.returnButton} onClick={() => router.push("/landing")}>
+            <Link className = {Styles.returnButton} href = "./landing" replace>
                     <h1 className = {Styles.returnButtonText}>Return</h1>
-            </button>
+            </Link>
         </div>
     );
 }

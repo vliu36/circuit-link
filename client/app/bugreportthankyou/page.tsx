@@ -1,10 +1,10 @@
 "use client";
 import React from "react";
 import Styles from "./bugreports.module.css";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function BugReportThankYou() {
-    const router = useRouter();
+
     
     return (
         <div className = {Styles.background}>
@@ -18,9 +18,9 @@ export default function BugReportThankYou() {
                     <br/>
                     Press the return button, to return to the home page.
                 </h2>
-                <button className = {Styles.returnButton} onClick={() => router.push("/landing")}>
+                <Link className = {Styles.returnButton} href = "./landing" replace>
                     <h1 className = {Styles.returnButtonText}>Return</h1>
-                </button>
+                </Link>
             </div>
         </div>
     );

@@ -5,23 +5,13 @@ import { useAuth } from "../_firebase/context.tsx";
 import { Suspense } from 'react';
 import SearchBar from "../_components/searchbar/search.tsx";
 import SearchResults from "../_components/searchbar/table.tsx";
-import { useRouter } from 'next/navigation';
+import NavBar from "../_components/navbar/navbar.tsx";
 import { logout } from './landing.ts';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Landing() {
     const { user } = useAuth();
-    const router = useRouter();
-
-    // handleLogout
-    const handleLogout = async () => {
-        const res = await logout();
-        if (res?.status === "ok") {
-            router.push("/");
-        } else {
-            console.log(res?.message || "An error occurred while signing out.");
-        } // end if else
-    } // end handleLogout
     
     return (
     
@@ -38,22 +28,22 @@ export default function Landing() {
             <div className = {Styles.resourcesBar}>
                 <div className = {Styles.horizontalLine}></div>
                 <h1>  Resources</h1>
-                <button className ={Styles.resourcesBarButtons} onClick={() => router.push("/aboutus")}>
+                <Link className ={Styles.resourcesBarButtons} href = "./aboutus" replace>
                     <Image src = "/aboutUs.svg" className = {Styles.aboutUsIcon} alt="About us icon" width={5} height={5}></Image>
                     <h1 className = {Styles.buttonText}>About Circuit Link</h1>
-                </button>
-                <button className ={Styles.resourcesBarButtons} onClick={() => router.push("/help")}>
+                </Link>
+                <Link className ={Styles.resourcesBarButtons} href = "./help"replace>
                     <Image src = "/helpbutton.svg" className = {Styles.aboutUsIcon} alt="Question mark" width={5} height={5}></Image>
                     <h1 className = {Styles.buttonText}>Get Help</h1>
-                </button>
-                <button className ={Styles.resourcesBarButtons} onClick={() => router.push("/bugreports")}>
+                </Link>
+                <Link className ={Styles.resourcesBarButtons} href = "./bugreports" replace>
                     <Image src = "/bug.svg" className = {Styles.aboutUsIcon} alt="Bug icon" width={5} height={5}></Image>
                     <h1 className = {Styles.buttonText}>Report A Bug</h1>
-                </button>
-                <button className ={Styles.resourcesBarButtons} onClick={() => router.push("/siterules")}>
+                </Link>
+                <Link className ={Styles.resourcesBarButtons} href = "./siterules" replace>
                     <Image src = "/rules.svg" className = {Styles.aboutUsIcon} alt="Book icon" width={5} height={5}></Image>
                     <h1 className = {Styles.buttonText}>Circuit Link Rules</h1>
-                </button>
+                </Link>
             </div>
 
             <div className = {Styles.topUsersBar}>
@@ -65,8 +55,7 @@ export default function Landing() {
                 <h1>  Top Communities</h1>
             </div>
 
-
-
+            {/*<NavBar/>*/}
             <div className = {Styles.navBox}>
                 <div className = {Styles.homeLogo}>
                     <Image src="./circuitlinklogowback.svg" alt="Logo" width={200} height={200}></Image>
@@ -78,7 +67,7 @@ export default function Landing() {
                     <div className = {Styles.dropdown}>
                         <button><img src = {user?.photoURL || "/circleUser.svg"} className = {Styles.settingsIcon} alt="User profile"></img></button>
                         <div className = {Styles.dropdownMenu}>
-                            <button onClick={() => window.location.href = "http://localhost:3000/profile"}>Profile</button>
+                            <Link href = "./profile" replace>Profile</Link>
                             <button>Settings</button>
                             <button onClick={() => {handleLogout()}}>Log Out</button>
                         </div>
