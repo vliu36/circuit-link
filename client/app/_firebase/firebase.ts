@@ -20,7 +20,7 @@ const auth = getAuth(app);
 
 const db = getFirestore(app);
 
-const storage = getStorage(app, "gs://circuit-link-images"); // This uses our custom bucket
+const storage = getStorage(app, "gs://circuit-link"); // This uses our custom bucket
 
 // connectAuthEmulator(auth, "http://localhost:9099/");
 // connectFirestoreEmulator(db, "localhost", 8080);

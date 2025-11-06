@@ -2,7 +2,7 @@
 // import React, { useState } from "react";
 import { signInWithEmailAndPassword, signInWithPopup, sendPasswordResetEmail } from "firebase/auth";
 import { GoogleAuthProvider } from "firebase/auth";
-import { auth, db } from "../firebase";
+import { auth, db } from "../_firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { FirebaseError } from "firebase/app";
 

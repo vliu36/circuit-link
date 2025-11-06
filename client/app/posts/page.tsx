@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "../context";
+import { useAuth } from "../_firebase/context.tsx";
 import Link from "next/link";
 import { fetchAllPosts, createPost, editPost, deletePostById, votePost } from "./posts.ts";
 import styles from "./postsPage.module.css";
@@ -10,6 +10,7 @@ type Post = {
     id: string;
     title: string;
     contents: string;
+    media: string;
     authorUsername: string;
     authorId: string;
     yayScore: number;
