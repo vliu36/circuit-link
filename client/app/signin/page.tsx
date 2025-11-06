@@ -40,7 +40,7 @@ export default function Login() {
             <div className={Styles.loginContainer}>
             <h1 className={Styles.title}>Log in</h1>
             <form onSubmit={handleSubmitLog}>
-                <script className={Styles.emailBox}>
+                <div className={Styles.emailBox}>
                     <label>Email:</label>
                     <input
                     type="email"
@@ -49,7 +49,7 @@ export default function Login() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     />
-                </script>
+                </div>
 
                 <div className={Styles.passwordBox}>
                     <label>Password:</label>
@@ -122,7 +122,7 @@ export default function Login() {
                         height={40}
                         alt="Sign up with Google"
                 ></Image>
-                <script className = {Styles.signUpWithGoogleText} onClick={loginWithGoogle}>Log in with Google</script>
+                <button className = {Styles.signUpWithGoogleText} onClick={loginWithGoogle}>Log in with Google</button>
             </div>
 
             <div className="registerLink">
