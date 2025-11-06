@@ -55,8 +55,8 @@ export default function Landing() {
                 <h1>  Top Communities</h1>
             </div>
 
-            <NavBar/>
-            {/*<div className = {Styles.navBox}>
+            {/*<NavBar/>*/}
+            <div className = {Styles.navBox}>
                 <div className = {Styles.homeLogo}>
                     <Image src="./circuitlinklogowback.svg" alt="Logo" width={200} height={200}></Image>
                 </div>
@@ -73,7 +73,7 @@ export default function Landing() {
                         </div>
                     </div>
                 </div>
-            </div>*/}
+            </div>
 
             <div className = {Styles.searchBarArea}>
                 <div className = {Styles.welcomeText}>
