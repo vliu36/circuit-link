@@ -14,9 +14,8 @@
 }
 
 .background{
-  background-color: rgba(57, 65, 83, 1);
-  height: 100%;
-  width: 100%;
+  background-color: rgb(57, 65, 83);
+  height:1000px;
 }
 
 .box{
@@ -25,7 +24,7 @@
   flex-direction: column;
   width: 30%;
   height: 60%;
-  background-color: rgba(91, 102, 128, 1); 
+  background-color: rgb(91, 102, 128); 
   margin: 0;
   position: absolute;
   top: 50%;

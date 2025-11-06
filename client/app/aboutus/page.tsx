@@ -1,10 +1,9 @@
 "use client";
 import React from "react";
 import Styles from "./aboutus.module.css";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function AboutUs() {
-    const router = useRouter();
     
     return (
         <div className = {Styles.background}>
@@ -12,7 +11,7 @@ export default function AboutUs() {
             <div className = {Styles.pageDoc}>
                 <h1 className = {Styles.heading1}>About Us</h1>
                 <br/>
-                <h2 className = {Styles.heading2}>Hello, we are blue circuit. </h2>
+                <h2 className = {Styles.heading2}>Hello, we are Blue Circuit, the developers of Circuit Link. We have created a code of conduct and ettiquette that all communities and users of this site are bound by.</h2>
                 <br/>
                 <h2 className = {Styles.heading2}>
                     Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah 
@@ -36,9 +35,9 @@ export default function AboutUs() {
                 </h2>
             </div>
 
-            <button className = {Styles.returnButton} onClick={() => router.push("/landing")}>
+            <Link className = {Styles.returnButton} href = "./landing" replace>
                 <h1 className = {Styles.returnButtonText}>Return</h1>
-            </button>
+            </Link>
         </div>
     );
 }

@@ -3,6 +3,8 @@ import React, { useState, useEffect } from "react";
 import * as profileFunctions from "./profile";
 import { useAuth } from "../_firebase/context";
 import "./profile-styles.css";
+import Image from 'next/image';
+import Link from 'next/link';
 // import { auth, db } from "../firebase";
 // import { User, onAuthStateChanged } from "firebase/auth";
 // import { deleteUserAccount, logout, editProfile } from "./profile";
@@ -105,14 +107,14 @@ export default function Profile() {
             <div className="profile-card">
                 <h1>Profile</h1>
                 <p>Welcome to your profile page!</p>
-                <button className="go-back-btn" onClick={() => window.location.href = "http://localhost:3000/landing"}>Go back</button>
+                <Link className="go-back-btn" href = "./landing" replace>Go back</Link>
                 <br/>
                 <br/>
                 <div className="profile-header">
-                    <img 
+                    <img
                     src={user.photoURL || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
-                    alt="Profile Picture" 
-                    className="w-16 h-16 rounded-full object-cover border"/>
+                    alt="Profile Picture"
+                    className="w-16 h-16 rounded-full object-cover border"></img>
                     <span className="username">{userData?.username}</span>
                 </div>
                 <p>{userData?.profileDesc}</p>
@@ -137,10 +139,11 @@ export default function Profile() {
                         className="hidden"
                         onChange={handleImageChange}/>
                     </label>
-                    {preview && (<img src={preview} alt="Preview" className="w-16 h-16 rounded-full object-cover border"/>)}
+                    {preview && (<Image src={preview} alt="Preview" className="w-16 h-16 rounded-full object-cover border"></Image>)}
                     <button
-                    type="submit"
-                    disabled={!file}>Upload</button>
+                        type="submit"
+                        disabled={!file}>Upload
+                    </button>
                     <p>File size limit: {MAX_KB} KB</p>
                 </form>
             </div>
@@ -213,8 +216,8 @@ export default function Profile() {
                         onClick={(e) => e.stopPropagation()}>
                             <h2 className="popup-text">Are you sure?</h2>
                             <div className="confirm-actions">
-                                <button className="btn-cancel" onClick={togglePopup}>Close</button>
-                                <button className="btn-confirm" onClick={() => {profileFunctions.deleteUserAccount()}}>Delete</button>
+                                <script className="btn-cancel" onClick={togglePopup}>Close</script>
+                                <script className="btn-confirm" onClick={() => {profileFunctions.deleteUserAccount()}}>Delete</script>
                             </div>
                         </div>
                     </div>
@@ -222,7 +225,7 @@ export default function Profile() {
                 <br/>
                 <br/>
                 {/* Log out */}
-                <button className="logout-btn" onClick={() => { profileFunctions.logout(); }}>Log Out</button>
+                <script className="logout-btn" onClick={() => { profileFunctions.logout(); }}>Log Out</script>
             </div>
         </main>
     );
