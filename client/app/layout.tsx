@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { initAuthListener } from "./_firebase/auth-observer.ts";
+// import { initAuthListener } from "./_firebase/auth-observer.ts";
 import { AuthProvider } from "./_firebase/context.tsx";
 import NavBar from "./_components/navbar/navbar.tsx";
 
-// Initialize the auth listener to monitor auth state changes
-initAuthListener();
+// Removed because this is supposed to run on the clientside
+// // Initialize the auth listener to monitor auth state changes
+// initAuthListener();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

@@ -13,7 +13,7 @@ export default function BugReportThankYou() {
                 <h1 className = {Styles.heading1}>Thank you for Reporting a bug</h1>
                 <br/>
                 <h2 className = {Styles.heading1}>
-                    With your report, we can further improve Circuit Link's user experience. 
+                    With your report, we can further improve Circuit Link&apos;s user experience. 
                     <br/>
                     <br/>
                     Press the return button, to return to the home page.

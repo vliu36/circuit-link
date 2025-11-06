@@ -1,0 +1,284 @@
+"use client";
+import { Community } from "../../../../_types/types.ts";
+import { useAuth } from "../../../../_firebase/context.tsx";
+import { Post, Reply, useReplies } from "./post.ts";
+import { use, useEffect, useState } from "react";
+import styles from "./postPage.module.css";
+import NavBar from '../../../../_components/navbar/navbar.tsx';
+import { fetchStructure, createGroup, deleteGroup, createForum, deleteForum } from "../../../[commName]/community.ts";
+
+export default function PostDetail({ params }: { params: Promise<{ commName: string; forumSlug: string; postId: string }> }) {
+    const { commName, forumSlug, postId } = use(params);
+    const { user, loading: authLoading } = useAuth();
+    const postIdStr = Array.isArray(postId) ? postId[0] : postId;
+    const { post, handleVote, addReply, deleteReplyById, editReply, deletePostById, editPost, fetchPost, loading } = useReplies(postIdStr || "", user?.uid);
+    const [community, setCommunity] = useState<Community | null>(null);
+    const [activeReplyTo, setActiveReplyTo] = useState<string | null>(null);
+    const [replyContent, setReplyContent] = useState("");
+    const [editingId, setEditingId] = useState<string | null>(null);
+    const [editContent, setEditContent] = useState("");
+    const [editTitle, setEditTitle] = useState("");
+    const [load, setLoading] = useState(true);
+
+    const MAX_DEPTH = 5;
+
+    useEffect(() => {
+        setLoading(true);
+        fetchStructure(commName)
+          .then((data) => {
+            if (data) setCommunity(data);
+          })
+          .finally(() => setLoading(false));
+      }, [commName]);
+    
+      if (load) return <div>Loading community...</div>;
+      if (!community) return <div>Community not found.</div>;
+
+    // Handler for editing posts/replies
+    const handleEdit = async (id: string, isReply: boolean) => {
+        if (!editContent.trim()) return alert("Content cannot be empty.");
+        try {
+            if (isReply) {
+                await editReply(id, user?.uid, editContent);
+            } else if (post) {
+                await editPost(post.id, user?.uid, editTitle, editContent);
+            }
+            setEditingId(null);
+            setEditContent("");
+            setEditTitle("");
+            fetchPost();
+        } catch (err) {
+            console.error("Failed to edit:", err);
+        }
+    };
+
+    // Handler for deleting posts/replies
+    const handleDelete = async (id: string, isReply: boolean) => {
+        if (!confirm("Are you sure you want to delete this?")) return;
+        try {
+            if (isReply) {
+                await deleteReplyById(id, user?.uid);
+                fetchPost();
+            } else if (post) {
+                await deletePostById(id, user?.uid);
+                window.location.href = `/community/${commName}/${forumSlug}`;
+            }
+        } catch (err) {
+            console.error("Failed to delete:", err);
+        }
+    };
+
+    // Recursive rendering function for posts and replies
+    const renderPostOrReply = (item: Post | Reply, depth = 0) => {
+        if (depth >= MAX_DEPTH) return null;
+        const isReply = "timeReply" in item;
+        const isOwner = item.authorId === user?.uid;
+
+        return (
+            <div 
+                key={item.id} 
+                className={styles.replyCard} 
+                style={{ marginLeft: `${depth * 20}px` }}>
+                {/* If editing, show input fields instead */}
+                {editingId === item.id ? (
+                    <div style={{ marginBottom: "10px" }}>
+                        {/* Show title input if not editing a reply */}
+                        {!isReply && 
+                            <input 
+                                className={styles.replyInput} 
+                                value={editTitle} 
+                                onChange={(e) => setEditTitle(e.target.value)} 
+                                placeholder="Edit title" 
+                            />
+                        }
+                        
+                        {/* Show content input */}
+                        <textarea 
+                            className={styles.replyInput} 
+                            value={editContent} 
+                            onChange={(e) => setEditContent(e.target.value)} 
+                            placeholder="Edit contents" 
+                        />
+                        {/* ---- Buttons ---- */}
+                        <div className={styles.actions}>
+                            {/* Save button */}
+                            <button 
+                                className={styles.editButton} 
+                                onClick={() => handleEdit(item.id, isReply)}
+                            >
+                                Save
+                            </button>
+                            {/* Cancel button */}
+                            <button 
+                                className={styles.deleteButton} 
+                                onClick={() => { setEditingId(null); setEditContent(""); setEditTitle(""); }}
+                            >
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className = {styles.postBox}>
+                        {/* Otherwise, show the post/reply */}
+                        {/* Show the author's username and display total yay score */}
+                        <p className={styles.meta}>
+                            <div className = {styles.userIcon}></div>
+                            <div className = {styles.userTextAlignPosts}>{item.authorUsername}</div>
+                        </p>
+
+                        {/* Show the time created, using timeReply if a reply, or timePosted if a post. Additionally show if edited */}
+                        <p className={styles.time}>{isReply ? item.timeReply : item.timePosted}{item.edited && <span> (edited)</span>}</p>
+
+                        {/* If the item has a title (only posts have this) shows title */}
+                        {"title" in item && <h2 className={styles.title}>{item.title}</h2>}
+                        {/* Show content of post or reply */}
+                        <p className={styles.contents}>{item.contents}</p>
+                        {/* Show metadata */}
+                        
+                        
+
+                        
+
+                        <div className={styles.actions}>
+                            {/* Yay button; if the current user is in the yay list, show as active (green) */}
+                            <button 
+                                className={`${styles.voteButton} ${user?.uid && item.yayList.includes(user.uid) ? styles.yayActive : ""}`} 
+                                onClick={() => handleVote(item.id, "yay", isReply)}
+                            >
+                                👍 Yay
+                            </button>
+                            <div className = {styles.yayscore}>{item.yayScore}</div>
+                            {/* Nay button; if the current user is in the nay list, show as active (red) */}
+                            <button 
+                                className={`${styles.voteButton} ${styles.dislikeButton} ${user?.uid && item.nayList.includes(user.uid) ? styles.nayActive : ""}`} 
+                                onClick={() => handleVote(item.id, "nay", isReply)}
+                            >
+                                👎 Nay
+                            </button>
+                            {/* Reply button; disabled (but not hidden) if max depth reached */}
+                            
+                        </div>
+
+                        <button 
+                                className={styles.replyButton} 
+                                onClick={() => setActiveReplyTo(activeReplyTo === item.id ? null : item.id)} 
+                                disabled={depth >= MAX_DEPTH - 1}
+                                >
+                                    Reply to this post
+                                </button>
+                            {/* Edit and Delete buttons, only shown if the current user is the author */}
+                            {isOwner && (
+                                <>
+                                    {/* Edit button */}
+                                    <button 
+                                        className={styles.editButton} 
+                                        onClick={() => { setEditingId(item.id); setEditContent(item.contents); if (!isReply) setEditTitle(item.title); }}
+                                    >
+                                        Edit
+                                    </button>
+                                    {/* Delete button */}
+                                    <button 
+                                        className={styles.deleteButton} 
+                                        onClick={() => handleDelete(item.id, isReply)}
+                                    >
+                                        Delete
+                                    </button>
+                                </>
+                            )}
+                    </div>
+                )}
+
+                {/* If the current item is being replied to */}
+                {activeReplyTo === item.id && (
+                    <div className={styles.replyBox}>
+                        {/* Show text area for reply */}
+                        <textarea 
+                            className={styles.replyInput} 
+                            placeholder="Write a reply..." 
+                            value={replyContent} 
+                            onChange={(e) => setReplyContent(e.target.value)}
+                        />
+                        {/* Submit button */}
+                        <button 
+                            className={styles.submitButton} 
+                            onClick={() => { addReply(item.id, replyContent, isReply); setReplyContent(""); setActiveReplyTo(null); }}
+                        >
+                            Submit
+                        </button>
+                    </div>
+                )}
+
+                {/* Render nested replies, if any */}
+                {"listOfReplies" in item && item.listOfReplies.length > 0 && (
+                    <div style={{ marginTop: "15px" }}>
+                        {item.listOfReplies.map((r) => renderPostOrReply(r, depth + 1))}
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    if (!user) return <div>Sign in to view replies!</div>;
+    if (authLoading || !post) return <div>Loading post...</div>;
+
+    return (
+        
+        <div className = {styles.background}>
+            <div className = {styles.yourCommunitiesBar}>
+                <h1>Your Communities</h1>
+                <button className = {styles.communitiesButtons}>
+                    <img src = "plus.svg" className = {styles.addIcon}></img>
+                    <h1 className = {styles.buttonTextforCommunities}>Add a Community</h1>
+                </button>
+            </div>
+
+            
+            <div className = {styles.serverBar}>
+                <div className = {styles.horizontalLine}></div>
+                <h1>{commName}</h1>
+                <div className = {styles.horizontalLine}></div>
+                <div className = {styles.serverContainer}>
+                    <h1>Group (WIP)</h1>
+                    <div className = {styles.channelText}>Channel 1</div>
+                    <div className = {styles.channelText}>Channel 2</div>
+                    <div className = {styles.channelText}>Channel 3</div>
+                </div>
+            </div>
+
+            <div className = {styles.channelInfoBox}>
+                <div className = {styles.channelInfoh1}>{commName}</div>
+                <div className = {styles.channelInfoh2}>{community?.description}</div>
+                
+            </div>
+            
+            <div className = {styles.RulesBar}>
+                <div className = {styles.horizontalLine}></div>
+                <div className = {styles.horizontalLine}></div>
+                <h1>Rules</h1>
+                
+                <div className = {styles.usersBar}>
+                    <div className = {styles.horizontalLine}></div>
+                    <div className = {styles.channelInfoh1}>Users</div>
+                    <ul>{community.userList.map((u) => 
+                        <div className = {styles.UserContainer}>
+                            <div className = {styles.addIcon}></div>
+                            <div className = {styles.userTextAlign}>
+                                <li key={u.id}>
+                                    &gt;{u.username || u.id}
+                                </li>
+                            </div>
+                        </div>   
+                    )}
+                    </ul>
+                    
+                </div>
+            </div>
+
+            <div className = {styles.navBox}>
+                <NavBar/>
+            </div>
+            
+            <div className={styles.postsPage}>{renderPostOrReply(post)}</div>
+        </div>
+    );
+}

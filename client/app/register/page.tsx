@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import {register, registerWithGoogle} from "./register";
+import {register, loginWithGoogle} from "./register";
 import Styles from './register.module.css';
 import Image from 'next/image';
 import googleIcon from '../../public/googleIcon.png';
@@ -17,26 +17,42 @@ export default function Registration() {
     const [showPass, setShowPass] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    const router = useRouter();
+
     // handleSubmit function for registration
     async function handleSubmitReg(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setLoading(true);
         try {
-            await register(email.trim(), password.trim(), username);
+            const res = await register(email.trim(), password.trim(), username);
+            if (res?.status === "ok") {
+                router.push("/landing");
+            } else {
+                console.log(res?.message);
+            } // end if else
+        } catch (err) {
+            console.error("Unexpected error:", err);
         } finally {
             setLoading(false);
         } // end try finally
     } // end function handleSubmitReg
 
     // handleGoogleReg function for Google signup
-    async function handleGoogleReg() {
+    async function handleSubmitGoogle() {
         setLoading(true);
         try {
-            await registerWithGoogle();
+            const res = await loginWithGoogle();
+            if (res.status === "ok") {
+                router.push("/landing");
+            } else {
+                console.log(res.message);
+            } // end if else
+        } catch (err) {
+            console.error("Unexpected error:", err);
         } finally {
             setLoading(false);
-        } // end try finally
-    } // end function handleGoogleReg
+        } // end try catch finally
+    } // end function handleSubmitGoogle
 
     if (loading) {
         return <div>Loading...</div>;
@@ -61,8 +77,6 @@ export default function Registration() {
                     onFocus={() => setShowHintU(true)}/>
                     {showHintU && <p className={Styles.hint}><strong>Username can only contain letters, numbers, and underscores, and be within 1-20 characters.</strong></p>}
                 </label>
-                    
-                
                 <label className = {Styles.smallBox}>
                     Email
                     <input 
@@ -105,7 +119,7 @@ export default function Registration() {
                 </div>
                 <button
                     className = {Styles.signUpWithGoogleButton}
-                    onClick={handleGoogleReg}>
+                    onClick={handleSubmitGoogle}>
                     <Image
                         src={googleIcon}
                         width={40}
