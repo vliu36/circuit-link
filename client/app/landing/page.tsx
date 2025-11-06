@@ -5,6 +5,7 @@ import { useAuth } from "../context.tsx";
 import { Suspense } from 'react';
 import SearchBar from "../_components/searchbar/search.tsx";
 import SearchResults from "../_components/searchbar/table.tsx";
+import NavBar from "../_components/navbar/navbar.tsx";
 import { logout } from './landing.ts';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -54,6 +55,7 @@ export default function Landing() {
                 <h1>  Top Communities</h1>
             </div>
 
+            <NavBar/>
             {/*<div className = {Styles.navBox}>
                 <div className = {Styles.homeLogo}>
                     <Image src="./circuitlinklogowback.svg" alt="Logo" width={200} height={200}></Image>
