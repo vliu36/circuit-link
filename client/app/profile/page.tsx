@@ -216,8 +216,8 @@ export default function Profile() {
                         onClick={(e) => e.stopPropagation()}>
                             <h2 className="popup-text">Are you sure?</h2>
                             <div className="confirm-actions">
-                                <script className="btn-cancel" onClick={togglePopup}>Close</script>
-                                <script className="btn-confirm" onClick={() => {profileFunctions.deleteUserAccount()}}>Delete</script>
+                                <button className="btn-cancel" onClick={togglePopup}>Close</button>
+                                <button className="btn-confirm" onClick={() => {profileFunctions.deleteUserAccount()}}>Delete</button>
                             </div>
                         </div>
                     </div>
