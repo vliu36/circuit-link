@@ -23,10 +23,12 @@
     border-radius: 8px;
     border: 1px solid #ccc;
     font-size: 14px;
+    background-color: #005bb5;
 }
 
 .textarea {
     min-height: 100px;
+    background-color: #005bb5;
 }
 
 .primaryButton {
