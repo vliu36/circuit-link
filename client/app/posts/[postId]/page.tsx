@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useParams } from "next/navigation";
-import { useAuth } from "../../context.tsx";
+import { useAuth } from "../../_firebase/context.tsx";
 import { useReplies, Reply, Post } from "./replies.ts";
 import styles from "./repliesPage.module.css";
 import { fetchAllPosts } from "../posts.ts";
