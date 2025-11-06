@@ -2,7 +2,6 @@
 
 import Styles from './landingPage.module.css';
 import SearchBar from "./_components/searchbar/search.tsx";
-// import { useRouter } from "next/navigation";
 import Link from "next/link";
 import AuthButtons from './_components/navbar/authbuttons.tsx';
 import Image from "next/image";
@@ -20,7 +19,7 @@ export default async function Landing(props: {
             <div className = {Styles.yourCommunitiesBar}>
                 <h1>Your Communities</h1>
                 <button className = {Styles.communitiesButtons}>
-                    <img src = "plus.svg" className = {Styles.addIcon}></img>
+                    <Image src = "plus.svg" alt = "add" className = {Styles.addIcon} width={5} height={5}></Image>
                     <h1 className = {Styles.buttonTextforCommunities}>Add a Community</h1>
                 </button>
             </div>
@@ -28,22 +27,22 @@ export default async function Landing(props: {
             <div className = {Styles.resourcesBar}>
                 <div className = {Styles.horizontalLine}></div>
                 <h1>Resources</h1>
-                <button className ={Styles.resourcesBarButtons}>
-                    <img src = "/aboutUs.svg" className = {Styles.aboutUsIcon}></img>
+                <Link className ={Styles.resourcesBarButtons} href = "./aboutus" replace>
+                    <Image src = "/aboutUs.svg" alt = "about" className = {Styles.aboutUsIcon} width={5} height={5}></Image>
                     <h1 className = {Styles.buttonText}>About Circuit Link</h1>
-                </button>
-                <button className ={Styles.resourcesBarButtons}>
-                    <img src = "/helpbutton.svg" className = {Styles.aboutUsIcon}></img>
+                </Link>
+                <Link className ={Styles.resourcesBarButtons} href = "./help" replace>
+                    <Image src = "/helpbutton.svg" alt = "help" className = {Styles.aboutUsIcon} width={5} height={5}></Image>
                     <h1 className = {Styles.buttonText}>Get Help</h1>
-                </button>
-                <button className ={Styles.resourcesBarButtons}>
-                    <img src = "/bug.svg" className = {Styles.aboutUsIcon}></img>
+                </Link>
+                <Link className ={Styles.resourcesBarButtons} href = "./bugreports" replace>
+                    <Image src = "/bug.svg" alt = "bug" className = {Styles.aboutUsIcon} width={5} height={5}></Image>
                     <h1 className = {Styles.buttonText}>Report A Bug</h1>
-                </button>
-                <button className ={Styles.resourcesBarButtons}>
-                    <img src = "/rules.svg" className = {Styles.aboutUsIcon}></img>
+                </Link>
+                <Link className ={Styles.resourcesBarButtons} href = "./siterules" replace>
+                    <Image src = "/rules.svg" alt = "rules" className = {Styles.aboutUsIcon} width={5} height={5}></Image>
                     <h1 className = {Styles.buttonText}>Circuit Link Rules</h1>
-                </button>
+                </Link>
             </div>
 
             <div className = {Styles.topUsersBar}>
@@ -56,7 +55,7 @@ export default async function Landing(props: {
             </div>
 
             <div className = {Styles.navBox}>
-                <Link href="/">
+                <Link href="/" replace>
                     <Image className = {Styles.homeLogo} src="/circuitlinklogowback.svg" width={200} height={50} alt="Circuit Link Logo"/>
                 </Link>
                 <div className = {Styles.logInInfo}>
