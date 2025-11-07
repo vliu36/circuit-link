@@ -17,7 +17,7 @@ export async function login(email: string, password: string) {
     console.log("Logged in user:", auth.currentUser?.email);
     // router.push("/dashboard"); // Redirect to home page
     // return user;
-    window.location.href = "http://localhost:3000/landing"
+    window.location.href = "https://circuitlink-160321257010.us-west2.run.app/landing"
     } catch (error) {
         if (error instanceof FirebaseError) {
             if (error.code === "auth/invalid-email" || 
@@ -45,7 +45,7 @@ export async function loginWithGoogle() {
 
         if (docSnap.exists()) {
             console.log("Google user already exists in Firestore: ", result.user.email);
-            window.location.href = "http://localhost:3000/landing";   // TODO: Redirect to landing page
+            window.location.href = "https://circuitlink-160321257010.us-west2.run.app/landing";   // TODO: Redirect to landing page
             return; // Account exists, no need to register
         } // end if
 
@@ -68,7 +68,7 @@ export async function loginWithGoogle() {
         // const token = credential?.accessToken;
         
         console.log("Google user:", user.email);
-        const res = await fetch("http://localhost:2400/api/users/register-google", {
+        const res = await fetch("https://api-circuit-link-160321257010.us-west2.run.app/api/users/register-google", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ uid: user.uid, email: user.email, username: defaultUsername }), // <--- include any extra data you want server-side
@@ -82,8 +82,8 @@ export async function loginWithGoogle() {
         } // end if
         
         // alert(data.message); // placeholder, replace with better UI feedback
-        // window.location.href = "http://localhost:3000/dashboard"
-        window.location.href = "http://localhost:3000/landing" // TODO: Redirect to landing page
+        // window.location.href = "https://circuitlink-160321257010.us-west2.run.app/dashboard"
+        window.location.href = "https://circuitlink-160321257010.us-west2.run.app/landing" // TODO: Redirect to landing page
 
         return user;
     } catch (error) {

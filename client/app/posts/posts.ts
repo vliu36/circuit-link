@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:2400/api/posts";
+const BASE_URL = "https://api-circuit-link-160321257010.us-west2.run.app/api/posts";
 
 export async function fetchAllPosts() {
     const res = await fetch(`${BASE_URL}/all`);

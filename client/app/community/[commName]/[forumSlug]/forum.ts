@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:2400/api";
+const BASE_URL = "https://api-circuit-link-160321257010.us-west2.run.app/api";
 
 // Fetch posts belonging to a specific forum
 export async function fetchPostsByForum(commName: string, forumSlug: string) {
