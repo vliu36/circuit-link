@@ -259,18 +259,18 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                 <div className = {styles.usersBar}>
                     <div className = {styles.horizontalLine}></div>
                     <div className = {styles.channelInfoh1}>Users</div>
-                    <ul>{community.userList.map((u) => 
-                        <div className = {styles.UserContainer}>
-                            <div className = {styles.addIcon}></div>
-                            <div className = {styles.userTextAlign}>
-                                <li key={u.id}>
+                    <ul>
+                        {community.userList.map((u) => (
+                            <li key={u.id} className={styles.UserContainer}>
+                                <div className={styles.addIcon}></div>
+                                <div className={styles.userTextAlign}>
                                     &gt;{u.username || u.id}
-                                </li>
-                            </div>
-                        </div>   
-                    )}
+                                </div>
+                            </li>
+                        ))}
+
                     </ul>
-                    
+
                 </div>
             </div>
 

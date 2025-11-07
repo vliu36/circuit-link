@@ -1,7 +1,7 @@
 import { DocumentReference } from "firebase/firestore";
 
 const BASE_URL = "http://localhost:2400/api"; // adjust as needed
-import { Community } from "../../_types/types";
+import { Community } from "../../_types/types.ts";
 
 interface CreateForumParams {
     name: string;

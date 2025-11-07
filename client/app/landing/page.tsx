@@ -69,7 +69,7 @@ export default function Landing() {
                         <div className = {Styles.dropdownMenu}>
                             <Link href = "./profile" replace>Profile</Link>
                             <button>Settings</button>
-                            <button onClick={() => {handleLogout()}}>Log Out</button>
+                            <button onClick={logout}>Log Out</button>
                         </div>
                     </div>
                 </div>

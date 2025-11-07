@@ -1,67 +1,62 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useAuth } from "../../../_firebase/context.tsx";
-import { use } from "react";
+import { useAuth } from "../_firebase/context.tsx";
 import Link from "next/link";
-// import { useAuth } from "../../../context.tsx";
-import { fetchPostsByForum, createPost, editPost, deletePostById, votePost } from "./forum.ts";
-import styles from "./forumPage.module.css";
-import { Post, Forum } from "../../../_types/types.ts";
+import { fetchAllPosts, createPost, editPost, deletePostById, votePost } from "./posts.ts";
+import styles from "./postsPage.module.css";
 
-export default function ForumPage({
-    params,
-}: {
-    params: Promise<{ commName: string; forumSlug: string }>;
-}) {
-    const { commName, forumSlug } = use(params);
-    const { user } = useAuth();
+type Post = {
+    id: string;
+    title: string;
+    contents: string;
+    media: string;
+    authorUsername: string;
+    authorId: string;
+    yayScore: number;
+    yayList: string[];
+    nayList: string[];
+    timePosted: string;
+    edited: boolean;
+};
 
+export default function PostsPage() {
+    const { user, loading } = useAuth();
     const [posts, setPosts] = useState<Post[]>([]);
     const [title, setTitle] = useState("");
     const [contents, setContents] = useState("");
+
     const [editingPostId, setEditingPostId] = useState<string | null>(null);
     const [editTitle, setEditTitle] = useState("");
     const [editContents, setEditContents] = useState("");
 
-    const [forum, setForum] = useState<Forum | null>(null);
-    const [loading, setLoading] = useState(true);
-
-    /** Fetch posts by forum
-     *  This is used to load posts when the component mounts and after actions like adding, editing, or deleting a post.
-     */
+    // Fetch posts from backend
     const fetchPosts = async () => {
         try {
-            const { forum, posts } = await fetchPostsByForum(commName, forumSlug);
-
-            const formattedPosts = (posts || []).map((p: Post) => ({
-                ...p,
-                timePosted: p.timePosted
-                    ? new Date(p.timePosted).toLocaleString()
+            const data = await fetchAllPosts();
+            const formattedPosts = (data || []).map((post: Post) => ({
+                ...post,
+                timePosted: post.timePosted
+                    ? new Date(post.timePosted).toLocaleString()
                     : "Unknown",
             }));
-
-            setForum(forum);
             setPosts(formattedPosts);
         } catch (err) {
-            console.error("Failed to fetch forum:", err);
-        } finally {
-            setLoading(false);
+            console.error("Failed to fetch posts:", err);
         }
     };
 
     useEffect(() => {
         fetchPosts();
-    }, [commName, forumSlug]);
+    }, []);
 
-    // Handler to add a new post
     const handleAddPost = async () => {
         if (!user) return alert("Sign in to post!");
         if (!title || !contents) return alert("Please fill out title and contents");
 
         try {
-            const msg = await createPost(user.uid, title, contents, commName, forumSlug);
-            // alert(msg);
+            const msg = await createPost(user.uid, title, contents);
+            alert(msg);
             setTitle("");
             setContents("");
             fetchPosts();
@@ -70,7 +65,6 @@ export default function ForumPage({
         }
     };
 
-    // Handler to save edited post
     const handleSaveEdit = async (postId: string) => {
         try {
             const msg = await editPost(postId, user?.uid, editTitle, editContents);
@@ -81,13 +75,13 @@ export default function ForumPage({
             console.error("Failed to edit post:", err);
         }
     };
+
     const cancelEditing = () => {
         setEditingPostId(null);
         setEditTitle("");
         setEditContents("");
     };
 
-    // Handler to delete a post
     const handleDeletePost = async (postId: string) => {
         if (!confirm("Are you sure you want to delete this post?")) return;
         try {
@@ -99,7 +93,6 @@ export default function ForumPage({
         }
     };
 
-    // Handler to vote on a post
     const handleVote = async (postId: string, type: "yay" | "nay") => {
         if (!user) return alert("Sign in to vote!");
         try {
@@ -110,78 +103,65 @@ export default function ForumPage({
         }
     };
 
-    if (loading) return <div>Loading forum...</div>;
-    if (!forum) return <div>Forum not found.</div>;
+    if (loading) return <div>Loading...</div>;
+    if (!user) return <div>Sign in to view posts!</div>;
 
     return (
         <div className={styles.container}>
-            <h1 className={styles.header}>
-                {commName} / {forumSlug} Posts
-            </h1>
-            <h2 className={styles.header}>
-                Description: {forum.description}
-            </h2>
+            <h1 className={styles.header}>Posts Demo</h1>
 
-            {/* --- Create New Post Section --- */}
-            {user ? (
-                <div className={styles.createSection}>
-                    <h2>Create New Post</h2>
-                    <input
-                        placeholder="Post Title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        className={styles.input}
-                    />
-                    <textarea
-                        placeholder="Post Contents"
-                        value={contents}
-                        onChange={(e) => setContents(e.target.value)}
-                        className={styles.textarea}
-                    />
-                    <button className={styles.primaryButton} onClick={handleAddPost}>
-                        Add Post
-                    </button>
-                </div>
-            ) : (
-                <p>Please sign in to create posts.</p>
-            )}
+            {/* --- New Post Section --- */}
+            <div className={styles.createSection}>
+                <h2>Create New Post</h2>
+                <input
+                    placeholder="Post Title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className={styles.input}
+                />
+                <textarea
+                    placeholder="Post Contents"
+                    value={contents}
+                    onChange={(e) => setContents(e.target.value)}
+                    className={styles.textarea}
+                />
+                <button className={styles.primaryButton} onClick={handleAddPost}>
+                    Add Post
+                </button>
+            </div>
 
             {/* --- Posts List --- */}
-            <h2>Forum Posts</h2>
+            <h2>All Posts</h2>
             {posts.length === 0 ? (
-                <p>No posts found in this forum.</p>
+                <p>No posts found.</p>
             ) : (
                 posts.map((post) => {
-                    // Check if the current user is the author of the post
-                    const isAuthor = post.authorId === user?.uid;
-                    // Check if the post is currently being edited
+                    const isAuthor = post.authorId === user.uid;
                     const isEditing = editingPostId === post.id;
 
                     return (
-                        <div key={post.id} className={styles.postCard}>
-                            {/* If the post is being edited, show input fields */}
+                        <div
+                            key={post.id}
+                            className={styles.postCard}
+                        >
                             {isEditing ? (
                                 <>
-                                    {/* Title input */}
                                     <input
                                         value={editTitle}
                                         onChange={(e) => setEditTitle(e.target.value)}
                                         className={styles.input}
                                     />
-                                    {/* Contents textarea */}
                                     <textarea
                                         value={editContents}
                                         onChange={(e) => setEditContents(e.target.value)}
                                         className={styles.textarea}
                                     />
-                                    {/* Save button */}
                                     <button
                                         onClick={() => handleSaveEdit(post.id)}
                                         className={`${styles.button} ${styles.saveButton}`}
                                     >
                                         Save
                                     </button>
-                                    {/* Cancel button */}
                                     <button
                                         onClick={cancelEditing}
                                         className={`${styles.button} ${styles.cancelButton}`}
@@ -191,50 +171,41 @@ export default function ForumPage({
                                 </>
                             ) : (
                                 <>
-                                    {/* Post title and contents, linked to the post details page */}
-                                    <Link href={`/community/${commName}/${forumSlug}/${post.id}`}>
+                                    {/* Wrap clickable area for the post */}
+                                    <Link href={`/posts/${post.id}`}>
                                         <h3 className={styles.title}>{post.title}</h3>
                                         <p className={styles.contents}>{post.contents}</p>
                                     </Link>
-                                    {/* ---- Post metadata ---- */}
-                                    {/* Post author */}
                                     <p className={styles.meta}>
                                         <strong>Author:</strong> {post.authorUsername}
                                     </p>
-                                    {/* Time post was created, and if it was edited */}
                                     <p className={styles.time}>
                                         {post.timePosted} {post.edited && "(edited)"}
                                     </p>
-                                    {/* Yay score and reply count */}
                                     <p className={styles.meta}>
-                                        <strong>Yay Score:</strong> {post.yayScore} | <strong>Replies:</strong> {post.replyCount}
+                                        <strong>Yay Score:</strong> {post.yayScore}
                                     </p>
 
                                     <div className={styles.actions}>
-                                        {/* ---- Vote buttons ---- */}
-                                        {/* If the user has already voted, show their vote status (green for yay) */}
                                         <button
                                             onClick={() => handleVote(post.id, "yay")}
                                             className={`${styles.voteButton} ${
-                                                post.yayList.includes(user?.uid || "") ? styles.yayActive : ""
+                                                post.yayList.includes(user.uid) ? styles.yayActive : ""
                                             }`}
                                         >
                                             👍 Yay
                                         </button>
-                                        {/* If the user has already voted, show their vote status (red for nay) */}
                                         <button
                                             onClick={() => handleVote(post.id, "nay")}
                                             className={`${styles.voteButton} ${
-                                                post.nayList.includes(user?.uid || "") ? styles.nayActive : ""
+                                                post.nayList.includes(user.uid) ? styles.nayActive : ""
                                             }`}
                                         >
                                             👎 Nay
                                         </button>
 
-                                        {/* If the user is the author of the post, show edit and delete buttons */}
                                         {isAuthor && (
                                             <>
-                                                {/* Edit button */}
                                                 <button
                                                     onClick={() => {
                                                         setEditingPostId(post.id);
@@ -245,7 +216,6 @@ export default function ForumPage({
                                                 >
                                                     Edit
                                                 </button>
-                                                {/* Delete button */}
                                                 <button
                                                     onClick={() => handleDeletePost(post.id)}
                                                     className={`${styles.button} ${styles.deleteButton}`}

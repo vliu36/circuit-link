@@ -79,4 +79,3 @@ router.get("/user-info", users.getCurrentUser);
 router.patch("/update-comm/:uid", users.updateCommunityField)
 
 export default router;
-

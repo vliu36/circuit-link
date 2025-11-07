@@ -6,12 +6,14 @@ import { logout } from "../../landing/landing.ts";
 import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { fetchStructure, createGroup, deleteGroup, createForum, deleteForum } from "./community";
+import { Community } from "../../_types/types.ts";
 
 
 export default function CommunityPage({
   params,
 }: {
-  params: Promise<{ commName: string}>
+  params: Promise<{ commName: string }>;
 }) {
   const { commName } = use(params);
   const { user } = useAuth();
@@ -107,29 +109,9 @@ export default function CommunityPage({
     }
   };
 
-  /*const [ numUsers, setNumUsers] = useState(null);*/
-  /*useEffect(() => {
-  async function fetchData(){
-  const res = await fetch(`http://localhost:2400/api/comm/${commName}`, {     
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const data = await res.json();
-  setNumUsers(data.numUsers);
-  }
-  fetchData();
-  }, [commName]);*/
-  
-
   return (
 
-    // ---------------------------------------------------------------- Old Design ---------------------------------------------------------------- //
-    // ---------------------------------------------------- Commented out so I can see clearer ---------------------------------------------------- //
-    
-    // <div className = {Styles.background}>
-      
+    <div className = {Styles.background}>
       <div className = {Styles.navBox}>
         <Link className = {Styles.homeLogo} href = "./landing" replace>
           <Image src="../circuitlinklogowback.svg" alt="Logo" width={200} height = {200}></Image>
@@ -154,39 +136,6 @@ export default function CommunityPage({
           </div>
         </div>
       </div>
-      
-    //   <div>
-    //     <h1 className = {Styles.line}>Welcome to the {commName} community.</h1>
-    //     {/* Display all groups and forums in the community */}
-    //     {community.groupsInCommunity.map((group) => (
-    //       <div key={group.id}>
-    //         <h2>{group.name}</h2>
-    //         <ul>
-    //           {group.forumsInGroup.map((forum) => (
-    //             <li key={forum.id}>
-    //               <Link href={`/community/${commName}/${forum.slug}`}>
-    //                 {forum.name}
-    //               </Link>
-    //             </li>
-    //           ))}
-    //         </ul>
-    //       </div>
-    //     ))}
-    //   </div>
-
-    //   <div>
-    //     <h2 className = {Styles.bigBox}> Look at these amazing posts, coming soon(+2 weeks) to a forum near you.</h2>
-    //   </div>
-
-    //   <div>
-    //     <h1 className = {Styles.banner}> This is a banner</h1>
-    //   </div>
-
-    // </div>
-
-    // ---------------------------------------------------------------- End of old Design ---------------------------------------------------------------- //
-
-    // ---------------------------------------------------------------- Simple HTML for Community Demo ---------------------------------------------------------------- //
     
     <div style={{ padding: "1rem" }}>
       <h1>Welcome to the {community.name} community.</h1>
@@ -278,6 +227,6 @@ export default function CommunityPage({
         <p>Logged in as: {user?.displayName || user?.email}</p>
       </div>
     </div>
-    
-  )
+    </div>
+  );
 }

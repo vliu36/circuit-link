@@ -6,8 +6,8 @@ import Image from "next/image";
 import AuthButtons from "./authbuttons.tsx";   
 import { useEffect, useState } from "react";
 import { User } from "firebase/auth";
-import { authStateCallback } from "@/app/auth-observer.ts";
-import { useAuth } from "@/app/context.tsx";
+import { authStateCallback } from "@/app/_firebase/auth-observer.ts";
+import { useAuth } from "@/app/_firebase/context.tsx";
 import { logout } from '../../landing.ts';
            
 export default function NavBar() {
