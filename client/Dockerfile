@@ -1,17 +1,33 @@
-FROM node:20
+# Dockerfile for building the web client image
+# Divided into two stages for nextjs: build and production
 
-ENV NODE_ENV=production
+# Build stage
+FROM node:20 AS nextBuild
 
-WORKDIR /client
+WORKDIR /app
 
 COPY package*.json ./
 
 RUN npm install
 
-RUN rm -rf .next
-
 COPY . .
 
-EXPOSE 2400
+RUN npm run build
 
-CMD ["npm", "run", "dev"]
+# Production stage
+FROM node:20
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install --only=production
+
+# Copies static files from the build to production folder
+COPY --from=nextBuild /app/.next ./.next
+
+COPY --from=nextBuild /app/public ./public
+
+EXPOSE 3000
+
+CMD ["npm", "run", "start"]
