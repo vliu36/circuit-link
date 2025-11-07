@@ -121,10 +121,10 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                     <div className = {styles.postBox}>
                         {/* Otherwise, show the post/reply */}
                         {/* Show the author's username and display total yay score */}
-                        <p className={styles.meta}>
+                        <div className={styles.meta}>
                             <div className = {styles.userIcon}></div>
                             <div className = {styles.userTextAlignPosts}>{item.authorUsername}</div>
-                        </p>
+                        </div>
 
                         {/* Show the time created, using timeReply if a reply, or timePosted if a post. Additionally show if edited */}
                         <p className={styles.time}>{isReply ? item.timeReply : item.timePosted}{item.edited && <span> (edited)</span>}</p>
@@ -145,7 +145,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                                 className={`${styles.voteButton} ${user?.uid && item.yayList.includes(user.uid) ? styles.yayActive : ""}`} 
                                 onClick={() => handleVote(item.id, "yay", isReply)}
                             >
-                                👍 Yay
+                                👍
                             </button>
                             <div className = {styles.yayscore}>{item.yayScore}</div>
                             {/* Nay button; if the current user is in the nay list, show as active (red) */}
@@ -153,7 +153,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                                 className={`${styles.voteButton} ${styles.dislikeButton} ${user?.uid && item.nayList.includes(user.uid) ? styles.nayActive : ""}`} 
                                 onClick={() => handleVote(item.id, "nay", isReply)}
                             >
-                                👎 Nay
+                                👎
                             </button>
                             {/* Reply button; disabled (but not hidden) if max depth reached */}
                             
@@ -210,7 +210,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
 
                 {/* Render nested replies, if any */}
                 {"listOfReplies" in item && item.listOfReplies.length > 0 && (
-                    <div style={{ marginTop: "15px" }}>
+                    <div style={{ marginTop: "100px" }}>
                         {item.listOfReplies.map((r) => renderPostOrReply(r, depth + 1))}
                     </div>
                 )}
