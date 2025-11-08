@@ -77,7 +77,7 @@ const userRegistration = async (req: Request, res: Response) => {
             font: "Arial",          // TODO: Change to a different default font
             notifications: [],
             communities: [],
-            friends: [],
+            friendList: [],
             photoURL: "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg",
         });
 
@@ -92,33 +92,6 @@ const userRegistration = async (req: Request, res: Response) => {
     } // end try catch
 } // end function userRegistration
 
-// // Sets up default user values for Google sign-in 
-// const setupGoogleUser = async (req: Request, res: Response) => {
-//     const { email, username } = req.body;
-//     const uid = req.body.uid; // User's Firebase Authentication UID
-
-//     try {
-//         // const db = getFirestore();
-//         await db.collection("Users").doc(uid).set({
-//             email: email, 
-//             username: username,
-//             createdAt: new Date(),
-//             profileDesc: "Hi! I'm still setting up my profile.",
-//             darkMode: true,
-//             privateMode: false,
-//             restrictedMode: false,
-//             textSize: 12,           // TODO: Change to a different default size
-//             font: "Arial",          // TODO: Change to a different default font
-//             notifications: [],
-//             communities: [],
-//             friends: []
-//         });
-
-//         res.status(201).json({ message: "Google user setup successfully", uid: uid })
-//     } catch (err) {
-//         console.error("Error setting up Google user:", err);
-//     } // end try catch
-// } // end function setupGoogleUser
 
 // Google setup revised
 // Sets up default user values for Google sign-in
@@ -149,7 +122,7 @@ const userRegistrationGoogle = async (req: Request, res: Response) => {
         const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
         res.cookie("session", sessionCookie, {
             httpOnly: true,
-            //secure: true,
+            secure: true,
             maxAge: expiresIn,
             sameSite: "lax",
         });
@@ -183,6 +156,7 @@ const userRegistrationGoogle = async (req: Request, res: Response) => {
             notifications: [],
             communities: [],
             photoURL: photoURL,
+            friendList: [],
         }
 
         try {
@@ -276,23 +250,6 @@ const deleteDoc = async (req: Request, res: Response) => {
         res.status(500).json({ message: "Failed to delete user: " + error.message });
     } // end try catch
 } // end function deleteDoc
-
-// // Delete user document
-// const deleteUserDocument = async (req: Request, res: Response) => {
-//     const uid = req.params.uid;
-
-//     try {
-//         // const db = getFirestore();
-//         await db.collection("Users").doc(uid).delete();
-//         res.status(201).json({ message: "Document deleted successfully", uid: uid })
-//     } catch (err) {
-//         res.status(500).send({ 
-//             status: "backend error",
-//             message: "Failed to delete user document. " + err
-//         });
-//         console.error("Error deleting user document:", err);
-//     } // end try catch
-// } // end function deleteUserDocument
 
 // Edit profile
 const editProfile = async (req: Request, res: Response) => {
@@ -425,8 +382,6 @@ const updateCommunityField = async (req: Request, res: Response) => {
 export {
     getAllDocuments,
     userRegistration,
-    // setupGoogleUser,
-    // deleteUserDocument,
     userLogin,
     updateCommunityField,
     deleteDoc,
