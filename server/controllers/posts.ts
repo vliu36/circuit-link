@@ -1,32 +1,10 @@
 import { db } from "../firebase.ts"
 import { Request, Response } from "express"
 import { FieldValue, DocumentReference, Timestamp } from "firebase-admin/firestore";
+import { fetchRepliesRecursively, Post, isUserAuthorizedToDeletePost, deleteNestedRepliesRecursive } from "./_utils/postUtils.ts";
 
-interface Post {
-    author: DocumentReference;
-    title: string;
-    contents: string;
-    yayScore: number;
-    replyCount: number;
-    yayList: DocumentReference[];
-    nayList: DocumentReference[];
-    timePosted: Timestamp;
-    timeUpdated: Timestamp;
-    listOfReplies: DocumentReference[];
-    edited: boolean;
-}
 
-interface Reply {
-    id: string,
-    authorUsername: string,
-    authorId: string,
-    yayList: string[],
-    nayList: string[],
-    timeReply: Timestamp;
-    listOfReplies: Reply[];
-    edited: boolean;
-    contents: string;
-}
+
 
 // -------------------------------- Controller functions -------------------------------- //
 // Retrieves all documents in Posts sorted by date posted (modified to get post authors from Users)
@@ -247,50 +225,6 @@ const editDoc = async (req: Request, res: Response) => {
 }
 
 
-// -------- Helper functions for deleteDoc -------- //
-// --- Helper function for deleteDoc that recursively deletes replies and their nested replies --- //
-const deleteRepliesRecursive = async (replyRefs: FirebaseFirestore.DocumentReference[]) => {
-    for (const replyRef of replyRefs) {
-        const replyDoc = await replyRef.get();
-        if (!replyDoc.exists) continue;
-
-        const replyData = replyDoc.data();
-        if (replyData?.listOfReplies?.length) {
-            await deleteRepliesRecursive(replyData.listOfReplies);
-        }
-
-        await replyRef.delete();
-    } // end for
-} // end helper function deleteRepliesRecursive
-
-// --- Helper function for deleteDoc to check if user is authorized to delete a post --- //
-const isUserAuthorizedToDeletePost = async ( userId: string, postData: FirebaseFirestore.DocumentData, communityId?: string ): Promise<boolean> => {
-    const authorPath = postData?.author?.path;
-    const authorId = authorPath?.split("/")[1];
-
-    // Author can always delete
-    if (authorId === userId) return true;
-
-    // If not author, check if user is mod/owner of community
-    if (communityId) {
-        const communityRef = db.collection("Community").doc(communityId);
-        const communityDoc = await communityRef.get();
-        if (communityDoc.exists) {
-            const communityData = communityDoc.data();
-            const userRef = db.doc(`/Users/${userId}`);
-            const ownerList: FirebaseFirestore.DocumentReference[] = communityData?.ownerList || [];
-            const modList: FirebaseFirestore.DocumentReference[] = communityData?.modList || [];
-
-            const isOwner = ownerList.some(ref => ref.path === userRef.path);
-            const isMod = modList.some(ref => ref.path === userRef.path);
-
-            if (isOwner || isMod) return true;
-        }
-    }
-
-    return false;
-};
-
 // Delete post (Can only be done by author or community mods)
 const deleteDoc = async (req: Request, res: Response) => {
     try {
@@ -321,7 +255,7 @@ const deleteDoc = async (req: Request, res: Response) => {
         // Delete all replies recursively
         console.log("Deleting replies...");
         const replyRefs: FirebaseFirestore.DocumentReference[] = postData?.listOfReplies || [];
-        await deleteRepliesRecursive(replyRefs);
+        await deleteNestedRepliesRecursive(replyRefs);
         console.log("All replies deleted.");
 
         // Dereference post from parent forum
@@ -464,55 +398,7 @@ const replyToPost = async (req: Request, res: Response) => {
     }
 }
 
-// Helper function for getPostById to retrieve replies for a post
-const fetchRepliesRecursively = async (replyRefs: DocumentReference[] = []): Promise<Reply[]> => {
-    if (!replyRefs || replyRefs.length === 0) {
-        return [];
-    }
-    const replies: Reply[] = [];
 
-    for (const ref of replyRefs) {
-        const replySnap = await ref.get();
-        if (!replySnap.exists) continue;
-
-        const replyData = replySnap.data();
-
-        // Dereference reply author
-        let replyAuthorUsername = "Unknown";
-        let replyAuthorId = "Unknown";
-        if (replyData?.author?.get) {
-            const authorSnap = await replyData.author.get();
-            replyAuthorUsername = authorSnap.exists ? authorSnap.data()?.username || "Unknown" : "Unknown";
-            replyAuthorId = replyData.author.path.split("/").pop() || "Unknown";
-        }
-
-        // Convert yayList/nayList references to user IDs
-        const yayList: string[] = (replyData?.yayList || []).map((ref: DocumentReference | string) =>
-            typeof ref === "string" ? ref : ref.path.split("/").pop() || "Unknown"
-        );
-        const nayList: string[] = (replyData?.nayList || []).map((ref: DocumentReference | string) =>
-            typeof ref === "string" ? ref : ref.path.split("/").pop() || "Unknown"
-        );
-
-        // Recursively fetch nested replies
-        const nestedReplies = await fetchRepliesRecursively(replyData?.listOfReplies || []);
-
-        replies.push({
-            id: replySnap.id,
-            contents: replyData?.contents || "",
-            edited: replyData?.edited,
-            ...replyData,
-            authorUsername: replyAuthorUsername,
-            authorId: replyAuthorId,
-            yayList,
-            nayList,
-            timeReply: replyData?.timeReply?.toMillis(),
-            listOfReplies: nestedReplies,
-        });
-    } // end for
-    
-    return replies;
-};
 
 // Retrieve a post by its ID
 const getPostById = async (req: Request, res: Response) => {

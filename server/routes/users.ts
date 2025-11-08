@@ -69,7 +69,7 @@ router.post("/edit-profile", users.editProfile);
  *  @cookie session - Firebase session cookie used for authentication
  *  @returns {Object} Combined Auth and Firestore user data if session is valid, or an error if unauthorized
  */
-router.get("/user-info", users.getCurrentUser);
+router.get("/me", users.getCurrentUser);
 
 /** Updates the communities field of a User 
  *  @route PATCH /api/users/update-comm/:uid

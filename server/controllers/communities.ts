@@ -2,20 +2,8 @@ import { DocumentReference, Timestamp, Firestore, FieldValue } from "firebase-ad
 import { db } from "../firebase.ts";
 import { Request, Response } from "express";
 import admin from "firebase-admin";
-import { group } from "console";
-
-interface Forum {
-    id: string,
-    name: string,
-    slug: string,
-    description?: string,
-}
-
-interface Group {
-    id: string,
-    name: string,
-    forumsInGroup: Forum[],
-}
+// import { group } from "console";
+import { Group, Forum, deleteForumsInGroup, fetchUserData } from "./_utils/commUtils.ts";
 
 // Retrieves all documents in Communities
 const getAllDocuments = async (req: Request, res: Response) => {
@@ -148,68 +136,7 @@ const createGroup = async (req: Request, res: Response) => {
     } // end try catch
 } // end createGroup
 
-// -------- Helper functions for deleteGroup -------- //
-// --- Helper function for deleteGroup to recursively delete replies of a post or another reply --- //
-async function deleteRepliesRecursively(replyRef: DocumentReference) {
-    const repliesSnap = await db.collection("Replies")
-        .where("parentReply", "==", replyRef)
-        .get();
 
-    for (const replyDoc of repliesSnap.docs) {
-        await deleteRepliesRecursively(replyDoc.ref); // recursive deletion
-        await replyDoc.ref.delete();
-    }
-
-    await replyRef.delete(); // finally delete the reply itself
-}
-
-// --- Helper function for deleteGroup to recursively delete posts and replies in a forum --- //
-async function deletePostsInForum(forumRef: DocumentReference) {
-    const postsSnap = await db.collection("Posts")
-        .where("parentForum", "==", forumRef)
-        .get();
-
-    for (const postDoc of postsSnap.docs) {
-        const postRef = postDoc.ref;
-
-        // Delete replies belonging to this post
-        const repliesSnap = await db.collection("Replies")
-            .where("parentPost", "==", postRef)
-            .get();
-
-        for (const replyDoc of repliesSnap.docs) {
-            await deleteRepliesRecursively(replyDoc.ref);
-        }
-
-        await postRef.delete(); // delete the post itself
-    }
-}
-
-// --- Helper function for deleteGroup to recursively delete forums, posts, and replies in a group --- //
-async function deleteForumsInGroup(groupRef: DocumentReference) {
-    const forumsSnap = await db.collection("Forums")
-        .where("parentGroup", "==", groupRef)
-        .get();
-
-    for (const forumDoc of forumsSnap.docs) {
-        const forumRef = forumDoc.ref;
-
-        // Dereference the forum from its parent community
-        const forumData = forumDoc.data();
-        const parentCommunityRef: DocumentReference | undefined = forumData?.parentCommunity;
-        if (parentCommunityRef) {
-            await parentCommunityRef.update({
-                forumsInCommunity: FieldValue.arrayRemove(forumRef)
-            });
-        }
-
-        // Delete all posts in this forum
-        await deletePostsInForum(forumRef);
-
-        // Finally, delete the forum itself
-        await forumRef.delete();
-    }
-}
 
 // Deletes a group, all its forums, posts, and replies
 const deleteGroup = async (req: Request, res: Response) => {
@@ -401,18 +328,6 @@ const getCommunityStructure = async (req: Request, res: Response) => {
         const communityDoc = snapshot.docs[0];
         const communityData = communityDoc.data();
         const groupsRefs = communityData.groupsInCommunity || [];
-
-        // Helper function to fetch user data from references
-        const fetchUserData = async (userRefs: DocumentReference[]) => {
-            const users = [];
-            for (const userRef of userRefs) {
-                const userSnap = await userRef.get();
-                if (userSnap.exists) {
-                    users.push({ id: userSnap.id, ...userSnap.data() });
-                }
-            }
-            return users;
-        };
 
         // Fetch user data for community lists
         const ownerList = await fetchUserData(communityData.ownerList || []);

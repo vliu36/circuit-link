@@ -1,40 +1,7 @@
 import { DocumentReference, FieldValue, Timestamp } from "firebase-admin/firestore";
 import { db } from "../firebase.ts"
 import { Request, Response } from "express"
-
-interface Reply {
-    id: string;
-    authorUsername: string;
-    authorId: string;
-    yayList: string[];
-    nayList: string[];
-    timeReply: Timestamp;
-    listOfReplies: DocumentReference[];
-    edited: boolean;
-    contents: string;
-    parentPost: DocumentReference;
-    parentForum?: DocumentReference;
-    parentGroup?: DocumentReference;
-    parentCommunity?: DocumentReference;
-}
-
-// --- Helper: delete nested replies recursively ---
-const deleteRepliesRecursive = async (replyRefs: DocumentReference[]) => {
-    for (const rRef of replyRefs) {
-        const rDoc = await rRef.get();
-        if (!rDoc.exists) continue;
-        const rData = rDoc.data();
-        if (rData?.listOfReplies?.length) {
-            await deleteRepliesRecursive(rData.listOfReplies);
-        }
-        await rRef.delete();
-        // Decrement replyCount in parent post
-        const parentPostRef: DocumentReference | undefined = rData?.parentPost;
-        await parentPostRef?.update({
-            replyCount: FieldValue.increment(-1),
-        });
-    }
-};
+import { deletePostRepliesRecursive } from "./_utils/replyUtils.ts";
 
 // Retrieves all documents in Replies collection
 const getAllDocuments = async (req: Request, res: Response) => {
@@ -203,7 +170,7 @@ const deleteDoc = async (req: Request, res: Response) => {
         if (!authorized) return res.status(403).json({ status: "Forbidden", message: "Not authorized to delete this reply" });
 
         const childReplies: DocumentReference[] = replyData?.listOfReplies || [];
-        await deleteRepliesRecursive(childReplies);
+        await deletePostRepliesRecursive(childReplies);
         await replyRef.delete();
 
         res.status(200).json({ status: "OK", message: `Reply ${replyId} deleted successfully` });
