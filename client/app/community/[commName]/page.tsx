@@ -145,13 +145,37 @@ export default function CommunityPage({
       {/* --- OWNERS, MODS, USERS --- */}
       <section>
         <h2><u>Owners</u></h2>
-        <ul>{community.ownerList.map((owner) => <li key={owner.id}>&gt;{owner.username || owner.id}</li>)}</ul>
+        <ul>
+          {community.ownerList.map((owner) => 
+            <li key={owner.id}>
+              <Link href = {`/profile/${owner.id}`}>
+                &gt;{owner.username || owner.id}
+              </Link>
+            </li>
+          )}
+        </ul>
 
         <h2><u>Moderators</u></h2>
-        <ul>{community.modList.map((mod) => <li key={mod.id}>&gt;{mod.username || mod.id}</li>)}</ul>
+        <ul>
+          {community.modList.map((mod) => 
+            <li key={mod.id}>
+              <Link href = {`/profile/${mod.id}`}>
+                &gt;{mod.username || mod.id}
+              </Link>
+            </li>
+          )}
+        </ul>
 
         <h2><u>Users</u></h2>
-        <ul>{community.userList.map((u) => <li key={u.id}>&gt;{u.username || u.id}</li>)}</ul>
+        <ul>
+          {community.userList.map((u) => 
+            <li key={u.id}>
+              <Link href = {`/profile/${u.id}`}>
+                &gt;{u.username || u.id}
+              </Link>
+            </li>
+          )}
+        </ul>
       </section>
       <br />
 

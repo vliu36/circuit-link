@@ -6,6 +6,8 @@ import { use, useEffect, useState } from "react";
 import styles from "./postPage.module.css";
 import NavBar from '../../../../_components/navbar/navbar.tsx';
 import { fetchStructure, createGroup, deleteGroup, createForum, deleteForum } from "../../../[commName]/community.ts";
+// import { Link } from "react-router-dom";
+import Link from 'next/link';
 
 export default function PostDetail({ params }: { params: Promise<{ commName: string; forumSlug: string; postId: string }> }) {
     const { commName, forumSlug, postId } = use(params);
@@ -25,14 +27,14 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
     useEffect(() => {
         setLoading(true);
         fetchStructure(commName)
-          .then((data) => {
-            if (data) setCommunity(data);
-          })
-          .finally(() => setLoading(false));
-      }, [commName]);
+            .then((data) => {
+                if (data) setCommunity(data);
+            })
+            .finally(() => setLoading(false));
+        }, [commName]);
     
-      if (load) return <div>Loading community...</div>;
-      if (!community) return <div>Community not found.</div>;
+        if (load) return <div>Loading community...</div>;
+        if (!community) return <div>Community not found.</div>;
 
     // Handler for editing posts/replies
     const handleEdit = async (id: string, isReply: boolean) => {
@@ -123,7 +125,11 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                         {/* Show the author's username and display total yay score */}
                         <div className={styles.meta}>
                             <div className = {styles.userIcon}></div>
-                            <div className = {styles.userTextAlignPosts}>{item.authorUsername}</div>
+                            <div className = {styles.userTextAlignPosts}>
+                                <Link href={`/profile/${item.authorId}`}>
+                                    {item.authorUsername}
+                                </Link>
+                            </div>
                         </div>
 
                         {/* Show the time created, using timeReply if a reply, or timePosted if a post. Additionally show if edited */}

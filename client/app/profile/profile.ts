@@ -1,6 +1,6 @@
 import { auth, db, storage } from "../_firebase/firebase";
 import { updateProfile, sendEmailVerification } from "firebase/auth";
-import { doc, updateDoc } from "firebase/firestore";
+import { arrayRemove, doc, DocumentReference, getDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 // Interface for updatedData in function editProfile
@@ -12,6 +12,18 @@ interface updatedData {
     darkMode?: boolean;
     privateMode?: boolean;
     restrictedMode?: boolean;
+}
+
+// Interface used for getFriends function
+export interface User {
+    id: string;
+    username: string;
+    email: string;
+    photoURL: string;
+    createdAt: Date;
+    friendList: DocumentReference[];
+    notifications: DocumentReference[];
+    profileDesc?: string;
 }
 
 // Delete user 
@@ -108,14 +120,20 @@ export async function editProfile(username: string, profileDesc: string, textSiz
 } // end function editProfile
 
 // Update profile picture
-export async function uploadProfilePicture(file: File, path: string) {
+export async function uploadProfilePicture(file: File) {
     try {
         // Create storage reference for the file
-        const fileRef = ref(storage, `${path}${file.name}`);
+        const fileRef = ref(storage, `profiles/${file.name}`);
         const snapshot = await uploadBytes(fileRef, file);
         const downloadURL = await getDownloadURL(snapshot.ref);
         console.log("Profile picture uploaded. URL:", downloadURL);
+
+        // Update user's profile in auth
         await updateProfile(auth.currentUser!, { photoURL: downloadURL });
+
+        // Update user's document in Firestore
+        const userDocRef = doc(db, "Users", auth.currentUser!.uid);
+        await updateDoc(userDocRef, { photoURL: downloadURL });
         // return downloadURL;
     } catch (error) {
         console.error("Error uploading profile picture:", error);
@@ -146,3 +164,46 @@ export async function verifyEmail() {
         console.error("Error verifying email:", error);
     } // end try catch
 } // end function verifyEmail
+
+// Convert array of DocumentReferences to array of User objects
+export async function getFriends(friendRefs: DocumentReference[]): Promise<User[]> {
+    if (!friendRefs || friendRefs.length === 0) return [];
+
+    try {
+        // Fetch all friend documents in parallel
+        const friendDocs = await Promise.all(
+            friendRefs.map(async (ref) => {
+            const docSnap = await getDoc(ref);
+            if (docSnap.exists()) {
+                return { id: docSnap.id, ...docSnap.data() } as User;
+            }
+            return null;
+            })
+        );
+
+        // Filter out any missing/null results
+        return friendDocs.filter((f): f is User => f !== null);
+    } catch (error) {
+        console.error("Error fetching friends:", error);
+        throw error;
+    } // end try catch
+} // end function getFriends
+
+// Remove friend
+export async function removeFriend(friendId: string, userId: string) {
+    try {
+        const removed = await fetch(`http://localhost:2400/api/users/remove-friend`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ friendId, userId }),
+        });
+        if (!removed.ok) {
+            throw new Error("Failed to remove friend");
+        }
+        console.log("Friend removed successfully.");
+    } catch (error) {
+        console.error("Error removing friend:", error);
+    } // end try catch
+}

@@ -2,6 +2,23 @@ import { db, auth } from "../firebase.ts";
 import { Request, Response } from "express";
 import { FieldValue } from "firebase-admin/firestore";
 import { cookieParser } from "./_utils/generalUtils.ts";
+import { createNotification } from "./_utils/generalUtils.ts";
+
+interface UserData {
+    uid: string;
+    email: string;
+    username: string;
+    createdAt: FirebaseFirestore.Timestamp;
+    profileDesc?: string;
+    darkMode?: boolean;
+    privateMode?: boolean;
+    restrictedMode?: boolean;
+    textSize?: number;
+    font?: string;
+    photoURL?: string;
+    emailVerified?: boolean;
+    // [key: string]: any; // for any additional fields
+}
 
 // Retrieves all documents in Users
 const getAllDocuments = async (req: Request, res: Response) => {
@@ -359,6 +376,154 @@ const updateCommunityField = async (req: Request, res: Response) => {
     }
 }
 
+// Get user by id
+const getUserById = async (req: Request, res: Response) => {
+    try {
+        const uid = req.params.uid;
+        const userDoc = await db.collection("Users").doc(uid).get();
+        if (!userDoc.exists) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        const data = userDoc.data() as UserData;
+        const safeUserData = { 
+            ...data,
+            createdAt: userDoc.createTime?.toMillis() || null,
+        };
+
+        res.status(200).json({ user: safeUserData });
+    } catch (error) {
+        console.error("Error fetching user by ID:", error);
+        res.status(500).json({ message: "Failed to fetch user" });
+    } // end try catch
+}
+
+// Send friend request
+const sendFriendRequest = async (req: Request, res: Response) => {
+    const { senderId, recipientId } = req.body;
+    if (!senderId || !recipientId) {
+        return res.status(400).json({ message: "Missing senderId or recipientId" });
+    }
+
+    try {
+        // Check if request already exists
+        const existing = await db.collection("FriendRequests")
+            .where("senderId", "==", senderId)
+            .where("recipientId", "==", recipientId)
+            .where("status", "==", "pending")
+            .get();
+        if (!existing.empty) {
+            return res.status(400).json({ status: "exists", message: "Friend request already sent" });
+        }
+
+        // Get sender's username for notification
+        const senderDoc = await db.collection("Users").doc(senderId).get();
+        const senderData = senderDoc.data();
+        const senderUsername = senderData?.username || "Someone";
+        
+        // Create friend request
+        const requestRef = await db.collection("FriendRequests").add({
+            senderId,
+            recipientId,
+            status: "pending",
+            timestamp: new Date(),
+        });
+
+        // Notify the recipient
+        const notifRef = await createNotification({
+            senderId,
+            recipientId,
+            type: "friend_request",
+            message: `${senderUsername} has sent you a friend request.`,
+            relatedDocRef: requestRef,
+        });
+        // Add reference to notification in recipient's document under field 'notifications'
+        const recipientRef = db.collection("Users").doc(recipientId);
+        await recipientRef.update({
+            notifications: FieldValue.arrayUnion(db.doc(`/Notifs/${notifRef}`))
+        });
+
+        res.status(201).json({ status: "ok", message: "Friend request sent successfully" });
+    } catch (error) {
+        console.error("Error sending friend request:", error);
+        res.status(500).json({ status: "error", message: "Failed to send friend request" });
+    } // end try catch
+} // end sendFriendRequest
+
+// Respond to friend request
+const respondToFriendRequest = async (req: Request, res: Response) => {
+    const { 
+        requestId,      // ID of the friend request document
+        accept,         // true to accept, false to reject
+        recId           // ID of the recipient (current user)
+    } = req.body;
+
+    try {
+        // Fetch the friend request document and check if it exists
+        const requestDoc = await db.collection("FriendRequests").doc(requestId).get();
+        if (!requestDoc.exists) {
+            return res.status(404).json({ status: "error", message: "Friend request not found" });
+        }
+
+        // Extract senderId and recipientId from the request document
+        const { senderId, recipientId } = requestDoc.data() as { senderId: string; recipientId: string; };
+        // Verify that the recId matches the recipientId
+        if (recId !== recipientId) {
+            return res.status(403).json({ status: "error", message: "Unauthorized action" });
+        }
+
+        // Update the friend request status
+        const newStatus = accept ? "accepted" : "rejected";
+        await db.collection("FriendRequests").doc(requestId).update({
+            status: newStatus,
+            respondedAt: new Date(),
+        });
+        // If accepted, update both users' friend lists and notify the sender
+        if (accept) {
+            await db.collection("Users").doc(senderId).update({
+                friendList: FieldValue.arrayUnion(db.doc(`/Users/${recipientId}`))
+            });
+            await db.collection("Users").doc(recipientId).update({
+                friendList: FieldValue.arrayUnion(db.doc(`/Users/${senderId}`))
+            });
+
+            // Get recipient's username for notification
+            const recipientDoc = await db.collection("Users").doc(recipientId).get();
+            const recipientData = recipientDoc.data();
+            const recipientUsername = recipientData?.username || "Someone";
+
+            await createNotification({
+                senderId: recipientId,
+                recipientId: senderId,
+                type: "friend_request_accepted",
+                message: `User ${recipientUsername} has accepted your friend request.`,
+            });
+        } 
+
+        res.status(200).json({ status: "ok", message: `Friend request ${newStatus}` });
+    } catch (error) {
+        console.error("Error responding to friend request:", error);
+        res.status(500).json({ status: "error", message: "Failed to respond to friend request" });
+    } // end try catch
+} // end respondToFriendRequest
+
+// Remove friend
+const removeFriend = async (req: Request, res: Response) => {
+    const { userId, friendId } = req.body;
+    try {
+        await db.collection("Users").doc(userId).update({
+            friendList: FieldValue.arrayRemove(db.doc(`/Users/${friendId}`))
+        });
+        await db.collection("Users").doc(friendId).update({
+            friendList: FieldValue.arrayRemove(db.doc(`/Users/${userId}`))
+        });
+        res.status(200).json({ status: "ok", message: "Friend removed successfully" });
+    } catch (error) {
+        console.error("Error removing friend:", error);
+        res.status(500).json({ status: "error", message: "Failed to remove friend" });
+    } // end try catch
+} // end removeFriend
+
 export {
     getAllDocuments,
     userRegistration,
@@ -369,4 +534,8 @@ export {
     editProfile,
     getCurrentUser,
     logoutUser,
+    getUserById,
+    sendFriendRequest,
+    respondToFriendRequest,
+    removeFriend,
 }

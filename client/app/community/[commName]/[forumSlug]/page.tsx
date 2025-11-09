@@ -199,7 +199,9 @@ export default function ForumPage({
                                     {/* ---- Post metadata ---- */}
                                     {/* Post author */}
                                     <p className={styles.meta}>
-                                        <strong>Author:</strong> {post.authorUsername}
+                                        <Link href={`/profile/${post.authorId}`}>
+                                            <strong>Author:</strong> {post.authorUsername}
+                                        </Link>
                                     </p>
                                     {/* Time post was created, and if it was edited */}
                                     <p className={styles.time}>

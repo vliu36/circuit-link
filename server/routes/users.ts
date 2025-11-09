@@ -71,11 +71,40 @@ router.post("/edit-profile", users.editProfile);
  */
 router.get("/me", users.getCurrentUser);
 
+/** Retrieves a user's data by their UID
+ *  @route GET /api/users/get/:uid
+ *  @param uid - The UID of the user to retrieve
+ *  @returns {Object} User data if found, or an error message if not found
+ */
+router.get("/get/:uid", users.getUserById);
+
 /** Updates the communities field of a User 
  *  @route PATCH /api/users/update-comm/:uid
  *  @body mode - Boolean value where true = add, false = remove
  *  @body community - Document id for community to add or remove
 */
 router.patch("/update-comm/:uid", users.updateCommunityField)
+
+/** Send a friend request from one user to another
+ *  @route POST /api/users/friend-request
+ *  @body senderId - UID of the user sending the friend request
+ *  @body recipientId - UID of the user receiving the friend request
+ */
+router.post("/friend-request", users.sendFriendRequest);
+
+/** Respond to a friend request (accept or decline)
+ *  @route POST /api/users/respond-friend-request
+ *  @body senderId - UID of the user who sent the friend request
+ *  @body recipientId - UID of the user responding to the friend request
+ *  @body accept - Boolean indicating whether to accept (true) or decline (false) the request
+ */
+router.post("/respond-friend-request", users.respondToFriendRequest);
+
+/** Remove a friend from the user's friend list
+ *  @route POST /api/users/remove-friend
+ *  @body userId - UID of the user removing the friend
+ *  @body friendId - UID of the friend to be removed
+ */
+router.post("/remove-friend", users.removeFriend);
 
 export default router;

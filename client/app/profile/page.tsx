@@ -28,6 +28,8 @@ export default function Profile() {
     const [privateMode, setPrivateMode] = useState(userData?.privateMode ?? false);
     const [restrictedMode, setRestrictedMode] = useState(userData?.restrictedMode ?? false);
     const [error, setError] = useState("");
+
+    const [friends, setFriends] = useState<profileFunctions.User[]>([]); // TODO: replace any with proper interface
     
     const [isOpen, setIsOpen] = useState(false);
 
@@ -37,16 +39,22 @@ export default function Profile() {
     // Live username validation
     useEffect(() => {
         if (!newUsername) {
-            // if (error) setError("");
             setError("");
             return;
         }
         const localError = profileFunctions.basicUsernameCheck(newUsername);
         setError(localError);
-        // if (error !== localError) {
-        //     setError(localError);
-        // }
+
     }, [newUsername]); // end useEffect
+
+    useEffect(() => {
+        const loadFriends = async () => {
+        if (!userData?.friendList) return;
+        const data = await profileFunctions.getFriends(userData.friendList);
+        setFriends(data);
+        };
+        loadFriends();
+    }, [userData]);
 
     // Show loading message while auth state is being determined
     if (loading) {
@@ -54,9 +62,10 @@ export default function Profile() {
     }
 
     // If no user is logged in, show message
-    if (!user) {
+    if (!user || !userData) {
         return ( <p>You must be logged in to view this page.</p> );
     }
+
     // Handle form submission for editing profile
     const handleEditProfile = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -93,7 +102,7 @@ export default function Profile() {
             return;
         }
         try {
-            const url = await profileFunctions.uploadProfilePicture(file, "profile/");
+            const url = await profileFunctions.uploadProfilePicture(file);
             alert("Profile picture uploaded successfully.");
             console.log("File URL: ", url);
             window.location.reload();
@@ -104,21 +113,29 @@ export default function Profile() {
 
     return (
         <main>
+            {/* Profile */}
             <div className="profile-card">
                 <h1>Profile</h1>
                 <p>Welcome to your profile page!</p>
                 <Link className="go-back-btn" href = "./landing" replace>Go back</Link>
                 <br/>
                 <br/>
+                <Link className="go-back-btn" href = "/profile/notifications">Go to Notifications</Link>
+                <br/>
+                <br/>
+                {/* Display profile info */}
                 <div className="profile-header">
-                    <img
+                    <Image
                     src={user.photoURL || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
                     alt="Profile Picture"
-                    className="w-16 h-16 rounded-full object-cover border"></img>
+                    width={64}
+                    height={64}
+                    className="w-16 h-16 rounded-full object-cover border" />
                     <span className="username">{userData?.username}</span>
                 </div>
                 <p>{userData?.profileDesc}</p>
             </div>
+            {/* Additional information */}
             <div className="account-info">
                 <p>Email: {user?.email}</p>
                 <p>Email Verified: {user?.emailVerified ? "Yes" : "No"}</p>
@@ -128,6 +145,34 @@ export default function Profile() {
                 <p>Last Sign-in: {user?.metadata.lastSignInTime}</p>
             </div>
 
+            {/* Friend list */}
+            <div className="account-info">
+                <h2>Friends</h2>
+                <br/>
+                {friends.length > 0 ? (
+                    <ul>
+                        {friends.map((friend) => (
+                            <li key={friend.id}>
+                                <Link href={`/profile/${friend.id}`}>
+                                    <Image 
+                                        src={friend.photoURL || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
+                                        width={32} 
+                                        height={32} 
+                                        alt="Profile Picture" 
+                                        className="w-16 h-16 rounded-full object-cover border" 
+                                    />
+                                    {friend.username}
+                                </Link>
+                                <button onClick={() => profileFunctions.removeFriend(friend.id, user.uid)}>Remove</button>
+                            </li>
+                        ))}
+                    </ul>
+                ) : (
+                    <p>No friends to display.</p>
+                )}
+            </div>
+
+            {/* Change profile picture */}
             <div>
                 <br/>
                 <form onSubmit={submitImage} className="flex items-left gap-4">
@@ -139,7 +184,7 @@ export default function Profile() {
                         className="hidden"
                         onChange={handleImageChange}/>
                     </label>
-                    {preview && (<Image src={preview} alt="Preview" className="w-16 h-16 rounded-full object-cover border"></Image>)}
+                    {preview && (<Image src={preview} alt="Preview" width={16} height={16} className="w-16 h-16 rounded-full object-cover border"></Image>)}
                     <button
                         type="submit"
                         disabled={!file}>Upload
