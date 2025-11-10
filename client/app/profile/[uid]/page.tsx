@@ -1,13 +1,11 @@
 // This page displays another user's profile based on the UID in the URL.
 "use client"
-import React, { useState, useEffect, use } from "react";
-// import * as profileFunctions from "../profile";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../_firebase/context";
 import "../profile-styles.css";
 import Image from 'next/image';
 import Link from 'next/link';
 import * as profileFunctions from "./userProfile";
-// import { User, getFriends } from "../profile.ts";
 import { DocumentReference } from "firebase/firestore";
 
 
@@ -40,8 +38,8 @@ export default function OtherProfile({ params }: { params: Promise<{ uid: string
                     setOther(data);
                 }
             } catch (err) {
-                setError("Error fetching user profile");
-                console.error(error);
+                setError("Error fetching user profile: " + err);
+                console.log(err);
                 setOther(null);
             } finally {
                 setLoading(false);
@@ -63,6 +61,11 @@ export default function OtherProfile({ params }: { params: Promise<{ uid: string
     // If no profile data found, show message
     if (!other || !otherId) {
         return ( <p>User not found.</p> );
+    }
+
+    // Display error, if any
+    if (error) {
+        return <p style={{ color: "red" }}>{error}</p>;
     }
 
     // If current user is viewing their own profile, redirect to /profile page
@@ -91,10 +94,12 @@ export default function OtherProfile({ params }: { params: Promise<{ uid: string
                 <br/>
                 <br/>
                 <div className="profile-header">
-                    <img
+                    <Image
                     src={other.user.photoURL || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
                     alt="Profile Picture"
-                    className="w-16 h-16 rounded-full object-cover border"></img>
+                    width={64}
+                    height={64}
+                    className="w-16 h-16 rounded-full object-cover border"/>
                     <span className="username">{other.user.username}</span>
                 </div>
                 <p>{other.user.profileDesc}</p>

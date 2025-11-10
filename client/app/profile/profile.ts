@@ -1,6 +1,6 @@
 import { auth, db, storage } from "../_firebase/firebase";
 import { updateProfile, sendEmailVerification } from "firebase/auth";
-import { arrayRemove, doc, DocumentReference, getDoc, updateDoc } from "firebase/firestore";
+import { doc, DocumentReference, getDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 // Interface for updatedData in function editProfile

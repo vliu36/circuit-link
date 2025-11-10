@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useCallback } from "react";
 
 export type Reply = {
     id: string;
@@ -35,7 +36,7 @@ export const useReplies = (postId: string, userId?: string) => {
     const BASE_URL = "http://localhost:2400/api";
 
     // --- Fetch post and its replies ---
-    const fetchPost = async () => {
+    const fetchPost = useCallback(async () => {
         setLoading(true);
         try {
             const res = await fetch(`${BASE_URL}/posts/get/${postId}`);
@@ -59,11 +60,11 @@ export const useReplies = (postId: string, userId?: string) => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [postId]);
 
     useEffect(() => {
         if (postId) fetchPost();
-    }, [postId]);
+    }, [postId, fetchPost]);
 
     // --- Voting ---
     const handleVote = async (id: string, type: "yay" | "nay", isReply = false) => {

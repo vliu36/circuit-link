@@ -5,10 +5,10 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../../_firebase/context.tsx";
 import { use } from "react";
 import Link from "next/link";
-// import { useAuth } from "../../../context.tsx";
 import { fetchPostsByForum, createPost, editPost, deletePostById, votePost } from "./forum.ts";
 import styles from "./forumPage.module.css";
 import { Post, Forum } from "../../../_types/types.ts";
+import { useCallback } from "react";
 
 export default function ForumPage({
     params,
@@ -31,7 +31,7 @@ export default function ForumPage({
     /** Fetch posts by forum
      *  This is used to load posts when the component mounts and after actions like adding, editing, or deleting a post.
      */
-    const fetchPosts = async () => {
+    const fetchPosts = useCallback(async () => {
         try {
             const { forum, posts } = await fetchPostsByForum(commName, forumSlug);
 
@@ -49,11 +49,11 @@ export default function ForumPage({
         } finally {
             setLoading(false);
         }
-    };
+    }, [commName, forumSlug]);
 
     useEffect(() => {
         fetchPosts();
-    }, [commName, forumSlug]);
+    }, [commName, forumSlug, fetchPosts]);
 
     // Handler to add a new post
     const handleAddPost = async () => {
@@ -62,7 +62,7 @@ export default function ForumPage({
 
         try {
             const msg = await createPost(user.uid, title, contents, commName, forumSlug);
-            // alert(msg);
+            console.log(msg);
             setTitle("");
             setContents("");
             fetchPosts();
@@ -75,7 +75,7 @@ export default function ForumPage({
     const handleSaveEdit = async (postId: string) => {
         try {
             const msg = await editPost(postId, user?.uid, editTitle, editContents);
-            alert(msg);
+            console.log(msg);
             cancelEditing();
             fetchPosts();
         } catch (err) {
