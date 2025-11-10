@@ -31,7 +31,15 @@ export async function respondToFriendRequest(requestRef: DocumentReference, acce
         }
 
         console.log("Friend request response sent successfully.");
-        alert("Friend request response sent successfully.");
+        
+        // // Mark the notification as read
+        // markNotificationAsRead(notifId);
+
+        if (accept) {
+            alert("Friend request accepted.");
+        } else {
+            alert("Friend request declined.");
+        }
     } catch (error) {
         console.error("Error responding to friend request:", error);
     } // end try catch

@@ -1,3 +1,4 @@
+// This page displays another user's profile based on the UID in the URL.
 "use client"
 import React, { useState, useEffect, use } from "react";
 // import * as profileFunctions from "../profile";

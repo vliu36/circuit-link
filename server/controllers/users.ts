@@ -402,7 +402,7 @@ const getUserById = async (req: Request, res: Response) => {
 const sendFriendRequest = async (req: Request, res: Response) => {
     const { senderId, recipientId } = req.body;
     if (!senderId || !recipientId) {
-        return res.status(400).json({ message: "Missing senderId or recipientId" });
+        return res.status(400).json({ status: "error", message: "Missing senderId or recipientId" });
     }
 
     try {
@@ -413,6 +413,7 @@ const sendFriendRequest = async (req: Request, res: Response) => {
             .where("status", "==", "pending")
             .get();
         if (!existing.empty) {
+            console.log("Friend request already sent.");
             return res.status(400).json({ status: "exists", message: "Friend request already sent" });
         }
 

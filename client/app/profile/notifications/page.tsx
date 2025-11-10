@@ -1,3 +1,4 @@
+// This page displays the user's notifications
 "use client"
 import { useAuth } from "../../_firebase/context";
 import { DocumentReference, getDoc } from "firebase/firestore";
@@ -19,6 +20,7 @@ export default function Notifications() {
     //         .catch(console.error);
     // }, [userData?.notifications]);
 
+    // Fetch notifications and their friend request statuses if applicable
     useEffect(() => {
         if (!userData?.notifications) return;
 
@@ -51,15 +53,47 @@ export default function Notifications() {
         fetchAll();
     }, [userData?.notifications]);
 
+    // Handle marking notification as read
+    async function markAsRead(notifId: string) {
+        try {
+            await markNotificationAsRead(notifId);
+            // Update local state
+            setNotifications((prevNotifs) =>
+                prevNotifs.map((notif) =>
+                    notif.id === notifId ? { ...notif, read: true } : notif
+                )
+            );
+        } catch (error) {
+            console.error("Error marking notification as read:", error);
+        } // end try catch
+    } // end function markAsRead
+
+    // Handle responding to friend requests
+    async function respondToRequest(requestRef: DocumentReference, accept: boolean, userId: string, notifId: string) {
+        try {
+            await respondToFriendRequest(requestRef, accept, userId);
+            // Mark the notification as read
+            markAsRead(notifId);
+
+            // Update local state 
+            setRequestStatus((prevStatus) => ({
+                ...prevStatus,
+                [notifId]: accept ? "accepted" : "declined",
+            }));
+        } catch (error) {
+            console.error("Error responding to friend request:", error);
+        } // end try catch
+    } // end function respondToRequest
+
+    // Loading states
     if (loading) {
         return <div>Loading...</div>;
     }
-
     if (!user || !userData) {
         return <div>You must be logged in to view notifications.</div>;
     }
 
-    return(
+    return (
         <div>
             <h1>Notifications Page</h1>
             <p>This is where user notifications will be displayed.</p>
@@ -85,28 +119,38 @@ export default function Notifications() {
 
                                 {/* If notification is unread, show that it is; clicking on it marks it as read */}
                                 {!notif.read && (
-                                    <button onClick={() => markNotificationAsRead(notif.id)}>
+                                    <button onClick={() => markAsRead(notif.id)}>
                                         [Unread]
                                     </button>
                                 )}
 
-                                {/* If notification type is a 'friend_request', show accept/decline buttons */}
-                                {notif.type === "friend_request" && requestStatus[notif.id] === "pending" && notif.relatedDocRef && (
-                                    
+                                {/* If notification type is a 'friend_request', show it */}
+                                {notif.type === "friend_request" && notif.relatedDocRef && (
                                     <div>
-                                        <button onClick={() => respondToFriendRequest(notif.relatedDocRef!, true, user.uid)}>
-                                            [Accept Friend Request]
-                                        </button>
-                                        <button onClick={() => respondToFriendRequest(notif.relatedDocRef!, false, user.uid)}>
-                                            [Decline Friend Request]
-                                        </button>
+                                        {/* If status is pending, show accept/decline buttons */}
+                                        {requestStatus[notif.id] === "pending" && (
+                                            <>
+                                                <button onClick={() => respondToRequest(notif.relatedDocRef!, true, user.uid, notif.id)}>
+                                                    [Accept Friend Request]
+                                                </button>
+                                                <button onClick={() => respondToRequest(notif.relatedDocRef!, false, user.uid, notif.id)}>
+                                                    [Decline Friend Request]
+                                                </button>
+                                            </>
+                                        )}
+                                        {/* If status is accepted, show accepted message */}
+                                        {requestStatus[notif.id] === "accepted" && (
+                                            <span><em>Accepted.</em></span>
+                                        )}
+                                        {/* If status is rejected, show rejected message */}
+                                        {requestStatus[notif.id] === "rejected" && (
+                                            <span><em>Rejected.</em></span>
+                                        )}
                                     </div>
-                                    
-                                )}
+                                )} {/* End friend_request handling */}
                             </li>
-                            
-                        ))}
-                    </ul>
+                        ))} {/* End mapping notifications */}
+                    </ul> 
                 ) : (
                     <ul>
                         <li>No notifications available.</li>

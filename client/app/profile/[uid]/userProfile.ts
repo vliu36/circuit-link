@@ -42,7 +42,10 @@ export async function sendFriendRequest(senderId: string, recipientId: string) {
             body: JSON.stringify({ senderId, recipientId }),
         });
         if (!response.ok) {
-            throw new Error("Failed to send friend request");
+            const errorData = await response.json();
+            console.error("Error sending friend request:", errorData.message);
+            alert(`Error: ${errorData.message}`);
+            return;
         }
         alert("Friend request sent successfully.");
     } catch (error) {

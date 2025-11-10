@@ -1,27 +1,22 @@
-"use client";
+// This page allows users to view and edit their profile information, including uploading a profile picture, changing username, bio, and account settings.
+"use client"
 import React, { useState, useEffect } from "react";
 import * as profileFunctions from "./profile";
 import { useAuth } from "../_firebase/context";
 import "./profile-styles.css";
 import Image from 'next/image';
 import Link from 'next/link';
-// import { auth, db } from "../firebase";
-// import { User, onAuthStateChanged } from "firebase/auth";
-// import { deleteUserAccount, logout, editProfile } from "./profile";
-// import { doc, getDoc } from "firebase/firestore";
-// import { profile } from "console";
 
 
 export default function Profile() {
-    const { user, userData, loading } = useAuth();
+    const { user, userData, loading } = useAuth();    
 
-    const [newUsername, setNewUsername] = useState("");
-    const [newBio, setNewBio] = useState("");
-
-    // const [imageUrl, setImageUrl] = useState("");          
     const [file, setFile] = useState<File | null>(null);   // For profile picture upload
     const [preview, setPreview] = useState<string | null>(null); // For image preview
     
+    // Profile edit states
+    const [newUsername, setNewUsername] = useState("");
+    const [newBio, setNewBio] = useState("");   
     const [textSize, setTextSize] = useState(userData?.textSize ?? 12);     
     const [font, setFont] = useState(userData?.font ?? "Arial");
     const [darkMode, setDarkMode] = useState(userData?.darkMode ?? true); 
@@ -29,10 +24,13 @@ export default function Profile() {
     const [restrictedMode, setRestrictedMode] = useState(userData?.restrictedMode ?? false);
     const [error, setError] = useState("");
 
-    const [friends, setFriends] = useState<profileFunctions.User[]>([]); // TODO: replace any with proper interface
+    // Friends list
+    const [friends, setFriends] = useState<profileFunctions.User[]>([]); 
     
+    // Popup state
     const [isOpen, setIsOpen] = useState(false);
 
+    // File size limit
     const MAX_KB = 200;
     const MAX_BYTES = MAX_KB * 1024;
 
@@ -47,6 +45,7 @@ export default function Profile() {
 
     }, [newUsername]); // end useEffect
 
+    // Load friends list
     useEffect(() => {
         const loadFriends = async () => {
         if (!userData?.friendList) return;
@@ -111,6 +110,17 @@ export default function Profile() {
         } // end try catch
     } // end submitImage
 
+    // Handle removing a friend
+    const handleRemoveFriend = async (friendId: string) => {
+        try {
+            await profileFunctions.removeFriend(friendId, user.uid);
+            // Optimistically remove from local state
+            setFriends(prevFriends => prevFriends.filter(f => f.id !== friendId));
+        } catch (error) {
+            console.error("Error removing friend:", error);
+        }
+    };
+
     return (
         <main>
             {/* Profile */}
@@ -163,7 +173,7 @@ export default function Profile() {
                                     />
                                     {friend.username}
                                 </Link>
-                                <button onClick={() => profileFunctions.removeFriend(friend.id, user.uid)}>Remove</button>
+                                <button onClick={() => handleRemoveFriend(friend.id)}>Remove</button>
                             </li>
                         ))}
                     </ul>

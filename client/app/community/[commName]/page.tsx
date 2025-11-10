@@ -1,3 +1,4 @@
+// This page displays the main community page with groups and forums.
 "use client"
 import React, { use, useState, useEffect } from "react";
 import Styles from "./community.module.css";

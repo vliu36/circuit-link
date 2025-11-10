@@ -1,4 +1,5 @@
-"use client";
+// This page displays the list of posts within a specific forum of a community.
+"use client"
 
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../_firebase/context.tsx";

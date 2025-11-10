@@ -1,3 +1,4 @@
+// This page is for displaying individual post details along with its replies in a community forum.
 "use client";
 import { Community } from "../../../../_types/types.ts";
 import { useAuth } from "../../../../_firebase/context.tsx";
@@ -141,9 +142,6 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                         <p className={styles.contents}>{item.contents}</p>
                         {/* Show metadata */}
                         
-                        
-
-                        
 
                         <div className={styles.actions}>
                             {/* Yay button; if the current user is in the yay list, show as active (green) */}
@@ -261,7 +259,8 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                 <div className = {styles.horizontalLine}></div>
                 <div className = {styles.horizontalLine}></div>
                 <h1>Rules</h1>
-                
+
+                {/* Displays the list of users in the community */}
                 <div className = {styles.usersBar}>
                     <div className = {styles.horizontalLine}></div>
                     <div className = {styles.channelInfoh1}>Users</div>
@@ -270,13 +269,13 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                             <li key={u.id} className={styles.UserContainer}>
                                 <div className={styles.addIcon}></div>
                                 <div className={styles.userTextAlign}>
-                                    &gt;{u.username || u.id}
+                                    <Link href={`/profile/${u.id}`}>
+                                        {u.username}
+                                    </Link>
                                 </div>
                             </li>
                         ))}
-
                     </ul>
-
                 </div>
             </div>
 
