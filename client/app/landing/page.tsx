@@ -62,7 +62,9 @@ export default function Landing() {
                 </div>
                 <div className = {Styles.logInInfo}>
                     <button>
-                        <Image src = "./notifBell.svg" alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
+                        <Link href="/profile/notifications">
+                            <Image src = "./notifBell.svg" alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
+                        </Link>
                     </button>
                     <div className = {Styles.dropdown}>
                         <button><img src = {user?.photoURL || "/circleUser.svg"} className = {Styles.settingsIcon} alt="User profile"></img></button>
