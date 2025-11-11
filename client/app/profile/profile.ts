@@ -26,62 +26,68 @@ export interface User {
     profileDesc?: string;
 }
 
-// Delete user 
+// Delete account (revised)
 export async function deleteUserAccount() {
     const user = auth.currentUser;
-    if (user) {
-        try {
-            const idToken = await user.getIdToken();
-            // Delete user's document from Firestore first via backend
-            const res = await fetch(`http://localhost:2400/api/users/delete/${user.uid}`, {
-                method: "DELETE",
-                headers: {
-                    "Content-Type": "application/json",
-                    "Authorization": "Bearer " + idToken
-                },
-                body: JSON.stringify({ uid: user.uid })
-            });
-            if (res.ok) {
-                console.log("User document deleted from Firestore.");
-                //alert("User document deleted from Firestore.");
-            } else {
-                const data = await res.json();
-                console.error("Error deleting user document:", data.message);
-                alert("Error deleting user document: " + data.message);
-                return;
-            } // end if else
+    if (!user) return alert("Not signed in");
 
-            // Now delete the user from Firebase Authentication
-            await user.delete();
-            alert("User account deleted successfully.");
-            window.location.href = "http://localhost:3000/signin"; // Redirect to sign-in page
-        } catch (error) {
-            if (error instanceof Error) {
-                const firebaseAuthError = error as { code?: string; message: string};
-                if (firebaseAuthError.code === "auth/requires-recent-login") {
-                    alert("Please log in again to delete your account."); 
-                    window.location.href = "http://localhost:3000/signin";
-                } else {
-                    alert("Error deleting user: " + firebaseAuthError.message);
-                } // end if else
-            } else {
-                alert("An unknown error occurred while deleting your account.");
-            } // end if else
-        } // end try catch
-    } else {
-        return alert("No user is currently signed in.");
-    } // end if else
-} // end function deleteUserAccount
+    try {
+    const idToken = await user.getIdToken();
 
-// Log user out
+    // Call the backend endpoint
+    const res = await fetch(`http://localhost:2400/api/users/delete-account`, {
+        method: "DELETE",
+        headers: {
+            "Authorization": `Bearer ${idToken}`,
+        },
+    });
+
+    if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.message || "Failed to delete account.");
+    }
+
+    console.log("Account deleted successfully.");
+    // alert("Account deleted successfully."); 
+    window.location.href = "/";
+    return { status: "ok", message: "Your account has been deleted." };
+    } catch (error) {
+        let msg: string;
+        if (error instanceof Error) {
+            const firebaseAuthError = error as { code?: string; message: string};
+            if (firebaseAuthError.code === "auth/requires-recent-login") {
+                alert("Please log in again to delete your account."); 
+                // window.location.href = "http://localhost:3000/signin";
+            } else {
+                alert("Error deleting user: " + firebaseAuthError.message);
+            } // end if else
+            msg = firebaseAuthError.message;
+        } else {
+            msg = "An unknown error occurred while deleting your account.";
+            alert("An unknown error occurred while deleting your account.");
+        } // end if else
+        return { status: "error", message: msg };
+    } // end try catch
+} // end deleteAccount
+
+// Log user out (revised)
 export async function logout() {
     try {
         await auth.signOut();
         console.log("User signed out.");
-        // Redirect to sign-in page after logout
-        window.location.href = "http://localhost:3000/signin"
+        // Clear the session cookie
+        const res = await fetch("http://localhost:2400/api/users/logout", {
+            method: "POST",
+            credentials: "include",
+        })
+        const data = await res.json();
+        console.log( data.message );
+
+        window.location.href = "http://localhost:3000/"
+        return { status: "ok", message: "User signed out successfully", };
     } catch (err) {
         console.error("Error signing out:", err);
+        return { status: "error", message: "An error occurred while signing out.", };
     } // end try catch
 } // end function logout
 

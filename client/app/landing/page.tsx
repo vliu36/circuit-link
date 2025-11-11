@@ -19,10 +19,10 @@ export default function Landing() {
 
             <div className = {Styles.yourCommunitiesBar}>
                 <h1>  Your Communities</h1>
-                <button className = {Styles.communitiesButtons}>
+                <Link className = {Styles.communitiesButtons} href="/community">
                     <Image src = "plus.svg" className = {Styles.addIcon} alt="Add icon" width={5} height={5}></Image>
-                    <h1 className = {Styles.buttonTextforCommunities}>Add a Community</h1>
-                </button>
+                    <h1 className = {Styles.buttonTextforCommunities}>Create a Community</h1>
+                </Link>
             </div>
 
             <div className = {Styles.resourcesBar}>

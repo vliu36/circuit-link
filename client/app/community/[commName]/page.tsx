@@ -7,8 +7,9 @@ import { logout } from "../../landing/landing.ts";
 import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { fetchStructure, createGroup, deleteGroup, createForum, deleteForum } from "./community";
+import * as commApi from "./community";
 import { Community } from "../../_types/types.ts";
+import { useRouter } from "next/navigation";
 
 
 export default function CommunityPage({
@@ -26,9 +27,11 @@ export default function CommunityPage({
   const [groupMessage, setGroupMessage] = useState("");
   const [forumInputs, setForumInputs] = useState<{ [groupId: string]: { name: string; description: string; message: string } }>({});
 
+  const router = useRouter();
+
   useEffect(() => {
     setLoading(true);
-    fetchStructure(commName)
+    commApi.fetchStructure(commName)
       .then((data) => {
         if (data) setCommunity(data);
       })
@@ -38,26 +41,26 @@ export default function CommunityPage({
   if (loading) return <div>Loading community...</div>;
   if (!community) return <div>Community not found.</div>;
 
-  
-
   // --- CREATE GROUP ---
   const handleCreateGroup = async () => {
     if (!user) {
       return;
     }
-    const result = await createGroup(commName, groupName, user.uid);
+    const result = await commApi.createGroup(commName, groupName, user.uid);
     setGroupMessage(result.message);
     setGroupName("");
     // Refresh community structure after creating a group
-    fetchStructure(commName).then((data) => data && setCommunity(data));
+    // commApi.fetchStructure(commName).then((data) => data && setCommunity(data));
+    refreshCommunity();
   };
   
   // --- DELETE GROUP ---
   const handleDeleteGroup = async (groupId: string) => {
     if (!user) return;
     try {
-      const result = await deleteGroup(groupId);
+      const result = await commApi.deleteGroup(groupId);
       console.log("Group deleted successfully:", result);
+      await refreshCommunity();
     } catch (err) {
       console.error("Error deleting group:", err);
     }
@@ -74,7 +77,7 @@ export default function CommunityPage({
     }
 
     try {
-      const forumId = await createForum({
+      const forumId = await commApi.createForum({
         name,
         description,
         userId: user.uid,
@@ -84,7 +87,8 @@ export default function CommunityPage({
       setForumInputs((prev) => ({ ...prev, [groupId]: { name: "", description: "", message: "Forum created successfully!" } }));
 
       // Refresh community structure
-      fetchStructure(commName).then((data) => data && setCommunity(data));
+      // commApi.fetchStructure(commName).then((data) => data && setCommunity(data));
+      refreshCommunity();
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Failed to create forum.";
@@ -99,19 +103,89 @@ export default function CommunityPage({
     }
   };
 
+  // Refresh the current community structure and update state
+  const refreshCommunity = async () => {
+    try {
+      const updated = await commApi.fetchStructure(commName);
+      if (updated) {
+        setCommunity(updated);
+      } else {
+        console.error("Failed to refresh community: no data returned");
+      }
+    } catch (err) {
+      console.error("Error refreshing community:", err);
+    }
+  };
+
   // --- DELETE FORUM ---
   const handleDeleteForum = async (forumId: string) => {
     if (!user) return;
     try {
-      const result = await deleteForum(forumId, user.uid);
+      const result = await commApi.deleteForum(forumId, user.uid);
       console.log("Forum deleted successfully:", result);
+      await refreshCommunity();
     } catch (err) {
       console.error("Error deleting forum:", err);
     }
   };
 
-  return (
+  // --- DELETE COMMUNITY ---
+  const handleDeleteComm = async (commName: string) => {
+    if (!confirm(`Are you sure you want to delete "${commName}"? This action cannot be undone.`)) {
+      return;
+    }
 
+    await commApi.deleteCommunity(commName);
+    console.log("Community successfully deleted.");
+    router.push("/landing");
+  }
+
+  // --- JOIN THE COMMUNITY ---
+  const handleJoin = async () => {
+    const res = await commApi.joinCommunity(commName);
+    console.log(res.message);
+    await refreshCommunity(); 
+  };
+
+  // --- LEAVE THE COMMUNITY ---
+  const handleLeave = async () => {
+    const res = await commApi.leaveCommunity(commName);
+    console.log(res.message);
+    await refreshCommunity();
+  };
+
+  // --- PROMOTE USER TO MOD ---
+  const handlePromoteToMod = async (userId: string) => {
+    const res = await commApi.promoteToMod(commName, userId);
+    console.log(res.message);
+    await refreshCommunity();
+  };
+
+  // --- DEMOTE MOD TO USER ---
+  const handleDemoteMod = async (userId: string) => {
+    const res = await commApi.demoteMod(commName, userId);
+    console.log(res.message);
+    await refreshCommunity();
+  };
+
+  // --- PROMOTE USER TO OWNER ---
+  const handlePromoteToOwner = async (userId: string) => {
+    const res = await commApi.promoteToOwner(commName, userId);
+    console.log(res.message);
+    await refreshCommunity();
+  };
+
+  // --- DEMOTE OWNER ---
+  const handleDemoteOwner = async (userId: string) => {
+    const res = await commApi.demoteOwner(commName, userId);
+    console.log(res.message);
+    await refreshCommunity();
+  };
+
+  const isMember = community.userList.some(u => u.id === user?.uid);
+  const isOwner = community.ownerList.some(o => o.id === user?.uid);
+
+  return (
     <div className = {Styles.background}>
       <div className = {Styles.navBox}>
         <Link className = {Styles.homeLogo} href = "./landing" replace>
@@ -138,42 +212,92 @@ export default function CommunityPage({
         </div>
       </div>
     
+
     <div style={{ padding: "1rem" }}>
+      {/* Displays community name and description */}
       <h1>Welcome to the {community.name} community.</h1>
       <p>{community.description}</p>
       <br />
 
+      {/* If not member, show Join button, otherwise show Leave Button */}
+      {!isMember ? (
+        <button onClick={handleJoin}>[Join Community]</button>
+      ) : (
+        <button onClick={handleLeave}>[Leave Community]</button>
+      )}
+
+      {/* If current user is an owner, show DELETE COMMUNITY button */}
+      {isOwner && (
+        <div style={{ marginTop: "1rem" }}>
+          <button onClick={() => handleDeleteComm(community.name)}>
+            [DELETE COMMUNITY]
+          </button>
+        </div>
+      )}
+
+      <br/>
       {/* --- OWNERS, MODS, USERS --- */}
       <section>
         <h2><u>Owners</u></h2>
         <ul>
+          {/* Display each owner */}
           {community.ownerList.map((owner) => 
             <li key={owner.id}>
-              <Link href = {`/profile/${owner.id}`}>
+              <Link href={`/profile/${owner.id}`}>
                 &gt;{owner.username || owner.id}
               </Link>
+              {/* If current user is an owner, display demote owner button */}
+              {isOwner && owner.id !== user?.uid && (
+                <button style={{ marginLeft: "0.5rem" }} onClick={() => handleDemoteOwner(owner.id)}>
+                  [Demote Owner]
+                </button>
+              )}
             </li>
           )}
         </ul>
 
         <h2><u>Moderators</u></h2>
         <ul>
+          {/* Display each moderator */}
           {community.modList.map((mod) => 
             <li key={mod.id}>
-              <Link href = {`/profile/${mod.id}`}>
+              <Link href={`/profile/${mod.id}`}>
                 &gt;{mod.username || mod.id}
               </Link>
+              {/* If current user is an owner, display buttons to promote or demote a mod */}
+              {isOwner && !community.ownerList.some(o => o.id === mod.id) && (
+                <>
+                  <button style={{ marginLeft: "0.5rem" }} onClick={() => handlePromoteToOwner(mod.id)}>
+                    [Promote to Owner]
+                  </button>
+                  <button style={{ marginLeft: "0.5rem" }} onClick={() => handleDemoteMod(mod.id)}>
+                    [Demote Mod]
+                  </button>
+                </>
+              )}
             </li>
           )}
         </ul>
 
         <h2><u>Users</u></h2>
         <ul>
+          {/* Display each user */}
           {community.userList.map((u) => 
             <li key={u.id}>
-              <Link href = {`/profile/${u.id}`}>
+              <Link href={`/profile/${u.id}`}>
                 &gt;{u.username || u.id}
               </Link>
+              {/* If current user is an owner, display buttons to promote user to a mod or owner */}
+              {isOwner && !community.modList.some(m => m.id === u.id) && !community.ownerList.some(o => o.id === u.id) && (
+                <>
+                  <button style={{ marginLeft: "0.5rem" }} onClick={() => handlePromoteToMod(u.id)}>
+                    [Promote to Mod]
+                  </button>
+                  <button style={{ marginLeft: "0.5rem" }} onClick={() => handlePromoteToOwner(u.id)}>
+                    [Promote to Owner]
+                  </button>
+                </>
+              )}
             </li>
           )}
         </ul>

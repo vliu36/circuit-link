@@ -149,3 +149,176 @@ export async function deleteForum(forumId: string, userId: string): Promise<{ st
         };
     } // end try catch
 } // end deleteForum
+
+// Delete the community
+export async function deleteCommunity(commName: string) {
+    try {
+        const res = await fetch(`${BASE_URL}/comm/delete/${commName}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "include", // include the cookie
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            console.log(data.message);
+            return;
+        }
+        console.log(data.message);
+        window.location.href = "/landing";
+        return;
+    } catch (err) {
+        console.error("Error deleting community: ", err);
+        throw err;
+    } // end try catch
+} // end deleteCommunity
+
+// Join the community
+export async function joinCommunity(commName: string): Promise<{ status: string; message: string }> {
+    try {
+        const res = await fetch(`${BASE_URL}/comm/join/${commName}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to join community");
+
+        console.log("Joined community successfully:", data);
+        return data;
+    } catch (err) {
+        console.error("Error joining community:", err);
+        return {
+            status: "error",
+            message: err instanceof Error ? err.message : "Unknown error",
+        };
+    }
+}
+
+// Leave the community
+export async function leaveCommunity(commName: string): Promise<{ status: string; message: string }> {
+    try {
+        const res = await fetch(`${BASE_URL}/comm/leave/${commName}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+            console.log(data.message);
+            alert(data.message);
+            return {
+                status: data.statusText,
+                message: data.message
+            };
+        }
+
+        console.log("Left community successfully:", data);
+        return data;
+    } catch (err) {
+        console.error("Error leaving community:", err);
+        return {
+            status: "error",
+            message: err instanceof Error ? err.message : "Unknown error",
+        };
+    }
+}
+
+// Promote a user to moderator
+export async function promoteToMod(commName: string, userId: string): Promise<{ status: string; message: string }> {
+    try {
+        const res = await fetch(`${BASE_URL}/comm/promote-mod/${commName}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ userId }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to promote user to mod");
+
+        console.log("User promoted to mod successfully:", data);
+        return data;
+    } catch (err) {
+        console.error("Error promoting to mod:", err);
+        return {
+            status: "error",
+            message: err instanceof Error ? err.message : "Unknown error",
+        };
+    }
+}
+
+// Demote a user from moderator
+export async function demoteMod(commName: string, userId: string): Promise<{ status: string; message: string }> {
+    try {
+        const res = await fetch(`${BASE_URL}/comm/demote-mod/${commName}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ userId }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to demote user from mod");
+
+        console.log("User demoted from mod successfully:", data);
+        return data;
+    } catch (err) {
+        console.error("Error demoting mod:", err);
+        return {
+            status: "error",
+            message: err instanceof Error ? err.message : "Unknown error",
+        };
+    }
+}
+
+// Promote a user to owner
+export async function promoteToOwner(commName: string, userId: string): Promise<{ status: string; message: string }> {
+    try {
+        const res = await fetch(`${BASE_URL}/comm/promote-owner/${commName}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ userId }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to promote user to owner");
+
+        console.log("User promoted to owner successfully:", data);
+        return data;
+    } catch (err) {
+        console.error("Error promoting to owner:", err);
+        return {
+            status: "error",
+            message: err instanceof Error ? err.message : "Unknown error",
+        };
+    }
+}
+
+// Demote a user from owner
+export async function demoteOwner(commName: string, userId: string): Promise<{ status: string; message: string }> {
+    try {
+        const res = await fetch(`${BASE_URL}/comm/demote-owner/${commName}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ userId }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.message || "Failed to demote user from owner");
+
+        console.log("User demoted from owner successfully:", data);
+        return data;
+    } catch (err) {
+        console.error("Error demoting owner:", err);
+        return {
+            status: "error",
+            message: err instanceof Error ? err.message : "Unknown error",
+        };
+    }
+}

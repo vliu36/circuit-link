@@ -138,6 +138,8 @@
 }
 
 .buttonTextforCommunities{
+    display: inline-block;
+    white-space: nowrap;
     text-align: left;
     margin-top: 15px;
     margin-left: 10px;

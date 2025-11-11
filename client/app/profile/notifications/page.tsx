@@ -11,15 +11,6 @@ export default function Notifications() {
     const [notifications, setNotifications] = useState<NotificationData[]>([]);
     const [requestStatus, setRequestStatus] = useState<Record<string, string>>({});
 
-    // Fetch notifications when userData.notifications changes
-    // useEffect(() => {
-    //     if (!userData?.notifications) return;
-
-    //     getNotifications(userData.notifications)
-    //         .then(setNotifications)
-    //         .catch(console.error);
-    // }, [userData?.notifications]);
-
     // Fetch notifications and their friend request statuses if applicable
     useEffect(() => {
         if (!userData?.notifications) return;
