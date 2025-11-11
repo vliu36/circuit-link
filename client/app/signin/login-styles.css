@@ -88,10 +88,12 @@
    position:relative;
    left: 350px;
    top: 110px;
+   font-family: Jura;
 }
-
+/*I don't know what .sign-with-google and :hover do...please double check cuz we 
+can maybe get rid of them*/
 .sign-with-google:hover {
-  transform: scale(1.1);
+  transform: scale(1.02);
 }
 
 .transparent-button-box-2{

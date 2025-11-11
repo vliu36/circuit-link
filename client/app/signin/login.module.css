@@ -3,6 +3,11 @@
   src: url('../../public/fonts/Jura-Light.ttf');
 }
 
+@font-face {
+  font-family: Roboto;
+  src: url('../../public/fonts/Roboto-Light.ttf');
+}
+
 .background {
   background-color: rgb(57, 65, 83);
     display: flex;
@@ -66,6 +71,7 @@
 
 .loginButton:hover {
   transform: scale(1.1);
+  background-color: #3F6DA1;
 }
 
 .forgotPasswordBox {
@@ -74,16 +80,23 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  left: 200px;
+  left: 400px;
   bottom: 10px;
 }
 
 .googleButton {
   margin-right: 65%;
+  display: flex;
+  text-align: center;
+  font-family: Roboto;
+  font-size: 0.7rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
 }
 
+/*We may not need the hover for the google button*/
 .googleButton:hover {
-  transform: scale(1.1);
+  transform: scale(1.02);
 }
 
 .registerLink {
@@ -110,7 +123,7 @@
   font-size: 16px;
   border-radius: 16px;
   border: none;
-  background-color: #699dd8;
+  background-color: #828FAF;
 }
 
 .passwordBox input {
@@ -119,7 +132,7 @@
   font-size: 16px;
   border-radius: 16px;
   border: none;
-  background-color: #699dd8;
+  background-color: #828FAF;
 }
 
 .showpasswordSection label {
@@ -142,21 +155,20 @@
 .googleButton {
   height: 40px;
   width: 80%;
-  font-size: 22px;
-  border-radius: 8px;
+  font-size: 20px;
+  border-radius: 32px;
   border: none;
   cursor: pointer;
   background-color: #f7f7f7;
   color: black;
-  border-radius: 1em;
   display: flex;
   margin-left: 70%;
 }
 
 .signUpWithGoogleText{
   margin-left: 20%;
-  margin-top: 1.5%;
-
+  margin-top: 0.5%;
+  font-family: Roboto;
 }
 
 .forgotPasswordBox button {
@@ -168,6 +180,11 @@
   cursor: pointer;
   background-color: #699dd8;
   color: white;
+}
+
+.forgotPasswordBox button:hover {
+  background-color: #3F6DA1;
+  transform: scale(1.1);
 }
 
 .registerLink a {
@@ -226,27 +243,27 @@
 }
 
 .lefthorizontalLine{
-  height: 2px;
+  height: 1px;
   width: 37%;
   margin-top: 20px;
   margin-left: 5%;
-  background-color: #ffffff;
+  background-color: #282828;
 
 }
 
 .righthorizontalLine{
-  height: 2px;
+  height: 1px;
   width: 37%;
   margin-top: 20px;
   margin-left: 5%;
-  background-color: #ffffff;
+  background-color: #282828;
 
 }
 
 .orBox{
   width: 5%;
   height: 2px;
-  font-size: 30px;
+  font-size: 25px;
   color:white;
   margin-left: 5%;
   font-family: 'Jura';
