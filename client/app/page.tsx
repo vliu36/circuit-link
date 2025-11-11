@@ -1,3 +1,4 @@
+//This page appears when the user is not registered
 "use server"
 
 import Styles from './landingPage.module.css';
@@ -69,7 +70,9 @@ export default async function Landing(props: {
 
             <div className = {Styles.searchBarArea}>
                 <div className = {Styles.welcomeText}>
-                    Welcome to Circuit Link
+                    Welcome to Circuit Link 
+                    <br></br>
+                    Please log in or sign up
                 </div>
                 <div className= {Styles.searchBarAlignment}>
                     <SearchBar/>

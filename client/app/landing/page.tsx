@@ -1,3 +1,4 @@
+//NOTE: This page is shown upon signing in
 "use client"
 // import React, {useEffect, useState} from "react";
 import Styles from './landingPage.module.css';

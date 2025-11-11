@@ -99,12 +99,13 @@
 
 .buttonText{
     text-align: left;
-    margin-top: 11px;
+    margin-top: 10px;
     margin-left: 1px;
     font-family: Inria Sans;
     color: rgb(255, 255, 255);
     position: relative;
     font-size: 0.8rem;
+    width: 100%;
 }
 
 .communitiesButtons{
@@ -181,6 +182,7 @@
 .welcomeText{
     width: 100%;
     height: 6vh;
+    color: rgb(255,255,255);
 }
 
 .usernameText{
