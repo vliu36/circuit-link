@@ -56,8 +56,8 @@ export default async function Landing(props: {
                 <h1>Top Communities</h1>
             </div>
 
-            {/*<NavBar/>*/}
-            <div className = {Styles.navBox}>
+            <NavBar/>
+            {/*<div className = {Styles.navBox}>
                 <Link href="/" replace>
                     <Image className = {Styles.homeLogo} src="/circuitlinklogowback.svg" width={200} height={50} alt="Circuit Link Logo"/>
                 </Link>
@@ -66,7 +66,7 @@ export default async function Landing(props: {
                     <h1 className = {Styles.orText}> or </h1>
                     <Link className = {Styles.logInSignUpButton} href="./register" replace> Sign Up </Link>
                 </div>
-            </div>
+            </div>*/}
 
             <div className = {Styles.searchBarArea}>
                 <div className = {Styles.welcomeText}>
