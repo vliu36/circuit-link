@@ -13,12 +13,12 @@ export async function uploadImage(file: File) {
         }
 
         // Invoke the cloud function to get a signed URL
-        const res: HttpsCallableResult<any> = await generateUploadUrlRef({
+        const URLres: HttpsCallableResult<any> = await generateUploadUrlRef({
             fileExtension: file.name.split('.').pop()
         });
 
         // Upload the file using the signed URL
-        const uploadRes = await fetch(res?.data?.url, {
+        const uploadRes = await fetch(URLres?.data?.url, {
             method: "PUT",
             body: file,
             headers: {

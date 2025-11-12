@@ -4,16 +4,21 @@
 
 import { useState } from "react";
 import { uploadImage } from "./storageHandler.ts";
+import Image from "next/image";
 
 export default function storageTest() {
     const [image, setImage] = useState<FileList | null>();
+    const [preview, setPreview] = useState<string>("");
 
     const handleFileSubmission = (): void => {
         try {
             if (image) {
                 const file: File = image[0];
+                setPreview(URL.createObjectURL(file));
+
                 const cloudUrl = uploadImage(file).then((result) => {
                     console.log(result);
+                    alert(result?.url);
                 })
             }
             else {
@@ -37,7 +42,9 @@ export default function storageTest() {
             />
             <button onClick={handleFileSubmission}>
                 Upload Image
-            </button>
+            </button> 
+            {preview && 
+            <Image src={preview} alt="Image Preview" width={1000} height={1000}/>}
         </div>
     )
 }
