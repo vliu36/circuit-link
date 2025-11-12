@@ -10,6 +10,8 @@ import Image from 'next/image';
 import * as commApi from "./community";
 import { Community } from "../../_types/types.ts";
 import { useRouter } from "next/navigation";
+import NavBar from '../../_components/navbar/navbar.tsx';
+
 
 
 export default function CommunityPage({
@@ -187,195 +189,237 @@ export default function CommunityPage({
 
   return (
     <div className = {Styles.background}>
-      <div className = {Styles.navBox}>
-        <Link className = {Styles.homeLogo} href = "./landing" replace>
-          <Image src="../circuitlinklogowback.svg" alt="Logo" width={200} height = {200}></Image>
-        </Link>
+      <div>
+        <NavBar/>
       </div>
 
-      <div className = {Styles.pfpSection}>
-        <button className = {Styles.notificationButton}>
-          <Image src = "../notifBell.svg" alt = "Notif" width = {5} height = {5}></Image>
-        </button>
-      </div>
-
-      <div className = {Styles.dropdown}>
-        <div className = {Styles.pfpSection}>
-          <button>
-            <Image src = {user?.photoURL || "../circleUser.svg"} className = {Styles.settingsIcon} width = {5} height = {5} alt="User profile"></Image>
+      <div className = {Styles.yourCommunitiesBar}>
+        <h1>Your Communities</h1>
+          <button className = {Styles.communitiesButtons}>
+            <img src = "plus.svg" className = {Styles.addIcon}></img>
+            <h1 className = {Styles.buttonTextforCommunities}>Add a Community</h1>
           </button>
-          <div className = {Styles.dropdownMenu}>
-            <Link href = "./profile" replace>Profile</Link>
-            <button>Settings</button>
-            <button onClick={logout}>Log Out</button>
+      </div>
+
+            
+      <div className = {Styles.serverBar}>
+        <div className = {Styles.horizontalLine}></div>
+        <h1>{commName}</h1>
+        <div className = {Styles.horizontalLine}></div>
+        <div className = {Styles.serverContainer}>
+          {/* --- GROUPS AND FORUMS --- */}
+          <section>
+            {community.groupsInCommunity.length === 0 && <p>No groups in this community yet.</p>}
+          
+            {/* Displays a group and its forums */}
+            {community.groupsInCommunity.map((group) => (
+              <div key={group.id} style={{ marginBottom: "2rem"}}>
+                <div className = {Styles.groupHeader}>
+                  <div className = {Styles.groupName}>{group.name}</div>
+                  <button className = {Styles.deleteGroup} onClick={() => handleDeleteGroup(group.id)}>
+                    Delete Group
+                  </button>
+                </div>
+                
+
+                {/* Displays the forums in this group */}
+                {group.forumsInGroup.length > 0 ? (
+                  <div>
+                    {group.forumsInGroup.map((forum) => (
+                    <div key={forum.id} className = {Styles.channelHeader}>
+                      {/* Link to the forum (displays its posts) */}
+                      <div className = {Styles.channelName}>
+                        <Link href={`/community/${commName}/${forum.slug}`}>
+                          &gt;{forum.name}
+                        </Link>
+                      </div>
+                      {/* -------- Delete Forum Button -------- */}
+                      <button className = {Styles.deleteChannel} onClick={() => handleDeleteForum(forum.id)}>Delete Forum</button>
+                    </div>
+                    ))}
+                    
+                  </div>
+                ) : <p>No forums in this group.</p>}
+
+                {/* --- CREATE FORUM FORM --- */}
+                <div className = {Styles.createForumContainer} style={{ marginTop: "1rem" }}>
+                  <h4>Create a new forum in {group.name}</h4>
+
+                  {/* -------- Forum Name -------- */}
+                  <input
+                    type="text"
+                    placeholder="Forum name"
+                    className = {Styles.forumCreationInfomation}
+                    value={forumInputs[group.id]?.name || ""}
+                    onChange={(e) => setForumInputs((prev) => ({
+                      ...prev,
+                      [group.id]: { ...prev[group.id], name: e.target.value, message: "" },
+                    }))}
+                  />
+
+                  {/* -------- Forum Description -------- */}
+                  <input
+                    type="text"
+                    placeholder="Forum description"
+                    className = {Styles.forumDescCreationInfomation}
+                    value={forumInputs[group.id]?.description || ""}
+                    onChange={(e) => setForumInputs((prev) => ({
+                      ...prev,
+                      [group.id]: { ...prev[group.id], description: e.target.value, message: "" },
+                    }))}
+                  />
+
+                  {/* -------- Submit -------- */}
+                  <button className = {Styles.createForumButton} onClick={() => handleCreateForum(group.id)}>Create Forum</button>
+                  {forumInputs[group.id]?.message && <p>{forumInputs[group.id].message}</p>}
+                </div>
+              </div>
+            ))}
+          </section>
+        </div>
+      </div>
+
+      <div className = {Styles.channelInfoBox}>
+        <div className = {Styles.channelInfoh1}>{commName}</div>
+        <div className = {Styles.channelInfoh2}>{community?.description}</div>
+      </div>
+            
+      <div className = {Styles.RightBar}>
+        <div className = {Styles.horizontalLine}></div>
+
+        <div className = {Styles.RulesBar}>
+          Rules
+        </div>
+        
+        
+        
+        
+        {/* Displays the list of users in the community */}
+        <div className = {Styles.usersBar}>
+          <div className = {Styles.channelInfoh1}>
+            <div className = {Styles.horizontalLine1}></div>
+            User Information
           </div>
-        </div>
-      </div>
-    
-
-    <div style={{ padding: "1rem" }}>
-      {/* Displays community name and description */}
-      <h1>Welcome to the {community.name} community.</h1>
-      <p>{community.description}</p>
-      <br />
-
-      {/* If not member, show Join button, otherwise show Leave Button */}
-      {!isMember ? (
-        <button onClick={handleJoin}>[Join Community]</button>
-      ) : (
-        <button onClick={handleLeave}>[Leave Community]</button>
-      )}
-
-      {/* If current user is an owner, show DELETE COMMUNITY button */}
-      {isOwner && (
-        <div style={{ marginTop: "1rem" }}>
-          <button onClick={() => handleDeleteComm(community.name)}>
-            [DELETE COMMUNITY]
-          </button>
-        </div>
-      )}
-
-      <br/>
-      {/* --- OWNERS, MODS, USERS --- */}
-      <section>
-        <h2><u>Owners</u></h2>
-        <ul>
-          {/* Display each owner */}
-          {community.ownerList.map((owner) => 
-            <li key={owner.id}>
-              <Link href={`/profile/${owner.id}`}>
-                &gt;{owner.username || owner.id}
-              </Link>
-              {/* If current user is an owner, display demote owner button */}
-              {isOwner && owner.id !== user?.uid && (
-                <button style={{ marginLeft: "0.5rem" }} onClick={() => handleDemoteOwner(owner.id)}>
-                  [Demote Owner]
-                </button>
-              )}
-            </li>
-          )}
-        </ul>
-
-        <h2><u>Moderators</u></h2>
-        <ul>
-          {/* Display each moderator */}
-          {community.modList.map((mod) => 
-            <li key={mod.id}>
-              <Link href={`/profile/${mod.id}`}>
-                &gt;{mod.username || mod.id}
-              </Link>
-              {/* If current user is an owner, display buttons to promote or demote a mod */}
-              {isOwner && !community.ownerList.some(o => o.id === mod.id) && (
-                <>
-                  <button style={{ marginLeft: "0.5rem" }} onClick={() => handlePromoteToOwner(mod.id)}>
-                    [Promote to Owner]
-                  </button>
-                  <button style={{ marginLeft: "0.5rem" }} onClick={() => handleDemoteMod(mod.id)}>
-                    [Demote Mod]
-                  </button>
-                </>
-              )}
-            </li>
-          )}
-        </ul>
-
-        <h2><u>Users</u></h2>
-        <ul>
-          {/* Display each user */}
-          {community.userList.map((u) => 
-            <li key={u.id}>
-              <Link href={`/profile/${u.id}`}>
-                &gt;{u.username || u.id}
-              </Link>
-              {/* If current user is an owner, display buttons to promote user to a mod or owner */}
-              {isOwner && !community.modList.some(m => m.id === u.id) && !community.ownerList.some(o => o.id === u.id) && (
-                <>
-                  <button style={{ marginLeft: "0.5rem" }} onClick={() => handlePromoteToMod(u.id)}>
-                    [Promote to Mod]
-                  </button>
-                  <button style={{ marginLeft: "0.5rem" }} onClick={() => handlePromoteToOwner(u.id)}>
-                    [Promote to Owner]
-                  </button>
-                </>
-              )}
-            </li>
-          )}
-        </ul>
-      </section>
-      <br />
-
-      {/* --- GROUPS AND FORUMS --- */}
-      <section>
-        <h2><u>Groups</u></h2>
-        {community.groupsInCommunity.length === 0 && <p>No groups in this community yet.</p>}
-        <p>----------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
-        {/* Displays a group and its forums */}
-        {community.groupsInCommunity.map((group) => (
-          <div key={group.id} style={{ marginBottom: "2rem" }}>
-            <h3>{group.name}</h3>
-            <button onClick={() => handleDeleteGroup(group.id)}>[Delete Group &apos;{group.name}&apos;]</button>
-            <br/><br/>
-
-            {/* Displays the forums in this group */}
-            {group.forumsInGroup.length > 0 ? (
+            {/* --- OWNERS, MODS, USERS --- */}
+            <div>
+              <h2><u>Owners</u></h2>
               <ul>
-                {group.forumsInGroup.map((forum) => (
-                  <li key={forum.id}>
-                    {/* Link to the forum (displays its posts) */}
-                    <Link href={`/community/${commName}/${forum.slug}`}>
-                      &gt;{forum.name}
+                {/* Display each owner */}
+                {community.ownerList.map((owner) => 
+                  <li key={owner.id}>
+                    <Link href={`/profile/${owner.id}`}>
+                      &gt;{owner.username || owner.id}
                     </Link>
-                    {/* -------- Delete Forum Button -------- */}
-                    <button style={{ marginLeft: "2rem" }} onClick={() => handleDeleteForum(forum.id)}>[Delete &apos;{forum.name}&apos;]</button>
+
+                    {/* If current user is an owner, display demote owner button */}
+                    {isOwner && owner.id !== user?.uid && (
+                      <button style={{ marginLeft: "0.5rem" }} onClick={() => handleDemoteOwner(owner.id)}>
+                        [Demote Owner]
+                      </button>
+                    )}
                   </li>
-                ))}
+                )}
               </ul>
-            ) : <p>No forums in this group.</p>}
 
-            {/* --- CREATE FORUM FORM --- */}
-            <div style={{ marginTop: "1rem" }}>
-              <h4>Create a new forum in {group.name}</h4>
-              {/* -------- Forum Name -------- */}
-              <input
-                type="text"
-                placeholder="Forum name"
-                value={forumInputs[group.id]?.name || ""}
-                onChange={(e) => setForumInputs((prev) => ({
-                  ...prev,
-                  [group.id]: { ...prev[group.id], name: e.target.value, message: "" },
-                }))}
-              />
-              {/* -------- Forum Description -------- */}
-              <input
-                type="text"
-                placeholder="Forum description"
-                value={forumInputs[group.id]?.description || ""}
-                onChange={(e) => setForumInputs((prev) => ({
-                  ...prev,
-                  [group.id]: { ...prev[group.id], description: e.target.value, message: "" },
-                }))}
-              />
-              {/* -------- Submit -------- */}
-              <button onClick={() => handleCreateForum(group.id)}>Create Forum</button>
-              {forumInputs[group.id]?.message && <p>{forumInputs[group.id].message}</p>}
-            </div>
-            <p>----------------------------------------------------------------------------------------------------------------------------------------------------------------</p>
+              <h2><u>Moderators</u></h2>
+              <ul>
+                {/* Display each moderator */}
+                {community.modList.map((mod) => 
+                  <li key={mod.id}>
+                    <Link href={`/profile/${mod.id}`}>
+                      &gt;{mod.username || mod.id}
+                    </Link>
+
+                    {/* If current user is an owner, display buttons to promote or demote a mod */}
+                    {isOwner && !community.ownerList.some(o => o.id === mod.id) && (
+                    <>
+                      <button style={{ marginLeft: "0.5rem" }} onClick={() => handlePromoteToOwner(mod.id)}>
+                        [Promote to Owner]
+                      </button>
+                      <button style={{ marginLeft: "0.5rem" }} onClick={() => handleDemoteMod(mod.id)}>
+                        [Demote Mod]
+                      </button>
+                    </>
+                    )}
+                  </li>
+                )}
+              </ul>
+
+              <h2><u>Users</u></h2>
+              <ul>
+                {/* Display each user */}
+                {community.userList.map((u) => 
+                <li key={u.id}>
+                  <Link href={`/profile/${u.id}`}>
+                    &gt;{u.username || u.id}
+                  </Link>
+
+                  {/* If current user is an owner, display buttons to promote user to a mod or owner */}
+                  {isOwner && !community.modList.some(m => m.id === u.id) && !community.ownerList.some(o => o.id === u.id) && (
+                  <>
+                    <button style={{ marginLeft: "0.5rem" }} onClick={() => handlePromoteToMod(u.id)}>
+                      [Promote to Mod]
+                    </button>
+                    <button style={{ marginLeft: "0.5rem" }} onClick={() => handlePromoteToOwner(u.id)}>
+                      [Promote to Owner]
+                    </button>
+                  </>
+                  )}
+                </li>
+                )}
+              </ul>
+
+              </div>
           </div>
-        ))}
-      </section>
+        </div>
 
-      {/* --- CREATE GROUP FORM --- */}
-      <div style={{ marginTop: "2rem" }}>
-        <h3>Create a new group in {commName}</h3>
-        <input type="text" value={groupName} onChange={(e) => setGroupName(e.target.value)} placeholder="Group name" />
-        <button onClick={handleCreateGroup}>Create Group</button>
-        {groupMessage && <p>{groupMessage}</p>}
-      </div>
+      <div className = {Styles.centerPage}>
+        <div className = {Styles.bannerBox}></div>
+        <div className = {Styles.titleBox}>
+          <div className = {Styles.serverIcon}></div>
+          <div className = {Styles.titleText}>{community.name}</div>
+          {/* If not member, show Join button, otherwise show Leave Button */}
+          {!isMember ? (
+            <button className = {Styles.joinCommunityButton} onClick={handleJoin}>[Join Community]</button>
+            ) : (
+            <button onClick={handleLeave}>[Leave Community]</button>
+          )}
+        </div>
+        <div className = {Styles.blackLine}> </div>
+        
+        <div style={{ padding: "1rem" }}>
+        {/* Displays community name and description */}
+        
+        <p style={{ marginTop: "1rem", marginLeft: "10%"}}>{community.description}</p>
 
-      <div style={{ marginTop: "2rem" }}>
-        <p>Logged in as: {user?.displayName || user?.email}</p>
+        
+
+        {/* If current user is an owner, show DELETE COMMUNITY button */}
+        {isOwner && (
+          <div style={{ marginTop: "1rem", marginLeft: "10%"}}>
+            <button onClick={() => handleDeleteComm(community.name)}>
+              [DELETE COMMUNITY]
+            </button>
+          </div>
+        )}
+
+
+        
+        
+
+        {/* --- CREATE GROUP FORM --- */}
+        <div style={{ marginTop: "2rem", marginLeft: "10%"}}>
+          <h3>Create a new group in {commName}</h3>
+          <input type="text" value={groupName} onChange={(e) => setGroupName(e.target.value)} placeholder="Group name" />
+          <button onClick={handleCreateGroup}>Create Group</button>
+          {groupMessage && <p>{groupMessage}</p>}
+        </div>
+
+        <div style={{ marginTop: "2rem", marginLeft: "10%"}}>
+          <p>Logged in as: {user?.displayName || user?.email}</p>
+        </div>
       </div>
     </div>
-    </div>
+  </div>
   );
 }
