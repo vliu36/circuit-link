@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import { getFunctions } from "firebase/functions";
 // import { connectAuthEmulator } from "firebase/auth";
 // import { connectFirestoreEmulator } from "firebase/firestore";
 // import { connectStorageEmulator } from "firebase/storage";
@@ -22,8 +23,10 @@ const db = getFirestore(app);
 
 const storage = getStorage(app, "gs://circuit-link"); // This uses our custom bucket
 
+const functions = getFunctions();
+
 // connectAuthEmulator(auth, "http://localhost:9099/");
 // connectFirestoreEmulator(db, "localhost", 8080);
 // connectStorageEmulator(storage, "localhost", 9199);
 
-export { app, auth, db, storage };
+export { app, auth, db, storage, functions };

@@ -1,5 +1,5 @@
 import env from "dotenv";
-import { db } from "./firebase.ts"
+import { db, bucket } from "./firebase.ts"
 import app from "./app.ts";
 
 env.config();
@@ -15,5 +15,15 @@ app.listen(port, () => {
 
 if (db.databaseId) {
     console.log(`Firestore db: ${db.databaseId} successfully initialized.`)
+}
+else {
+    console.error("ERROR: Failed to initialize database");
+}
+
+if (bucket.id) {
+    console.log(`Firebase storage bucket: ${bucket.id} successfully initialized.`)
+}
+else {
+    console.error("ERROR: Failed to initialize storage bucket");
 }
 

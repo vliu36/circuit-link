@@ -1,3 +1,5 @@
+// Temporary page to test image functionality
+
 "use client"
 
 import { useState } from "react";
