@@ -5,6 +5,7 @@ import repliesRouter from "./routes/replies.ts";
 import forumsRouter from "./routes/forums.ts";
 import postsRouter from "./routes/posts.ts";
 import usersRouter from "./routes/users.ts";
+import storageHandler from "./routes/storageHandler.ts";
 
 const app = express();
 app.use(cors({
@@ -18,5 +19,6 @@ app.use("/api/replies", repliesRouter)
 app.use("/api/forums", forumsRouter)
 app.use("/api/posts", postsRouter)
 app.use("/api/users", usersRouter)
+app.use("/api/storage", storageHandler)
 
 export default app;
