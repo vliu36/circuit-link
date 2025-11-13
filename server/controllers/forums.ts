@@ -1,10 +1,10 @@
-import { group } from "console";
-import { db } from "../firebase.ts"
+import { db, auth } from "../firebase.ts"
 import { Request, Response } from "express"
-import { FieldValue, Timestamp } from "firebase-admin/firestore";
+import { Timestamp } from "firebase-admin/firestore";
 import admin from "firebase-admin";
 import { DocumentReference } from "firebase-admin/firestore";
 import * as forumUtils from "./_utils/forumUtils.ts";
+import { cookieParser } from "./_utils/generalUtils.ts";
 
 // Retrieves all documents in Forums
 const getAllDocuments = async (req: Request, res: Response) => {
@@ -163,8 +163,23 @@ const getForumBySlug = async (req: Request, res: Response) => {
 const deleteForum = async (req: Request, res: Response) => {
     try {
         const { forumId } = req.params;
-        // TODO : Add authentication/authorization checks whether user is owner of forum, community or a mod
+        const { commName } = req.body;
 
+        // Verify and get userId from session cookie
+        const cookies = cookieParser(req);
+        const sessionCookie = cookies.session;
+        const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+        const userId = decodedClaims.uid; // Authenticated user's UID
+
+        if (!commName || !userId) {
+            console.log("No community or user provided.");
+            return res.status(400).send({
+                status: "Bad Request",
+                message: "Missing community name or user ID in request.",
+            });
+        }
+
+        // Verify forum exists
         const forumRef = db.collection("Forums").doc(forumId);
         const forumSnap = await forumRef.get();
         if (!forumSnap.exists) {
@@ -173,6 +188,40 @@ const deleteForum = async (req: Request, res: Response) => {
                 message: "Forum not found",
             });
         }
+
+        // Convert the name to lowercase
+        const nameLower = commName.toLowerCase();
+
+        // Find community by name
+        const commRef = db.collection("Communities");
+        const snapshot = await commRef.where("nameLower", "==", nameLower).get();
+        if (snapshot.empty) {
+            console.log(`No community found with name "${commName}".`);
+            return res.status(404).send({
+                status: "Not Found",
+                message: `No community found with name "${commName}".`,
+            });
+        }
+        console.log(`Found community "${commName}".`);
+
+        const doc = snapshot.docs[0];
+        const commData = doc.data();
+
+        // Check if requester is an owner or mod
+        const userRef = db.doc(`/Users/${userId}`)
+        const ownerList: FirebaseFirestore.DocumentReference[] = commData.ownerList || [];
+        const modList: FirebaseFirestore.DocumentReference[] = commData.modList || [];
+        let isOwner = ownerList.some(ref => ref.path === userRef.path);
+        let isMod = modList.some(ref=> ref.path === userRef.path);
+
+        if (!isOwner && !isMod) {
+            console.log(`User with ID ${userId} is unauthorized to delete this forum.`);
+            return res.status(403).send({
+                status: "Forbidden",
+                message: "You are not authorized to delete this forum.",
+            });
+        }
+        console.log(`Confirmed user with ID ${userId} is ${isOwner ? "an owner" : "a moderator"} of community "${commName}".`);
 
         const forumData = forumSnap.data();
 

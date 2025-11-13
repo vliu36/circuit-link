@@ -69,11 +69,13 @@ export async function createGroup( commName: string, name: string, userId: strin
 } // end createGroup
 
 // Delete a group by its ID
-export async function deleteGroup(groupId: string): Promise<{ status: string; message: string }> {
+export async function deleteGroup(groupId: string, commName: string): Promise<{ status: string; message: string }> {
     try {
         const res = await fetch(`${BASE_URL}/comm/delete-group/${groupId}`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ commName }),
+            credentials: "include"
         });
         const data = await res.json();
 
@@ -121,14 +123,15 @@ export async function createForum({ name, description, userId, groupId, commName
 } // end createForum
 
 // Delete a forum by its ID
-export async function deleteForum(forumId: string, userId: string): Promise<{ status: string; message: string }> {
+export async function deleteForum(forumId: string, commName: string): Promise<{ status: string; message: string }> {
     try {
         const res = await fetch(`${BASE_URL}/forums/delete/${forumId}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ userId }),
+            body: JSON.stringify({ commName }),
+            credentials: "include",
         });
         const data = await res.json();
 
