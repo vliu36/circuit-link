@@ -60,7 +60,7 @@ export default function CommunityPage({
   const handleDeleteGroup = async (groupId: string) => {
     if (!user) return;
     try {
-      const result = await commApi.deleteGroup(groupId);
+      const result = await commApi.deleteGroup(groupId, commName);
       console.log("Group deleted successfully:", result);
       await refreshCommunity();
     } catch (err) {
@@ -123,7 +123,7 @@ export default function CommunityPage({
   const handleDeleteForum = async (forumId: string) => {
     if (!user) return;
     try {
-      const result = await commApi.deleteForum(forumId, user.uid);
+      const result = await commApi.deleteForum(forumId, commName);
       console.log("Forum deleted successfully:", result);
       await refreshCommunity();
     } catch (err) {
