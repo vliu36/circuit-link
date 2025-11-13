@@ -19,15 +19,15 @@ export default function Landing() {
 
             <div className = {Styles.yourCommunitiesBar}>
                 <h1>  Your Communities</h1>
-                <button className = {Styles.communitiesButtons}>
+                <Link className = {Styles.communitiesButtons} href="/community">
                     <Image src = "plus.svg" className = {Styles.addIcon} alt="Add icon" width={5} height={5}></Image>
-                    <h1 className = {Styles.buttonTextforCommunities}>Add a Community</h1>
-                </button>
+                    <h1 className = {Styles.buttonTextforCommunities}>Create a Community</h1>
+                </Link>
             </div>
 
             <div className = {Styles.resourcesBar}>
                 <div className = {Styles.horizontalLine}></div>
-                <h1>  Resources</h1>
+                <h1> Resources</h1>
                 <Link className ={Styles.resourcesBarButtons} href = "./aboutus" replace>
                     <Image src = "/aboutUs.svg" className = {Styles.aboutUsIcon} alt="About us icon" width={5} height={5}></Image>
                     <h1 className = {Styles.buttonText}>About Circuit Link</h1>
@@ -62,7 +62,9 @@ export default function Landing() {
                 </div>
                 <div className = {Styles.logInInfo}>
                     <button>
-                        <Image src = "./notifBell.svg" alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
+                        <Link href="/profile/notifications">
+                            <Image src = "./notifBell.svg" alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
+                        </Link>
                     </button>
                     <div className = {Styles.dropdown}>
                         <button><img src = {user?.photoURL || "/circleUser.svg"} className = {Styles.settingsIcon} alt="User profile"></img></button>

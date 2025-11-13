@@ -127,3 +127,363 @@
     border-radius: 1em;
     background-color: rgb(184,184,184);
 }
+
+.yourCommunitiesBar{
+    background-color: rgb(11, 11, 44);
+    width: 20%;
+    height: 25vh;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 51px;
+    font-family: Inria Sans;
+    color: gray;
+    text-indent: 3%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.serverBar{
+    background-color: rgb(11, 11, 44);
+    width: 20%;
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    bottom: 0vw;
+    text-indent: 3%;
+    font-family: Inria Sans;
+    font-size: 25px;
+    color: rgb(255, 255, 255);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.serverContainer{
+    background-color: rgb(11, 11, 44);
+    width: 100%;
+    height: 65vh;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    bottom: 0vw;
+    font-family: Inria Sans;
+    font-size: 15px;
+    color: gray;
+}
+
+.channelText{
+    font-family: Inria Sans;
+    font-size: 15px;
+    color: rgb(255, 255, 255);
+    margin-left: 10px;
+}
+
+
+.horizontalLine{
+    background-color: #AAAAAA;
+    width: 95%;
+    height: 1px;
+    margin-left: 8px;
+}
+
+.horizontalLine1{
+    background-color: #AAAAAA;
+    width: 95%;
+    height: 1px;
+    margin-left: 8px;
+    margin-top: -1.1vh;
+    position: fixed;
+}
+
+.communitiesButtons{
+    width: 90%;
+    margin-left: 10px;
+    height: 50px;
+    display: flex;
+    flex-wrap: nowrap;
+    border-radius: 1em;
+}
+
+.addIcon{
+    background-color: rgb(168, 156, 156);
+    margin-top: 5px;
+    height: 40px;
+    width: 40px;
+    border-radius: 1em;
+}
+
+.buttonTextforCommunities{
+    text-align: left;
+    margin-top: 15px;
+    margin-left: 10px;
+    font-family: Inria Sans;
+    color: rgb(255, 255, 255);
+    position: relative;
+    font-size: 0.8rem;
+}
+
+.communitiesButtons:hover{
+    background-color: #394153;
+}
+
+.channelInfoBox{
+    background-color: rgb(11, 11, 44);
+    width: 20%;
+    height: 20vh;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 51px;
+    right: 0px;
+    font-family: Inria Sans;
+    color: gray;
+    text-indent: 3%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.channelInfoh1{
+    margin-top: 10px;
+    color: rgb(255, 255, 255);
+    font-size: 25px;
+}
+
+.usersText{
+    background-color: rgb(255, 255, 255);
+    font-size: 25px;
+    width: 100%;
+    height: 20vh;
+}
+
+.channelInfoh2{
+    margin-top: 10px;
+    font-size: 15px;
+    text-indent: 0%;
+    margin-left: 3%;
+}
+
+.UserContainer{
+    margin-left: 3%;
+    display: flex;
+    color: gray;
+    font-size: 17px;
+    
+}
+
+.userTextAlign{
+    margin-left: 3%;
+    margin-top: 4%;
+}
+
+.RightBar{
+    background-color: rgb(11, 11, 44);
+    width: 20%;
+    height: 75vh;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    right: 0px;
+    bottom: 0vw;
+    font-family: Inria Sans;
+    color: rgb(255, 255, 255);
+    font-size: 25px;
+    text-indent: 3%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.RulesBar{
+    width: 100%;
+    height: 45vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.usersBar{
+    background-color: rgb(11, 11, 44);
+    width: 100%;
+    height: 55vh;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    right: 0px;
+    bottom: 0vw;
+    font-family: Inria Sans;
+    color: rgb(255, 255, 255);
+    font-size: 25px;
+    text-indent: 3%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.navBox{
+    background-color: rgb(11, 11, 44);
+    width: 100%;
+    height: 51px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.communnitiesPage{
+    width: 60%;
+    height: calc(100vh - 51px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: absolute;
+    left:20vw;
+    top: 2.5vw;
+    display: flex;
+    flex-direction: column;
+    color: gray;
+    font-size: 20px;  
+}
+
+.centerPage{
+    width: 60%;
+    height: 94vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: absolute;
+    left:20vw;
+    top: 2.7vw;
+    display: flex;
+    flex-direction: column;
+    color: rgb(255, 255, 255);
+    font-size: 20px;
+    background-color: rgba(57, 65, 83, 1);
+    font-family: Inria Sans;
+}
+
+.bannerBox{
+    width: 100%;
+    min-height: 20vh;
+    max-height: 20vh;
+    background-color: rgba(217, 217, 217, 1);
+}
+
+.titleBox{
+    width: 100%;
+    height: 10vh;
+    display: flex;
+}
+
+.titleText{
+    margin-left: 3vh;
+    font-size: 2vw;
+}
+
+.serverIcon{
+    min-width: 13%;
+    min-height: 16vh;
+    max-height: 16vh;
+    background-color: rgb(0, 0, 0);
+    border-radius: 50%;
+    margin-top: -3.5vw;
+    margin-left: 4vw;
+}
+
+.blackLine{
+    width: 100%;
+    min-height: 2px;
+    max-height: 2px;
+    margin-top: 0.25%;
+    background-color: black;
+}
+
+.groupHeader{
+    width: 95%;
+    height: 2vh;
+    margin-left: 0.5%;
+    display: flex;
+}
+
+.groupName{
+    width: 72%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.deleteGroup{
+    width: 30%;
+    height: 100%;
+}
+
+.channelHeader{
+    width: 95%;
+    height: 2vh;
+    display:flex;
+}
+
+.channelName{
+    width: 65.5%;
+    height: 100%;
+    font-family: Inria Sans;
+    font-size: 15px;
+    color: rgb(255, 255, 255);
+    margin-left: 10px;
+    margin-left: 4%;
+    overflow: hidden;
+    
+}
+
+.deleteChannel{
+    width: 25%;
+    height: 100%;
+    font-family: Inria Sans;
+    font-size: 15px;
+    color: rgb(255, 255, 255);
+    margin-left: 10px;
+    margin-left: 4%;
+}
+
+.createForumContainer{
+    width: 100%;
+    height: 30vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.forumCreationInfomation{
+    margin-left: 10%;
+    background-color: rgb(19, 19, 19);
+    border-radius: 1em;
+    width: 80%;
+}
+
+.forumDescCreationInfomation{
+    margin-top: 1vh;
+    margin-left: 10%;
+    background-color: rgb(19, 19, 19);
+    border-radius: 1em;
+    width: 80%;
+}
+
+.createForumButton{
+    width: 25%;
+    margin-left: 35%;
+    margin-top: 1vh;
+    border-radius: 1em;
+    background-color: rgb(1, 92, 1);
+}
+
+.joinCommunityButton{
+    width: 15%;
+    height: 5vh;
+    border-radius: 1em;
+    margin-top: 0.25%;
+    margin-left: 45%;
+    background-color: rgb(15, 68, 167);
+}
+
+@font-face {
+  font-family: Jura;
+  src: url('../../../public/fonts/Jura-Light.ttf');
+}
+
+@font-face {
+  font-family: Inria Sans;
+  src: url('../../../public/fonts/InriaSans-Light.ttf');
+}

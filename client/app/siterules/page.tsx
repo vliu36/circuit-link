@@ -16,7 +16,7 @@ export default function SiteRules() {
                     <div className = {Styles.titleBoxLine}></div>
                 </div>
                 <div className = {Styles.innerBox}>
-                    <p>0. Please be nice, don't be rude.
+                    <p>0. Please be nice, don&apos;t be rude.
                     The first rule of Circuit Link is to never talk about Circuit Link.</p>
                 </div>
             </div>

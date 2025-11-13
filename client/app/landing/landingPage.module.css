@@ -81,6 +81,7 @@
     font-family: Inria Sans;
     color: gray;
     text-indent: 3%;
+
 }
 
 .horizontalLine{
@@ -138,6 +139,8 @@
 }
 
 .buttonTextforCommunities{
+    display: inline-block;
+    white-space: nowrap;
     text-align: left;
     margin-top: 15px;
     margin-left: 10px;
