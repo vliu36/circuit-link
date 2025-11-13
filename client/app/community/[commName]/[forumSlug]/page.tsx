@@ -197,7 +197,8 @@ export default function ForumPage({
                 {/* --- Posts List --- */}
                 
                 <div className = {styles.forumBox}>
-                <h2>Forum Posts</h2>
+                {/*<h2>Forum Posts</h2>*/}
+                <br></br>
                 {posts.length === 0 ? (
                     <p>No posts found in this forum.</p>
                 ) : (

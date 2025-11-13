@@ -395,7 +395,7 @@
 
 .groupHeader{
     width: 95%;
-    height: 2vh;
+    height: 5vh;
     margin-left: 0.5%;
     display: flex;
 }
@@ -407,7 +407,7 @@
 }
 
 .deleteGroup{
-    width: 30%;
+    width: 50%;
     height: 100%;
 }
 
@@ -425,18 +425,18 @@
     color: rgb(255, 255, 255);
     margin-left: 10px;
     margin-left: 4%;
-    overflow: hidden;
-    
 }
+/*Fixed the display for forum here by removing overflow, but now things move down when new forum is created*/
 
 .deleteChannel{
-    width: 25%;
+    width:50%;
     height: 100%;
     font-family: Inria Sans;
     font-size: 15px;
     color: rgb(255, 255, 255);
     margin-left: 10px;
     margin-left: 4%;
+    padding: auto
 }
 
 .createForumContainer{
@@ -467,6 +467,10 @@
     margin-top: 1vh;
     border-radius: 1em;
     background-color: rgb(1, 92, 1);
+}
+
+.createForumButton:hover{
+    background-color: green;
 }
 
 .joinCommunityButton{

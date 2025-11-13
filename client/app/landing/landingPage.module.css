@@ -81,7 +81,6 @@
     font-family: Inria Sans;
     color: gray;
     text-indent: 3%;
-
 }
 
 .horizontalLine{
@@ -113,12 +112,13 @@
 
 .buttonText{
     text-align: left;
-    margin-top: 11px;
+    margin-top: 10px;
     margin-left: 1px;
     font-family: Inria Sans;
     color: rgb(255, 255, 255);
     position: relative;
-    font-size: 0.8rem;
+    font-size: 16px;
+    width: 100%;
 }
 
 .communitiesButtons{
@@ -209,7 +209,7 @@
 .searchBarAlignment{
     position: absolute;
     top: 200px;
-    left: 5vw;
+    left: 4vw;
     width: 100%;
 }
 
