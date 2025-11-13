@@ -1,10 +1,10 @@
-import { group } from "console";
-import { db } from "../firebase.ts"
+import { db, auth } from "../firebase.ts"
 import { Request, Response } from "express"
-import { FieldValue, Timestamp } from "firebase-admin/firestore";
+import { Timestamp } from "firebase-admin/firestore";
 import admin from "firebase-admin";
 import { DocumentReference } from "firebase-admin/firestore";
 import * as forumUtils from "./_utils/forumUtils.ts";
+import { cookieParser } from "./_utils/generalUtils.ts";
 
 // Retrieves all documents in Forums
 const getAllDocuments = async (req: Request, res: Response) => {
@@ -163,7 +163,20 @@ const getForumBySlug = async (req: Request, res: Response) => {
 const deleteForum = async (req: Request, res: Response) => {
     try {
         const { forumId } = req.params;
-        // TODO : Add authentication/authorization checks whether user is owner of forum, community or a mod
+
+        // Verify and get userId from session cookie
+        const cookies = cookieParser(req);
+        const sessionCookie = cookies.session;
+        const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+        const userId = decodedClaims.uid; // Authenticated user's UID
+
+        if (!userId) {
+            console.log("No community or user provided.");
+            return res.status(400).send({
+                status: "Bad Request",
+                message: "Missing user ID in request.",
+            });
+        }
 
         const forumRef = db.collection("Forums").doc(forumId);
         const forumSnap = await forumRef.get();

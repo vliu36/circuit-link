@@ -74,6 +74,7 @@ export async function deleteGroup(groupId: string): Promise<{ status: string; me
         const res = await fetch(`${BASE_URL}/comm/delete-group/${groupId}`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
+            credentials: "include"
         });
         const data = await res.json();
 
@@ -128,7 +129,8 @@ export async function deleteForum(forumId: string, userId: string): Promise<{ st
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ userId }),
+            // body: JSON.stringify({ userId }),
+            credentials: "include",
         });
         const data = await res.json();
 

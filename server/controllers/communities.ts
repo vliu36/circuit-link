@@ -171,6 +171,20 @@ const deleteGroup = async (req: Request, res: Response) => {
     try {
         const { groupId } = req.params;
 
+        // Verify and get userId from session cookie
+        const cookies = cookieParser(req);
+        const sessionCookie = cookies.session;
+        const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+        const userId = decodedClaims.uid; // Authenticated user's UID
+
+        if (!userId) {
+            console.log("No community or user provided.");
+            return res.status(400).send({
+                status: "Bad Request",
+                message: "Missing user ID in request.",
+            });
+        }
+
         const groupRef = db.collection("Groups").doc(groupId);
         const groupSnap = await groupRef.get();
 
