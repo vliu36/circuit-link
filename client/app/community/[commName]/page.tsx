@@ -185,6 +185,7 @@ export default function CommunityPage({
   };
 
   const isMember = community.userList.some(u => u.id === user?.uid);
+  const isMod = community.modList.some(m => m.id === user?.uid);
   const isOwner = community.ownerList.some(o => o.id === user?.uid);
 
   return (
@@ -216,9 +217,12 @@ export default function CommunityPage({
               <div key={group.id} style={{ marginBottom: "2rem"}}>
                 <div className = {Styles.groupHeader}>
                   <div className = {Styles.groupName}>{group.name}</div>
-                  <button className = {Styles.deleteGroup} onClick={() => handleDeleteGroup(group.id)}>
-                    Delete Group
-                  </button>
+                  {/* Only displays if user is an owner or a mod */}
+                  {(isOwner || isMod) &&
+                    <button className = {Styles.deleteGroup} onClick={() => handleDeleteGroup(group.id)}>
+                      Delete Group
+                    </button>
+                  }
                 </div>
                 
 
@@ -234,7 +238,12 @@ export default function CommunityPage({
                         </Link>
                       </div>
                       {/* -------- Delete Forum Button -------- */}
-                      <button className = {Styles.deleteChannel} onClick={() => handleDeleteForum(forum.id)}>Delete Forum</button>
+                      {/* Only shows if user is owner or mod */}
+                      {(isOwner || isMod) && 
+                        <button className = {Styles.deleteChannel} onClick={() => handleDeleteForum(forum.id)}>
+                          Delete Forum
+                        </button>
+                      }
                     </div>
                     ))}
                     
@@ -380,9 +389,9 @@ export default function CommunityPage({
           <div className = {Styles.titleText}>{community.name}</div>
           {/* If not member, show Join button, otherwise show Leave Button */}
           {!isMember ? (
-            <button className = {Styles.joinCommunityButton} onClick={handleJoin}>[Join Community]</button>
+            <button className = {Styles.joinCommunityButton} onClick={handleJoin}>Join Community</button>
             ) : (
-            <button onClick={handleLeave}>[Leave Community]</button>
+            <button className={Styles.joinCommunityButton} onClick={handleLeave}>Leave Community</button>
           )}
         </div>
         <div className = {Styles.blackLine}> </div>
