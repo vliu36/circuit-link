@@ -8,11 +8,9 @@ import "./register.module.css";
 
 const provider = new GoogleAuthProvider();
 
-// ---- User Registration ---- //
+// ---- User Registration + Login ---- //                                                    
 export async function register(email: string, password: string, username: string) {
-    // e.preventDefault();
-
-    // const res = await fetch("https://api-circuit-link-160321257010.us-west2.run.app/api/users/register", {
+    // Register new user
     const res = await fetch("http://localhost:2400/api/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -22,65 +20,66 @@ export async function register(email: string, password: string, username: string
     const data = await res.json();
     // Check if the response is successful
     if (!res.ok) {
-        alert(data.message || "Failed to register user.");
-        return;
+        // alert(data.message || "Failed to register user.");
+        return { message: data.message || "Failed to register user" };
     } // end if
-    // Automatically log in the user after successful registration
-    const user = await signInWithEmailAndPassword(auth, email, password);
-    console.log("Registered user:", user);
 
-    // Redirect to main app page after successful registration and login
-    // window.location.href = "https://circuitlink-160321257010.us-west2.run.app" // TODO: uncomment when deployed
+    // Log in the user after successful registration
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+    const idToken = await user.getIdToken();
+
+    // Send token to backend to create session cookie
+    const loginRes = await fetch("http://localhost:2400/api/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken }),
+        credentials: "include"
+    })
+
+    if (!loginRes.ok) {
+        console.log("Login failed after registration.");
+        // alert("Login failed after registration.");
+        return { message: "Login failed after registration" };
+    }
+    
+    console.log("User registered and logged in successfully.")
     window.location.href = "http://localhost:3000/landing"
-
+    return { status: "ok", message:"User registered and logged in successfully", user};
 } // end function register
 
-// ---- Google Registration ---- //
+
+// ---- Login/Signup with Google (revised) ---- //
 export async function registerWithGoogle() {
     try {
-        const result = await signInWithPopup(auth, provider);
-        
-        // These weren't used
-        // // This gives you a Google Access Token. You can use it to access the Google API.
-        // const credential = GoogleAuthProvider.credentialFromResult(result);
-        // const token = credential?.accessToken;
+        const userCredential = await signInWithPopup(auth, provider);
+        const user = userCredential.user;
 
-        // Check if account already exists
-        const docSnap = await getDoc(doc(db, "Users", result.user.uid));
-        if (docSnap.exists()) {
-            console.log("Google user already exists in Firestore: ", result.user.email);
-            window.location.href = "http://localhost:3000/landing";
-            return; // Account exists, no need to register
-        } // end if
+        // Get Firebase ID token
+        const idToken = await user.getIdToken();
 
-        // Generate a default username since Google sign-in doesn't provide one
-        const now = new Date();
-        const day = String(now.getDate()).padStart(2, '0');
-        const hour = String(now.getHours()).padStart(2, '0');
-        const minute = String(now.getMinutes()).padStart(2, '0');
-        const defaultUsername = "User" + day + hour + minute;       // e.g., User231430 for 23rd at 14:30
-
-        // The signed-in user info.
-        const user = result.user;
-        console.log("Google user:", user);
-        
+        // Send to backend for verification/registration
         const res = await fetch("http://localhost:2400/api/users/register-google", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ uid: user.uid, email: user.email, username: defaultUsername }), // <--- include any extra data you want server-side
+            body: JSON.stringify({ idToken, photoURL: user.photoURL }),
+            credentials: "include"
         });
 
         const data = await res.json();
-        // Check if the response is successful
         if (!res.ok) {
-            alert(data.message || "Failed to register user with Google.");
-            return;
-        } // end if
-        
-        // alert(data.message); // placeholder, replace with better UI feedback
-        window.location.href = "http://localhost:3000/landing"
+            console.error("Google sign in failed:", data);
 
+            // alert(data.message || "Failed to sign in user with Google.");
+            return { status: "error", message: data.message || "Failed to sign in user with Google" };
+        } // end if
+        console.log("Google user signed in successfully:", data);
+        window.location.href = "http://localhost:3000/landing"
+        return { status: "ok", message: "Google login successful", user};
+        
     } catch (error) {
+        // console.error("Error during Google sign-in:", error.code, error.message);
+        // alert("Google sign-in failed: " + error.message);
         if (error instanceof FirebaseError) {
             const errorCode = error.code;
             const errorMessage = error.message;
@@ -88,10 +87,11 @@ export async function registerWithGoogle() {
             const credential = GoogleAuthProvider.credentialFromError(error); // AuthCredential type that was used
             
             console.error("Error during Google sign-in:", errorCode, errorMessage, email, credential);
-            alert("Error during Google sign-in: " + errorMessage);
+            // alert("Error during Google sign-in: " + errorMessage);
         } else {
             console.error("Unexpected error during Google sign-in:", error);
-            alert("An unexpected error occurred during sign-in.");
+            // alert("An unexpected error occurred during sign-in.");
         }
+        return { status: "error", message: "Google sign-in failed" };
     } // end try catch
-} // end function registerWithGoogle
+} // end function loginWithGoogle
