@@ -7,7 +7,6 @@ import { use, useEffect, useState } from "react";
 import styles from "./postPage.module.css";
 import NavBar from '../../../../_components/navbar/navbar.tsx';
 import { fetchStructure, createGroup, deleteGroup, createForum, deleteForum } from "../../../[commName]/community.ts";
-// import { Link } from "react-router-dom";
 import Link from 'next/link';
 
 export default function PostDetail({ params }: { params: Promise<{ commName: string; forumSlug: string; postId: string }> }) {
@@ -80,8 +79,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
         return (
             <div 
                 key={item.id} 
-                className={styles.replyCard} 
-                style={{ marginLeft: `${depth * 20}px` }}>
+                className={styles.replyCard}>
                 {/* If editing, show input fields instead */}
                 {editingId === item.id ? (
                     <div style={{ marginBottom: "10px" }}>
@@ -162,14 +160,16 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                             {/* Reply button; disabled (but not hidden) if max depth reached */}
                             
                         </div>
-
-                        <button 
-                                className={styles.replyButton} 
-                                onClick={() => setActiveReplyTo(activeReplyTo === item.id ? null : item.id)} 
-                                disabled={depth >= MAX_DEPTH - 1}
-                                >
-                                    Reply to this post
-                                </button>
+                        <div>
+                            <button 
+                                    className={styles.replyButton} 
+                                    onClick={() => setActiveReplyTo(activeReplyTo === item.id ? null : item.id)} 
+                                    disabled={depth >= MAX_DEPTH - 1}
+                                    >
+                                        Reply to this post
+                            </button>
+                        </div>
+                        
                             {/* Edit and Delete buttons, only shown if the current user is the author */}
                             {isOwner && (
                                 <>
@@ -189,6 +189,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                                     </button>
                                 </>
                             )}
+                            <div className={styles.darkline}></div>
                     </div>
                 )}
 
@@ -283,7 +284,18 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                 <NavBar/>
             </div>
             
-            <div className={styles.postsPage}>{renderPostOrReply(post)}</div>
+            
+            
+
+            <div className={styles.postsPage}>
+                <div className={styles.backDisplay}>
+                    <Link href={`/community/${commName}/${forumSlug}`}>
+                        Back
+                    </Link>
+                </div>
+                {renderPostOrReply(post)}
+                
+            </div>
         </div>
     );
 }
