@@ -1,3 +1,4 @@
+//NOTE: This page is shown upon signing in
 "use client"
 // import React, {useEffect, useState} from "react";
 import Styles from './landingPage.module.css';
@@ -19,15 +20,15 @@ export default function Landing() {
 
             <div className = {Styles.yourCommunitiesBar}>
                 <h1>  Your Communities</h1>
-                <Link className = {Styles.communitiesButtons} href="/community">
+                <button className = {Styles.communitiesButtons}>
                     <Image src = "plus.svg" className = {Styles.addIcon} alt="Add icon" width={5} height={5}></Image>
-                    <h1 className = {Styles.buttonTextforCommunities}>Create a Community</h1>
-                </Link>
+                    <h1 className = {Styles.buttonTextforCommunities}>Add a Community</h1>
+                </button>
             </div>
 
             <div className = {Styles.resourcesBar}>
                 <div className = {Styles.horizontalLine}></div>
-                <h1> Resources</h1>
+                <h1>  Resources</h1>
                 <Link className ={Styles.resourcesBarButtons} href = "./aboutus" replace>
                     <Image src = "/aboutUs.svg" className = {Styles.aboutUsIcon} alt="About us icon" width={5} height={5}></Image>
                     <h1 className = {Styles.buttonText}>About Circuit Link</h1>
@@ -55,16 +56,14 @@ export default function Landing() {
                 <h1>  Top Communities</h1>
             </div>
 
-            {/*<NavBar/>*/}
-            <div className = {Styles.navBox}>
+            <NavBar/>
+            {/*<div className = {Styles.navBox}>
                 <div className = {Styles.homeLogo}>
                     <Image src="./circuitlinklogowback.svg" alt="Logo" width={200} height={200}></Image>
                 </div>
                 <div className = {Styles.logInInfo}>
                     <button>
-                        <Link href="/profile/notifications">
-                            <Image src = "./notifBell.svg" alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
-                        </Link>
+                        <Image src = "./notifBell.svg" alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
                     </button>
                     <div className = {Styles.dropdown}>
                         <button><img src = {user?.photoURL || "/circleUser.svg"} className = {Styles.settingsIcon} alt="User profile"></img></button>
@@ -75,7 +74,7 @@ export default function Landing() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div>*/}
 
             <div className = {Styles.searchBarArea}>
                 <div className = {Styles.welcomeText}>

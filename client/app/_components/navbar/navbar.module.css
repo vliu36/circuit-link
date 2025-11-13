@@ -64,11 +64,12 @@
 }
 
 .dropdown:focus-within .dropdownMenu{
-    opacity: 0;
+    opacity: 1;
     pointer-events: auto;
 }
 
 .settingsIcon{
+    margin-top:5px;
     height: 40px;
     width: 40px;
     border-radius: 50%;

@@ -3,7 +3,14 @@
 import { httpsCallable, HttpsCallableResult } from "firebase/functions";
 import { functions } from "@/app/_firebase/firebase.ts";
 
-const generateUploadUrlRef = httpsCallable(functions, "generateUploadUrl");
+interface RequestData {
+  fileExtension: string | undefined;
+}
+
+interface ResponseData {
+  url: string;
+}
+const generateUploadUrlRef = httpsCallable<RequestData, ResponseData>(functions, "generateUploadUrl");
 
 // Takes an image file and uploads it to the cloud bucket
 export async function uploadImage(file: File) {
@@ -13,12 +20,12 @@ export async function uploadImage(file: File) {
         }
 
         // Invoke the cloud function to get a signed URL
-        const URLres: HttpsCallableResult<any> = await generateUploadUrlRef({
+        const URLres = await generateUploadUrlRef({
             fileExtension: file.name.split('.').pop()
         });
 
         // Upload the file using the signed URL
-        const uploadRes = await fetch(URLres?.data?.url, {
+        const uploadRes = await fetch(URLres.data.url, {
             method: "PUT",
             body: file,
             headers: {

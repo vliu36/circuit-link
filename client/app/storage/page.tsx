@@ -6,7 +6,7 @@ import { useState } from "react";
 import { uploadImage } from "./storageHandler.ts";
 import Image from "next/image";
 
-export default function storageTest() {
+export default function StorageTest() {
     const [image, setImage] = useState<FileList | null>();
     const [preview, setPreview] = useState<string>("");
 

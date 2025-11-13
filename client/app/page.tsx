@@ -1,3 +1,4 @@
+//This page appears when the user is not registered
 "use server"
 
 import Styles from './landingPage.module.css';
@@ -6,6 +7,8 @@ import Link from "next/link";
 import AuthButtons from './_components/navbar/authbuttons.tsx';
 import NavBar from './_components/navbar/navbar.tsx';
 import Image from "next/image";
+import SearchComponent from './search-component';
+import { Suspense } from 'react';
 
 export default async function Landing(props: {
     searchParams?: Promise<{
@@ -55,8 +58,8 @@ export default async function Landing(props: {
                 <h1>Top Communities</h1>
             </div>
 
-            {/*<NavBar/>*/}
-            <div className = {Styles.navBox}>
+            <NavBar/>
+            {/*<div className = {Styles.navBox}>
                 <Link href="/" replace>
                     <Image className = {Styles.homeLogo} src="/circuitlinklogowback.svg" width={200} height={50} alt="Circuit Link Logo"/>
                 </Link>
@@ -65,14 +68,18 @@ export default async function Landing(props: {
                     <h1 className = {Styles.orText}> or </h1>
                     <Link className = {Styles.logInSignUpButton} href="./register" replace> Sign Up </Link>
                 </div>
-            </div>
+            </div>*/}
 
             <div className = {Styles.searchBarArea}>
                 <div className = {Styles.welcomeText}>
-                    Welcome to Circuit Link
+                    Welcome to Circuit Link 
+                    <br></br>
+                    Please log in or sign up
                 </div>
                 <div className= {Styles.searchBarAlignment}>
+                <Suspense fallback={<div>Loading...</div>}>
                     <SearchBar/>
+                </Suspense>
                 </div>
             </div>
         </div>
