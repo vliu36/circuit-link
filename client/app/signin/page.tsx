@@ -111,7 +111,7 @@ export default function Login() {
             
             <div className = {Styles.lineBox}>
                 <div className = {Styles.lefthorizontalLine}></div>
-                <div className = {Styles.orBox}>OR</div>
+                <div className = {Styles.orBox}>or</div>
                 <div className = {Styles.righthorizontalLine}></div>
             </div>
             <br/>
@@ -121,8 +121,9 @@ export default function Login() {
                         width={40}
                         height={40}
                         alt="Sign up with Google"
+                        style={{marginLeft: '10px'}}
                 ></Image>
-                <button className = {Styles.signUpWithGoogleText} onClick={loginWithGoogle}>Log in with Google</button>
+                <button className = {Styles.signUpWithGoogleText} onClick={loginWithGoogle}>Sign in with Google</button>
             </div>
 
             <div className="registerLink">

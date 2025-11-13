@@ -100,7 +100,7 @@ export default function Registration() {
                 <button className={Styles.buttonBox} type="submit">Sign Up</button>
                 <div className = {Styles.lineBox}>
                     <div className = {Styles.lefthorizontalLine}></div>
-                    <div className = {Styles.orBox}>OR</div>
+                    <div className = {Styles.orBox}>or</div>
                     <div className = {Styles.righthorizontalLine}></div>
                 </div>
                 <button
@@ -108,16 +108,17 @@ export default function Registration() {
                     onClick={handleGoogleReg}>
                     <Image
                         src={googleIcon}
-                        width={40}
+                        width={30}
                         height={40}
                         alt="Sign up with Google"
+                        style={{marginLeft: '10px'}}
                     ></Image>
                     <h1 className = {Styles.signUpWithGoogleText}>Sign up with Google</h1>
                     </button>
             </form>
             
         </div>
-        <Link className={Styles.transparentButtonBox} href="../signin">Already have an account? Sign In</Link>
+        <Link className={Styles.transparentButtonBox} href="../signin"></Link>
     </div>
     );
 }
