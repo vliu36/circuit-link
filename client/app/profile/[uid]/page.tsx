@@ -70,7 +70,7 @@ export default function OtherProfile({ params }: { params: Promise<{ uid: string
 
     // If current user is viewing their own profile, redirect to /profile page
     if (otherId === user.uid) {
-        window.location.href = "https://circuitlink-160321257010.us-west2.run.app/profile";
+        window.location.href = "http://localhost:3000/profile";
         return null;
     }
 
