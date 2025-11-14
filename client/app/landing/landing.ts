@@ -6,14 +6,14 @@ export async function logout() {
         await auth.signOut();
         console.log("User signed out.");
         // Clear the session cookie
-        const res = await fetch("http://localhost:2400/api/users/logout", {
+        const res = await fetch("https://api-circuit-link-160321257010.us-west2.run.app/api/users/logout", {
             method: "POST",
             credentials: "include",
         })
         const data = await res.json();
         console.log( data.message );
 
-        window.location.href = "http://localhost:3000/"
+        window.location.href = "https://circuitlink-160321257010.us-west2.run.app/"
         return { status: "ok", message: "User signed out successfully", };
     } catch (err) {
         console.error("Error signing out:", err);
