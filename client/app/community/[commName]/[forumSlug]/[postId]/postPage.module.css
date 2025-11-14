@@ -493,7 +493,7 @@
     overflow-x: hidden;
     position: absolute;
     left:23vw;
-    top: 4vw;
+    top: 3vw;
     display: flex;
     flex-direction: column;
     color: gray;
@@ -509,4 +509,10 @@
     border: 1px solid white;
     color: white;
     font-size: 0.75vw;
+}
+
+@media screen and (max-width: 1550px) {
+  .postsPage{
+        top: 7%;
+    }
 }

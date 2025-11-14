@@ -20,20 +20,22 @@
 
 .background{
   background-color: rgb(57, 65, 83);
-  height:100vh;
+  height:90vh;
   width:100%;
+  overflow-y: hidden;
+  position: relative;
 }
 
 .box{
   display: flex;
   color: white;
   flex-direction: column;
-  width: 600px;
-  height: 500px;
+  width: 30%;
+  height: 60vh;
   background-color: rgb(91, 102, 128); 
   margin: 0;
   position: absolute;
-  top: 50%;
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
   border-radius: 5%;
@@ -79,17 +81,18 @@
   width: 40%;
   margin-left: 15%;
   font-family: 'Jura';
-  font-size: 12px;
+  font-size: 0.75vw;
 }
 
 .buttonBox{
-   height: 40px;
+   height: 4vh;
    width: 30%;
    margin-left: 35%;
    border-radius: 1em;
    background-color: #699DD8;
    font-family: 'Jura';
-   font-size: 23px;
+   font-size: 1vw;
+   overflow: hidden;
    border: 1px solid white;
 }
 
@@ -100,7 +103,7 @@
 
 .lineBox{
   margin-top: 5%;
-  height: 50%;
+  height: 5%;
   width: 100%;
   display: flex;
   flex-direction: row;
@@ -128,12 +131,12 @@
 .orBox{
   width: 10%;
   height: 2px;
-  font-size: 25px;
+  font-size: 1.5vw;
   color:white;
   margin-left: 5%;
+  margin-bottom: 3%;
   font-family: 'Jura';
   text-align: center;
-  margin-top: -10px;
 }
 
 .signUpWithGoogleButton{
@@ -147,12 +150,12 @@
    font-family: 'Roboto';
    display: flex;
    margin-top: 40px;
+   overflow: hidden;
 }
 
 .signUpWithGoogleText{
   margin-left: 25%;
-  margin-top: 1.0%;
-  font-size: 16px;
+  font-size: 1.5vw;
 }
 
 .transparentButtonBox{
@@ -162,45 +165,4 @@
    left: 43.75%;
    bottom: 15%;
    font-family: 'Jura';
-}
-
-@media(max-height: 800px){
-  .hint {
-    font-size: 0px;
-    color: #ffffff00;
-  }
-  .lineBox{
-    margin-top: 0%;
-    height: 17%;
-  }
-  .orBox{
-    margin-left: 0%;
-  }
-  .lefthorizontalLine{
-    width: 32.5%;
-    margin-right: 5%;
-  }
-
-  .righthorizontalLine{
-    width: 32.5%;
-    margin-left: 10%;
-  }
-
-  .signUpWithGoogleButton{
-   height: 12.5%;
-   font-size: 12px;
-  }
-
-  .transparentButtonBox{
-   height: 30px;
-   width: 50%;
-   position:absolute;
-   left: 38%;
-   bottom: 15%;
-  }
-
-  .buttonBox{
-    margin-left: 32.5%;
-    font-size: 15px;
-  }
 }

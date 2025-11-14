@@ -119,7 +119,7 @@ export default function ForumPage({
 
     return (
         <div className={styles.background}>
-            <div>
+            <div className = {styles.navBox}>
                 <NavBar/>
             </div>
 
