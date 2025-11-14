@@ -119,7 +119,7 @@ export default function ForumPage({
 
     return (
         <div className={styles.background}>
-            <div>
+            <div className = {styles.navBox}>
                 <NavBar/>
             </div>
 
@@ -197,7 +197,7 @@ export default function ForumPage({
                 {/* --- Posts List --- */}
                 
                 <div className = {styles.forumBox}>
-                <h2>Forum Posts</h2>
+                <div>Forum Posts</div>
                 {posts.length === 0 ? (
                     <p>No posts found in this forum.</p>
                 ) : (

@@ -9,6 +9,7 @@ import { User } from "firebase/auth";
 import { authStateCallback } from "@/app/_firebase/auth-observer.ts";
 import { useAuth } from "@/app/_firebase/context.tsx";
 import { logout } from '../../landing.ts';
+import homeIcon from '../../../public/circuitlinklogowback.jpg'
            
 export default function NavBar() {
     const [user, setUser] = useState<User | null>(null);
@@ -25,7 +26,13 @@ export default function NavBar() {
         <div className = {Styles.navBox}>
                 <div className = {Styles.navBox}>
                 <Link href="/" replace>
-                    <Image className = {Styles.homeLogo} src="/circuitlinklogowback.svg" width={200} height={50} alt="Circuit Link Logo"/>
+                    <Image 
+                        className = {Styles.homeLogo} 
+                        src={homeIcon}
+                        width={200} 
+                        height={50} 
+                        alt="Circuit Link Logo"
+                    />
                 </Link>
                 <div className = {Styles.logInInfo}>
                     <Link className = {Styles.logInSignUpButton} href="./signin" replace> Log In </Link>
@@ -38,7 +45,7 @@ export default function NavBar() {
         :(
             <div className = {Styles.navBox}>
                 <div className = {Styles.homeLogo}>
-                    <Image src="./circuitlinklogowback.svg" alt="Logo" width={200} height={200}></Image>
+                    <Image src={homeIcon} alt="Logo" width={200} height={200}></Image>
                 </div>
                 <div className = {Styles.logInInfo}>
                     <button>

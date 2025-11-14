@@ -190,9 +190,7 @@ export default function CommunityPage({
 
   return (
     <div className = {Styles.background}>
-      <div>
-        <NavBar/>
-      </div>
+      
 
       <div className = {Styles.yourCommunitiesBar}>
         <h1>Your Communities</h1>
@@ -205,7 +203,7 @@ export default function CommunityPage({
             
       <div className = {Styles.serverBar}>
         <div className = {Styles.horizontalLine}></div>
-        <h1>{commName}</h1>
+        <div>{commName}</div>
         <div className = {Styles.horizontalLine}></div>
         <div className = {Styles.serverContainer}>
           {/* --- GROUPS AND FORUMS --- */}
@@ -218,7 +216,8 @@ export default function CommunityPage({
                 <div className = {Styles.groupHeader}>
                   <div className = {Styles.groupName}>{group.name}</div>
                   {/* Only displays if user is an owner or a mod */}
-                  {(isOwner || isMod) &&
+                  {
+                    (isOwner || isMod) &&
                     <button className = {Styles.deleteGroup} onClick={() => handleDeleteGroup(group.id)}>
                       Delete Group
                     </button>
@@ -239,7 +238,7 @@ export default function CommunityPage({
                       </div>
                       {/* -------- Delete Forum Button -------- */}
                       {/* Only shows if user is owner or mod */}
-                      {(isOwner || isMod) && 
+                      { (isOwner || isMod) && 
                         <button className = {Styles.deleteChannel} onClick={() => handleDeleteForum(forum.id)}>
                           Delete Forum
                         </button>
@@ -429,6 +428,10 @@ export default function CommunityPage({
         </div>
       </div>
     </div>
+
+      <div className = {Styles.navBox}>
+        <NavBar/>
+      </div>
   </div>
   );
 }

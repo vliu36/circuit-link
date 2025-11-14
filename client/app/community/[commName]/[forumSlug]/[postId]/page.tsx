@@ -8,6 +8,9 @@ import styles from "./postPage.module.css";
 import NavBar from '../../../../_components/navbar/navbar.tsx';
 import { fetchStructure, createGroup, deleteGroup, createForum, deleteForum } from "../../../[commName]/community.ts";
 import Link from 'next/link';
+import thumbsUp from '../../../../../public/thumbs-up-regular-full.svg';
+import thumbsDown from '../../../../../public/thumbs-down-regular-full.svg';
+import Image from 'next/image'
 
 export default function PostDetail({ params }: { params: Promise<{ commName: string; forumSlug: string; postId: string }> }) {
     const { commName, forumSlug, postId } = use(params);
@@ -82,7 +85,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                 className={styles.replyCard}>
                 {/* If editing, show input fields instead */}
                 {editingId === item.id ? (
-                    <div style={{ marginBottom: "10px" }}>
+                    <div>
                         {/* Show title input if not editing a reply */}
                         {!isReply && 
                             <input 
@@ -140,14 +143,22 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                         <p className={styles.contents}>{item.contents}</p>
                         {/* Show metadata */}
                         
-
+                    <div className = {styles.buttonFormat}>
                         <div className={styles.actions}>
                             {/* Yay button; if the current user is in the yay list, show as active (green) */}
                             <button 
                                 className={`${styles.voteButton} ${user?.uid && item.yayList.includes(user.uid) ? styles.yayActive : ""}`} 
                                 onClick={() => handleVote(item.id, "yay", isReply)}
                             >
-                                👍
+                                <div className = {styles.votingIcon}>
+                                    <Image
+                                        src = {thumbsUp}
+                                        width = {40}
+                                        height = {40}
+                                        alt = "YAYS"
+                                    />
+                                </div>
+                                
                             </button>
                             <div className = {styles.yayscore}>{item.yayScore}</div>
                             {/* Nay button; if the current user is in the nay list, show as active (red) */}
@@ -155,24 +166,20 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                                 className={`${styles.voteButton} ${styles.dislikeButton} ${user?.uid && item.nayList.includes(user.uid) ? styles.nayActive : ""}`} 
                                 onClick={() => handleVote(item.id, "nay", isReply)}
                             >
-                                👎
+                                <Image
+                                    src = {thumbsDown}
+                                    width = {40}
+                                    height = {40}
+                                    alt = "YAYS"
+                                />
                             </button>
                             {/* Reply button; disabled (but not hidden) if max depth reached */}
                             
                         </div>
-                        <div>
-                            <button 
-                                    className={styles.replyButton} 
-                                    onClick={() => setActiveReplyTo(activeReplyTo === item.id ? null : item.id)} 
-                                    disabled={depth >= MAX_DEPTH - 1}
-                                    >
-                                        Reply to this post
-                            </button>
-                        </div>
                         
                             {/* Edit and Delete buttons, only shown if the current user is the author */}
                             {isOwner && (
-                                <>
+                                <div className = {styles.utilityButtons}>
                                     {/* Edit button */}
                                     <button 
                                         className={styles.editButton} 
@@ -187,15 +194,27 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                                     >
                                         Delete
                                     </button>
-                                </>
+                                </div>
                             )}
-                            <div className={styles.darkline}></div>
+                            
                     </div>
+                </div>
+
                 )}
+
+                <div>
+                    <button 
+                        className={styles.replyButton} 
+                        onClick={() => setActiveReplyTo(activeReplyTo === item.id ? null : item.id)} 
+                        disabled={depth >= MAX_DEPTH - 1}
+                    >
+                        Reply to this post
+                    </button>
+                </div>
 
                 {/* If the current item is being replied to */}
                 {activeReplyTo === item.id && (
-                    <div className={styles.replyBox}>
+                    <div className={styles.replyBox} >
                         {/* Show text area for reply */}
                         <textarea 
                             className={styles.replyInput} 
@@ -212,10 +231,12 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                         </button>
                     </div>
                 )}
+                
+                <div className={styles.darkline}></div>
 
                 {/* Render nested replies, if any */}
                 {"listOfReplies" in item && item.listOfReplies.length > 0 && (
-                    <div style={{ marginTop: "100px" }}>
+                    <div style={{ marginLeft: "2vw", width: "96%"}}>
                         {item.listOfReplies.map((r) => renderPostOrReply(r, depth + 1))}
                     </div>
                 )}

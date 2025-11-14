@@ -395,15 +395,22 @@
 
 .groupHeader{
     width: 95%;
-    height: 2vh;
-    margin-left: 0.5%;
+    height: 3vh;
+    margin-left: 1.1%;
+    font-size: 1vw;
     display: flex;
+    overflow:hidden;
+
 }
 
 .groupName{
     width: 72%;
     height: 100%;
     overflow: hidden;
+}
+
+.communityName{
+    
 }
 
 .deleteGroup{
@@ -413,30 +420,31 @@
 
 .channelHeader{
     width: 95%;
-    height: 2vh;
+    height: 4vh;
     display:flex;
+    flex-direction: row;
 }
 
 .channelName{
-    width: 65.5%;
+    width: 60%;
     height: 100%;
     font-family: Inria Sans;
-    font-size: 15px;
+    font-size: 1vw;
     color: rgb(255, 255, 255);
     margin-left: 10px;
     margin-left: 4%;
     overflow: hidden;
-    
 }
 
 .deleteChannel{
-    width: 25%;
+    width: 35%;
     height: 100%;
     font-family: Inria Sans;
-    font-size: 15px;
+    font-size: 1vw;
     color: rgb(255, 255, 255);
     margin-left: 10px;
     margin-left: 4%;
+
 }
 
 .createForumContainer{
