@@ -73,6 +73,8 @@ export default async function Landing(props: {
             <div className = {Styles.searchBarArea}>
                 <div className = {Styles.welcomeText}>
                     Welcome to Circuit Link 
+                    <br></br>
+                    Please log in or sign up
                 </div>
                 <div className= {Styles.searchBarAlignment}>
                 <Suspense fallback={<div>Loading...</div>}>

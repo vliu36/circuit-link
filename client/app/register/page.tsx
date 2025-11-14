@@ -5,7 +5,6 @@ import Styles from './register.module.css';
 import Image from 'next/image';
 import googleIcon from '../../public/googleIcon.png';
 import Link from "next/link";
-import NavBar from "../_components/navbar/navbar.tsx";
 
 export default function Registration() {
 
@@ -44,8 +43,6 @@ export default function Registration() {
     }
 
     return (
-    <div>
-        <NavBar/>
     <div className = {Styles.background}>
         <div className = {Styles.box}>
             <h1 className = {Styles.lblBox}>Sign Up</h1>
@@ -117,12 +114,11 @@ export default function Registration() {
                         style={{marginLeft: '10px'}}
                     ></Image>
                     <h1 className = {Styles.signUpWithGoogleText}>Sign up with Google</h1>
-                </button>
+                    </button>
             </form>
             
         </div>
         <Link className={Styles.transparentButtonBox} href="../signin"></Link>
-    </div>
     </div>
     );
 }

@@ -18,7 +18,7 @@ export default function StorageTest() {
 
                 const cloudUrl = uploadImage(file).then((result) => {
                     console.log(result);
-                    alert(result);
+                    alert(result?.url);
                 })
             }
             else {
