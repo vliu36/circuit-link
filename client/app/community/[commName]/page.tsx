@@ -190,9 +190,7 @@ export default function CommunityPage({
 
   return (
     <div className = {Styles.background}>
-      <div>
-        <NavBar/>
-      </div>
+      
 
       <div className = {Styles.yourCommunitiesBar}>
         <h1>Your Communities</h1>
@@ -428,6 +426,10 @@ export default function CommunityPage({
           <p>Logged in as: {user?.displayName || user?.email}</p>
         </div>
       </div>
+    </div>
+
+    <div className = {Styles.navBox}>
+        <NavBar/>
     </div>
   </div>
   );

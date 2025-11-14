@@ -117,7 +117,7 @@ export default function Registration() {
                         style={{marginLeft: '10px'}}
                     ></Image>
                     <h1 className = {Styles.signUpWithGoogleText}>Sign up with Google</h1>
-                    </button>
+                </button>
             </form>
             
         </div>
