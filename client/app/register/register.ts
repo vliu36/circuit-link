@@ -11,7 +11,7 @@ const provider = new GoogleAuthProvider();
 // ---- User Registration + Login ---- //                                                    
 export async function register(email: string, password: string, username: string) {
     // Register new user
-    const res = await fetch("http://https://api-circuit-link-160321257010.us-west2.run.app/api/users/register", {
+    const res = await fetch("https://api-circuit-link-160321257010.us-west2.run.app/api/users/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, username }), // <--- include any extra data you want server-side
@@ -30,7 +30,7 @@ export async function register(email: string, password: string, username: string
     const idToken = await user.getIdToken();
 
     // Send token to backend to create session cookie
-    const loginRes = await fetch("http://https://api-circuit-link-160321257010.us-west2.run.app/api/users/login", {
+    const loginRes = await fetch("https://api-circuit-link-160321257010.us-west2.run.app/api/users/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ idToken }),
@@ -44,7 +44,7 @@ export async function register(email: string, password: string, username: string
     }
     
     console.log("User registered and logged in successfully.")
-    window.location.href = "http://https://circuitlink-160321257010.us-west2.run.app/landing"
+    window.location.href = "https://circuitlink-160321257010.us-west2.run.app/landing"
     return { status: "ok", message:"User registered and logged in successfully", user};
 } // end function register
 
@@ -59,7 +59,7 @@ export async function registerWithGoogle() {
         const idToken = await user.getIdToken();
 
         // Send to backend for verification/registration
-        const res = await fetch("http://https://api-circuit-link-160321257010.us-west2.run.app/api/users/register-google", {
+        const res = await fetch("https://api-circuit-link-160321257010.us-west2.run.app/api/users/register-google", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ idToken, photoURL: user.photoURL }),
@@ -74,7 +74,7 @@ export async function registerWithGoogle() {
             return { status: "error", message: data.message || "Failed to sign in user with Google" };
         } // end if
         console.log("Google user signed in successfully:", data);
-        window.location.href = "http://https://circuitlink-160321257010.us-west2.run.app/landing"
+        window.location.href = "https://circuitlink-160321257010.us-west2.run.app/landing"
         return { status: "ok", message: "Google login successful", user};
         
     } catch (error) {

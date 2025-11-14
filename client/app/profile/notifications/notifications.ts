@@ -19,7 +19,7 @@ export async function respondToFriendRequest(requestRef: DocumentReference, acce
         const requestId = requestRef.id;
 
         // Send response to server
-        const response = await fetch(`http://https://api-circuit-link-160321257010.us-west2.run.app/api/users/respond-friend-request`, {
+        const response = await fetch(`https://api-circuit-link-160321257010.us-west2.run.app/api/users/respond-friend-request`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
