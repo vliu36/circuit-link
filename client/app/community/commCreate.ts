@@ -1,6 +1,6 @@
 // This is for functions that help with creating a community
 
-const BASE_URL = "http://localhost:2400/api/comm"
+const BASE_URL = "http://https://api-circuit-link-160321257010.us-west2.run.app/api/comm"
 
 // Creates a community
 export async function createCommunity(

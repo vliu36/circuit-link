@@ -15,7 +15,7 @@ export async function login(email: string, password: string) {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const idToken = await userCredential.user.getIdToken();
         // Send the ID token to the server for verification
-        const res = await fetch("http://localhost:2400/api/users/login", {
+        const res = await fetch("http://https://api-circuit-link-160321257010.us-west2.run.app/api/users/login", {
             method: "POST",
             credentials: "include",
             headers: { "Content-Type": "application/json"},
@@ -29,7 +29,7 @@ export async function login(email: string, password: string) {
         }
 
         console.log("")
-        window.location.href = "http://localhost:3000/landing"
+        window.location.href = "http://https://circuitlink-160321257010.us-west2.run.app/landing"
         return { status: "ok", message: "Login success."};
     } catch (error) {
         let msg: string;
@@ -64,7 +64,7 @@ export async function loginWithGoogle() {
         const idToken = await user.getIdToken();
 
         // Send to backend for verification/registration
-        const res = await fetch("http://localhost:2400/api/users/register-google", {
+        const res = await fetch("http://https://api-circuit-link-160321257010.us-west2.run.app/api/users/register-google", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ idToken, photoURL: user.photoURL }),
@@ -79,7 +79,7 @@ export async function loginWithGoogle() {
             return { status: "error", message: data.message || "Failed to sign in user with Google" };
         } // end if
         console.log("Google user signed in successfully:", data);
-        window.location.href = "http://localhost:3000/landing"
+        window.location.href = "http://https://circuitlink-160321257010.us-west2.run.app/landing"
         return { status: "ok", message: "Google login successful", user};
         
     } catch (error) {
