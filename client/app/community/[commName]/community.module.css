@@ -5,7 +5,7 @@
 }
 
 .background {
-    background-color: rgb(28, 38, 66);
+    background-color: rgba(57, 65, 83, 1);
     display: flex;
     width: 100%;
     height: 100vh;
@@ -393,11 +393,25 @@
     background-color: black;
 }
 
+.communityName{
+    width: 95%;
+    height: 3.25vh;
+    font-size: 1.4vw;
+}
+
+
 .groupHeader{
     width: 95%;
-    height: 2vh;
+    height: 3.25vh;
     margin-left: 0.5%;
+    font-size: 1vw;
     display: flex;
+}
+
+.createForumText{
+    width: 95%;
+    height: 2.5vh;
+    font-size: 1vw;
 }
 
 .groupName{
@@ -413,30 +427,32 @@
 
 .channelHeader{
     width: 95%;
-    height: 2vh;
+    height: 2.5vh;
     display:flex;
+    font-size: 0.75vw;
+    margin-top: 1px;
 }
 
 .channelName{
     width: 65.5%;
     height: 100%;
     font-family: Inria Sans;
-    font-size: 15px;
+
     color: rgb(255, 255, 255);
     margin-left: 10px;
     margin-left: 4%;
     overflow: hidden;
-    
+
 }
 
 .deleteChannel{
     width: 25%;
     height: 100%;
     font-family: Inria Sans;
-    font-size: 15px;
     color: rgb(255, 255, 255);
     margin-left: 10px;
     margin-left: 4%;
+    overflow: hidden;
 }
 
 .createForumContainer{
@@ -451,6 +467,7 @@
     background-color: rgb(19, 19, 19);
     border-radius: 1em;
     width: 80%;
+    font-size: 1vw;
 }
 
 .forumDescCreationInfomation{
@@ -459,14 +476,16 @@
     background-color: rgb(19, 19, 19);
     border-radius: 1em;
     width: 80%;
+    font-size: 1vw;
 }
 
 .createForumButton{
-    width: 25%;
-    margin-left: 35%;
+    width: 32%;
+    margin-left: 30%;
     margin-top: 1vh;
     border-radius: 1em;
     background-color: rgb(1, 92, 1);
+    font-size: 1vw;
 }
 
 .joinCommunityButton{

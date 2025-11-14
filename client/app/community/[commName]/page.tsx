@@ -203,8 +203,9 @@ export default function CommunityPage({
             
       <div className = {Styles.serverBar}>
         <div className = {Styles.horizontalLine}></div>
-        <h1>{commName}</h1>
+        <div className = {Styles.communityName}>{commName}</div>
         <div className = {Styles.horizontalLine}></div>
+        
         <div className = {Styles.serverContainer}>
           {/* --- GROUPS AND FORUMS --- */}
           <section>
@@ -250,7 +251,7 @@ export default function CommunityPage({
 
                 {/* --- CREATE FORUM FORM --- */}
                 <div className = {Styles.createForumContainer} style={{ marginTop: "1rem" }}>
-                  <h4>Create a new forum in {group.name}</h4>
+                  <div className = {Styles.createForumText}>Create a new forum in {group.name}</div>
 
                   {/* -------- Forum Name -------- */}
                   <input
@@ -427,10 +428,10 @@ export default function CommunityPage({
         </div>
       </div>
     </div>
-
     <div className = {Styles.navBox}>
-        <NavBar/>
+      <NavBar/>
     </div>
+    
   </div>
   );
 }
