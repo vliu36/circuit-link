@@ -2,12 +2,14 @@
 import React from "react";
 import Styles from "./aboutus.module.css";
 import Link from "next/link";
+import NavBar from "../_components/navbar/navbar.tsx";
 
 export default function AboutUs() {
     
     return (
+        <div>
+            <NavBar/>
         <div className = {Styles.background}>
-            
             <div className = {Styles.pageDoc}>
                 <h1 className = {Styles.heading1}>About Us</h1>
                 <br/>
@@ -38,6 +40,7 @@ export default function AboutUs() {
             <Link className = {Styles.returnButton} href = "./landing" replace>
                 <h1 className = {Styles.returnButtonText}>Return</h1>
             </Link>
+        </div>
         </div>
     );
 }

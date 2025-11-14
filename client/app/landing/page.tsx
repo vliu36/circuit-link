@@ -17,7 +17,7 @@ export default function Landing() {
     return (
     
         <div className = {Styles.background}>
-
+            
             <div className = {Styles.yourCommunitiesBar}>
                 <h1>  Your Communities</h1>
                 <button className = {Styles.communitiesButtons}>

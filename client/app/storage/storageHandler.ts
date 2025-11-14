@@ -1,7 +1,8 @@
 // Functions that handle storage upload and download
 
 import { httpsCallable, HttpsCallableResult } from "firebase/functions";
-import { functions } from "@/app/_firebase/firebase.ts";
+import { functions, storage } from "@/app/_firebase/firebase.ts";
+import { getDownloadURL, ref } from "firebase/storage";
 
 interface RequestData {
   fileExtension: string | undefined;
@@ -33,10 +34,29 @@ export async function uploadImage(file: File) {
             },
         });
         
-        return uploadRes;
+        // Extracts the filepath from the return url
+        const filepath = uploadRes?.url.substring(64,123);
+        return filepath;
     }
     catch (err) {
         console.error(err);
+    }
+}
+
+// Takes the file name of an image in the cloud bucket and retrieves the download url
+export async function downloadMediaImage(fileName: string) {
+    try {
+        if (fileName) {
+            throw Error("Image download failed: FileName cannot be empty.");
+        }
+
+        const imageRef = ref(storage, `media/images/${fileName}`)
+        const res = await getDownloadURL(imageRef).then((result) => {
+            return result;
+        });
+    }
+    catch (err) {
+        return err;
     }
 }
 
@@ -76,18 +96,4 @@ export async function uploadImage(file: File) {
 //             })
 //             .save(filepath);
 //     });
-// }
-
-// Download a video or image from the cloud bucket
-// path: string - The relative path of the media in the firebase cloud storage bucket
-// export async function downloadMedia(path: string) {
-//     try {
-//         const mediaRef = ref(storage, path);
-//         await getBytes(mediaRef).then((result) => {
-//             return result;
-//         });
-//     }
-//     catch (err) {
-//         console.error(err);
-//     }
 // }
