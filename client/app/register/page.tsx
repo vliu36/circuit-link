@@ -51,7 +51,7 @@ export default function Registration() {
             <h1 className = {Styles.lblBox}>Sign Up</h1>
             <form onSubmit={handleSubmitReg}>
                 <label className = {Styles.smallBox}>
-                    Username
+                    Username:
                     <input
                     className = {Styles.txtBox} 
                     type="text" 
@@ -67,7 +67,7 @@ export default function Registration() {
                     
                 
                 <label className = {Styles.smallBox}>
-                    Email
+                    Email:
                     <input 
                     className = {Styles.txtBox}
                     type="email" 
@@ -77,7 +77,7 @@ export default function Registration() {
                     <p className={Styles.blankHint}>   </p>
                 </label>
                 <label className = {Styles.smallBox}>
-                    Password
+                    Password:
                     <input 
                     id = "password"
                     className={Styles.txtBox}
@@ -111,12 +111,12 @@ export default function Registration() {
                     onClick={handleGoogleReg}>
                     <Image
                         src={googleIcon}
-                        width={30}
+                        width={40}
                         height={40}
                         alt="Sign up with Google"
                         style={{marginLeft: '10px'}}
                     ></Image>
-                    <h1 className = {Styles.signUpWithGoogleText}>Sign up with Google</h1>
+                    <h1 className = {Styles.signUpWithGoogleText}>Sign in with Google</h1>
                 </button>
             </form>
             

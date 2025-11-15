@@ -203,11 +203,7 @@ export default function CommunityPage({
             
       <div className = {Styles.serverBar}>
         <div className = {Styles.horizontalLine}></div>
-<<<<<<< HEAD
-        <div>{commName}</div>
-=======
         <div className = {Styles.communityName}>{commName}</div>
->>>>>>> 44803f0486e3970a6b6f7bfd9915f0fcf8f77e8e
         <div className = {Styles.horizontalLine}></div>
         
         <div className = {Styles.serverContainer}>
@@ -433,17 +429,10 @@ export default function CommunityPage({
         </div>
       </div>
     </div>
-<<<<<<< HEAD
-
-      <div className = {Styles.navBox}>
-        <NavBar/>
-      </div>
-=======
     <div className = {Styles.navBox}>
       <NavBar/>
     </div>
     
->>>>>>> 44803f0486e3970a6b6f7bfd9915f0fcf8f77e8e
   </div>
   );
 }
