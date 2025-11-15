@@ -9,11 +9,14 @@ import { User } from "firebase/auth";
 import { authStateCallback } from "@/app/_firebase/auth-observer.ts";
 import { useAuth } from "@/app/_firebase/context.tsx";
 import { logout } from '../../landing.ts';
-import homeIcon from '../../../public/circuitlinklogowback.jpg'
+import HomeLogo from '../../../public/circuitlinklogowback.svg'
+import ProfilePic from '../../../public/circleUser.svg'
+import notificationBell from '../../../public/notifBell.svg'
            
 export default function NavBar() {
     const [user, setUser] = useState<User | null>(null);
-
+    const [open, setOpen] = useState(false);
+    
     useEffect(() => {
         const unsubscribe = authStateCallback((user) => {
             setUser(user);
@@ -26,13 +29,7 @@ export default function NavBar() {
         <div className = {Styles.navBox}>
                 <div className = {Styles.navBox}>
                 <Link href="/" replace>
-                    <Image 
-                        className = {Styles.homeLogo} 
-                        src={homeIcon}
-                        width={200} 
-                        height={50} 
-                        alt="Circuit Link Logo"
-                    />
+                    <Image className = {Styles.homeLogo} src={HomeLogo} width={200} height={50} alt="Circuit Link Logo"/>
                 </Link>
                 <div className = {Styles.logInInfo}>
                     <Link className = {Styles.logInSignUpButton} href="./signin" replace> Log In </Link>
@@ -45,19 +42,21 @@ export default function NavBar() {
         :(
             <div className = {Styles.navBox}>
                 <div className = {Styles.homeLogo}>
-                    <Image src={homeIcon} alt="Logo" width={200} height={200}></Image>
+                    <Image src={HomeLogo} alt="Logo" width={200} height={200}></Image>
                 </div>
                 <div className = {Styles.logInInfo}>
                     <button>
-                        <Image src = "./notifBell.svg" alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
+                        <Image src = {notificationBell} alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
                     </button>
                     <div className = {Styles.dropdown}>
-                        <button><img src = {user?.photoURL || "/circleUser.svg"} className = {Styles.settingsIcon} alt="User profile"></img></button>
-                        <div className = {Styles.dropdownMenu}>
-                            <Link href = "./profile" replace>Profile</Link>
-                            <button>Settings</button>
-                            <button onClick={logout}>Log Out</button>
-                        </div>
+                        <button><img src = {user?.photoURL || ProfilePic} className = {Styles.settingsIcon} alt="User profile" onClick={() => setOpen(prev => !prev)}></img></button>
+                        {open && (
+                            <div className={Styles.dropdownMenu}>
+                                <Link href="./profile" replace>Profile</Link>
+                                <button>Settings</button>
+                                <button onClick={logout}>Log Out</button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

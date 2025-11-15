@@ -121,7 +121,8 @@ const userRegistrationGoogle = async (req: Request, res: Response) => {
             httpOnly: true,
             secure: true,
             maxAge: expiresIn,
-            sameSite: "lax",
+            // sameSite: "lax",
+            sameSite: "none",
         });
         console.log("Created session cookie for user: ", uid);
 
@@ -214,7 +215,8 @@ const userLogin = async (req: Request, res: Response) => {
             httpOnly: true,
             secure: true,
             maxAge: expiresIn,
-            sameSite: "lax",
+            //sameSite: "lax",
+            sameSite: "none",
         });
         console.log("Created session cookie for user:", uid);
 
@@ -333,7 +335,8 @@ const logoutUser = async (req: Request, res: Response) => {
         res.clearCookie("session", {
             httpOnly: true,
             secure: true,
-            sameSite: "lax",
+            // sameSite: "lax",
+            sameSite: "none",
         });
         console.log("Logout successful");
         res.status(200).json({ message: "Logout successful" });
@@ -539,4 +542,5 @@ export {
     sendFriendRequest,
     respondToFriendRequest,
     removeFriend,
+
 }

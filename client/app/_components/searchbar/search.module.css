@@ -14,16 +14,15 @@
     font-size: 20px;
     font-family: Inria Sans;
     width: 50%
-
 }
 
 .searchbar input::placeholder {
-    color: #D9D9D9;
+    color: #5A5454;
 }
 
 .searchResult {
-    background-color: #5B6680;
-    color: #D9D9D9;
+    background-color: #FFFFFF;
+    color: #5A5454;
     font-size: 20px;
     width: 50%;
     box-sizing: border-box;
