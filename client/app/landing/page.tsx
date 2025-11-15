@@ -27,7 +27,7 @@ export default function Landing() {
             </div>
 
             <div className = {Styles.resourcesBar}>
-                <div className = {Styles.horizontalLine}></div>
+                {/*<div className = {Styles.horizontalLine}></div>*/}
                 <h1>  Resources</h1>
                 <Link className ={Styles.resourcesBarButtons} href = "./aboutus" replace>
                     <Image src = "/aboutUs.svg" className = {Styles.aboutUsIcon} alt="About us icon" width={5} height={5}></Image>

@@ -9,7 +9,7 @@
 }
 
 .background {
-    background-color: rgb(57, 65, 83);
+    background-color: #D0E0EB;
     width: 100%;
     height: 100vh;
     font-family: Inria Sans;
@@ -42,50 +42,63 @@
 }
 
 .yourCommunitiesBar{
-    background-color: rgb(11, 11, 44);
+    background-color: #FFFFFF;
+    border: 3px #D9D9D9;
+    border-radius: 0.5em;
     width: 20%;
-    height: 60vh;
+    height: 50vh;
     display: flex;
     flex-direction: column;
     position: absolute;
-    top: 51px;
-    font-family: Inria Sans;
-    color: gray;
+    left: 1em;
+    top: 3.8em;
+    font-family: Jura;
+    font-weight: bold;
+    color: #5A5454;
     text-indent: 3%;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .resourcesBar{
-    background-color: rgb(11, 11, 44);
+    background-color: #FFFFFF;
     width: 20%;
     height: 35vh;
     display: flex;
     flex-direction: column;
     position: absolute;
-    bottom: 0vw;
-    font-family: Inria Sans;
-    color: gray;
+    left: 1em;
+    bottom: 2vw;
+    border: 3px #D9D9D9;
+    border-radius: 0.5em;
+    font-family: Jura;
+    font-weight: bold;
+    color: #5A5454;
+    padding: 2px;
     text-indent: 3%;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
-
+/*
 .horizontalLine{
     background-color: #AAAAAA;
     width: 95%;
     height: 1px;
     margin-left: 8px;
-}
+}*/
 
 .resourcesBarButtons{
     width: 90%;
     margin-left: 10px;
     height: 40px;
-    background-color: rgb(11, 11, 44);
+    background-color: #F0F0F0;
+    color: #5A5454;
     display: flex;
     flex-wrap: nowrap;
+    margin-top: 0.3em;
     border-radius: 1em;
 }
 
 .resourcesBarButtons:hover{
-    background-color: #394153;
+    background-color: #D9D9D9;
 }
 
 .aboutUsIcon{
@@ -98,8 +111,8 @@
     text-align: left;
     margin-top: 10px;
     margin-left: 1px;
-    font-family: Inria Sans;
-    color: rgb(255, 255, 255);
+    font-family: Jura;
+    color: #5A5454;
     position: relative;
     font-size: 0.8rem;
     width:100%;
@@ -126,8 +139,9 @@
     text-align: left;
     margin-top: 15px;
     margin-left: 10px;
-    font-family: Inria Sans;
-    color: rgb(255, 255, 255);
+    font-family: Jura;
+    font-weight: bold;
+    color: #5A5454;
     position: relative;
     font-size: 0.8rem;
 }
@@ -137,64 +151,84 @@
 }
 
 .topUsersBar{
-    background-color: rgb(11, 11, 44);
+    background-color: #FFFFFF;
+    color: #5A5454;
     width: 20%;
-    height: 50vh;
+    height: 35vh;
     display: flex;
     flex-direction: column;
     position: absolute;
-    top: 51px;
-    right: 0px;
-    font-family: Inria Sans;
+    top: 3.8em;
+    right: 1em;
+    font-family: Jura;
+    font-weight: bold;
     color: gray;
     text-indent: 3%;
+    border: 3px #D9D9D9;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .topCommunitiesBar{
-    background-color: rgb(11, 11, 44);
+    background-color: #FFFFFF;
+    color: #5A5454;
     width: 20%;
     height: 45vh;
     display: flex;
     flex-direction: column;
     position: absolute;
-    right: 0px;
-    bottom: 0vw;
-    font-family: Inria Sans;
+    right: 1em;
+    bottom: 3em;
+    font-family: Jura;
+    font-weight: bold;
     color: gray;
     text-indent: 3%;
+    border: 3px #D9D9D9;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
+/*This controls the center box with "welcome" and the search area*/
 .searchBarArea{
     width: 40%;
-    height: 45vh;
+    height: 60vh;
     position: absolute;
-    top: 15vw;
+    top: 5vw;
     left: 30vw;
-    font-size: 40px;
+    font-size: 4vh;
     text-align: center;
     display: flex;
     flex-direction: column;
+    margin-top: 1em;
+    background-color: #FFFFFF;
+    border-radius: 1em;
+    color: #5A5454;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .welcomeText{
     width: 100%;
     height: 6vh;
+    font-size: 3vh;
     font-family: Jura;
-    color: rgb(255,255,255);
+    color: #5A5454;
 }
 
 .usernameText{
     width: 100%;
     height: 10vh;
+    font-size: 4vh;
     font-family: Jura;
-    color: rgb(255,255,255);
+    color: #5A5454;
 }
 
 .searchBarAlignment{
     position: absolute;
-    top: 200px;
-    left: 5vw;
-    width: 100%;
+    top: 3em;
+    left: 7vw;
+    width: 80%;
+    color: #5A5454;
+    background-color: #FFFFFF;
 }
 
 .navBox{
@@ -244,7 +278,7 @@
 }
 
 .dropdownMenu {
-    background-color: #5B6680;
+    background-color: #FFFFFF;
     width: 150px;
     height: 150px;
     right: 0px;
@@ -255,7 +289,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: white;
+    color: #FFFFFF;
 }
 
 .dropdownMenu:hover{
