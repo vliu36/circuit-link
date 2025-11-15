@@ -268,3 +268,52 @@
   margin-left: 5%;
   font-family: 'Jura';
 }
+
+/* Overlay that darkens the background */
+.popupOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+/* The actual popup box */
+.popupBox {
+  background-color: #5B6680;
+  padding: 2rem;
+  border-radius: 1em;
+  width: 300px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  text-align: center;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+.popupBox form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.popupText{
+    color: darkgrey;
+}
+
+.openBtn, .closeBtn {
+  background-color: #699DD8;
+  border: none;
+  color: white;
+  border-radius: 8px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.closeBtn {
+  background-color: #555;
+  margin-top: 10px;
+}

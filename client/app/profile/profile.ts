@@ -1,7 +1,8 @@
-import { auth, db, storage } from "../_firebase/firebase";
+import { auth, db, storage, app, functions } from "../_firebase/firebase";
 import { updateProfile, sendEmailVerification } from "firebase/auth";
 import { doc, DocumentReference, getDoc, updateDoc } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 // Interface for updatedData in function editProfile
 interface updatedData {
@@ -128,19 +129,52 @@ export async function editProfile(username: string, profileDesc: string, textSiz
 // Update profile picture
 export async function uploadProfilePicture(file: File) {
     try {
-        // Create storage reference for the file
-        const fileRef = ref(storage, `profiles/${file.name}`);
-        const snapshot = await uploadBytes(fileRef, file);
-        const downloadURL = await getDownloadURL(snapshot.ref);
-        console.log("Profile picture uploaded. URL:", downloadURL);
+        // Ask Cloud Function for a signed upload URL
+        const fileExtension = file.name.split('.').pop()?.toLowerCase();
+
+        const generateUploadUrl = httpsCallable(functions, "generateUploadUrl");
+        const result = await generateUploadUrl({ fileExtension });
+
+        const { url, fileName } = result.data as {
+            url: string;
+            fileName: string;
+        };
+
+        // Upload file directly to Google Cloud Storage using the signed URL
+        await fetch(url, {
+            method: "PUT",
+            headers: { "Content-Type": file.type },
+            body: file,
+        })
+
+        // Build final public file path
+        const finalPublicPath = `media/images/${fileName}`;
+
+        // Construct CDN URL for display
+        const publicUrl = `https://storage.googleapis.com/circuit-link.firebasestorage.app/${finalPublicPath}`;
 
         // Update user's profile in auth
-        await updateProfile(auth.currentUser!, { photoURL: downloadURL });
-
+        await updateProfile(auth.currentUser!, { photoURL: publicUrl });
         // Update user's document in Firestore
         const userDocRef = doc(db, "Users", auth.currentUser!.uid);
-        await updateDoc(userDocRef, { photoURL: downloadURL });
-        // return downloadURL;
+        await updateDoc(userDocRef, { photoURL: publicUrl });
+
+        console.log("Profile picture uploaded. URL:", publicUrl);
+        return publicUrl;
+
+        // // Create storage reference for the file
+        // const fileRef = ref(storage, `profiles/${file.name}`);
+        // const snapshot = await uploadBytes(fileRef, file);
+        // const downloadURL = await getDownloadURL(snapshot.ref);
+        // console.log("Profile picture uploaded. URL:", downloadURL);
+
+        // // Update user's profile in auth
+        // await updateProfile(auth.currentUser!, { photoURL: downloadURL });
+
+        // // Update user's document in Firestore
+        // const userDocRef = doc(db, "Users", auth.currentUser!.uid);
+        // await updateDoc(userDocRef, { photoURL: downloadURL });
+        // // return downloadURL;
     } catch (error) {
         console.error("Error uploading profile picture:", error);
         throw error;
