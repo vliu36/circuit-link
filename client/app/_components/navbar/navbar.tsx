@@ -42,10 +42,10 @@ export default function NavBar() {
                 </div>
                 <div className = {Styles.logInInfo}>
                     <button>
-                        <Image src = "./notifBell.svg" alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
+                        <Image src = "./notification.svg" alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
                     </button>
                     <div className = {Styles.dropdown}>
-                        <button><img src = {user?.photoURL || "/circleUser.svg"} className = {Styles.settingsIcon} alt="User profile"></img></button>
+                        <button><Image src = {user?.photoURL || "/circleUser.svg"} className = {Styles.settingsIcon} alt="User profile" width = {10} height = {10}></Image></button>
                         <div className = {Styles.dropdownMenu}>
                             <Link href = "./profile" replace>Profile</Link>
                             <button>Settings</button>
