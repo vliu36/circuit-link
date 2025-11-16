@@ -81,7 +81,7 @@ export default function NavBar() {
         !user ?(
         <div className = {Styles.navBox}>
                 <Link href = "http://localhost:3000/landing" replace>
-                    <Image className = {Styles.homeLogo} src="/circuitlinklogowback.svg" width={200} height={50} alt="Circuit Link Logo"/>
+                    <Image className = {Styles.homeLogo} src="./CircuitLinkHomeLogo.svg" width={200} height={50} alt="Circuit Link Logo"/>
                 </Link>
                 <div className = {Styles.logInInfo}>
                     <Link className = {Styles.logInSignUpButton} href="./signin" replace> Log In </Link>
@@ -94,7 +94,7 @@ export default function NavBar() {
             <div className = {Styles.navBox}>
                 {/*else , if a user is signed in*/}
                 <Link href = "http://localhost:3000/landing" replace>
-                    <Image className = {Styles.homeLogo} src="./circuitlinklogowback.svg" alt="Logo" width={200} height={200}>
+                    <Image className = {Styles.homeLogo} src="./CircuitLinkHomeLogo.svg" alt="Logo" width={200} height={200}>
                     </Image>
                 </Link>
                 <div className = {Styles.logInInfo}>
