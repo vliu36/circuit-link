@@ -596,8 +596,11 @@ export default function CommunityPage({
         </div>
       </div>
     </div>
-    <div className = {Styles.navBox}>
-      <NavBar/>
+
+      <div className = {Styles.navBox}>
+        <NavBar/>
+      </div>
+      
     </div>
     {/* --- EDIT COMMUNITY POPUP --- */}
     {editOpen && (
