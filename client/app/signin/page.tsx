@@ -35,6 +35,8 @@ export default function Login() {
 
     // ---- HTML ---- //
     return (
+    <div>
+        <NavBar/>    
     <main>
         <div className={Styles.background}>
             <div className={Styles.loginContainer}>

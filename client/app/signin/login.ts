@@ -29,7 +29,7 @@ export async function login(email: string, password: string) {
         }
 
         console.log("")
-        window.location.href = "http://localhost:3000/landing"
+        window.location.href = "http://localhost:3000"
         return { status: "ok", message: "Login success."};
     } catch (error) {
         let msg: string;
@@ -79,7 +79,7 @@ export async function loginWithGoogle() {
             return { status: "error", message: data.message || "Failed to sign in user with Google" };
         } // end if
         console.log("Google user signed in successfully:", data);
-        window.location.href = "http://localhost:3000/landing"
+        window.location.href = "http://localhost:3000"
         return { status: "ok", message: "Google login successful", user};
         
     } catch (error) {

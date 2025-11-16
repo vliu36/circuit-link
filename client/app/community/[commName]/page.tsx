@@ -3,7 +3,7 @@
 import React, { use, useState, useEffect } from "react";
 import Styles from "./community.module.css";
 import { useAuth } from "../../_firebase/context.tsx";
-import { logout } from "../../landing/landing.ts";
+import { logout } from "../../landing.ts";
 import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -591,15 +591,13 @@ export default function CommunityPage({
             {groupMessage && <p>{groupMessage}</p>}
           </div>
 
-          <div style={{ marginTop: "2rem", marginLeft: "10%"}}>
-            <p>Logged in as: {user?.displayName || user?.email}</p>
-          </div>
+        <div style={{ marginTop: "2rem", marginLeft: "10%"}}>
+          <p>Logged in as: {user?.displayName || user?.email}</p>
         </div>
       </div>
-
-        <div className = {Styles.navBox}>
-          <NavBar/>
-        </div>
+    </div>
+    <div className = {Styles.navBox}>
+      <NavBar/>
     </div>
     {/* --- EDIT COMMUNITY POPUP --- */}
     {editOpen && (

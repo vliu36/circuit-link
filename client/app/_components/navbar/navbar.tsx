@@ -8,8 +8,10 @@ import { useEffect, useState } from "react";
 import { User } from "firebase/auth";
 import { authStateCallback } from "@/app/_firebase/auth-observer.ts";
 import { useAuth } from "@/app/_firebase/context.tsx";
-import { logout } from '../../landing.ts';
-import homeIcon from '../../../public/circuitlinklogowback.jpg'
+import { logout } from '../../OldDefault/landing.ts';
+import HomeLogo from '../../../public/circuitlinklogowback.svg'
+import ProfilePic from '../../../public/circleUser.svg'
+import notificationBell from '../../../public/notifBell.svg'
            
 export default function NavBar() {
     const [user, setUser] = useState<User | null>(null);
@@ -24,30 +26,28 @@ export default function NavBar() {
     return (
         !user ?(
         <div className = {Styles.navBox}>
-                <div className = {Styles.navBox}>
+            <div style={{gridArea: 'Home'}}>
                 <Link href="/" replace>
-                    <Image 
-                        className = {Styles.homeLogo} 
-                        src={homeIcon}
-                        width={200} 
-                        height={50} 
-                        alt="Circuit Link Logo"
-                    />
+                    <Image className = {Styles.homeLogo} src={HomeLogo} width={200} height={50} alt="Circuit Link Logo"/>
                 </Link>
-                <div className = {Styles.logInInfo}>
+            </div>
+                
+            <div className = {Styles.logInInfo} style={{gridArea: 'login'}}>
                     <Link className = {Styles.logInSignUpButton} href="./signin" replace> Log In </Link>
                     <h1 className = {Styles.orText}> or </h1>
                     <Link className = {Styles.logInSignUpButton} href="./register" replace> Sign Up </Link>
-                </div>
             </div>
+            <div className={Styles.line} style={{gridArea: 'line'}}></div>
         </div>
         )
         :(
             <div className = {Styles.navBox}>
-                <div className = {Styles.homeLogo}>
-                    <Image src={homeIcon} alt="Logo" width={200} height={200}></Image>
+                <div className = {Styles.homeLogo} style={{gridArea: 'Home'}}>
+                    <Link href="/" replace>
+                        <Image src={HomeLogo} alt="Logo" width={200} height={200}></Image>
+                    </Link>
                 </div>
-                <div className = {Styles.logInInfo}>
+                <div className = {Styles.logInInfo} style={{gridArea: 'login'}}>
                     <button>
                         <Image src = "./notifBell.svg" alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
                     </button>
@@ -60,6 +60,7 @@ export default function NavBar() {
                         </div>
                     </div>
                 </div>
+                <div className={Styles.line} style={{gridArea: 'line'}}></div>
             </div>
             
         )
