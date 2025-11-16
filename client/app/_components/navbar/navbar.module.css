@@ -22,7 +22,7 @@
 }
 
 .logInSignUpButton{
-    background-color: #3F6DA1;
+    background-color: #D0E0EB;
     height: 32px;
     width: 80px;
     border-radius: 1em;
@@ -44,8 +44,23 @@
     right: 128px;
 }
 
+.notifDropdownMenu {
+    background-color: #EDEDED;
+    width: 150px;
+    height: 150px;
+    right: 0px;
+    border-radius: 1em;
+    position: relative;
+    right:50px;
+    opacity: 1;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: rgb(0,0,0);
+}
 .dropdownMenu {
-    background-color: #5B6680;
+    background-color: #EDEDED;
     width: 150px;
     height: 150px;
     right: 0px;
@@ -56,7 +71,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: rgb(255,255,255);
+    color: rgb(0,0,0);
 }
 
 .dropdownMenu:hover{
@@ -68,6 +83,10 @@
     pointer-events: auto;
 }
 
+.dropdown:focus-within .notifDropdownMenu{
+    opacity: 1;
+    pointer-events: auto;
+}
 .settingsIcon{
     margin-top:5px;
     height: 40px;
@@ -82,4 +101,5 @@
     border-radius: 1em;
     background-color: rgb(255,255,255);
     margin-left: 10px;
+    margin-top:10px;
 }

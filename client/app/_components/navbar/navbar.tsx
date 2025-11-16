@@ -12,8 +12,24 @@ import { logout } from '../../landing.ts';
            
 export default function NavBar() {
     const [user, setUser] = useState<User | null>(null);
+    const [isNotifOpen, setIsNotifOpen] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const notifRef = useRef<HTMLDivElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+                setIsNotifOpen(false);
+             }
+        }
+        if (isNotifOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isNotifOpen]);
 
     useEffect(() => {
         const unsubscribe = authStateCallback((user) => {
@@ -37,6 +53,30 @@ export default function NavBar() {
         };
     }, [isDropdownOpen]);
 
+    useEffect(() => {
+        function handleProfileClickOutside(event: MouseEvent) {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+                setIsDropdownOpen(false);
+            }
+        }
+        if (isDropdownOpen) {
+            document.addEventListener("mousedown", handleProfileClickOutside);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleProfileClickOutside);
+        };
+    }, [isDropdownOpen]);
+
+    const toggleNotif = () => {
+        setIsNotifOpen(prev => !prev);
+        setIsDropdownOpen(false); // Close profile
+    };
+
+    const toggleProfile = () => {
+        setIsDropdownOpen(prev => !prev);
+        setIsNotifOpen(false); // Close notifs
+    };
+
     return (
         !user ?(
         <div className = {Styles.navBox}>
@@ -52,21 +92,30 @@ export default function NavBar() {
         )
         :(
             <div className = {Styles.navBox}>
+                {/*else , if a user is signed in*/}
                 <Link href = "http://localhost:3000/landing" replace>
                     <Image className = {Styles.homeLogo} src="./circuitlinklogowback.svg" alt="Logo" width={200} height={200}>
                     </Image>
                 </Link>
                 <div className = {Styles.logInInfo}>
-                    <button>
-                        <Image src = "./notification.svg" alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
-                    </button>
+                    <div className = {Styles.notifDropdown} ref = {notifRef}>
+                        <button onClick={() => setIsNotifOpen(prev => !prev)}>
+                             <Image src = "./notification.svg" alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
+                        </button>
+                          {isNotifOpen && (
+                            <div className = {Styles.notifDropdownMenu}>
+                                <Link href = "http://localhost:3000/profile/notifications" replace>Notifications</Link>
+                            </div>
+                            )}
+                    </div>
+
                     <div className = {Styles.dropdown} ref = {dropdownRef}>
                         <button onClick={() => setIsDropdownOpen(prev => !prev)}>
                             <Image src = {user?.photoURL || "/circleUser.svg"} className = {Styles.settingsIcon} alt="User profile" width = {10} height = {10}></Image>
                         </button>
                           {isDropdownOpen && (
                             <div className = {Styles.dropdownMenu}>
-                                <Link href = "./profile" replace>Profile</Link>
+                                <Link href = "http://localhost:3000/profile" replace>Profile</Link>
                                 <button>Settings</button>
                                 <button onClick={logout}>Log Out</button>
                             </div>
