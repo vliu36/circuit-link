@@ -758,7 +758,12 @@
     background-color: #45a049;
 }
 
-
+.mediaPreview {
+    max-width: 100%;
+    max-height: 200px;
+    margin-top: 1rem;
+    border-radius: 0.5em;
+}
 
 @font-face {
   font-family: Jura;

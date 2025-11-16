@@ -3,9 +3,9 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../_firebase/context.tsx";
-import { use } from "react";
+import { use, useRef } from "react";
 import Link from "next/link";
-import { fetchPostsByForum, createPost, editPost, deletePostById, votePost, editForum } from "./forum.ts";
+import { fetchPostsByForum, createPost, editPost, deletePostById, votePost, editForum, getMediaUrl } from "./forum.ts";
 import styles from "./forumPage.module.css";
 import { Post, Forum } from "../../../_types/types.ts";
 import { useCallback } from "react";
@@ -13,6 +13,8 @@ import NavBar from '../../../_components/navbar/navbar.tsx';
 import { Community } from "../../../_types/types.ts";
 import { useRouter } from "next/navigation";
 import { fetchStructure } from "../community.ts";
+import { uploadImage, uploadVideo } from "../../../_utils/mediaUpload.ts";
+import Image from "next/image";
 
 export default function ForumPage({
     params,
@@ -36,6 +38,9 @@ export default function ForumPage({
 
     const [editPopup, setEditPopup] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
+    const [mediaFile, setMediaFile] = useState<File | null>(null);
+    const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
     const router = useRouter();
 
     // Toggle edit forum popup
@@ -88,13 +93,35 @@ export default function ForumPage({
         if (!title || !contents) return alert("Please fill out title and contents");
 
         try {
-            const msg = await createPost(user.uid, title, contents, commName, forumSlug);
+
+            const res = await getMediaUrl(mediaFile);
+            const mediaUrl = res.media || null;
+
+            const msg = await createPost(
+                user.uid, 
+                title, 
+                contents, 
+                commName, 
+                forumSlug,
+                mediaUrl,
+            );
+
             console.log(msg);
             setTitle("");
             setContents("");
+            setMediaFile(null);
+            setMediaPreview(null);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+            }
             fetchPosts();
         } catch (err) {
-            console.error(err);
+            console.log(err);
+            if (err instanceof Error) {
+                alert(`Failed to add post: ${err.message}`);
+            } else {
+                alert("Failed to add post due to an unknown error.");
+            }
         }
     };
 
@@ -161,6 +188,12 @@ export default function ForumPage({
             setMessage("An error occurred while editing the forum.");
         }
     }
+
+    const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+        setMediaFile(file);
+        if (file) setMediaPreview(URL.createObjectURL(file));
+    };    
 
     return (
         <main>
@@ -244,7 +277,18 @@ export default function ForumPage({
                                 onChange={(e) => setTitle(e.target.value)}
                                 className={styles.input}
                             />
-
+                            <div className={styles.input}>
+                                {mediaPreview && (
+                                    <img src={mediaPreview} alt="Media preview" className={styles.mediaPreview} />
+                                )}
+                                <input
+                                    type="file"
+                                    accept="image/*,video/*"
+                                    ref={fileInputRef}
+                                    onChange={handleMediaChange}
+                                    className={styles.input}
+                                />
+                            </div>
                             <textarea
                                 placeholder="Post Contents"
                                 value={contents}
@@ -312,8 +356,21 @@ export default function ForumPage({
                                             {/* Post title and contents, linked to the post details page */}
                                             <Link href={`/community/${commName}/${forumSlug}/${post.id}`}>
                                                 <h3 className={styles.title}>{post.title}</h3>
-                                                <p className={styles.contents}>{post.contents}</p>
                                             </Link>
+                                            {/* Display media if available */}
+                                            {post.media && (
+                                                <div className={styles.mediaPreview}>
+                                                    {post.media.endsWith(".mp4") ? (
+                                                        <video controls>
+                                                            <source src={post.media} type="video/mp4" />
+                                                        </video>
+                                                    ) : (
+                                                        <Image src={post.media} alt="Post Media" width={500} height={300} />
+                                                    )}
+                                                </div>
+                                            )}
+                                            
+                                            <p className={styles.contents}>{post.contents}</p>
 
                                             {/* ---- Post metadata ---- */}
                                             {/* Post author */}

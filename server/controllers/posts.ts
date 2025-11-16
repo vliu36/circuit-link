@@ -64,6 +64,7 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
             contents,
             commName,   // Community name
             forumSlug,  // Forum slug
+            media       // Optional media URL
         } = req.body;
 
         const authorRef = db.doc(`/Users/${author}`);
@@ -149,6 +150,7 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
             parentCommunity: commRef,
             parentGroup: parentGroupRef,
             parentForum: forumRef,
+            media: media || null,
         };
 
         // Add to Posts collection

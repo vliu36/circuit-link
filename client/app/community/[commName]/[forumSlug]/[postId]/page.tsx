@@ -139,6 +139,22 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
 
                         {/* If the item has a title (only posts have this) shows title */}
                         {"title" in item && <h2 className={styles.title}>{item.title}</h2>}
+                        {/* If the item has media (only posts have this) display media */}
+                        {"media" in item && item.media && (
+                            // If media ends with .mp4, render video tag, else render image tag
+                            item.media.endsWith(".mp4") ? (
+                                <div className={styles.mediaContainer}>
+                                    <video controls className={styles.postMedia}>
+                                        <source src={item.media} type="video/mp4" />
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            ) : (
+                                <div className={styles.mediaContainer}>
+                                    <Image src={item.media} alt="Post media" width={200} height={200} className={styles.postMedia} />
+                                </div>
+                            )
+                        )}
                         {/* Show content of post or reply */}
                         <p className={styles.contents}>{item.contents}</p>
                         {/* Show metadata */}
