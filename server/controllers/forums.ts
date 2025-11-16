@@ -122,6 +122,7 @@ const addDoc = async (req: Request, res: Response) => {
 const getForumBySlug = async (req: Request, res: Response) => {
     try {
         const { commName, forumSlug } = req.params;
+        const { sortMode } = req.body; 
 
         // Locate community 
         const community = await forumUtils.getCommunityByName(commName);
@@ -155,7 +156,7 @@ const getForumBySlug = async (req: Request, res: Response) => {
 
         // Retrieve and format posts 
         const postRefs: DocumentReference[] = forumData.postsInForum || [];
-        const sortedPosts = await forumUtils.getFormattedPosts(postRefs);
+        const sortedPosts = await forumUtils.getFormattedPosts(postRefs, sortMode || "newest");
 
         // Return combined data 
         res.status(200).json({

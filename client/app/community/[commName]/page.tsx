@@ -35,6 +35,13 @@ export default function CommunityPage({
   const [bannerOpen, setBannerOpen] = useState(false);
   const [editGroupOpen, setEditGroupOpen] = useState(false);
 
+  // Files and previews for changing icon and banner
+  const [iconFile, setIconFile] = useState<File | null>(null);
+  const [iconPreview, setIconPreview] = useState<string | null>(null);
+  const [bannerFile, setBannerFile] = useState<File | null>(null);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+
+
   // setEditGroupDetails
   const [editGroupId, setEditGroupId] = useState<string>("");
 
@@ -44,9 +51,11 @@ export default function CommunityPage({
   }
   const toggleIconPopup = () => {
     setIconOpen(!iconOpen);
+    setError(null);
   };
   const toggleBannerPopup = () => {
     setBannerOpen(!bannerOpen);
+    setError(null);
   };
 
   const toggleEditGroupPopup = () => {
@@ -76,8 +85,6 @@ export default function CommunityPage({
     const result = await commApi.createGroup(commName, groupName);
     setGroupMessage(result.message);
     setGroupName("");
-    // Refresh community structure after creating a group
-    // commApi.fetchStructure(commName).then((data) => data && setCommunity(data));
     refreshCommunity();
   };
   
@@ -239,6 +246,46 @@ export default function CommunityPage({
       }
     } catch (err) {
       console.error("Error editing group:", err);
+    }
+  };
+
+  // Handle file selection
+  const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setIconFile(file);
+    if (file) setIconPreview(URL.createObjectURL(file));
+  };
+
+  const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setBannerFile(file);
+    if (file) setBannerPreview(URL.createObjectURL(file));
+  };
+
+  // Handle file submission
+  const submitIcon = async () => {
+    if (!iconFile) return;
+    try {
+      await commApi.changeCommunityIcon(iconFile, community.id);
+      toggleIconPopup();
+      setIconFile(null);
+      setIconPreview(null);
+      await refreshCommunity();
+    } catch (err) {
+      console.error("Failed to upload icon:", err);
+    }
+  };
+
+  const submitBanner = async () => {
+    if (!bannerFile) return;
+    try {
+      await commApi.changeCommunityBanner(bannerFile, community.id);
+      toggleBannerPopup();
+      setBannerFile(null);
+      setBannerPreview(null);
+      await refreshCommunity();
+    } catch (err) {
+      console.error("Failed to upload banner:", err);
     }
   };
 
@@ -446,9 +493,64 @@ export default function CommunityPage({
           </div>
 
         <div className = {Styles.centerPage}>
-          <div className = {Styles.bannerBox}></div>
+          <div className = {Styles.bannerBox}>
+            {/* --- COMMUNITY BANNER --- -------- Click on banner, if mod/owner, to change the banner */}
+            {(isOwner || isMod) ? (
+              <button  
+                className={Styles.bannerBox}
+                onClick={toggleBannerPopup}
+                style={{ padding: 0, border: 'none', background: 'none', display: 'inline-block' }}
+              >
+                <Image 
+                  src={community.banner} 
+                  alt="Community Banner" 
+                  width={800} 
+                  height={200} 
+                  className={Styles.bannerBox}
+                  style={{ display: 'block' }}
+                />
+              </button>
+            ) : (
+              <Image
+                src={community.banner} 
+                alt="Community Banner" 
+                width={800} 
+                height={200} 
+                className={Styles.bannerBox}
+              />
+            )}
+
+          </div>
           <div className = {Styles.titleBox}>
-            <div className = {Styles.serverIcon}></div>
+            {/* --- COMMUNITY ICON --- -------- Click on image, if mod/owner, to change the icon */}
+            <div className = {Styles.serverIcon}>
+              {/* If user is an owner or mod, allow them to change the icon */}
+              {isOwner || isMod ? (
+                <button 
+                  className={Styles.editIconButton} 
+                  onClick={toggleIconPopup} 
+                  style={{ padding: 0, border: 'none', background: 'none' }}
+                >
+                  <Image
+                    src={community.icon || "/default_icon.png"}
+                    alt="Community Icon"
+                    width={80}
+                    height={80}
+                    className={Styles.serverIcon}
+                  />
+                </button>
+              ) : (
+                // Otherwise, just display the icon
+                <Image
+                  src={community.icon}
+                  alt="Community Icon"
+                  width={80}
+                  height={80}
+                  className={Styles.serverIcon}
+                />
+              )}
+
+            </div>
             <div className = {Styles.titleText}>
               {community.name || commName}
               {/* Button that toggles edit community popup */}
@@ -561,6 +663,7 @@ export default function CommunityPage({
         <div className={Styles.popupOverlay} onClick={toggleEditGroupPopup}>
             <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
                 <h2 className={Styles.popupText}>Edit Group</h2>
+                
                 {/* Form for editing the group */}
                 <form onSubmit={async (e) => {
                   e.preventDefault();
@@ -592,6 +695,55 @@ export default function CommunityPage({
                 </button>
             </div>
         </div>
+    )}
+    {/* --- ICON POPUP --- */}
+    {iconOpen && (
+      <div className={Styles.popupOverlay} onClick={toggleIconPopup}>
+        <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
+          <h2 className={Styles.popupText}>Change Community Icon</h2>
+
+          {/* Preview the uploaded image */}
+          {iconPreview && (
+            <div style={{ marginBottom: "1rem" }}>
+              <Image src={iconPreview} alt="Preview Icon" width={80} height={80} />
+            </div>
+          )}
+
+          {/* File upload input and buttons to change the icon or close the popup */}
+          <input type="file" accept="image/*" className={Styles.inputField} onChange={handleIconChange} />
+          <button className={`${Styles.saveBtn} ${Styles.popupText}`} onClick={submitIcon}>
+            Save Icon
+          </button>
+          <button className={`${Styles.closeBtn} ${Styles.popupText}`} onClick={toggleIconPopup}>
+            Close
+          </button>
+        </div>
+      </div>
+    )}
+
+    {/* --- BANNER POPUP --- */}
+    {bannerOpen && (
+      <div className={Styles.popupOverlay} onClick={toggleBannerPopup}>
+        <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
+          <h2 className={Styles.popupText}>Change Community Banner</h2>
+          
+          {/* Preview the uploaded image */}
+          {bannerPreview && (
+            <div style={{ marginBottom: "1rem" }}>
+              <Image src={bannerPreview} alt="Preview Banner" width={800} height={200} />
+            </div>
+          )}
+
+          {/* File upload input and buttons to change the banner or close the popup */}
+          <input type="file" accept="image/*" className={Styles.inputField} onChange={handleBannerChange} />
+          <button className={`${Styles.saveBtn} ${Styles.popupText}`} onClick={submitBanner}>
+            Save Banner
+          </button>
+          <button className={`${Styles.closeBtn} ${Styles.popupText}`} onClick={toggleBannerPopup}>
+            Close
+          </button>
+        </div>
+      </div>
     )}
   </main>
   );

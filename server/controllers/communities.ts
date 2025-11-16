@@ -2,8 +2,8 @@ import { DocumentReference, Timestamp, Firestore, FieldValue } from "firebase-ad
 import { db, auth } from "../firebase.ts";
 import { Request, Response } from "express";
 import admin from "firebase-admin";
-import { Group, Forum, deleteForumsInGroup, fetchUserData, addUserToCommunity, removeUserFromCommunity } from "./_utils/commUtils.ts";
-import { cookieParser, getUserIdFromSessionCookie } from "./_utils/generalUtils.ts";
+import * as commUtil  from "./_utils/commUtils.ts";
+import * as genUtil from "./_utils/generalUtils.ts";
 import { updateCommunityField } from "./users.ts";
 import { group } from "console";
 
@@ -32,7 +32,7 @@ const addDoc = async (req: Request, res: Response) => {
         const { name, description, isPublic }: { name: string; description: string; isPublic: boolean } = req.body;
 
         // Get userId from sessionCookie
-        const userId = await getUserIdFromSessionCookie(req);
+        const userId = await genUtil.getUserIdFromSessionCookie(req);
 
         // Clean up community name
         let cleanName = name.trim();                           // remove trailing spaces
@@ -68,8 +68,8 @@ const addDoc = async (req: Request, res: Response) => {
             nameLower,
             numUsers: 1,                                                                
             public: isPublic,
-            banner: "",
-            icon: "",
+            banner: "https://storage.googleapis.com/circuit-link.firebasestorage.app/images/default_banner.png",
+            icon: "https://storage.googleapis.com/circuit-link.firebasestorage.app/images/default_icon.jpeg",
             yayScore: 0,
         }
         const commRef = await communitiesRef.add(data);
@@ -114,7 +114,7 @@ const createGroup = async (req: Request, res: Response) => {
         const { commName, name } = req.body;
 
         // Verify and get userId from session cookie
-        const userId = await getUserIdFromSessionCookie(req);
+        const userId = await genUtil.getUserIdFromSessionCookie(req);
 
         const commsRef = db.collection("Communities");
         const commSnap = await commsRef.where("nameLower", "==", commName.toLowerCase()).get();
@@ -171,7 +171,7 @@ const deleteGroup = async (req: Request, res: Response) => {
         const { commName } = req.body;
 
         // Verify and get userId from session cookie
-        const userId = await getUserIdFromSessionCookie(req);
+        const userId = await genUtil.getUserIdFromSessionCookie(req);
 
         if (!commName || !userId) {
             console.log("No community or user provided.");
@@ -191,48 +191,19 @@ const deleteGroup = async (req: Request, res: Response) => {
             });
         }
 
-        // Convert the name to lowercase
-        const nameLower = commName.toLowerCase();
-
         // Find community by name
-        const commRef = db.collection("Communities");
-        const snapshot = await commRef.where("nameLower", "==", nameLower).get();
-        if (snapshot.empty) {
-            console.log(`No community found with name "${commName}".`);
-            return res.status(404).send({
-                status: "Not Found",
-                message: `No community found with name "${commName}".`,
-            });
-        }
+        const { data: commData } = await commUtil.getCommunityByName(db, commName);
         console.log(`Found community "${commName}".`);
 
-        const doc = snapshot.docs[0];
-        const commData = doc.data();
-
         // Check if requester is an owner or mod
-        const userRef = db.doc(`/Users/${userId}`)
-        const ownerList: FirebaseFirestore.DocumentReference[] = commData.ownerList || [];
-        const modList: FirebaseFirestore.DocumentReference[] = commData.modList || [];
-        let isOwner = ownerList.some(ref => ref.path === userRef.path);
-        let isMod = modList.some(ref=> ref.path === userRef.path);
-
-        if (!isOwner && !isMod) {
-            console.log(`User with ID ${userId} is unauthorized to delete this group.`);
-            return res.status(403).send({
-                status: "Forbidden",
-                message: "You are not authorized to delete this group.",
-            });
-        }
-        console.log(`Confirmed user with ID ${userId} is ${isOwner ? "an owner" : "a moderator"} of community "${commName}".`);
-
+        await genUtil.verifyUserIsOwnerOrMod(commData, userId, db);
+        console.log(`Confirmed user with ID ${userId} is authorized to delete community "${commName}".`);
 
         const groupData = groupSnap.data();
 
         // --- Delete all group children ---
         console.log("Deleting forums, posts, and replies within group...");
-
-        await deleteForumsInGroup(groupRef);    // This will delete all forums, posts, and replies within the group
-
+        await commUtil.deleteForumsInGroup(groupRef);    // This will delete all forums, posts, and replies within the group
         console.log("All forums, posts, and replies within group deleted.");
 
         // --- Dereference the group from its parent community ---
@@ -272,7 +243,7 @@ const joinCommunity = async (req: Request, res: Response) => {
         const { name } = req.params;
 
         // Verify and get userId from session cookie
-        const userId = await getUserIdFromSessionCookie(req);
+        const userId = await genUtil.getUserIdFromSessionCookie(req);
         if (!name || !userId) {
             console.log("Missing community name or user ID in request.");
             return res.status(400).send({
@@ -300,7 +271,7 @@ const joinCommunity = async (req: Request, res: Response) => {
         const userRef = db.collection("Users").doc(userId);
 
         // Add user to community's userList and community to user's communities field
-        await addUserToCommunity(commRef, userRef, userId, name);
+        await commUtil.addUserToCommunity(commRef, userRef, userId, name);
 
         console.log(`User ${userId} successfully joined community ${name}`);
         return res.status(200).send({
@@ -337,7 +308,7 @@ const leaveCommunity = async (req: Request, res: Response) => {
         const { name } = req.params;
 
         // Verify and get userId from session cookie
-        const userId = await getUserIdFromSessionCookie(req);
+        const userId = await genUtil.getUserIdFromSessionCookie(req);
         if (!name || !userId) {
             console.log("Missing community name or user ID in request.");
             return res.status(400).send({
@@ -367,7 +338,7 @@ const leaveCommunity = async (req: Request, res: Response) => {
 
 
         // Remove user from community
-        await removeUserFromCommunity(commRef, userRef, userId, name);
+        await commUtil.removeUserFromCommunity(commRef, userRef, userId, name);
 
         console.log(`User ${userId} successfully left community ${name}`);
         return res.status(200).send({
@@ -404,7 +375,7 @@ const deleteDoc = async (req: Request, res: Response) => {
         const { name } = req.params;
 
         // Verify and get userId from session cookie
-        const userId = await getUserIdFromSessionCookie(req);
+        const userId = await genUtil.getUserIdFromSessionCookie(req);
         if (!name || !userId) {
             console.log("No community or user provided.");
             return res.status(400).send({
@@ -461,7 +432,7 @@ const deleteDoc = async (req: Request, res: Response) => {
         console.log("Deleting all groups, forums, posts, and replies...");
         const groups: FirebaseFirestore.DocumentReference[] = commData.groupsInCommunity || [];
         for (const groupRef of groups) {
-            await deleteForumsInGroup(groupRef); // Function that deletes all forums, posts, and nested replies
+            await commUtil.deleteForumsInGroup(groupRef); // Function that deletes all forums, posts, and nested replies
             await groupRef.delete();
         }
         console.log("Delete success.");
@@ -492,8 +463,7 @@ const promoteToMod = async (req: Request, res: Response) => {
         const { userId: targetId } = req.body; // This is the uid of the user being promoted.
 
         // Verify and get userId from session cookie
-        const ownerId = await getUserIdFromSessionCookie(req);
-
+        const ownerId = await genUtil.getUserIdFromSessionCookie(req);
         if (!name || !targetId) {
             return res.status(400).send({ message: "Missing community name or target user ID" });
         }
@@ -546,7 +516,7 @@ const demoteMod = async (req: Request, res: Response) => {
         const { userId: targetId } = req.body; // UID of the user being demoted
 
         // Verify and get owner UID from session cookie
-        const ownerId = await getUserIdFromSessionCookie(req);
+        const ownerId = await genUtil.getUserIdFromSessionCookie(req);
 
         if (!name || !targetId) {
             return res.status(400).send({ message: "Missing community name or target user ID" });
@@ -601,7 +571,7 @@ const promoteToOwner = async (req: Request, res: Response) => {
         const { userId: targetId } = req.body; // UID of the user being promoted
 
         // Verify session cookie
-        const ownerId = await getUserIdFromSessionCookie(req);
+        const ownerId = await genUtil.getUserIdFromSessionCookie(req);
 
         if (!name || !targetId) {
             return res.status(400).send({ message: "Missing community name or target user ID" });
@@ -659,7 +629,7 @@ const demoteOwner = async (req: Request, res: Response) => {
         const { userId: targetId } = req.body; // UID of the owner being demoted
 
         // Verify session cookie
-        const ownerId = await getUserIdFromSessionCookie(req);
+        const ownerId = await genUtil.getUserIdFromSessionCookie(req);
 
         if (!name || !targetId) {
             return res.status(400).send({ message: "Missing community name or target user ID" });
@@ -780,7 +750,7 @@ const editComm = async (req: Request, res: Response) => {
         let { newName } = req.body; // new community name
 
         // Verify and get userId from session cookie
-        const userId = await getUserIdFromSessionCookie(req);
+        const userId = await genUtil.getUserIdFromSessionCookie(req);
         
         if (!name || !userId) {
             console.log("No community or user provided.");
@@ -870,7 +840,7 @@ const editGroup = async (req: Request, res: Response) => {
         const { commName, newName } = req.body;
 
         // Verify and get userId from session cookie
-        const userId = await getUserIdFromSessionCookie(req);
+        const userId = await genUtil.getUserIdFromSessionCookie(req);
         // Verify ownership or mod privileges
         const commsRef = db.collection("Communities");
         const commSnap = await commsRef.where("nameLower", "==", commName.toLowerCase()).get();
@@ -951,12 +921,12 @@ const getCommunityStructure = async (req: Request, res: Response) => {
         const groupsRefs = communityData.groupsInCommunity || [];
 
         // Fetch user data for community lists
-        const ownerList = await fetchUserData(communityData.ownerList || []);
-        const modList = await fetchUserData(communityData.modList || []);
-        const userList = await fetchUserData(communityData.userList || []);
+        const ownerList = await commUtil.fetchUserData(communityData.ownerList || []);
+        const modList = await commUtil.fetchUserData(communityData.modList || []);
+        const userList = await commUtil.fetchUserData(communityData.userList || []);
 
         // Fetch all groups
-        const groupsInCommunity: Group[] = [];
+        const groupsInCommunity: commUtil.Group[] = [];
         for (const groupRef of groupsRefs) {
             const groupSnap = await groupRef.get();
             if (!groupSnap.exists) continue;
@@ -965,7 +935,7 @@ const getCommunityStructure = async (req: Request, res: Response) => {
             const forumsRefs = groupData.forumsInGroup || [];
 
             // Fetch all forums for the current group
-            const forumsInGroup: Forum[] = [];
+            const forumsInGroup: commUtil.Forum[] = [];
             for (const forumRef of forumsRefs) {
                 const forumSnap = await forumRef.get();
                 if (!forumSnap.exists) continue;
@@ -990,6 +960,8 @@ const getCommunityStructure = async (req: Request, res: Response) => {
                 modList,
                 userList,
                 groupsInCommunity,
+                icon: communityData.icon,
+                banner: communityData.banner,
             },
         });
     } catch (err) {

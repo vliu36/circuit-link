@@ -77,3 +77,20 @@ export async function createNotification({
         throw new Error("Internal server error");
     } // end try catch
 } // end function createNotification
+
+// Verify if a user is an owner or moderator of a community
+export async function verifyUserIsOwnerOrMod(commData: any, userId: string, db: FirebaseFirestore.Firestore) {
+    const userRef = db.doc(`/Users/${userId}`);
+
+    const ownerList: FirebaseFirestore.DocumentReference[] = commData.ownerList || [];
+    const modList: FirebaseFirestore.DocumentReference[] = commData.modList || [];
+
+    const isOwner = ownerList.some(ref => ref.path === userRef.path);
+    const isMod = modList.some(ref => ref.path === userRef.path);
+
+    if (!isOwner && !isMod) {
+        throw new Error("User is not authorized (must be owner or moderator)");
+    }
+
+    return { isOwner, isMod };
+}

@@ -1,8 +1,12 @@
 const BASE_URL = "http://localhost:2400/api";
 
 // Fetch posts belonging to a specific forum
-export async function fetchPostsByForum(commName: string, forumSlug: string) {
-    const res = await fetch(`${BASE_URL}/forums/get/${commName}/${forumSlug}`);
+export async function fetchPostsByForum(commName: string, forumSlug: string, sortMode: string) {
+    const res = await fetch(`${BASE_URL}/forums/get/${commName}/${forumSlug}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sortMode }),
+    });
 
     // Defensive: handle non-JSON or errors
     if (!res.ok) {

@@ -12,6 +12,7 @@ import { useCallback } from "react";
 import NavBar from '../../../_components/navbar/navbar.tsx';
 import { Community } from "../../../_types/types.ts";
 import { useRouter } from "next/navigation";
+import { fetchStructure } from "../community.ts";
 
 export default function ForumPage({
     params,
@@ -27,6 +28,8 @@ export default function ForumPage({
     const [editingPostId, setEditingPostId] = useState<string | null>(null);
     const [editTitle, setEditTitle] = useState("");
     const [editContents, setEditContents] = useState("");
+
+    const [sortMode, setSortMode] = useState<string>("newest"); // "newest" | "oldest" | "mostYays" | "alphabetical"
 
     const [forum, setForum] = useState<Forum | null>(null);
     const [loading, setLoading] = useState(true);
@@ -46,7 +49,7 @@ export default function ForumPage({
      */
     const fetchPosts = useCallback(async () => {
         try {
-            const { forum, posts } = await fetchPostsByForum(commName, forumSlug);
+            const { forum, posts } = await fetchPostsByForum(commName, forumSlug, sortMode);
 
             const formattedPosts = (posts || []).map((p: Post) => ({
                 ...p,
@@ -62,11 +65,22 @@ export default function ForumPage({
         } finally {
             setLoading(false);
         }
-    }, [commName, forumSlug]);
+    }, [commName, forumSlug, sortMode]);
 
+    // Initial fetch and refetch on sort mode change
     useEffect(() => {
         fetchPosts();
     }, [commName, forumSlug, fetchPosts]);
+
+    // Fetch community structure
+    useEffect(() => {
+        setLoading(true);
+        fetchStructure(commName)
+            .then((data) => {
+                if (data) setCommunity(data);
+            })
+            .finally(() => setLoading(false));
+    }, [commName]);
 
     // Handler to add a new post
     const handleAddPost = async () => {
@@ -194,6 +208,20 @@ export default function ForumPage({
                             <button className={styles.editForumButton} onClick={() => setEditPopup(true)}>
                                 Edit
                             </button>
+                            {/* Drop down menu to change sort mode */}
+                            <div className={styles.sortDropdown}>
+                                <label htmlFor="sortMode">Sort by: </label>
+                                <select
+                                    id="sortMode"
+                                    value={sortMode}
+                                    onChange={(e) => setSortMode(e.target.value)}
+                                >
+                                    <option value="newest">Newest</option>
+                                    <option value="oldest">Oldest</option>
+                                    <option value="mostYays">Most Yays</option>
+                                    <option value="alphabetical">Alphabetical</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                     <div className = {styles.blackLine}> </div>

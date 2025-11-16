@@ -148,50 +148,64 @@ export const addUserToCommunity = async (
 
 // Helper function to remove user from community
 export const removeUserFromCommunity = async (
-            commRef: DocumentReference, 
-            userRef: DocumentReference, 
-            userId: string, 
-            communityName: string
-        ) => {
-            await db.runTransaction(async (transaction) => {
-                const commSnap = await transaction.get(commRef);
-                const userSnap = await transaction.get(userRef);
+    commRef: DocumentReference, 
+    userRef: DocumentReference, 
+    userId: string, 
+    communityName: string
+) => {
+    await db.runTransaction(async (transaction) => {
+        const commSnap = await transaction.get(commRef);
+        const userSnap = await transaction.get(userRef);
 
-                if (!userSnap.exists) {
-                    throw new Error("User not found");
-                }
+        if (!userSnap.exists) {
+            throw new Error("User not found");
+        }
 
-                const commData = commSnap.data();
-                if (!commData) {
-                    throw new Error("Community data not found");
-                }
+        const commData = commSnap.data();
+        if (!commData) {
+            throw new Error("Community data not found");
+        }
 
-                const userList: FirebaseFirestore.DocumentReference[] = commData.userList || [];
-                const ownerList: FirebaseFirestore.DocumentReference[] = commData.ownerList || []; 
+        const userList: FirebaseFirestore.DocumentReference[] = commData.userList || [];
+        const ownerList: FirebaseFirestore.DocumentReference[] = commData.ownerList || []; 
 
-                const isMember = userList.some(ref => ref.id === userId);
-                const isOwner = ownerList.some(ref => ref.id === userId);
+        const isMember = userList.some(ref => ref.id === userId);
+        const isOwner = ownerList.some(ref => ref.id === userId);
 
-                // Check if user is not a member
-                if (!isMember) {
-                    throw new Error("User is not a member of this community.");
-                }
-                // Check if user is the only owner
-                if (isOwner && ownerList.length === 1) {
-                    throw new Error("Cannot leave community: You are the only owner. Transfer ownership first before leaving.");
-                }
+        // Check if user is not a member
+        if (!isMember) {
+            throw new Error("User is not a member of this community.");
+        }
+        // Check if user is the only owner
+        if (isOwner && ownerList.length === 1) {
+            throw new Error("Cannot leave community: You are the only owner. Transfer ownership first before leaving.");
+        }
 
-                // Remove user from community userList, modList, and ownerList, decrement numUsers
-                transaction.update(commRef, {
-                    userList: FieldValue.arrayRemove(userRef),
-                    modList: FieldValue.arrayRemove(userRef),
-                    ownerList: FieldValue.arrayRemove(userRef),
-                    numUsers: FieldValue.increment(-1),
-                });
+        // Remove user from community userList, modList, and ownerList, decrement numUsers
+        transaction.update(commRef, {
+            userList: FieldValue.arrayRemove(userRef),
+            modList: FieldValue.arrayRemove(userRef),
+            ownerList: FieldValue.arrayRemove(userRef),
+            numUsers: FieldValue.increment(-1),
+        });
 
-                // Remove the community reference from the user's communities field
-                transaction.update(userRef, {
-                    communities: FieldValue.arrayRemove(commRef),
-                });
-            });
-        };
+        // Remove the community reference from the user's communities field
+        transaction.update(userRef, {
+            communities: FieldValue.arrayRemove(commRef),
+        });
+    });
+};
+
+// Helper function to get community by name
+export async function getCommunityByName(db: FirebaseFirestore.Firestore, commName: string) {
+    const nameLower = commName.toLowerCase();
+    const commRef = db.collection("Communities");
+    const snapshot = await commRef.where("nameLower", "==", nameLower).get();
+
+    if (snapshot.empty) {
+        throw new Error(`Community "${commName}" not found`);
+    }
+
+    const doc = snapshot.docs[0];
+    return { ref: doc.ref, data: doc.data() };
+}

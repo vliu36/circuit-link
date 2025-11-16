@@ -1,5 +1,9 @@
 const BASE_URL = "http://localhost:2400/api"; // adjust as needed
+import { uploadImage } from "@/app/_utils/mediaUpload.ts";
 import { Community } from "../../_types/types.ts";
+import { updateProfile } from "firebase/auth/web-extension";
+import { doc, updateDoc, getDoc} from "firebase/firestore";
+import { auth, db } from "@/app/_firebase/firebase.ts";
 
 interface CreateForumParams {
     name: string;
@@ -389,5 +393,52 @@ export async function editGroup(
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error",
         };
+    }
+}
+
+// Change community icon
+export async function changeCommunityIcon(file: File, commId: string) {
+    try {
+        // Upload new icon
+        const fileName = await uploadImage(file);
+        if (!fileName) throw new Error("Image upload failed — no filename returned.");
+
+        // Construct public URL
+        const finalPublicPath = `images/${fileName}`;
+        const publicUrl = `https://storage.googleapis.com/circuit-link.firebasestorage.app/${finalPublicPath}`;
+
+        // Update community document in Firestore
+        const commDocRef = doc(db, "Communities", commId);
+        await updateDoc(commDocRef, { icon: publicUrl });
+
+        console.log("Community icon updated successfully:", publicUrl);
+        return publicUrl;
+
+    } catch (error) {
+        console.error("Error uploading profile picture:", error);
+        throw error;
+    }
+}
+
+// Change community banner
+export async function changeCommunityBanner(file: File, commId: string) {
+    try {
+        // Upload new banner
+        const fileName = await uploadImage(file);
+        if (!fileName) throw new Error("Image upload failed — no filename returned.");
+
+        // Construct public URL
+        const finalPublicPath = `images/${fileName}`;
+        const publicUrl = `https://storage.googleapis.com/circuit-link.firebasestorage.app/${finalPublicPath}`;
+
+        // Update community document in Firestore
+        const commDocRef = doc(db, "Communities", commId);
+        await updateDoc(commDocRef, { banner: publicUrl });
+        console.log("Community banner updated successfully:", publicUrl);
+        return publicUrl;
+
+    } catch (error) {
+        console.error("Error uploading profile picture:", error);
+        throw error;
     }
 }

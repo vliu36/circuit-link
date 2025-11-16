@@ -1,4 +1,3 @@
-// Temporary page to test image functionality
 
 "use client"
 

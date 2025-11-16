@@ -20,8 +20,9 @@ router.post("/create", forums.addDoc);
  *  @route GET /api/forums/get/:commName/:forumSlug
  *  @param commName - The name of the community the forum belongs to
  *  @param forumSlug - The slug of the forum to retrieve
+ *  @body sortMode - (optional) The sorting mode for posts: "newest", "oldest", "mostYays", "alphabetical"
  */
-router.get("/get/:commName/:forumSlug", forums.getForumBySlug);
+router.post("/get/:commName/:forumSlug", forums.getForumBySlug);
 
 /** Delete a forum by its ID
  *  @route DELETE /api/forums/delete/:forumId
