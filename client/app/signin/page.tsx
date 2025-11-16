@@ -5,6 +5,7 @@ import Styles from "./login.module.css";
 import Image from 'next/image';
 import Link from 'next/link';
 import googleIcon from '../../public/googleIcon.png';
+import NavBar from "../_components/navbar/navbar.tsx";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -136,4 +137,7 @@ export default function Login() {
             </div>
         </div>
     )}
-</main>)}
+    </main>
+    </div>
+    );
+} // end Login component

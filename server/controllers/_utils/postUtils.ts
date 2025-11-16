@@ -104,7 +104,7 @@ export const deleteNestedRepliesRecursive = async (replyRefs: FirebaseFirestore.
     } // end for
 } // end helper function deleteRepliesRecursive
 
-// --- Helper function for deleteDoc to check if user is authorized to delete a post --- //
+// --- Helper function for deleteDoc in posts.ts to check if user is authorized to delete a post --- //
 export const isUserAuthorizedToDeletePost = async ( userId: string, postData: FirebaseFirestore.DocumentData, communityId?: string ): Promise<boolean> => {
     const authorPath = postData?.author?.path;
     const authorId = authorPath?.split("/")[1];
@@ -114,7 +114,7 @@ export const isUserAuthorizedToDeletePost = async ( userId: string, postData: Fi
 
     // If not author, check if user is mod/owner of community
     if (communityId) {
-        const communityRef = db.collection("Community").doc(communityId);
+        const communityRef = db.collection("Communities").doc(communityId);
         const communityDoc = await communityRef.get();
         if (communityDoc.exists) {
             const communityData = communityDoc.data();

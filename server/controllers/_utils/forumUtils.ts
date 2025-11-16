@@ -89,10 +89,6 @@ export async function getFormattedPosts(
         })
     );
 
-    // Remove nulls and sort
-    // return posts
-    //     .filter(Boolean)
-    //     .sort((a: any, b: any) => (b.timePosted || 0) - (a.timePosted || 0));
     const validPosts = posts.filter(Boolean);
     switch (sortMode) {
         case "newest":

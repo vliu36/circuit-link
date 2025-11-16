@@ -143,6 +143,7 @@ export default function CommunityPage({
       if (updated) {
         setCommunity(updated);
       } else {
+        // TODO: This causes an error when changing the community name; refreshing returns no data because the old name is used
         console.error("Failed to refresh community: no data returned");
       }
     } catch (err) {

@@ -79,7 +79,12 @@ export async function createNotification({
 } // end function createNotification
 
 // Verify if a user is an owner or moderator of a community
-export async function verifyUserIsOwnerOrMod(commData: any, userId: string, db: FirebaseFirestore.Firestore) {
+export async function verifyUserIsOwnerOrMod(
+    commData: FirebaseFirestore.DocumentData, 
+    userId: string, 
+    db: FirebaseFirestore.Firestore, 
+    ownerOnly: boolean = false          // If true, only check for owner status
+) {
     const userRef = db.doc(`/Users/${userId}`);
 
     const ownerList: FirebaseFirestore.DocumentReference[] = commData.ownerList || [];
@@ -88,9 +93,17 @@ export async function verifyUserIsOwnerOrMod(commData: any, userId: string, db: 
     const isOwner = ownerList.some(ref => ref.path === userRef.path);
     const isMod = modList.some(ref => ref.path === userRef.path);
 
+    // If only owner check is required
+    if (ownerOnly) {
+        if (!isOwner) {
+            throw new Error("User is not authorized (must be owner)");
+        }
+        return { isOwner, isMod: false };
+    }
+
+    // Default behavior: check for owner OR mod
     if (!isOwner && !isMod) {
         throw new Error("User is not authorized (must be owner or moderator)");
     }
-
     return { isOwner, isMod };
 }
