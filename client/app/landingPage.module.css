@@ -2,99 +2,114 @@
   font-family: Jura;
   src: url('../public/fonts/Jura-Light.ttf');
 }
+
+@font-face {
+  font-family: Inria Sans;
+  src: url('../public/fonts/InriaSans-Light.ttf');
+}
+
 .background {
-    background-color: rgb(57, 65, 83);
-    display: flex;
+    background-color: #D0E0EB;
     width: 100%;
     height: 100vh;
+    font-family: Inria Sans;
     position: relative;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: visible;
+    display:grid;
+    grid-template-columns: 15.003vw 60.003vw 15.003vw;
+    grid-template-rows: 5.5vh 35.5vh 10.5vh 10.5vh 10.5vh 10.5vh 3vh;
+    grid-template-areas: 
+    "navBar navBar navBar"
+    "communities search topUsers"
+    "communities search topCommunities"
+    "communities search topCommunities"
+    "resources friendReq topCommunities"
+    "resources friendReq topCommunities"
+    "resources blankBox topCommunities";
+
+    column-gap: 5%;
+    row-gap: 2%;
 }
 
-.notificationButton{
-    height: 30px;
-    width: 30px;
+.blankBox {
+    min-height: 5vh;
+}
+
+.friendsBox{
+    background-color: rgb(255, 255, 255);
     border-radius: 1em;
-    background-color: #394153;
-    margin-left: 10px;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
-.settingsIcon{
-    height: 40px;
-    width: 40px;
-    border-radius: 50%;
-    background-color: #B8B8B8;
-}
-
-.dropdownMenu {
-    background-color: #5B6680;
-    width: 150px;
-    height: 150px;
-    right: 0px;
-    border-radius: 1em;
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
+.navBox{
+    background-color: rgb(11, 11, 44);
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: white;
+    justify-content: space-between;
 }
 
-.dropdownMenu:hover{
-    background-color: #828FAF;
+.homeLogo{
+    height: 50px;
+    width: 200px;
 }
 
-.dropdown:focus-within .dropdownMenu{
-    opacity: 1;
-    pointer-events: auto;
+.logInInfo{
+    height: 50px;
+    width: 150px;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 .yourCommunitiesBar{
-    background-color: rgb(11, 11, 44);
-    width: 20%;
-    height: 60vh;
+    background-color: #FFFFFF;
+    border: 3px #D9D9D9;
+    border-radius: 0.5em;
     display: flex;
     flex-direction: column;
-    position: absolute;
-    top: 51px;
-    font-family: Inria Sans;
-    color: gray;
+    font-family: Jura;
+    font-weight: bold;
+    color: #5A5454;
     text-indent: 3%;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .resourcesBar{
-    background-color: rgb(11, 11, 44);
-    width: 20%;
-    height: 35vh;
+    background-color: #FFFFFF;
     display: flex;
     flex-direction: column;
-    position: absolute;
-    bottom: 0vw;
-    font-family: Inria Sans;
-    color: gray;
+    border: 3px #D9D9D9;
+    border-radius: 0.5em;
+    font-family: Jura;
+    font-weight: bold;
+    color: #5A5454;
+    padding: 2px;
     text-indent: 3%;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
-
+/*
 .horizontalLine{
     background-color: #AAAAAA;
     width: 95%;
     height: 1px;
     margin-left: 8px;
-}
+}*/
 
 .resourcesBarButtons{
     width: 90%;
     margin-left: 10px;
     height: 40px;
-    background-color: rgb(11, 11, 44);
+    background-color: #F0F0F0;
+    color: #5A5454;
     display: flex;
     flex-wrap: nowrap;
     border-radius: 1em;
 }
 
 .resourcesBarButtons:hover{
-    background-color: #394153;
+    background-color: #D9D9D9;
 }
 
 .aboutUsIcon{
@@ -107,11 +122,11 @@
     text-align: left;
     margin-top: 10px;
     margin-left: 1px;
-    font-family: Inria Sans;
-    color: rgb(255, 255, 255);
+    font-family: Jura;
+    color: #5A5454;
     position: relative;
     font-size: 0.8rem;
-    width: 100%;
+    width:100%;
 }
 
 .communitiesButtons{
@@ -135,8 +150,9 @@
     text-align: left;
     margin-top: 15px;
     margin-left: 10px;
-    font-family: Inria Sans;
-    color: rgb(255, 255, 255);
+    font-family: Jura;
+    font-weight: bold;
+    color: #5A5454;
     position: relative;
     font-size: 0.8rem;
 }
@@ -146,66 +162,71 @@
 }
 
 .topUsersBar{
-    background-color: rgb(11, 11, 44);
-    width: 20%;
-    height: 50vh;
+    background-color: #FFFFFF;
+    color: #5A5454;
     display: flex;
     flex-direction: column;
-    position: absolute;
-    top: 51px;
-    right: 0px;
-    font-family: Inria Sans;
+    font-family: Jura;
+    font-weight: bold;
     color: gray;
     text-indent: 3%;
+    border: 3px #D9D9D9;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .topCommunitiesBar{
-    background-color: rgb(11, 11, 44);
-    width: 20%;
-    height: 45vh;
+    background-color: #FFFFFF;
+    color: #5A5454;
     display: flex;
     flex-direction: column;
-    position: absolute;
-    right: 0px;
-    bottom: 0vw;
-    font-family: Inria Sans;
+    font-family: Jura;
+    font-weight: bold;
     color: gray;
     text-indent: 3%;
+    border: 3px #D9D9D9;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
+/*This controls the center box with "welcome" and the search area*/
 .searchBarArea{
-    width: 40%;
-    height: 45vh;
-    position: absolute;
-    top: 250px;
-    left: 30vw;
-    font-size: 40px;
+    font-size: 4vh;
     text-align: center;
     display: flex;
     flex-direction: column;
+    margin-top: 1em;
+    background-color: #FFFFFF;
+    border-radius: 1em;
+    color: #5A5454;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .welcomeText{
     width: 100%;
     height: 6vh;
-    color: rgb(255,255,255);
+    font-size: 2.5vw;
     font-family: Jura;
+    color: #5A5454;
 }
 
 .usernameText{
     width: 100%;
     height: 10vh;
+    font-size: 2.5vw;
+    font-family: Jura;
+    color: #5A5454;
 }
 
 .searchBarAlignment{
-    position: absolute;
-    top: 200px;
-    left: 5vw;
-    width: 100%;
+    margin-left:20%;
+    width: 70%;
+    color: #5A5454;
+    background-color: #FFFFFF;
 }
 
 .navBox{
-    background-color:  rgb(11, 11, 44);
+    background-color: rgb(11, 11, 44);
     width: 100%;
     height: 51px;
     display: flex;
@@ -235,7 +256,6 @@
     margin-top: 10px;
     text-align: center;
     line-height: 30px;
-    color: rgb(255,255,255);
 }
 
 .logInSignUpButton:hover {
@@ -249,11 +269,10 @@
     position: absolute;
     top: 12px;
     right: 128px;
-    color:rgb(255,255,255);
 }
 
 .dropdownMenu {
-    background-color: #5B6680;
+    background-color: #FFFFFF;
     width: 150px;
     height: 150px;
     right: 0px;
@@ -264,7 +283,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: white;
+    color: #FFFFFF;
 }
 
 .dropdownMenu:hover{

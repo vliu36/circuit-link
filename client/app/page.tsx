@@ -1,84 +1,85 @@
-//This page appears when the user is not registered
-"use server"
-
+//NOTE: This page is shown upon signing in
+"use client"
+// import React, {useEffect, useState} from "react";
 import Styles from './landingPage.module.css';
-import SearchBar from "./_components/searchbar/search.tsx";
-import Link from "next/link";
-import AuthButtons from './_components/navbar/authbuttons.tsx';
-import NavBar from './_components/navbar/navbar.tsx';
-import Image from "next/image";
-import SearchComponent from './search-component';
+import { useAuth } from "./_firebase/context.tsx";
 import { Suspense } from 'react';
+import SearchBar from "./_components/searchbar/search.tsx";
+import SearchResults from "./_components/searchbar/table.tsx";
+import NavBar from "./_components/navbar/navbar.tsx";
+import { logout } from './landing.ts';
+import Image from 'next/image';
+import Link from 'next/link';
 
-export default async function Landing(props: {
-    searchParams?: Promise<{
-        query?: string;
-        page?: string;
-    }>;
-}) {
-
+export default function Landing() {
+    const { user } = useAuth();
+    
     return (
+    
         <div className = {Styles.background}>
-
-            <div className = {Styles.yourCommunitiesBar}>
-                <h1>Your Communities</h1>
+            
+            <div className = {Styles.yourCommunitiesBar} style={{gridArea: 'communities'}}>
+                <h1>  Your Communities</h1>
                 <button className = {Styles.communitiesButtons}>
-                    <Image src = "plus.svg" alt = "add" className = {Styles.addIcon} width={5} height={5}></Image>
+                    <Image src = "plus.svg" className = {Styles.addIcon} alt="Add icon" width={5} height={5}></Image>
                     <h1 className = {Styles.buttonTextforCommunities}>Add a Community</h1>
                 </button>
             </div>
 
-            <div className = {Styles.resourcesBar}>
-                <div className = {Styles.horizontalLine}></div>
-                <h1>Resources</h1>
+            <div className = {Styles.resourcesBar} style={{gridArea: 'resources'}}>
+                {/*<div className = {Styles.horizontalLine}></div>*/}
+                <h1>  Resources</h1>
                 <Link className ={Styles.resourcesBarButtons} href = "./aboutus" replace>
-                    <Image src = "/aboutUs.svg" alt = "about" className = {Styles.aboutUsIcon} width={5} height={5}></Image>
+                    <Image src = "/aboutUsNew.svg" className = {Styles.aboutUsIcon} alt="About us icon" width={5} height={5}></Image>
                     <h1 className = {Styles.buttonText}>About Circuit Link</h1>
                 </Link>
-                <Link className ={Styles.resourcesBarButtons} href = "./help" replace>
-                    <Image src = "/helpbutton.svg" alt = "help" className = {Styles.aboutUsIcon} width={5} height={5}></Image>
+                <Link className ={Styles.resourcesBarButtons} href = "./help"replace>
+                    <Image src = "/helpIconNew.svg" className = {Styles.aboutUsIcon} alt="Question mark" width={5} height={5}></Image>
                     <h1 className = {Styles.buttonText}>Get Help</h1>
                 </Link>
                 <Link className ={Styles.resourcesBarButtons} href = "./bugreports" replace>
-                    <Image src = "/bug.svg" alt = "bug" className = {Styles.aboutUsIcon} width={5} height={5}></Image>
+                    <Image src = "/reportIconNew.svg" className = {Styles.aboutUsIcon} alt="Bug icon" width={5} height={5}></Image>
                     <h1 className = {Styles.buttonText}>Report A Bug</h1>
                 </Link>
                 <Link className ={Styles.resourcesBarButtons} href = "./siterules" replace>
-                    <Image src = "/rules.svg" alt = "rules" className = {Styles.aboutUsIcon} width={5} height={5}></Image>
+                    <Image src = "/rulesNew.svg" className = {Styles.aboutUsIcon} alt="Book icon" width={5} height={5}></Image>
                     <h1 className = {Styles.buttonText}>Circuit Link Rules</h1>
                 </Link>
             </div>
 
-            <div className = {Styles.topUsersBar}>
+            <div className = {Styles.topUsersBar} style={{gridArea: 'topUsers'}}>
                 <h1>Top Users</h1>
             </div>
 
-            <div className = {Styles.topCommunitiesBar}>
+            <div className = {Styles.topCommunitiesBar} style={{gridArea: 'topCommunities'}}>
                 <div className = {Styles.horizontalLine}></div>
-                <h1>Top Communities</h1>
+                <h1>  Top Communities</h1>
             </div>
 
-            <NavBar/>
-            {/*<div className = {Styles.navBox}>
-                <Link href="/" replace>
-                    <Image className = {Styles.homeLogo} src="/circuitlinklogowback.svg" width={200} height={50} alt="Circuit Link Logo"/>
-                </Link>
-                <div className = {Styles.logInInfo}>
-                    <Link className = {Styles.logInSignUpButton} href="./signin" replace> Log In </Link>
-                    <h1 className = {Styles.orText}> or </h1>
-                    <Link className = {Styles.logInSignUpButton} href="./register" replace> Sign Up </Link>
-                </div>
-            </div>*/}
+            <div className={Styles.navBox} style={{gridArea: 'navBar'}}>
+                <NavBar/>
+            </div>
 
-            <div className = {Styles.searchBarArea}>
+            <div className = {Styles.blankBox} style={{gridArea: "blankBox"}}></div>
+
+            <div className = {Styles.friendsBox} style={{gridArea: "friendReq"}}></div>
+            
+
+            <div className = {Styles.searchBarArea} style={{gridArea: 'search'}}>
                 <div className = {Styles.welcomeText}>
-                    Welcome to Circuit Link 
+                    Welcome to Circuit-Link,
                 </div>
-                <div className= {Styles.searchBarAlignment}>
-                <Suspense fallback={<div>Loading...</div>}>
-                    <SearchBar/>
-                </Suspense>
+                <div className = {Styles.usernameText}>
+                    {user?.displayName}
                 </div>
+                <h3 className = {Styles.searchBarAlignment}>
+                    <Suspense fallback={<div>Loading search bar...</div>}>
+                        <SearchBar/>
+                    </Suspense>
+                </h3>
+                <h4> 
+                    <SearchResults />
+                </h4>
             </div>
         </div>
         

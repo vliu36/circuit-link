@@ -6,10 +6,11 @@
     height: 50px;
     right: 10%;
     z-index: 1;
+    color: #000000;
 }
 .searchbar input {
-    background-color: #5B6680;
-    color: #D9D9D9;
+    background-color: #FFFFFF;
+    color: #5A5454;
     border-radius: 1em;
     font-size: 20px;
     font-family: Inria Sans;
@@ -31,6 +32,12 @@
     display: flex;
     flex-direction: column;
     max-height: 20vh;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.searchResult hover{
+    background-color: #8a8a8a;
+
 }
 
 .searchResult a {
@@ -49,15 +56,15 @@
 .resultText{
     width: 100%;
     height: 97%;
-    margin-top: 2.5%;
+    margin-top: 1%;
     text-align: left;
-    text-indent: 10%;
+    text-indent: 4%;
 }
 
 .line{
-    width: 100%;
+    width: 50%;
     height: 2%;
-    background-color: white;
+    background-color: rgb(0, 0, 0);
 }
 
 .searchBarInputThingIt {
@@ -75,11 +82,11 @@
 .searchbar::after{
     content: '';
     position: absolute;
-    height: 105%;
-    width: 50.4%;
+    height: 107%;
+    width: 50.5%;
     background-image: linear-gradient(to right,rgba(0, 89, 255, 1), rgba(152, 197, 248, 1));
     z-index: -1;
-    top:-5%;
-    left: -0.17%;
+    top:-8%;
+    left: -0.3%;
     border-radius: 1.5rem;
 }

@@ -12,7 +12,7 @@ export default function Table({ items }: SearchResultProps) {
     return (
         <ul>
             {items?.map((item: string, index: number) => (
-                <li className={Styles.searchResult} key={item}>
+                <li key={item}>
                     <div className={Styles.resultBox}>
                         <div className={Styles.resultText}>
                             <Link href={`/community/${item}`}>{item}</Link>

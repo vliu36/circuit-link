@@ -3,7 +3,7 @@
 import React, { use, useState, useEffect } from "react";
 import Styles from "./community.module.css";
 import { useAuth } from "../../_firebase/context.tsx";
-import { logout } from "../../landing/landing.ts";
+import { logout } from "../../landing.ts";
 import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
