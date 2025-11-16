@@ -33,6 +33,10 @@ export default function CommunityPage({
   const [editOpen, setEditOpen] = useState(false);
   const [iconOpen, setIconOpen] = useState(false);
   const [bannerOpen, setBannerOpen] = useState(false);
+  const [editGroupOpen, setEditGroupOpen] = useState(false);
+
+  // setEditGroupDetails
+  const [editGroupId, setEditGroupId] = useState<string>("");
 
   const toggleEditPopup = () => {
     setEditOpen(!editOpen);
@@ -43,6 +47,11 @@ export default function CommunityPage({
   };
   const toggleBannerPopup = () => {
     setBannerOpen(!bannerOpen);
+  };
+
+  const toggleEditGroupPopup = () => {
+    setEditGroupOpen(!editGroupOpen);
+    setError(null);
   };
 
   const router = useRouter();
@@ -218,6 +227,21 @@ export default function CommunityPage({
     }
   };
 
+  // --- EDIT GROUP ---
+  const handleEditGroup = async (groupId: string, newName: string) => {
+    try {
+      const res = await commApi.editGroup(commName, groupId, newName);
+      console.log(res.message);
+      setError(res.message || null);
+      await refreshCommunity();
+      if (res.status === "ok") {
+        toggleEditGroupPopup();
+      }
+    } catch (err) {
+      console.error("Error editing group:", err);
+    }
+  };
+
   const isMember = community.userList.some(u => u.id === user?.uid);
   const isMod = community.modList.some(m => m.id === user?.uid);
   const isOwner = community.ownerList.some(o => o.id === user?.uid);
@@ -253,9 +277,14 @@ export default function CommunityPage({
                     {/* Only displays if user is an owner or a mod */}
                     {
                       (isOwner || isMod) &&
-                      <button className = {Styles.deleteGroup} onClick={() => handleDeleteGroup(group.id)}>
-                        Delete Group
-                      </button>
+                      <>
+                        <button className = {Styles.deleteGroup} onClick={() => handleDeleteGroup(group.id)}>
+                          Delete Group
+                        </button>
+                        <button className={Styles.editGroup} onClick={() => { toggleEditGroupPopup(); setEditGroupId(group.id); }}>
+                          Edit Group
+                        </button>
+                      </>
                     }
                   </div>
                   
@@ -522,6 +551,43 @@ export default function CommunityPage({
                     <button type="submit" className={`${Styles.popupText} ${Styles.saveBtn}`}>Save Changes</button>
                 </form>
                 <button className={` ${Styles.closeBtn} ${Styles.popupText}`} onClick={toggleEditPopup}>
+                    Close
+                </button>
+            </div>
+        </div>
+    )}
+    {/* --- EDIT GROUP POPUP --- */}
+    {editGroupOpen && (
+        <div className={Styles.popupOverlay} onClick={toggleEditGroupPopup}>
+            <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                <h2 className={Styles.popupText}>Edit Group</h2>
+                {/* Form for editing the group */}
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.currentTarget);
+                  const newName = formData.get("newName") as string;
+                  const groupId = editGroupId;
+                  
+                  await handleEditGroup(groupId, newName);
+                }}>
+                    <label className={Styles.popupText}>
+                      New Name: <br />
+                      <input
+                        type="text"
+                        name="newName"
+                        className={`${Styles.popupText} ${Styles.inputField}`}
+                        maxLength={24} 
+                        pattern="^[a-zA-Z0-9_-]+$"
+                        title="24 characters max. Name can only contain letters, numbers, underscores, and hyphens."
+                        required
+                      />
+                    </label>
+                    <br /><br />
+                    {error && <p style={{ color: "yellow" }}>{error}</p>}
+                    <br/>
+                    <button type="submit" className={`${Styles.popupText} ${Styles.saveBtn}`}>Save Changes</button>
+                </form>
+                <button className={` ${Styles.closeBtn} ${Styles.popupText}`} onClick={toggleEditGroupPopup}>
                     Close
                 </button>
             </div>

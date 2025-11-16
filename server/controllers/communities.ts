@@ -842,20 +842,6 @@ const editComm = async (req: Request, res: Response) => {
                     message: `Community name "${newName}" is already taken.`,
                 });
             }
-            // NOTE: Updating users' communities field is currently disabled due to changes in community reference handling.
-            // // Update user's communities field
-            // const batch = db.batch();
-            // const userList: FirebaseFirestore.DocumentReference[] = commData.userList || [];
-            // for (const memberRef of userList) {
-            //     // Remove old name and add new name
-            //     batch.update(memberRef, {
-            //         communities: admin.firestore.FieldValue.arrayRemove(name),
-            //     });
-            //     batch.update(memberRef, {
-            //         communities: admin.firestore.FieldValue.arrayUnion(newName),
-            //     });
-            // }
-            // await batch.commit();
 
             // Set name updates
             updates.name = newName;
@@ -876,6 +862,74 @@ const editComm = async (req: Request, res: Response) => {
         });
     }
 }
+
+// Edit a group within a community
+const editGroup = async (req: Request, res: Response) => {
+    try {
+        const { groupId } = req.params;
+        const { commName, newName } = req.body;
+
+        // Verify and get userId from session cookie
+        const userId = await getUserIdFromSessionCookie(req);
+        // Verify ownership or mod privileges
+        const commsRef = db.collection("Communities");
+        const commSnap = await commsRef.where("nameLower", "==", commName.toLowerCase()).get();
+        if (commSnap.empty) {
+            return res.status(404).send({
+                status: "Not Found",
+                message: "Community not found.",
+            });
+        }
+        const commDoc = commSnap.docs[0];
+        const commData = commDoc.data();
+        const userRef = await db.doc(`/Users/${userId}`);
+        const isOwner = (commData.ownerList || []).some((ref: DocumentReference) => ref.id === userRef.id);
+        const isMod   = (commData.modList || []).some((ref: DocumentReference) => ref.id === userRef.id);
+        if (!isOwner && !isMod) {
+            return res.status(403).send({
+                status: "Forbidden",
+                message: "Only moderators or owners can edit groups.",
+            });
+        }
+
+        // End if newName is the same as current name
+        const groupRefCheck = db.collection("Groups").doc(groupId);
+        const groupSnapCheck = await groupRefCheck.get();
+        if (groupSnapCheck.data()?.name === newName) {
+            return res.status(200).send({
+                status: "ok",
+                message: "No changes detected in the update request.",
+            });
+        }
+
+        // Verify no other group in the community has the newName
+        const groupsRefs = commData.groupsInCommunity || [];
+        for (const groupRef of groupsRefs) {
+            const groupSnap = await groupRef.get();
+            if (!groupSnap.exists) continue;
+            const groupData = groupSnap.data();
+            if (groupData.name === newName) {
+                return res.status(409).send({
+                    status: "Conflict",
+                    message: `A group with the name "${newName}" already exists in this community.`,
+                });
+            }
+        }
+
+        // Update the group name
+        const groupRef = db.collection("Groups").doc(groupId);
+        await groupRef.update({ name: newName });
+        res.status(200).send({
+            status: "ok",
+            message: `Group name updated to "${newName}" successfully.`,
+        });
+    } catch(err) {
+        res.status(500).send({
+            status: "Backend Error",
+            message: err instanceof Error ? err.message : String(err),
+        });
+    } // end try catch
+} // end editGroup
 
 const getCommunityStructure = async (req: Request, res: Response) => {
     try {
@@ -965,4 +1019,5 @@ export {
     promoteToOwner,
     demoteOwner,
     editComm,
+    editGroup
 }

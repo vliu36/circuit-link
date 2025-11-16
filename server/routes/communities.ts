@@ -165,4 +165,19 @@ router.post("/demote-owner/:name", comm.demoteOwner);
  */
 router.put("/edit/:name", comm.editComm);
 
+/** Edit group details
+ *  @route PUT /api/comm/edit-group/:groupId
+ *  @params groupId - ID of the group to be edited
+ *  @body commName - Name of the community in which the group belongs in
+ *  @body newName - New name for the group 
+ *  @cookie session - Firebase session cookie used to authenticate the request (must be an owner)
+ *  @returns {200} - Group successfully updated
+ *  @returns {400} - Missing parameters or invalid data
+ *  @returns {403} - Requester is not an owner
+ *  @returns {404} - Group's community not found
+ *  @returns {409} - New group name already taken
+ *  @returns {500} - Backend failure
+ */
+router.put("/edit-group/:groupId", comm.editGroup);
+
 export default router;

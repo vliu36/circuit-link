@@ -359,3 +359,35 @@ export async function editCommunity(
         };
     }
 }
+
+// Edit group name
+export async function editGroup(
+    commName: string,
+    groupId: string,
+    newName: string
+): Promise<{ status: string; message: string }> {
+    try {
+        const res = await fetch(`${BASE_URL}/comm/edit-group/${groupId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ commName, newName }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            console.log("Failed to edit group:", data.message);
+            return {
+                status: "error",
+                message: data.message || "Failed to edit group.",
+            };
+        }
+        console.log("Group edited successfully:", data);
+        return data;
+    } catch (err) {
+        console.log("Error editing group:", err);
+        return {
+            status: "error",
+            message: err instanceof Error ? err.message : "Unknown error",
+        };
+    }
+}
