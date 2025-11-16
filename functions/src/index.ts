@@ -37,18 +37,39 @@ initializeApp({
 setGlobalOptions({ maxInstances: 10 });
 
 const storage = getStorage();
-
 const cloudUrl = "gs://circuit-link.firebasestorage.app";
 
-// Cloud function to generate a url for file upload to the cloud storage bucket
-export const generateUploadUrl = onCall({maxInstances: 1}, async (req) => {
+// Cloud function to generate a url for image upload to the cloud storage bucket
+export const generateImagesUploadUrl = onCall({maxInstances: 1}, async (req) => {
     if (!req.auth) {
         throw new HttpsError("failed-precondition", "The user must be authenticated to call this function.");
     }
 
     const auth = req.auth;
     const data = req.data;
-    const bucket = storage.bucket(`${cloudUrl}/media/images/`);
+    const bucket = storage.bucket(`${cloudUrl}/images/`);
+
+    const fileName = `${auth.uid}-${Date.now()}.${data.fileExtension}`;
+
+    // Generate a v4 signed URL with write permissions that expires in 10 minutes
+    const [url] = await bucket.file(fileName).getSignedUrl({
+        version: "v4",
+        action: "write",
+        expires: Date.now() + 10 * 60 * 1000
+    });
+
+    return {url, fileName};
+})
+
+// Cloud function to generate a url for video upload to the cloud storage bucket
+export const generateVideosUploadUrl = onCall({maxInstances: 1}, async (req) => {
+    if (!req.auth) {
+        throw new HttpsError("failed-precondition", "The user must be authenticated to call this function.");
+    }
+
+    const auth = req.auth;
+    const data = req.data;
+    const bucket = storage.bucket(`${cloudUrl}/videos/`);
 
     const fileName = `${auth.uid}-${Date.now()}.${data.fileExtension}`;
 
