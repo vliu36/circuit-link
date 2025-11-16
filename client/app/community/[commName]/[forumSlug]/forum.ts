@@ -67,3 +67,26 @@ export async function votePost(id: string, userId: string, type: "yay" | "nay") 
         body: JSON.stringify({ id, userId, type }),
     });
 }
+
+// Edit forum 
+export async function editForum(
+    forumId: string, 
+    name?: string, 
+    description?: string
+): Promise<{ status: string; message: string, newSlug?: string }> {
+    try {
+        const res = await fetch(`${BASE_URL}/forums/edit/${forumId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, description }),
+            credentials: "include",
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            return { status: "error", message: data.message || "Failed to edit forum.", newSlug: "" };
+        }
+        return { status: "ok", message: data.message || "Forum updated!", newSlug: data.newSlug || "" };
+    } catch (error) {
+        return { status: "error", message: "Failed to edit forum.", newSlug: ""};
+    }
+}

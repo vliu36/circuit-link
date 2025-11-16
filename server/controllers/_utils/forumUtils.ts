@@ -105,6 +105,13 @@ export async function deleteRepliesRecursively(parentRef: DocumentReference): Pr
         const replyRef = replyDoc.ref;
         await deleteRepliesRecursively(replyRef); // recursive step for nested replies
         await replyRef.delete();
+
+        // Update community's yayScore by decrementing the reply's yayScore
+        const replyData = replyDoc.data();
+        const commRef: FirebaseFirestore.DocumentReference = replyData?.parentCommunity;
+        await commRef.update({
+            yayScore: FieldValue.increment(-replyData?.yayScore || 0),
+        });
     }
 }
 

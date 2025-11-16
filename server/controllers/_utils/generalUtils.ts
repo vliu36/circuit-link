@@ -1,7 +1,7 @@
 // General utilities for controllers
 import { Request } from "express";
 import { DocumentReference, FieldValue, Timestamp } from "firebase-admin/firestore";
-import { db } from "../../firebase";
+import { auth, db } from "../../firebase";
 
 
 
@@ -18,6 +18,17 @@ export function cookieParser(req: Request): Record<string, string> {
     ); // end of const cookies
     // Return the parsed cookies as a Record<string, string>
     return cookies;
+}
+
+// Function to assist in getting userId from session cookie
+export async function getUserIdFromSessionCookie(req: Request): Promise<string> {
+    const cookies = cookieParser(req);
+    const sessionCookie = cookies.session;
+    if (!sessionCookie) {
+        throw new Error("Unauthorized: Missing session cookie");
+    }
+    const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+    return decodedClaims.uid;
 }
 
 // Create a new notification for a user

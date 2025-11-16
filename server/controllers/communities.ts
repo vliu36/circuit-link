@@ -2,8 +2,8 @@ import { DocumentReference, Timestamp, Firestore, FieldValue } from "firebase-ad
 import { db, auth } from "../firebase.ts";
 import { Request, Response } from "express";
 import admin from "firebase-admin";
-import { Group, Forum, deleteForumsInGroup, fetchUserData } from "./_utils/commUtils.ts";
-import { cookieParser } from "./_utils/generalUtils.ts";
+import { Group, Forum, deleteForumsInGroup, fetchUserData, addUserToCommunity, removeUserFromCommunity } from "./_utils/commUtils.ts";
+import { cookieParser, getUserIdFromSessionCookie } from "./_utils/generalUtils.ts";
 import { updateCommunityField } from "./users.ts";
 import { group } from "console";
 
@@ -32,13 +32,7 @@ const addDoc = async (req: Request, res: Response) => {
         const { name, description, isPublic }: { name: string; description: string; isPublic: boolean } = req.body;
 
         // Get userId from sessionCookie
-        const cookies = cookieParser(req); // parse cookies from helper function
-        const sessionCookie = cookies.session;
-        if (!sessionCookie) {
-            return res.status(401).send({ message: "Unauthorized: Missing session cookie" });
-        }
-        const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
-        const userId = decodedClaims.uid;
+        const userId = await getUserIdFromSessionCookie(req);
 
         // Clean up community name
         let cleanName = name.trim();                           // remove trailing spaces
@@ -76,6 +70,7 @@ const addDoc = async (req: Request, res: Response) => {
             public: isPublic,
             banner: "",
             icon: "",
+            yayScore: 0,
         }
         const commRef = await communitiesRef.add(data);
 
@@ -93,9 +88,9 @@ const addDoc = async (req: Request, res: Response) => {
             groupsInCommunity: admin.firestore.FieldValue.arrayUnion(generalGroupRef),
         });
 
-        // Update user's communities field
+        // Update user's communities field to include reference to new community
         await userRef.update({
-            communities: admin.firestore.FieldValue.arrayUnion(cleanName),
+            communities: admin.firestore.FieldValue.arrayUnion(commRef),
         })
 
         console.log("Successfully created community");
@@ -116,7 +111,10 @@ const addDoc = async (req: Request, res: Response) => {
 
 const createGroup = async (req: Request, res: Response) => {
     try {
-        const { commName, name, userId } = req.body;
+        const { commName, name } = req.body;
+
+        // Verify and get userId from session cookie
+        const userId = await getUserIdFromSessionCookie(req);
 
         const commsRef = db.collection("Communities");
         const commSnap = await commsRef.where("nameLower", "==", commName.toLowerCase()).get();
@@ -173,10 +171,7 @@ const deleteGroup = async (req: Request, res: Response) => {
         const { commName } = req.body;
 
         // Verify and get userId from session cookie
-        const cookies = cookieParser(req);
-        const sessionCookie = cookies.session;
-        const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
-        const userId = decodedClaims.uid; // Authenticated user's UID
+        const userId = await getUserIdFromSessionCookie(req);
 
         if (!commName || !userId) {
             console.log("No community or user provided.");
@@ -269,7 +264,7 @@ const deleteGroup = async (req: Request, res: Response) => {
     }
 };
 
-// TODO: ---------------- Add function that adds a user into a community as a user, mod, or owner ---------------- // 
+
 // User joins a community's userList, community is added to user's communities field
 const joinCommunity = async (req: Request, res: Response) => {
     try {
@@ -277,11 +272,7 @@ const joinCommunity = async (req: Request, res: Response) => {
         const { name } = req.params;
 
         // Verify and get userId from session cookie
-        const cookies = cookieParser(req); // parse cookies with helper function
-        const sessionCookie = cookies.session;
-        const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
-        const userId = decodedClaims.uid; // Authenticated user's UID
-
+        const userId = await getUserIdFromSessionCookie(req);
         if (!name || !userId) {
             console.log("Missing community name or user ID in request.");
             return res.status(400).send({
@@ -308,40 +299,8 @@ const joinCommunity = async (req: Request, res: Response) => {
         const commRef = commDoc.ref;
         const userRef = db.collection("Users").doc(userId);
 
-        // TODO: Turn this into a helper function 
-        // Run a transaction to safely update both user and community documents
-        await db.runTransaction(async (transaction) => {
-            const commSnap = await transaction.get(commRef);
-            const userSnap = await transaction.get(userRef);
-
-            // Check if user exists
-            if (!userSnap.exists) {
-                throw new Error("User not found");
-            }
-
-            const commData = commSnap.data();
-            const userList = commData?.userList || [];
-
-            // Check if user is already a member
-            const isMember = userList.some(
-                (ref: FirebaseFirestore.DocumentReference) => ref.id === userId
-            );
-
-            if (isMember) {
-                throw new Error("User is already a member of this community");
-            }
-
-            // Add the user reference to the community's userList
-            transaction.update(commRef, {
-                userList: FieldValue.arrayUnion(userRef),
-            });
-
-            // Add the community's name to the user's communities
-            transaction.update(userRef, {
-                communities: FieldValue.arrayUnion(name),
-            });
-        });
-        // TODO: End of todo
+        // Add user to community's userList and community to user's communities field
+        await addUserToCommunity(commRef, userRef, userId, name);
 
         console.log(`User ${userId} successfully joined community ${name}`);
         return res.status(200).send({
@@ -378,11 +337,7 @@ const leaveCommunity = async (req: Request, res: Response) => {
         const { name } = req.params;
 
         // Verify and get userId from session cookie
-        const cookies = cookieParser(req);
-        const sessionCookie = cookies.session;
-        const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
-        const userId = decodedClaims.uid;
-
+        const userId = await getUserIdFromSessionCookie(req);
         if (!name || !userId) {
             console.log("Missing community name or user ID in request.");
             return res.status(400).send({
@@ -410,48 +365,9 @@ const leaveCommunity = async (req: Request, res: Response) => {
         const commRef = commDoc.ref;
         const userRef = db.collection("Users").doc(userId);
 
-        // Run a transaction to safely update both user and community
-        // Dereferences the user from the community userList, and removes the community name from the user's communities list
-        await db.runTransaction(async (transaction) => {
-            const commSnap = await transaction.get(commRef);
-            const userSnap = await transaction.get(userRef);
 
-            if (!userSnap.exists) {
-                throw new Error("User not found");
-            }
-
-            const commData = commSnap.data();
-            if (!commData) {
-                throw new Error("Community data not found");
-            }
-
-            const userList: FirebaseFirestore.DocumentReference[] = commData.userList || [];
-            const ownerList: FirebaseFirestore.DocumentReference[] = commData.ownerList || []; 
-
-            const isMember = userList.some(ref => ref.id === userId);
-            const isOwner = ownerList.some(ref => ref.id === userId);
-
-            // Check if user is not a member
-            if (!isMember) {
-                throw new Error("User is not a member of this community.");
-            }
-            // Check if user is the only owner
-            if (isOwner && ownerList.length === 1) {
-                throw new Error("Cannot leave community: You are the only owner. Transfer ownership first before leaving.");
-            }
-
-            // Remove user from community userList, modList, and ownerList
-            transaction.update(commRef, {
-                userList: FieldValue.arrayRemove(userRef),
-                modList: FieldValue.arrayRemove(userRef),
-                ownerList: FieldValue.arrayRemove(userRef),
-            });
-
-            // Remove the community name from the user's communities field
-            transaction.update(userRef, {
-                communities: FieldValue.arrayRemove(name),
-            });
-        });
+        // Remove user from community
+        await removeUserFromCommunity(commRef, userRef, userId, name);
 
         console.log(`User ${userId} successfully left community ${name}`);
         return res.status(200).send({
@@ -488,11 +404,7 @@ const deleteDoc = async (req: Request, res: Response) => {
         const { name } = req.params;
 
         // Verify and get userId from session cookie
-        const cookies = cookieParser(req);
-        const sessionCookie = cookies.session;
-        const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
-        const userId = decodedClaims.uid; // Authenticated user's UID
-
+        const userId = await getUserIdFromSessionCookie(req);
         if (!name || !userId) {
             console.log("No community or user provided.");
             return res.status(400).send({
@@ -580,13 +492,7 @@ const promoteToMod = async (req: Request, res: Response) => {
         const { userId: targetId } = req.body; // This is the uid of the user being promoted.
 
         // Verify and get userId from session cookie
-        const cookies = cookieParser(req);
-        const sessionCookie = cookies.session;
-        if (!sessionCookie) {
-            return res.status(401).send({ message: "Unauthorized: Missing session cookie" });
-        }
-        const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
-        const ownerId = decodedClaims.uid; // Authenticated user's UID
+        const ownerId = await getUserIdFromSessionCookie(req);
 
         if (!name || !targetId) {
             return res.status(400).send({ message: "Missing community name or target user ID" });
@@ -640,13 +546,7 @@ const demoteMod = async (req: Request, res: Response) => {
         const { userId: targetId } = req.body; // UID of the user being demoted
 
         // Verify and get owner UID from session cookie
-        const cookies = cookieParser(req);
-        const sessionCookie = cookies.session;
-        if (!sessionCookie) {
-            return res.status(401).send({ message: "Unauthorized: Missing session cookie" });
-        }
-        const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
-        const ownerId = decodedClaims.uid;
+        const ownerId = await getUserIdFromSessionCookie(req);
 
         if (!name || !targetId) {
             return res.status(400).send({ message: "Missing community name or target user ID" });
@@ -701,13 +601,7 @@ const promoteToOwner = async (req: Request, res: Response) => {
         const { userId: targetId } = req.body; // UID of the user being promoted
 
         // Verify session cookie
-        const cookies = cookieParser(req);
-        const sessionCookie = cookies.session;
-        if (!sessionCookie) {
-            return res.status(401).send({ message: "Unauthorized: Missing session cookie" });
-        }
-        const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
-        const ownerId = decodedClaims.uid;
+        const ownerId = await getUserIdFromSessionCookie(req);
 
         if (!name || !targetId) {
             return res.status(400).send({ message: "Missing community name or target user ID" });
@@ -765,13 +659,7 @@ const demoteOwner = async (req: Request, res: Response) => {
         const { userId: targetId } = req.body; // UID of the owner being demoted
 
         // Verify session cookie
-        const cookies = cookieParser(req);
-        const sessionCookie = cookies.session;
-        if (!sessionCookie) {
-            return res.status(401).send({ message: "Unauthorized: Missing session cookie" });
-        }
-        const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
-        const ownerId = decodedClaims.uid;
+        const ownerId = await getUserIdFromSessionCookie(req);
 
         if (!name || !targetId) {
             return res.status(400).send({ message: "Missing community name or target user ID" });
@@ -884,6 +772,111 @@ const updateDoc = async (req: Request, res: Response) => {
     //TODO: Complete code stub
 }
 
+// Update a community's data
+const editComm = async (req: Request, res: Response) => {
+    try {
+        const { name } = req.params; // community name
+        const { description, isPublic } = req.body;
+        let { newName } = req.body; // new community name
+
+        // Verify and get userId from session cookie
+        const userId = await getUserIdFromSessionCookie(req);
+        
+        if (!name || !userId) {
+            console.log("No community or user provided.");
+            return res.status(400).send({
+                status: "Bad Request",
+                message: "Missing community name or user ID in request.",
+            });
+        }
+
+        // Verify if user is an owner of the community
+        const commsRef = db.collection("Communities");
+        const snapshot = await commsRef.where("nameLower", "==", name.toLowerCase()).get();
+        if (snapshot.empty) {
+            console.log(`No community found with name "${name}".`);
+            return res.status(404).send({
+                status: "Not Found",
+                message: `No community found with name "${name}".`,
+            });
+        }
+        const doc = snapshot.docs[0];
+        const commData = doc.data();
+        const userRef = db.doc(`/Users/${userId}`);
+        const ownerList: FirebaseFirestore.DocumentReference[] = commData.ownerList || [];
+        let isOwner = ownerList.some(ref => ref.path === userRef.path);
+        if (!isOwner) {
+            console.log(`User with ID ${userId} is unauthorized to edit this community.`);
+            return res.status(403).send({
+                status: "Forbidden",
+                message: "You are not authorized to edit this community.",
+            });
+        }
+
+        // If data sent does not change anything, return message
+        if (
+            (description === undefined || description === commData.description) &&
+            (isPublic === undefined || isPublic === commData.public) &&
+            (newName === undefined || newName === name) 
+        ) {
+            console.log("No changes detected in the update request.");
+            return res.status(200).send({
+                status: "ok",
+                message: "No changes detected in the update request.",
+            });
+        }
+
+        // Prepare update data
+        const updates: Partial<{ name: string; nameLower: string; description: string; public: boolean }> = {}
+        if (description !== undefined) updates.description = description;
+        if (isPublic !== undefined) updates.public = isPublic;
+
+        // Verify newName uniqueness if it is being changed
+        if (newName && newName !== name) {
+            const newNameLower = newName.toLowerCase();
+            const nameCheckSnap = await commsRef.where("nameLower", "==", newNameLower).get();
+            if (!nameCheckSnap.empty) {
+                console.log(`Community name "${newName}" is already taken.`);
+                return res.status(409).send({
+                    status: "Conflict",
+                    message: `Community name "${newName}" is already taken.`,
+                });
+            }
+            // NOTE: Updating users' communities field is currently disabled due to changes in community reference handling.
+            // // Update user's communities field
+            // const batch = db.batch();
+            // const userList: FirebaseFirestore.DocumentReference[] = commData.userList || [];
+            // for (const memberRef of userList) {
+            //     // Remove old name and add new name
+            //     batch.update(memberRef, {
+            //         communities: admin.firestore.FieldValue.arrayRemove(name),
+            //     });
+            //     batch.update(memberRef, {
+            //         communities: admin.firestore.FieldValue.arrayUnion(newName),
+            //     });
+            // }
+            // await batch.commit();
+
+            // Set name updates
+            updates.name = newName;
+            updates.nameLower = newNameLower;
+        }
+        
+        // Update community document
+        await doc.ref.update(updates);
+        console.log(`Community "${name}" successfully updated.`);
+        res.status(200).send({
+            status: "ok",
+            message: `Community "${name}" successfully updated.`,
+        });
+    } catch (err) {
+        res.status(500).send({
+            status: "Backend error",
+            message: err instanceof Error ? err.message : String(err),
+        });
+    }
+}
+
 const getCommunityStructure = async (req: Request, res: Response) => {
     try {
         const communityName = req.params.name;
@@ -938,6 +931,7 @@ const getCommunityStructure = async (req: Request, res: Response) => {
                 id: communityDoc.id,
                 name: communityData.name,
                 description: communityData.description,
+                public: communityData.public,
                 ownerList,
                 modList,
                 userList,
@@ -952,6 +946,7 @@ const getCommunityStructure = async (req: Request, res: Response) => {
         });
     } // end try catch
 } // end getCommunityStructure
+
 
 export {
     getAllDocuments,
@@ -969,4 +964,5 @@ export {
     demoteMod,
     promoteToOwner,
     demoteOwner,
+    editComm,
 }

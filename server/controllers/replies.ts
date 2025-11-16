@@ -75,6 +75,12 @@ const replyToReply = async (req: Request, res: Response) => {
             replyCount: FieldValue.increment(1),
         });
 
+        // Update community's yayScore
+        const commRef: FirebaseFirestore.DocumentReference = parentData?.parentCommunity;
+        await commRef.update({
+            yayScore: FieldValue.increment(1),
+        });
+
         res.status(200).json({ status: "OK", message: "Reply added to parent reply" });
     } catch (err) {
         console.error(err);
@@ -89,52 +95,129 @@ const voteReply = async (req: Request, res: Response) => {
         if (!["yay", "nay"].includes(type)) return res.status(400).json({ status: "error", message: "Invalid vote type" });
 
         const replyRef = db.collection("Replies").doc(id);
-        const replySnap = await replyRef.get();
-        if (!replySnap.exists) return res.status(404).json({ status: "error", message: "Reply not found" });
 
-        const replyData = replySnap.data();
-        const userRef = db.doc(`/Users/${userId}`);
-        const yayList: DocumentReference[] = replyData?.yayList || [];
-        const nayList: DocumentReference[] = replyData?.nayList || [];
-        let yayScore = replyData?.yayScore || 0;
+        await db.runTransaction(async (transaction) => {
+            const replySnap = await transaction.get(replyRef);
+            if (!replySnap.exists) throw new Error("Reply not found");
 
-        const liked = yayList.some((ref) => ref.path === userRef.path);
-        const disliked = nayList.some((ref) => ref.path === userRef.path);
+            const replyData = replySnap.data();
+            const userRef = db.doc(`/Users/${userId}`);
+            
+            const yayList: DocumentReference[] = replyData?.yayList || [];
+            const nayList: DocumentReference[] = replyData?.nayList || [];
 
-        let updatedYayList = [...yayList];
-        let updatedNayList = [...nayList];
+            // Old score
+            const oldYayScore = replyData?.yayScore || 0;
+            let yayScore = oldYayScore;
 
-        if (type === "yay") {
-            if (liked) {
-                updatedYayList = updatedYayList.filter((ref) => ref.path !== userRef.path);
-                yayScore -= 1;
+            const liked = yayList.some((ref) => ref.path === userRef.path);
+            const disliked = nayList.some((ref) => ref.path === userRef.path);
+            let updatedYayList = [...yayList];
+            let updatedNayList = [...nayList];
+
+            // Fetch parent community
+            const commRef: FirebaseFirestore.DocumentReference = replyData?.parentCommunity;
+            const commSnap = await transaction.get(commRef);
+            if (!commSnap.exists) throw new Error("Community not found");
+            
+            // Vote logic
+            if (type === "yay") {
+                if (liked) {
+                    updatedYayList = updatedYayList.filter((ref) => ref.path !== userRef.path);
+                    yayScore -= 1;
+                } else {
+                    if (disliked) {
+                        updatedNayList = updatedNayList.filter((ref) => ref.path !== userRef.path);
+                        yayScore += 1;
+                    }
+                    updatedYayList.push(userRef);
+                    yayScore += 1;
+                }
             } else {
                 if (disliked) {
                     updatedNayList = updatedNayList.filter((ref) => ref.path !== userRef.path);
                     yayScore += 1;
-                }
-                updatedYayList.push(userRef);
-                yayScore += 1;
-            }
-        } else {
-            if (disliked) {
-                updatedNayList = updatedNayList.filter((ref) => ref.path !== userRef.path);
-                yayScore += 1;
-            } else {
-                if (liked) {
-                    updatedYayList = updatedYayList.filter((ref) => ref.path !== userRef.path);
+                } else {
+                    if (liked) {
+                        updatedYayList = updatedYayList.filter((ref) => ref.path !== userRef.path);
+                        yayScore -= 1;
+                    }
+                    updatedNayList.push(userRef);
                     yayScore -= 1;
                 }
-                updatedNayList.push(userRef);
-                yayScore -= 1;
             }
-        }
 
-        await replyRef.update({ yayList: updatedYayList, nayList: updatedNayList, yayScore });
-        res.status(200).json({ status: "OK", message: "Vote updated", yayScore });
+            // Update reply document
+            transaction.update(replyRef, { 
+                yayList: updatedYayList, 
+                nayList: updatedNayList, 
+                yayScore 
+            });
+
+            // Update community's yayScore based on difference
+            const diff = yayScore - oldYayScore;
+            if (diff !== 0) {
+                // Update community yayScore
+                transaction.update(commRef, {
+                    yayScore: FieldValue.increment(diff),
+                });
+            }
+        }); // end of transaction
+
+        // const replySnap = await replyRef.get();
+        // if (!replySnap.exists) return res.status(404).json({ status: "error", message: "Reply not found" });
+
+        // const replyData = replySnap.data();
+        // const userRef = db.doc(`/Users/${userId}`);
+        // const yayList: DocumentReference[] = replyData?.yayList || [];
+        // const nayList: DocumentReference[] = replyData?.nayList || [];
+        // let yayScore = replyData?.yayScore || 0;
+
+        // const liked = yayList.some((ref) => ref.path === userRef.path);
+        // const disliked = nayList.some((ref) => ref.path === userRef.path);
+
+        // let updatedYayList = [...yayList];
+        // let updatedNayList = [...nayList];
+
+        // if (type === "yay") {
+        //     if (liked) {
+        //         updatedYayList = updatedYayList.filter((ref) => ref.path !== userRef.path);
+        //         yayScore -= 1;
+        //     } else {
+        //         if (disliked) {
+        //             updatedNayList = updatedNayList.filter((ref) => ref.path !== userRef.path);
+        //             yayScore += 1;
+        //         }
+        //         updatedYayList.push(userRef);
+        //         yayScore += 1;
+        //     }
+        // } else {
+        //     if (disliked) {
+        //         updatedNayList = updatedNayList.filter((ref) => ref.path !== userRef.path);
+        //         yayScore += 1;
+        //     } else {
+        //         if (liked) {
+        //             updatedYayList = updatedYayList.filter((ref) => ref.path !== userRef.path);
+        //             yayScore -= 1;
+        //         }
+        //         updatedNayList.push(userRef);
+        //         yayScore -= 1;
+        //     }
+        // }
+
+        // await replyRef.update({ yayList: updatedYayList, nayList: updatedNayList, yayScore });
+        res.status(200).json({ status: "OK", message: "Vote updated" });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ status: "error", message: err });
+        if (err instanceof Error) {
+            if (err.message.includes("not found")) {
+                return res.status(404).json({ status: "error", message: err.message });
+            } else {
+                res.status(500).json({ status: "error", message: err.message });
+            }
+        } else {
+            res.status(500).json({ status: "error", message: "Unknown error" });
+        }
     }
 };
 
@@ -172,6 +255,17 @@ const deleteDoc = async (req: Request, res: Response) => {
         const childReplies: DocumentReference[] = replyData?.listOfReplies || [];
         await deletePostRepliesRecursive(childReplies);
         await replyRef.delete();
+
+        // Update yayScore in parent community
+        const commRef: FirebaseFirestore.DocumentReference = replyData?.parentCommunity;
+        await commRef.update({
+            yayScore: FieldValue.increment(-replyData?.yayScore || 0),
+        });
+        // Decrement replyCount in parent post
+        const parentPostRef: FirebaseFirestore.DocumentReference = replyData?.parentPost;
+        await parentPostRef?.update({
+            replyCount: FieldValue.increment(-1),
+        });
 
         res.status(200).json({ status: "OK", message: `Reply ${replyId} deleted successfully` });
     } catch (err) {

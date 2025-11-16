@@ -43,4 +43,5 @@ export interface Community {
     userList: User[];
     ownerList: User[];
     modList: User[];
+    public: boolean;
 }

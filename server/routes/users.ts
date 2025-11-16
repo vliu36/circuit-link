@@ -51,7 +51,7 @@ router.post("/logout", users.logoutUser);
 router.delete("/delete-account", users.deleteDoc);
 
 /** Updates a user's profile information in Firestore and Firebase Authentication
- *  @route PUT /api/users/edit
+ *  @route PUT /api/users/edit-profile
  *  @header Authorization - Bearer token containing Firebase ID token
  *  @body username - (optional) String representing the user's new display name
  *  @body profileDesc - (optional) String representing the user's profile description

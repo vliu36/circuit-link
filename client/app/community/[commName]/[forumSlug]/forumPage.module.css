@@ -666,6 +666,100 @@
     background-color: rgb(15, 68, 167);
 }
 
+.editForumButton{
+    margin-left: 2vw;
+    padding: 0.5vw 1vw;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 1vw;
+    height: 4vh;
+    border-radius: 1em;
+    background-color: rgb(168, 156, 156);
+    font-size: 0.8vw;
+}
+
+.popupOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popupBox {
+    background-color: #5B6680;
+    padding: 2rem;
+    border-radius: 1em;
+    width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.popupText {
+    color: white;
+    margin-bottom: 1.5rem;
+    font-family: Inria Sans;
+}
+
+.inputField {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    border:floralwhite 1px solid;
+    border-radius: 0.5em;
+    font-family: Inria Sans;
+}
+
+.closeBtn {
+    background-color: #FF5C5C;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+}
+
+.saveBtn {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+}
+
+.closeBtn:hover {
+    background-color: #FF3B3B;
+}
+
+.saveBtn:hover {
+    background-color: #45a049;
+}
+
+
+
 @font-face {
   font-family: Jura;
   src: url('../../../../public/fonts/Jura-Light.ttf');
