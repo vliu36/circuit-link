@@ -137,10 +137,6 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
 
         // Create post data
         const now = Timestamp.fromDate(new Date());
-        const extractedKeywords: Set<string> = new Set([
-            ...title.split(" "),
-            ...contents.split(" "),
-        ]);    // Stores words into an array for post searching
         
         const postData = {
             title,
