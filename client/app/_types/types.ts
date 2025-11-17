@@ -3,7 +3,7 @@ export type Post = {
     id: string;
     title: string;
     contents: string;
-    media: string;
+    media: string | null;
     authorUsername: string;
     authorId: string;
     yayScore: number;
@@ -43,4 +43,7 @@ export interface Community {
     userList: User[];
     ownerList: User[];
     modList: User[];
+    public: boolean;
+    icon: string;
+    banner: string;
 }

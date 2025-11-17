@@ -47,7 +47,10 @@ export async function findForumRefInCommunity(commData: any, forumSlug: string):
 }
 
 // --- Helper: Retrieve and enrich post data ---
-export async function getFormattedPosts(postRefs: DocumentReference[]) {
+export async function getFormattedPosts(
+    postRefs: DocumentReference[], 
+    sortMode: string, // "newest" | "oldest" | "mostYays" | "alphabetical"
+) {
     const posts = await Promise.all(
         postRefs.map(async (postRef) => {
             const postSnap = await postRef.get();
@@ -86,10 +89,23 @@ export async function getFormattedPosts(postRefs: DocumentReference[]) {
         })
     );
 
-    // Remove nulls and sort
-    return posts
-        .filter(Boolean)
-        .sort((a: any, b: any) => (b.timePosted || 0) - (a.timePosted || 0));
+    const validPosts = posts.filter(Boolean);
+    switch (sortMode) {
+        case "newest":
+            return validPosts.sort((a: any, b: any) => (b.timePosted || 0) - (a.timePosted || 0));
+        case "oldest":
+            return validPosts.sort((a: any, b: any) => (a.timePosted || 0) - (b.timePosted || 0));
+        case "mostYays":
+            return validPosts.sort((a: any, b: any) => (b.yayList.length || 0) - (a.yayList.length || 0));
+        case "alphabetical":
+            return validPosts.sort((a: any, b: any) => {
+                const titleA = (a.title || "").toLowerCase();
+                const titleB = (b.title || "").toLowerCase();
+                return titleA.localeCompare(titleB);
+            });
+        default:
+            return validPosts;
+    }
 }
 
 // -------- Helper functions for deleteForum -------- //
@@ -105,6 +121,13 @@ export async function deleteRepliesRecursively(parentRef: DocumentReference): Pr
         const replyRef = replyDoc.ref;
         await deleteRepliesRecursively(replyRef); // recursive step for nested replies
         await replyRef.delete();
+
+        // Update community's yayScore by decrementing the reply's yayScore
+        const replyData = replyDoc.data();
+        const commRef: FirebaseFirestore.DocumentReference = replyData?.parentCommunity;
+        await commRef.update({
+            yayScore: FieldValue.increment(-replyData?.yayScore || 0),
+        });
     }
 }
 

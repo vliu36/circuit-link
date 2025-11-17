@@ -1,7 +1,9 @@
-import { auth, db, storage } from "../_firebase/firebase";
+import { auth, db, storage, app, functions } from "../_firebase/firebase";
 import { updateProfile, sendEmailVerification } from "firebase/auth";
 import { doc, DocumentReference, getDoc, updateDoc } from "firebase/firestore";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+// import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { getFunctions, httpsCallable } from "firebase/functions";
+import { uploadImage } from "../_utils/mediaUpload";
 
 // Interface for updatedData in function editProfile
 interface updatedData {
@@ -128,24 +130,31 @@ export async function editProfile(username: string, profileDesc: string, textSiz
 // Update profile picture
 export async function uploadProfilePicture(file: File) {
     try {
-        // Create storage reference for the file
-        const fileRef = ref(storage, `profiles/${file.name}`);
-        const snapshot = await uploadBytes(fileRef, file);
-        const downloadURL = await getDownloadURL(snapshot.ref);
-        console.log("Profile picture uploaded. URL:", downloadURL);
+        // Upload image using updated storage handler
+        const fileName = await uploadImage(file);
+        if (!fileName) {
+            throw new Error("Image upload failed — no filename returned.");
+        }
 
-        // Update user's profile in auth
-        await updateProfile(auth.currentUser!, { photoURL: downloadURL });
+        // Storage folder for images
+        const finalPublicPath = `images/${fileName}`;
+        const publicUrl = `https://storage.googleapis.com/circuit-link.firebasestorage.app/${finalPublicPath}`;
 
-        // Update user's document in Firestore
+        // Update Firebase Auth profile
+        await updateProfile(auth.currentUser!, { photoURL: publicUrl });
+
+        // Update Firestore user document
         const userDocRef = doc(db, "Users", auth.currentUser!.uid);
-        await updateDoc(userDocRef, { photoURL: downloadURL });
-        // return downloadURL;
+        await updateDoc(userDocRef, { photoURL: publicUrl });
+
+        console.log("Profile picture uploaded. URL:", publicUrl);
+        return publicUrl;
+
     } catch (error) {
         console.error("Error uploading profile picture:", error);
         throw error;
-    } // end try catch
-} // end function uploadProfilePicture
+    }
+}
 
 // Live username check
 export const basicUsernameCheck = (username: string) => {

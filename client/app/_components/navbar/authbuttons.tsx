@@ -2,7 +2,7 @@
 import { User } from "firebase/auth";
 import Styles from "./navbar.module.css";
 import Link from "next/link";
-import { logout } from "../../landing.ts";
+import { logout } from "../../OldDefault/landing.ts";
 
 export default function AuthButtons({ user }: { user: User | null}) {
     console.log(user);

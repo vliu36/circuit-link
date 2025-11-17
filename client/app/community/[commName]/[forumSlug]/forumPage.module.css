@@ -12,7 +12,7 @@
 
 .createSection {
     width: 80%;
-    height: 30vh;
+    height: 70vh;
     margin-left: 10%;
     margin-top: 3vh;
 }
@@ -21,7 +21,13 @@
     width: 80%;
     height: 25vh;
     margin-left: 10%;
-    margin-top: 3vh;
+    margin-top:1%;
+}
+
+.createContainer{
+    width: 100%;
+    height: 50vh;
+
 }
 
 .input,
@@ -183,10 +189,18 @@
 
 .background {
     background-color: rgb(28, 38, 66);
-    display: flex;
+    display: grid;
     width: 100%;
     height: 100vh;
     overflow-x:hidden;
+    grid-template-columns: 16.67vw 58.67vw 16.67vw;
+    grid-template-rows: 6vh 34vh 54vh;
+    grid-template-areas: 
+    "NavBar NavBar NavBar"
+    "CommunitiesBar Center RightBar"
+    "ServerBar Center RightBar";
+    row-gap: 3%;
+    column-gap: 4%;
 }
 
 .text {
@@ -307,12 +321,8 @@
 
 .yourCommunitiesBar{
     background-color: rgb(11, 11, 44);
-    width: 20%;
-    height: 25vh;
     display: flex;
     flex-direction: column;
-    position: absolute;
-    top: 51px;
     font-family: Inria Sans;
     color: gray;
     text-indent: 3%;
@@ -322,12 +332,8 @@
 
 .serverBar{
     background-color: rgb(11, 11, 44);
-    width: 20%;
-    height: 70vh;
     display: flex;
     flex-direction: column;
-    position: absolute;
-    bottom: 0vw;
     text-indent: 3%;
     font-family: Inria Sans;
     font-size: 25px;
@@ -338,12 +344,8 @@
 
 .serverContainer{
     background-color: rgb(11, 11, 44);
-    width: 100%;
-    height: 65vh;
     display: flex;
     flex-direction: column;
-    position: absolute;
-    bottom: 0vw;
     font-family: Inria Sans;
     font-size: 15px;
     color: gray;
@@ -406,13 +408,8 @@
 
 .channelInfoBox{
     background-color: rgb(11, 11, 44);
-    width: 20%;
-    height: 20vh;
     display: flex;
     flex-direction: column;
-    position: absolute;
-    top: 51px;
-    right: 0px;
     font-family: Inria Sans;
     color: gray;
     text-indent: 3%;
@@ -455,13 +452,8 @@
 
 .RightBar{
     background-color: rgb(11, 11, 44);
-    width: 20%;
-    height: 75vh;
     display: flex;
     flex-direction: column;
-    position: absolute;
-    right: 0px;
-    bottom: 0vw;
     font-family: Inria Sans;
     color: rgb(255, 255, 255);
     font-size: 25px;
@@ -481,13 +473,8 @@
 
 .usersBar{
     background-color: rgb(11, 11, 44);
-    width: 100%;
-    height: 55vh;
     display: flex;
     flex-direction: column;
-    position: absolute;
-    right: 0px;
-    bottom: 0vw;
     font-family: Inria Sans;
     color: rgb(255, 255, 255);
     font-size: 25px;
@@ -519,13 +506,8 @@
 }
 
 .centerPage{
-    width: 60%;
-    height: 94vh;
     overflow-y: auto;
     overflow-x: hidden;
-    position: absolute;
-    left:20vw;
-    top: 2.7vw;
     display: flex;
     flex-direction: column;
     color: rgb(255, 255, 255);
@@ -658,6 +640,105 @@
     margin-top: 0.25%;
     margin-left: 45%;
     background-color: rgb(15, 68, 167);
+}
+
+.editForumButton{
+    margin-left: 2vw;
+    padding: 0.5vw 1vw;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    font-size: 1vw;
+    height: 4vh;
+    border-radius: 1em;
+    background-color: rgb(168, 156, 156);
+    font-size: 0.8vw;
+}
+
+.popupOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popupBox {
+    background-color: #5B6680;
+    padding: 2rem;
+    border-radius: 1em;
+    width: 400px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    text-align: center;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.popupText {
+    color: white;
+    margin-bottom: 1.5rem;
+    font-family: Inria Sans;
+}
+
+.inputField {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    border:floralwhite 1px solid;
+    border-radius: 0.5em;
+    font-family: Inria Sans;
+}
+
+.closeBtn {
+    background-color: #FF5C5C;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+}
+
+.saveBtn {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+}
+
+.closeBtn:hover {
+    background-color: #FF3B3B;
+}
+
+.saveBtn:hover {
+    background-color: #45a049;
+}
+
+.mediaPreview {
+    max-width: 100%;
+    max-height: 200px;
+    margin-top: 1rem;
+    border-radius: 0.5em;
 }
 
 @font-face {

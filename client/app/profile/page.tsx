@@ -6,7 +6,6 @@ import { useAuth } from "../_firebase/context";
 import "./profile-styles.css";
 import Image from 'next/image';
 import Link from 'next/link';
-import NavBar from "../_components/navbar/navbar.tsx";
 
 
 export default function Profile() {
@@ -123,16 +122,12 @@ export default function Profile() {
     };
 
     return (
-        <div>
-        <div className = "navBox">
-                <NavBar/>
-            </div>
         <main>
             {/* Profile */}
             <div className="profile-card">
                 <h1>Profile</h1>
                 <p>Welcome to your profile page!</p>
-                <Link className="go-back-btn" href = "./landing" replace>Go back</Link>
+                <Link className="go-back-btn" href = "/" replace>Go back</Link>
                 <br/>
                 <br/>
                 <Link className="go-back-btn" href = "/profile/notifications">Go to Notifications</Link>
@@ -288,6 +283,5 @@ export default function Profile() {
                 <script className="logout-btn" onClick={() => { profileFunctions.logout(); }}>Log Out</script>
             </div>
         </main>
-        </div>
     );
 }

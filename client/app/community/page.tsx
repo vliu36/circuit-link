@@ -41,6 +41,9 @@ export default function CommunityCreatePage() {
                     <input
                         type="text"
                         value={name}
+                        maxLength={24} 
+                        pattern="^[a-zA-Z0-9_-]+$"
+                        title="24 characters max. Name can only contain letters, numbers, underscores, and hyphens."
                         onChange={(e) => setName(e.target.value)}
                         required
                     />
@@ -51,6 +54,8 @@ export default function CommunityCreatePage() {
                     Description: <br />
                     <textarea
                         value={description}
+                        maxLength={100} 
+                        title="100 characters max."
                         onChange={(e) => setDescription(e.target.value)}
                         required
                     />

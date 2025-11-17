@@ -27,8 +27,16 @@ export async function deleteRepliesRecursively(replyRef: DocumentReference) {
         await deleteRepliesRecursively(replyDoc.ref); // recursive deletion
         await replyDoc.ref.delete();
     }
+    
+    // Update community's yayScore by decrementing the reply's yayScore
+    const replyData = (await replyRef.get()).data();
+    const commRef: FirebaseFirestore.DocumentReference = replyData?.parentCommunity;
+    await commRef.update({
+        yayScore: FieldValue.increment(-replyData?.yayScore || 0),
+    });
 
     await replyRef.delete(); // finally delete the reply itself
+
 }
 
 // --- Helper function for deleteGroup to recursively delete posts and replies in a forum --- //
@@ -49,6 +57,12 @@ export async function deletePostsInForum(forumRef: DocumentReference) {
             await deleteRepliesRecursively(replyDoc.ref);
         }
 
+        // Update community's yayScore by decrementing the post's yayScore
+        const postData = postDoc.data();
+        const commRef: FirebaseFirestore.DocumentReference = postData?.parentCommunity;
+        await commRef.update({
+            yayScore: FieldValue.increment(-postData?.yayScore || 0),
+        });
         await postRef.delete(); // delete the post itself
     }
 }
@@ -90,3 +104,108 @@ export const fetchUserData = async (userRefs: DocumentReference[]) => {
     }
     return users;
 };
+
+// Helper function for joinCommunity in /controllers/communities.ts to add user to community and community to user's communities field
+export const addUserToCommunity = async (
+    commRef: FirebaseFirestore.DocumentReference,
+    userRef: FirebaseFirestore.DocumentReference,
+    userId: string,
+    communityName: string
+): Promise<void> => {
+    await db.runTransaction(async (transaction) => {
+        const commSnap = await transaction.get(commRef);
+        const userSnap = await transaction.get(userRef);
+
+        // Check if user exists
+        if (!userSnap.exists) {
+            throw new Error("User not found");
+        }
+
+        const commData = commSnap.data();
+        const userList = commData?.userList || [];
+
+        // Check if user is already a member
+        const isMember = userList.some(
+            (ref: FirebaseFirestore.DocumentReference) => ref.id === userId
+        );
+
+        if (isMember) {
+            throw new Error("User is already a member of this community");
+        }
+
+        // Add the user reference to the community's userList, increment numUsers
+        transaction.update(commRef, {
+            userList: FieldValue.arrayUnion(userRef),
+            numUsers: FieldValue.increment(1),
+        });
+
+        // Add the community's reference to the user's communities
+        transaction.update(userRef, {
+            communities: FieldValue.arrayUnion(commRef),
+        });
+    });
+};
+
+// Helper function to remove user from community
+export const removeUserFromCommunity = async (
+    commRef: DocumentReference, 
+    userRef: DocumentReference, 
+    userId: string, 
+    communityName: string
+) => {
+    await db.runTransaction(async (transaction) => {
+        const commSnap = await transaction.get(commRef);
+        const userSnap = await transaction.get(userRef);
+
+        if (!userSnap.exists) {
+            throw new Error("User not found");
+        }
+
+        const commData = commSnap.data();
+        if (!commData) {
+            throw new Error("Community data not found");
+        }
+
+        const userList: FirebaseFirestore.DocumentReference[] = commData.userList || [];
+        const ownerList: FirebaseFirestore.DocumentReference[] = commData.ownerList || []; 
+
+        const isMember = userList.some(ref => ref.id === userId);
+        const isOwner = ownerList.some(ref => ref.id === userId);
+
+        // Check if user is not a member
+        if (!isMember) {
+            throw new Error("User is not a member of this community.");
+        }
+        // Check if user is the only owner
+        if (isOwner && ownerList.length === 1) {
+            throw new Error("Cannot leave community: You are the only owner. Transfer ownership first before leaving.");
+        }
+
+        // Remove user from community userList, modList, and ownerList, decrement numUsers
+        transaction.update(commRef, {
+            userList: FieldValue.arrayRemove(userRef),
+            modList: FieldValue.arrayRemove(userRef),
+            ownerList: FieldValue.arrayRemove(userRef),
+            numUsers: FieldValue.increment(-1),
+        });
+
+        // Remove the community reference from the user's communities field
+        transaction.update(userRef, {
+            communities: FieldValue.arrayRemove(commRef),
+        });
+    });
+};
+
+// Helper function to get community by name
+export async function getCommunityByName(db: FirebaseFirestore.Firestore, commName: string) {
+    const nameLower = commName.toLowerCase();
+    const commRef = db.collection("Communities");
+    const snapshot = await commRef.where("nameLower", "==", nameLower).get();
+
+    if (snapshot.empty) {
+        throw new Error(`Community "${commName}" not found`);
+    }
+
+    const doc = snapshot.docs[0];
+    return { ref: doc.ref, data: doc.data() };
+}

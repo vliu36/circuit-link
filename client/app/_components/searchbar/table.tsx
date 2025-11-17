@@ -8,12 +8,21 @@ interface SearchResultProps {
     items?: string[],
 }
 
-export default function Table({items}: SearchResultProps) {
+export default function Table({ items }: SearchResultProps) {
     return (
-        <ul> 
-            {items?.map((item: string) => (
-                <li className={Styles.searchResult} key={item}>
-                    <Link href={`/community/${item}`}>{item}</Link>
+        <ul>
+            {items?.map((item: string, index: number) => (
+                <li key={item}>
+                    <div className={Styles.resultBox}>
+                        <div className={Styles.resultText}>
+                            <Link href={`/community/${item}`}>{item}</Link>
+                        </div>
+
+                        {/* Only show the line if it's NOT the last item */}
+                        {index !== items.length - 1 && (
+                            <div className={Styles.line}></div>
+                        )}
+                    </div>
                 </li>
             ))}
         </ul>

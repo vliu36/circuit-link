@@ -1,7 +1,7 @@
 // General utilities for controllers
 import { Request } from "express";
 import { DocumentReference, FieldValue, Timestamp } from "firebase-admin/firestore";
-import { db } from "../../firebase";
+import { auth, db } from "../../firebase";
 
 
 
@@ -18,6 +18,17 @@ export function cookieParser(req: Request): Record<string, string> {
     ); // end of const cookies
     // Return the parsed cookies as a Record<string, string>
     return cookies;
+}
+
+// Function to assist in getting userId from session cookie
+export async function getUserIdFromSessionCookie(req: Request): Promise<string> {
+    const cookies = cookieParser(req);
+    const sessionCookie = cookies.session;
+    if (!sessionCookie) {
+        throw new Error("Unauthorized: Missing session cookie");
+    }
+    const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+    return decodedClaims.uid;
 }
 
 // Create a new notification for a user
@@ -66,3 +77,33 @@ export async function createNotification({
         throw new Error("Internal server error");
     } // end try catch
 } // end function createNotification
+
+// Verify if a user is an owner or moderator of a community
+export async function verifyUserIsOwnerOrMod(
+    commData: FirebaseFirestore.DocumentData, 
+    userId: string, 
+    db: FirebaseFirestore.Firestore, 
+    ownerOnly: boolean = false          // If true, only check for owner status
+) {
+    const userRef = db.doc(`/Users/${userId}`);
+
+    const ownerList: FirebaseFirestore.DocumentReference[] = commData.ownerList || [];
+    const modList: FirebaseFirestore.DocumentReference[] = commData.modList || [];
+
+    const isOwner = ownerList.some(ref => ref.path === userRef.path);
+    const isMod = modList.some(ref => ref.path === userRef.path);
+
+    // If only owner check is required
+    if (ownerOnly) {
+        if (!isOwner) {
+            throw new Error("User is not authorized (must be owner)");
+        }
+        return { isOwner, isMod: false };
+    }
+
+    // Default behavior: check for owner OR mod
+    if (!isOwner && !isMod) {
+        throw new Error("User is not authorized (must be owner or moderator)");
+    }
+    return { isOwner, isMod };
+}

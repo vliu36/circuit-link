@@ -2,13 +2,10 @@
 import React from "react";
 import Styles from "./bugreports.module.css";
 import Link from "next/link";
-import NavBar from "../_components/navbar/navbar.tsx";
 
 export default function BugReports() {
     
     return (
-        <div>
-            <NavBar/>
         <div className = {Styles.background}>
             <div className = {Styles.pageDoc}>
                 <br/>
@@ -30,7 +27,6 @@ export default function BugReports() {
             <Link className = {Styles.returnButton} href = "./landing" replace>
                     <h1 className = {Styles.returnButtonText}>Return</h1>
             </Link>
-        </div>
         </div>
     );
 }

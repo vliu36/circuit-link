@@ -37,7 +37,7 @@ export default function Login() {
     // ---- HTML ---- //
     return (
     <div>
-        <NavBar/>
+        <NavBar/>    
     <main>
         <div className={Styles.background}>
             <div className={Styles.loginContainer}>
@@ -87,30 +87,7 @@ export default function Login() {
                 </div>
             </form>
 
-            {isOpen && (
-                <div className="popup-overlay" onClick={togglePopup}>
-                    <div className="popup-box" onClick={(e) => e.stopPropagation()}>
-                        <h2 className="popup-text">Reset Password</h2>
-                        <form onSubmit={handleSubmitForgotPassword}>
-                            <input
-                            type="email"
-                            className="popup-text"
-                            placeholder="Enter your email"
-                            onChange={(e) => setEmail(e.target.value)}
-                            required
-                            />
 
-                            <button type="submit" className="popup-text">
-                                Send Reset Link
-                            </button>
-                        </form>
-
-                        <button className="close-button popup-text" onClick={togglePopup}>
-                            Close
-                        </button>
-                    </div>
-                </div>
-            )}
             
             <div className = {Styles.lineBox}>
                 <div className = {Styles.lefthorizontalLine}></div>
@@ -134,5 +111,33 @@ export default function Login() {
             </div>
         </div>
     </div> 
-</main>
-</div>)}
+
+    {/* Moved this outside because overlay wasn't working properly; only darkened the background for the login box */}
+    {/* This is a popup form that appears when the user clicks "Forgot Password?" */}
+    {isOpen && (
+        <div className={Styles.popupOverlay} onClick={togglePopup}>
+            <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                <h2 className={Styles.popupText}>Reset Password</h2>
+                <form onSubmit={handleSubmitForgotPassword}>
+                    <input
+                    type="email"
+                    className={Styles.popupText}
+                    placeholder="Enter your email"
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    />
+                    <button type="submit" className={Styles.popupText}>
+                        Send Reset Link
+                    </button>
+                </form>
+
+                <button className={` ${Styles.closeBtn} ${Styles.popupText}`} onClick={togglePopup}>
+                    Close
+                </button>
+            </div>
+        </div>
+    )}
+    </main>
+    </div>
+    );
+} // end Login component

@@ -1,10 +1,13 @@
 const BASE_URL = "http://localhost:2400/api"; // adjust as needed
+import { uploadImage } from "@/app/_utils/mediaUpload.ts";
 import { Community } from "../../_types/types.ts";
+import { updateProfile } from "firebase/auth/web-extension";
+import { doc, updateDoc, getDoc} from "firebase/firestore";
+import { auth, db } from "@/app/_firebase/firebase.ts";
 
 interface CreateForumParams {
     name: string;
     description: string;
-    userId: string;
     groupId: string;
     commName: string;
 }
@@ -14,14 +17,14 @@ export async function fetchStructure(communityName: string): Promise<Community |
     try {
         const res = await fetch (`${BASE_URL}/comm/get-structure/${communityName}`);
         if (!res.ok) {
-            console.error("Failed to fetch community structure", res.status, res.statusText);
+            console.log("Failed to fetch community structure", res.status, res.statusText);
             return null;
         }
 
         const data = await res.json();
         
         if (data.status !== "ok" || !data.community) {
-            console.error("Error in response data:", data);
+            console.log("Error in response data:", data);
             return null;
         }
 
@@ -33,7 +36,7 @@ export async function fetchStructure(communityName: string): Promise<Community |
 } // end fetchStructure
 
 // Create a group in the current community
-export async function createGroup( commName: string, name: string, userId: string ): Promise<{ status: string; message: string; groupId?: string }> {
+export async function createGroup( commName: string, name: string): Promise<{ status: string; message: string }> {
     try {
         const res = await fetch(`${BASE_URL}/comm/create-group`, {
             method: "POST",
@@ -43,14 +46,14 @@ export async function createGroup( commName: string, name: string, userId: strin
             body: JSON.stringify({
                 commName,
                 name,
-                userId,
             }),
+            credentials: "include",
         });
 
         const data = await res.json();
 
         if (!res.ok) {
-            console.error("Failed to create group:", data.message);
+            console.log("Failed to create group:", data.message);
             return {
                 status: "error",
                 message: data.message || "Failed to create group.",
@@ -99,14 +102,15 @@ export async function deleteGroup(groupId: string, commName: string): Promise<{ 
 } // end deleteGroup
 
 // Create a forum in a specified group within a community
-export async function createForum({ name, description, userId, groupId, commName, }: CreateForumParams): Promise<string> {
+export async function createForum({ name, description, groupId, commName, }: CreateForumParams): Promise<string> {
     try {
         const res = await fetch(`${BASE_URL}/forums/create`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ name, description, userId, groupId, commName }),
+            body: JSON.stringify({ name, description, groupId, commName }),
+            credentials: "include",
         }); 
     
         const data = await res.json();
@@ -323,5 +327,118 @@ export async function demoteOwner(commName: string, userId: string): Promise<{ s
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error",
         };
+    }
+}
+
+// Edit community details
+export async function editCommunity(
+    commName: string,           // current community name
+    newName?: string,           // new name for the community (optional)
+    description?: string,       // new description for the community (optional)
+    isPublic?: boolean          // new public status for the community (optional)
+): Promise<{ status: string; message: string }> {
+    try {
+        const res = await fetch(`${BASE_URL}/comm/edit/${commName}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ newName, description, isPublic }),
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+            console.log("Failed to edit community:", data.message);
+            return {
+                status: "error",
+                message: data.message || "Failed to edit community.",
+            };
+        }
+        console.log("Community edited successfully:", data);
+        return data;
+    } catch (err) {
+        console.log("Error editing community:", err);
+        return {
+            status: "error",
+            message: err instanceof Error ? err.message : "Unknown error",
+        };
+    }
+}
+
+// Edit group name
+export async function editGroup(
+    commName: string,
+    groupId: string,
+    newName: string
+): Promise<{ status: string; message: string }> {
+    try {
+        const res = await fetch(`${BASE_URL}/comm/edit-group/${groupId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ commName, newName }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            console.log("Failed to edit group:", data.message);
+            return {
+                status: "error",
+                message: data.message || "Failed to edit group.",
+            };
+        }
+        console.log("Group edited successfully:", data);
+        return data;
+    } catch (err) {
+        console.log("Error editing group:", err);
+        return {
+            status: "error",
+            message: err instanceof Error ? err.message : "Unknown error",
+        };
+    }
+}
+
+// Change community icon
+export async function changeCommunityIcon(file: File, commId: string) {
+    try {
+        // Upload new icon
+        const fileName = await uploadImage(file);
+        if (!fileName) throw new Error("Image upload failed — no filename returned.");
+
+        // Construct public URL
+        const finalPublicPath = `images/${fileName}`;
+        const publicUrl = `https://storage.googleapis.com/circuit-link.firebasestorage.app/${finalPublicPath}`;
+
+        // Update community document in Firestore
+        const commDocRef = doc(db, "Communities", commId);
+        await updateDoc(commDocRef, { icon: publicUrl });
+
+        console.log("Community icon updated successfully:", publicUrl);
+        return publicUrl;
+
+    } catch (error) {
+        console.error("Error uploading profile picture:", error);
+        throw error;
+    }
+}
+
+// Change community banner
+export async function changeCommunityBanner(file: File, commId: string) {
+    try {
+        // Upload new banner
+        const fileName = await uploadImage(file);
+        if (!fileName) throw new Error("Image upload failed — no filename returned.");
+
+        // Construct public URL
+        const finalPublicPath = `images/${fileName}`;
+        const publicUrl = `https://storage.googleapis.com/circuit-link.firebasestorage.app/${finalPublicPath}`;
+
+        // Update community document in Firestore
+        const commDocRef = doc(db, "Communities", commId);
+        await updateDoc(commDocRef, { banner: publicUrl });
+        console.log("Community banner updated successfully:", publicUrl);
+        return publicUrl;
+
+    } catch (error) {
+        console.error("Error uploading profile picture:", error);
+        throw error;
     }
 }

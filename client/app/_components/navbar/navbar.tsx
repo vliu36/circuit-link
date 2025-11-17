@@ -8,7 +8,10 @@ import { useEffect, useState, useRef } from "react";
 import { User } from "firebase/auth";
 import { authStateCallback } from "@/app/_firebase/auth-observer.ts";
 import { useAuth } from "@/app/_firebase/context.tsx";
-import { logout } from '../../landing.ts';
+import { logout } from '../../OldDefault/landing.ts';
+import HomeLogo from '../../../public/CircuitLinkHomeLogo.svg'
+import ProfilePic from '../../../public/circleUser.svg'
+import notificationBell from '../../../public/notification.svg'
            
 export default function NavBar() {
     const [user, setUser] = useState<User | null>(null);
@@ -80,24 +83,29 @@ export default function NavBar() {
     return (
         !user ?(
         <div className = {Styles.navBox}>
-                <Link href = "http://localhost:3000/landing" replace>
-                    <Image className = {Styles.homeLogo} src="./CircuitLinkHomeLogo.svg" width={200} height={50} alt="Circuit Link Logo"/>
+            <div style={{gridArea: 'Home'}}>
+                <Link href="/" replace>
+                    <Image className = {Styles.homeLogo} src={HomeLogo} width={200} height={50} alt="Circuit Link Logo"/>
                 </Link>
-                <div className = {Styles.logInInfo}>
+            </div>
+                
+            <div className = {Styles.logInInfo} style={{gridArea: 'login'}}>
                     <Link className = {Styles.logInSignUpButton} href="./signin" replace> Log In </Link>
                     <h1 className = {Styles.orText}> or </h1>
                     <Link className = {Styles.logInSignUpButton} href="./register" replace> Sign Up </Link>
-                </div>
+            </div>
+            <div className={Styles.line} style={{gridArea: 'line'}}></div>
         </div>
         )
         :(
             <div className = {Styles.navBox}>
-                {/*else , if a user is signed in*/}
-                <Link href = "http://localhost:3000/landing" replace>
-                    <Image className = {Styles.homeLogo} src="./CircuitLinkHomeLogo.svg" alt="Logo" width={200} height={200}>
-                    </Image>
-                </Link>
-                <div className = {Styles.logInInfo}>
+                {/*user signed in*/}
+                <div className = {Styles.homeLogo} style={{gridArea: 'Home'}}>
+                    <Link href="/" replace>
+                        <Image src={HomeLogo} alt="Logo" width={200} height={200}></Image>
+                    </Link>
+                </div>
+                <div className = {Styles.logInInfo} style={{gridArea: 'login'}}>
                     <div className = {Styles.notifDropdown} ref = {notifRef}>
                         <button onClick={() => setIsNotifOpen(prev => !prev)}>
                              <Image src = "./notification.svg" alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
@@ -108,7 +116,6 @@ export default function NavBar() {
                             </div>
                             )}
                     </div>
-
                     <div className = {Styles.dropdown} ref = {dropdownRef}>
                         <button onClick={() => setIsDropdownOpen(prev => !prev)}>
                             <Image src = {user?.photoURL || "/circleUser.svg"} className = {Styles.settingsIcon} alt="User profile" width = {10} height = {10}></Image>
@@ -116,11 +123,13 @@ export default function NavBar() {
                           {isDropdownOpen && (
                             <div className = {Styles.dropdownMenu}>
                                 <Link href = "http://localhost:3000/profile" replace>Profile</Link>
-                                <button>Settings</button>
-                                <button onClick={logout}>Log Out</button>
+                                <button style = {{color:'black'}}>Settings</button>
+                                <button style = {{color:'black'}}onClick={logout}>Log Out</button>
                             </div>
                             )}
                     </div>
+                </div>
+                <div className={Styles.line} style={{gridArea: 'line'}}>
                 </div>
             </div>
             

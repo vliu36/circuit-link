@@ -1,8 +1,14 @@
+import { uploadImage, uploadVideo } from "@/app/_utils/mediaUpload";
+
 const BASE_URL = "http://localhost:2400/api";
 
 // Fetch posts belonging to a specific forum
-export async function fetchPostsByForum(commName: string, forumSlug: string) {
-    const res = await fetch(`${BASE_URL}/forums/get/${commName}/${forumSlug}`);
+export async function fetchPostsByForum(commName: string, forumSlug: string, sortMode: string) {
+    const res = await fetch(`${BASE_URL}/forums/get/${commName}/${forumSlug}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sortMode }),
+    });
 
     // Defensive: handle non-JSON or errors
     if (!res.ok) {
@@ -29,12 +35,13 @@ export async function createPost(
     title: string,
     contents: string,
     commName: string,
-    forumSlug: string
+    forumSlug: string,
+    media: string | null = null
 ) {
     const res = await fetch(`${BASE_URL}/posts/make-post`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ author, title, contents, commName, forumSlug }),
+        body: JSON.stringify({ author, title, contents, commName, forumSlug, media }),
     });
     const data = await res.json();
     return data.message || "Post added!";
@@ -66,4 +73,53 @@ export async function votePost(id: string, userId: string, type: "yay" | "nay") 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, userId, type }),
     });
+}
+
+// Edit forum 
+export async function editForum(
+    forumId: string, 
+    name?: string, 
+    description?: string
+): Promise<{ status: string; message: string, newSlug?: string }> {
+    try {
+        const res = await fetch(`${BASE_URL}/forums/edit/${forumId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, description }),
+            credentials: "include",
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            return { status: "error", message: data.message || "Failed to edit forum.", newSlug: "" };
+        }
+        return { status: "ok", message: data.message || "Forum updated!", newSlug: data.newSlug || "" };
+    } catch (error) {
+        return { status: "error", message: "Failed to edit forum.", newSlug: ""};
+    }
+}
+
+// Upload media file and get its URL
+export async function getMediaUrl(mediaFile: File | null) {
+    let fileName: string | null = null;
+    let mediaUrl = "https://storage.googleapis.com/circuit-link.firebasestorage.app/"
+    try {
+        if (mediaFile) {
+            if (mediaFile.type.startsWith("image/")) {
+                fileName = await uploadImage(mediaFile);
+                mediaUrl += `images/${fileName}`;
+            } else if (mediaFile.type.startsWith("video/")) {
+                fileName = await uploadVideo(mediaFile);
+                mediaUrl += `videos/${fileName}`;
+            } else {
+                alert("Unsupported media type. Please upload an image or video.");
+                return { status: "error", message: "Unsupported media type.", media: null };
+            } // end if else
+        } else {
+            return { status: "no_media", message: "No media file provided.", media: null }; // No media file provided
+        } // end if else
+        return { status: "ok", message: "Media uploaded successfully.", media: mediaUrl };
+    } catch (err) {
+        console.error("Media upload failed:", err);
+        return { status: "error", message: "Media upload failed.", media: null };
+    }
 }
