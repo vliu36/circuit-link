@@ -135,6 +135,8 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
 
         // Create post data
         const now = Timestamp.fromDate(new Date());
+        const extractedKeywords: Set<string> = new Set(title.split(" ").push(contents.split(" ")));    // Stores words into an array for post searching
+        
         const postData = {
             title,
             contents,
@@ -151,6 +153,7 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
             parentGroup: parentGroupRef,
             parentForum: forumRef,
             media: media || null,
+            keywords: Array.from(extractedKeywords)
         };
 
         // Add to Posts collection
@@ -213,6 +216,9 @@ const editDoc = async (req: Request, res: Response) => {
         const updates: Partial<Post> = {};
         if (req.body.title) updates.title = req.body.title;
         if (req.body.contents) updates.contents = req.body.contents;
+        if (req.body.contents || req.body.title) {
+            updates.keywords = Array.from(new Set(req.body.contents.split(" ").push(req.body.title.split(" "))));
+        }
         updates.timeUpdated = Timestamp.fromDate(new Date());
         updates.edited = true; // Mark post as edited
 

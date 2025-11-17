@@ -398,6 +398,11 @@ const editForum = async (req: Request, res: Response) => {
     }
 };
 
+// Runs prefix search on post titles 
+const searchForum = async (req: Request, res: Response) => {
+    
+}
+
 export {
     getAllDocuments,
     addDoc,

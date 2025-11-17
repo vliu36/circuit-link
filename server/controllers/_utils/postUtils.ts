@@ -15,6 +15,7 @@ export interface Post {
     timeUpdated: Timestamp;
     listOfReplies: DocumentReference[];
     edited: boolean;
+    keywords: Array<string>;
 }
 
 // Reply interface for nested replies
