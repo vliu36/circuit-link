@@ -4,7 +4,8 @@ import { Timestamp } from "firebase-admin/firestore";
 import admin from "firebase-admin";
 import { DocumentReference } from "firebase-admin/firestore";
 import * as forumUtils from "./_utils/forumUtils.ts";
-import { cookieParser } from "./_utils/generalUtils.ts";
+import { getUserIdFromSessionCookie, verifyUserIsOwnerOrMod } from "./_utils/generalUtils.ts";
+import { getCommunityByName } from "./_utils/commUtils.ts";
 
 // Retrieves all documents in Forums
 const getAllDocuments = async (req: Request, res: Response) => {
@@ -26,13 +27,12 @@ const getAllDocuments = async (req: Request, res: Response) => {
     }    
 }
 
-
 // Creates and adds a document in Forums
 const addDoc = async (req: Request, res: Response) => {
     try {
-        const { name, description, userId, groupId, commName } = req.body;
-
-        const commsRef = db.collection("Communities");
+        const { name, description, groupId, commName } = req.body;
+        // Verify and get userId from session cookie
+        const userId = await getUserIdFromSessionCookie(req);
 
         // Generate slug from name
         const slug = name
@@ -42,18 +42,14 @@ const addDoc = async (req: Request, res: Response) => {
             .replace(/[^\w-]/g, "")
             .replace(/--+/g, "-");
 
-        const commSnap = await commsRef.where("name", "==", commName).get();
-        if (commSnap.empty) {
-            console.log("Community not found:", commName);
-            return res.status(404).send({
-                status: "Not Found",
-                message: "Community not found",
-            });
-        }
-        const commDoc = commSnap.docs[0];
-        const commRef = commDoc.ref;
+        // Get community reference and document data by name
+        const { ref: commRef, data: commData } = await getCommunityByName(commName);
+
         const groupRef = db.doc(`/Groups/${groupId}`);
         const userRef = db.doc(`/Users/${userId}`);
+
+        // Verify user is an owner or mod of the community
+        await verifyUserIsOwnerOrMod(commData, userId);
 
         // Check for duplicate forums
         const isDuplicate = await forumUtils.checkDuplicateForum(name, slug, commRef);
@@ -71,7 +67,6 @@ const addDoc = async (req: Request, res: Response) => {
             name,
             slug,
             postsInForum: [],
-            // repliesInForum: [],
             ownerList: [userRef],
             parentGroup: groupRef,
             parentCommunity: commRef,
@@ -106,17 +101,10 @@ const addDoc = async (req: Request, res: Response) => {
 const getForumBySlug = async (req: Request, res: Response) => {
     try {
         const { commName, forumSlug } = req.params;
+        const { sortMode } = req.body; 
 
-        // Locate community 
-        const community = await forumUtils.getCommunityByName(commName);
-        if (!community) {
-            return res.status(404).json({
-                status: "Not Found",
-                message: `Community "${commName}" not found.`,
-            });
-        }
-
-        const { commDoc, commData } = community;
+        // Get community by name
+        const { data: commData } = await getCommunityByName(commName);
 
         // Find forum in that community 
         const forumRef = await forumUtils.findForumRefInCommunity(commData, forumSlug);
@@ -139,7 +127,7 @@ const getForumBySlug = async (req: Request, res: Response) => {
 
         // Retrieve and format posts 
         const postRefs: DocumentReference[] = forumData.postsInForum || [];
-        const sortedPosts = await forumUtils.getFormattedPosts(postRefs);
+        const sortedPosts = await forumUtils.getFormattedPosts(postRefs, sortMode || "newest");
 
         // Return combined data 
         res.status(200).json({
@@ -166,11 +154,7 @@ const deleteForum = async (req: Request, res: Response) => {
         const { commName } = req.body;
 
         // Verify and get userId from session cookie
-        const cookies = cookieParser(req);
-        const sessionCookie = cookies.session;
-        const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
-        const userId = decodedClaims.uid; // Authenticated user's UID
-
+        const userId = await getUserIdFromSessionCookie(req);
         if (!commName || !userId) {
             console.log("No community or user provided.");
             return res.status(400).send({
@@ -192,50 +176,34 @@ const deleteForum = async (req: Request, res: Response) => {
         // Convert the name to lowercase
         const nameLower = commName.toLowerCase();
 
-        // Find community by name
-        const commRef = db.collection("Communities");
-        const snapshot = await commRef.where("nameLower", "==", nameLower).get();
-        if (snapshot.empty) {
-            console.log(`No community found with name "${commName}".`);
-            return res.status(404).send({
-                status: "Not Found",
-                message: `No community found with name "${commName}".`,
-            });
-        }
-        console.log(`Found community "${commName}".`);
-
-        const doc = snapshot.docs[0];
-        const commData = doc.data();
+        // Get community by name
+        const { data: commData } = await getCommunityByName(nameLower);
 
         // Check if requester is an owner or mod
-        const userRef = db.doc(`/Users/${userId}`)
-        const ownerList: FirebaseFirestore.DocumentReference[] = commData.ownerList || [];
-        const modList: FirebaseFirestore.DocumentReference[] = commData.modList || [];
-        let isOwner = ownerList.some(ref => ref.path === userRef.path);
-        let isMod = modList.some(ref=> ref.path === userRef.path);
-
-        if (!isOwner && !isMod) {
-            console.log(`User with ID ${userId} is unauthorized to delete this forum.`);
-            return res.status(403).send({
-                status: "Forbidden",
-                message: "You are not authorized to delete this forum.",
-            });
-        }
-        console.log(`Confirmed user with ID ${userId} is ${isOwner ? "an owner" : "a moderator"} of community "${commName}".`);
+        await verifyUserIsOwnerOrMod(commData, userId);        
+        console.log(`Confirmed user with ID ${userId} is authorized to delete forum in community "${commName}".`);
 
         const forumData = forumSnap.data();
 
         // --- Delete all posts in the forum's postsInForum ---
+        // Get all posts that belong to this forum
         const postsSnapshot = await db
             .collection("Posts")
             .where("parentForum", "==", forumRef)
             .get();
-
+        // Delete each post and its replies
         console.log("Deleting posts and their replies...");
         for (const postDoc of postsSnapshot.docs) {
             const postRef = postDoc.ref;
             await forumUtils.deleteRepliesRecursively(postRef);
+            // Delete the post itself
             await postRef.delete();
+            // Update community's yayScore by decrementing the post's yayScore
+            const postData = postDoc.data();
+            const commRef: FirebaseFirestore.DocumentReference = postData?.parentCommunity;
+            await commRef.update({
+                yayScore: admin.firestore.FieldValue.increment(-postData?.yayScore || 0),
+            });
         }
         console.log("All posts and their replies deleted.");
 
@@ -263,10 +231,96 @@ const deleteForum = async (req: Request, res: Response) => {
     }
 };
 
+// Edit forum details
+const editForum = async (req: Request, res: Response) => {
+    try {
+        const { forumId } = req.params;
+        const { name, description }: { name?: string; description?: string } = req.body;
+        // Verify and get userId from session cookie
+        const userId = await getUserIdFromSessionCookie(req);
+        if (!userId) {
+            console.log("No user provided.");
+            return res.status(400).send({
+                status: "Bad Request",
+                message: "Missing user ID in request.",
+                newSlug: "",
+            });
+        }
+
+        // Get forum and parent community data
+        const { forumRef, forumData } = await forumUtils.getForumById(forumId);
+        const { commRef, commData } = await forumUtils.getParentCommByRef(forumData.parentCommunity);
+
+        // Then verify owner/mod status
+        await verifyUserIsOwnerOrMod(commData, userId);
+        console.log(`Confirmed user with ID ${userId} is authorized to edit forum "${forumId}".`);
+
+        // If data sent does not change anything, exit early
+        if (
+            (!name || name === forumData?.name) &&
+            (!description || description === forumData?.description)
+        ) {
+            console.log("No changes detected in the update request.");
+            return res.status(200).send({
+                status: "ok",
+                message: "No changes detected in the update request.",
+            });
+        }
+
+        // Verify forum name uniqueness within the community if name is being changed
+        let newSlug: string | undefined = undefined;
+        if (name && name !== forumData?.name) {
+            newSlug = name
+                .toLowerCase()
+                .trim()
+                .replace(/\s+/g, "-")
+                .replace(/[^\w-]/g, "")
+                .replace(/--+/g, "-");
+            const isDuplicate = await forumUtils.checkDuplicateForum(name, newSlug, commRef);
+            if (isDuplicate) {
+                console.log("Duplicate forum name within the community:", name);
+                return res.status(400).json({
+                    status: "Bad Request",
+                    message: "Forum name already exists within the community.",
+                    newSlug: "",
+                });
+            }
+        }
+
+        // Update forum details
+        const updates: Partial<{ name: string; slug?: string, description: string }> = {};
+        if (name) {
+            updates.name = name;
+            if (newSlug) updates.slug = newSlug; // only set slug if name is changed
+        }
+        if (description) updates.description = description;
+        await forumRef.update(updates);
+
+        console.log("Forum updated successfully:", forumId);
+        res.status(200).json({
+            status: "ok",
+            message: `Forum ${name} updated successfully`,
+            newSlug: updates.slug,
+        });
+    } catch (err) {
+        console.error("Error editing forum:", err);
+        res.status(500).json({
+            status: "Backend error",
+            message: err instanceof Error ? err.message : err,
+            newSlug: "",
+        });
+    }
+};
+
+// Runs prefix search on post titles 
+const searchForum = async (req: Request, res: Response) => {
+    
+}
 
 export {
     getAllDocuments,
     addDoc,
     getForumBySlug,
     deleteForum,
+    editForum,
 }

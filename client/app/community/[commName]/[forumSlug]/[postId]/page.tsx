@@ -139,6 +139,22 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
 
                         {/* If the item has a title (only posts have this) shows title */}
                         {"title" in item && <h2 className={styles.title}>{item.title}</h2>}
+                        {/* If the item has media (only posts have this) display media */}
+                        {"media" in item && item.media && (
+                            // If media ends with .mp4, render video tag, else render image tag
+                            item.media.endsWith(".mp4") ? (
+                                <div className={styles.mediaContainer}>
+                                    <video controls className={styles.postMedia}>
+                                        <source src={item.media} type="video/mp4" />
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            ) : (
+                                <div className={styles.mediaContainer}>
+                                    <Image src={item.media} alt="Post media" width={200} height={200} className={styles.postMedia} />
+                                </div>
+                            )
+                        )}
                         {/* Show content of post or reply */}
                         <p className={styles.contents}>{item.contents}</p>
                         {/* Show metadata */}
@@ -250,7 +266,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
     return (
         
         <div className = {styles.background}>
-            <div className = {styles.yourCommunitiesBar}>
+            <div className = {styles.yourCommunitiesBar} style={{gridArea: "CommunitiesBar"}}>
                 <h1>Your Communities</h1>
                 <button className = {styles.communitiesButtons}>
                     <img src = "plus.svg" className = {styles.addIcon}></img>
@@ -259,7 +275,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
             </div>
 
             
-            <div className = {styles.serverBar}>
+            <div className = {styles.serverBar} style={{gridArea: "ServerBar"}}>
                 <div className = {styles.horizontalLine}></div>
                 <h1>{commName}</h1>
                 <div className = {styles.horizontalLine}></div>
@@ -271,13 +287,13 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                 </div>
             </div>
 
-            <div className = {styles.channelInfoBox}>
+            <div className = {styles.channelInfoBox} style={{gridArea: "RightBar"}}>
                 <div className = {styles.channelInfoh1}>{commName}</div>
                 <div className = {styles.channelInfoh2}>{community?.description}</div>
                 
             </div>
             
-            <div className = {styles.RulesBar}>
+            <div className = {styles.RulesBar} style={{gridArea: "RightBar"}}>
                 <div className = {styles.horizontalLine}></div>
                 <div className = {styles.horizontalLine}></div>
                 <h1>Rules</h1>
@@ -301,14 +317,14 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                 </div>
             </div>
 
-            <div className = {styles.navBox}>
+            <div className = {styles.navBox} style={{gridArea: "NavBar"}}>
                 <NavBar/>
             </div>
             
             
             
 
-            <div className={styles.postsPage}>
+            <div className={styles.postsPage} style={{gridArea: "Center"}}>
                 <div className={styles.backDisplay}>
                     <Link href={`/community/${commName}/${forumSlug}`}>
                         Back

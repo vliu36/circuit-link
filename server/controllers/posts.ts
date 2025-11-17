@@ -2,8 +2,8 @@ import { db } from "../firebase.ts"
 import { Request, Response } from "express"
 import { FieldValue, DocumentReference, Timestamp } from "firebase-admin/firestore";
 import { fetchRepliesRecursively, Post, isUserAuthorizedToDeletePost, deleteNestedRepliesRecursive } from "./_utils/postUtils.ts";
-
-
+import { getUserIdFromSessionCookie } from "./_utils/generalUtils.ts";
+import { getCommunityByName } from "./_utils/commUtils.ts";
 
 
 // -------------------------------- Controller functions -------------------------------- //
@@ -59,18 +59,21 @@ const getAllDocuments = async (req: Request, res: Response) => {
 const addDoc = async (req: Request, res: Response) => {         // TODO: Split this function into smaller helper functions
     try {
         const {
-            author,     // User ID of post author
+            // author,     // User ID of post author // ! DEPRECATED - now derived from session cookie
             title,
             contents,
             commName,   // Community name
             forumSlug,  // Forum slug
+            media       // Optional media URL
         } = req.body;
 
-        const authorRef = db.doc(`/Users/${author}`);
+        const authorId = await getUserIdFromSessionCookie(req);
+
+        const authorRef = db.doc(`/Users/${authorId}`);
         const postsRef = db.collection("Posts");
 
         // Validate required fields
-        if (!author || !title || !contents || !commName || !forumSlug) {
+        if (!authorId || !title || !contents || !commName || !forumSlug) {
             return res.status(400).send({
                 status: "Bad Request",
                 message: "Missing required fields: author, title, contents, commName, or forumSlug",
@@ -134,6 +137,7 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
 
         // Create post data
         const now = Timestamp.fromDate(new Date());
+        
         const postData = {
             title,
             contents,
@@ -149,6 +153,8 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
             parentCommunity: commRef,
             parentGroup: parentGroupRef,
             parentForum: forumRef,
+            media: media || null,
+            keywords: [...new Set(["",...req.body.contents.split(" "),...req.body.title.split(" ")])] // Stores words into an array for post searching
         };
 
         // Add to Posts collection
@@ -160,6 +166,15 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
                 postsInForum: FieldValue.arrayUnion(newPostRef),
             }),
         ]);
+
+        // Update community's yayScore
+        await commRef.update({
+            yayScore: FieldValue.increment(1),
+        });
+        // Update author's yayScore
+        await authorRef.update({
+            yayScore: FieldValue.increment(1),
+        });
 
         return res.status(201).send({
             status: "OK",
@@ -206,6 +221,9 @@ const editDoc = async (req: Request, res: Response) => {
         const updates: Partial<Post> = {};
         if (req.body.title) updates.title = req.body.title;
         if (req.body.contents) updates.contents = req.body.contents;
+        if (req.body.contents || req.body.title) {
+            updates.keywords = [...new Set(["",...req.body.contents.split(" "),...req.body.title.split(" ")])];
+        }
         updates.timeUpdated = Timestamp.fromDate(new Date());
         updates.edited = true; // Mark post as edited
 
@@ -270,6 +288,17 @@ const deleteDoc = async (req: Request, res: Response) => {
         }
         console.log("Dereferencing complete.");
 
+        // Update community's yayScore
+        const parentCommunityRef: FirebaseFirestore.DocumentReference = postData?.parentCommunity;
+        await parentCommunityRef.update({
+            yayScore: FieldValue.increment(-postData?.yayScore || 0),
+        });
+        // Update author's yayScore
+        const authorRef: FirebaseFirestore.DocumentReference = postData?.author;
+        await authorRef.update({
+            yayScore: FieldValue.increment(-postData?.yayScore || 0),
+        });
+
         // Delete the document from Firestore
         console.log("Deleting post...");
         await postRef.delete();
@@ -300,63 +329,83 @@ const votePost = async (req: Request, res: Response) => {
         }
 
         const postRef = db.collection("Posts").doc(id);
-        const postSnap = await postRef.get();
-        if (!postSnap.exists) return res.status(404).send({
-            status: "error", 
-            message: "Post not found" 
-        });
 
-        const postData = postSnap.data()!;
-        const userRef = db.doc(`/Users/${userId}`);
+        await db.runTransaction(async (transaction) => {
+            const postSnap = await transaction.get(postRef);
+            if (!postSnap.exists) {
+                throw new Error("Post not found");
+            }
 
-        // Extract current lists
-        const yayList: FirebaseFirestore.DocumentReference[] = postData.yayList || [];
-        const nayList: FirebaseFirestore.DocumentReference[] = postData.nayList || [];
+            const postData = postSnap.data()!;
+            const userRef = db.doc(`/Users/${userId}`);
+            const commRef: FirebaseFirestore.DocumentReference = postData.parentCommunity;
 
-        const liked = yayList.some(ref => ref.path === userRef.path);
-        const disliked = nayList.some(ref => ref.path === userRef.path);
+            // Extract current lists
+            const yayList: FirebaseFirestore.DocumentReference[] = postData.yayList || [];
+            const nayList: FirebaseFirestore.DocumentReference[] = postData.nayList || [];
 
-        let updatedYayList = yayList;
-        let updatedNayList = nayList;
-        let yayScore = postData.yayScore || 0;
+            const liked = yayList.some(ref => ref.path === userRef.path);
+            const disliked = nayList.some(ref => ref.path === userRef.path);
 
-        if (type === "yay") {
-            if (liked) {
-                // Toggle off like
-                updatedYayList = yayList.filter(ref => ref.path !== userRef.path);
-                yayScore -= 1;
-            } else {
-                // Remove dislike if exists
+            let updatedYayList = yayList;
+            let updatedNayList = nayList;
+            let yayScore = postData.yayScore || 0;
+
+            // Keep old score for computing difference
+            const oldYayScore = yayScore;
+
+            // Voting logic
+            if (type === "yay") {
+                if (liked) {
+                    // Toggle off like
+                    updatedYayList = yayList.filter(ref => ref.path !== userRef.path);
+                    yayScore -= 1;
+                } else {
+                    // Remove dislike if exists
+                    if (disliked) {
+                        updatedNayList = nayList.filter(ref => ref.path !== userRef.path);
+                        yayScore += 1; // remove -1 from dislike
+                    }
+                    updatedYayList = [...updatedYayList, userRef];
+                    yayScore += 1;
+                } // end if else
+            } else if (type === "nay") {
                 if (disliked) {
+                    // Toggle off dislike
                     updatedNayList = nayList.filter(ref => ref.path !== userRef.path);
                     yayScore += 1; // remove -1 from dislike
-                }
-                updatedYayList = [...updatedYayList, userRef];
-                yayScore += 1;
-            } // end if else
-        } else if (type === "nay") {
-            if (disliked) {
-                // Toggle off dislike
-                updatedNayList = nayList.filter(ref => ref.path !== userRef.path);
-                yayScore += 1; // remove -1 from dislike
-            } else {
-                // Remove like if exists
-                if (liked) {
-                    updatedYayList = yayList.filter(ref => ref.path !== userRef.path);
-                    yayScore -= 1; // remove +1 from like
-                }
-                updatedNayList = [...updatedNayList, userRef];
-                yayScore -= 1;
-            } // end if else
-        } // end if else-if
+                } else {
+                    // Remove like if exists
+                    if (liked) {
+                        updatedYayList = yayList.filter(ref => ref.path !== userRef.path);
+                        yayScore -= 1; // remove +1 from like
+                    }
+                    updatedNayList = [...updatedNayList, userRef];
+                    yayScore -= 1;
+                } // end if else
+            } // end if else-if
 
-        await postRef.update({
-            yayList: updatedYayList,
-            nayList: updatedNayList,
-            yayScore,
-        });
+            // Update post document
+            transaction.update(postRef, {
+                yayList: updatedYayList,
+                nayList: updatedNayList,
+                yayScore,
+            });
 
-        res.status(200).send({ status: "OK", message: "Vote updated", yayScore });
+            // Update community's and author's yayScore based on difference
+            const authorRef: FirebaseFirestore.DocumentReference = postData.author;
+            const diff = yayScore - oldYayScore;
+            if (diff !== 0) {
+                transaction.update(commRef, {
+                    yayScore: FieldValue.increment(diff),
+                });
+                transaction.update(authorRef, {
+                    yayScore: FieldValue.increment(diff),
+                });
+            }
+        }); // end transaction
+
+        res.status(200).send({ status: "OK", message: "Vote updated" });
     } catch (err) {
         console.error(err);
         res.status(500).send({ status: "error", message: err });
@@ -383,6 +432,14 @@ const replyToPost = async (req: Request, res: Response) => {
         const result = await post.update({
             listOfReplies: FieldValue.arrayUnion(db.doc(`/Replies/${replyId}`)),
             replyCount: FieldValue.increment(1),
+        });
+
+        // Update community's yayScore
+        const postSnap = await post.get();
+        const postData = postSnap.data();
+        const commRef: FirebaseFirestore.DocumentReference = postData?.parentCommunity;
+        await commRef.update({
+            yayScore: FieldValue.increment(1),
         });
 
         res.status(200).send({

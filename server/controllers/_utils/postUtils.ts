@@ -15,6 +15,7 @@ export interface Post {
     timeUpdated: Timestamp;
     listOfReplies: DocumentReference[];
     edited: boolean;
+    keywords: Array<string>;
 }
 
 // Reply interface for nested replies
@@ -88,15 +89,28 @@ export const deleteNestedRepliesRecursive = async (replyRefs: FirebaseFirestore.
         if (!replyDoc.exists) continue;
 
         const replyData = replyDoc.data();
+
         if (replyData?.listOfReplies?.length) {
             await deleteNestedRepliesRecursive(replyData.listOfReplies);
         }
 
+        // Update community's yayScore by decrementing the reply's yayScore
+        const commRef: FirebaseFirestore.DocumentReference = replyData?.parentCommunity;
+        await commRef.update({
+            yayScore: FieldValue.increment(-replyData?.yayScore || 0),
+        });
+        // Update author's yayScore by decrementing the reply's yayScore
+        const authorRef: FirebaseFirestore.DocumentReference = replyData?.author;
+        await authorRef.update({
+            yayScore: FieldValue.increment(-replyData?.yayScore || 0),
+        });
+
+        // Delete the reply
         await replyRef.delete();
     } // end for
 } // end helper function deleteRepliesRecursive
 
-// --- Helper function for deleteDoc to check if user is authorized to delete a post --- //
+// --- Helper function for deleteDoc in posts.ts to check if user is authorized to delete a post --- //
 export const isUserAuthorizedToDeletePost = async ( userId: string, postData: FirebaseFirestore.DocumentData, communityId?: string ): Promise<boolean> => {
     const authorPath = postData?.author?.path;
     const authorId = authorPath?.split("/")[1];
@@ -106,7 +120,7 @@ export const isUserAuthorizedToDeletePost = async ( userId: string, postData: Fi
 
     // If not author, check if user is mod/owner of community
     if (communityId) {
-        const communityRef = db.collection("Community").doc(communityId);
+        const communityRef = db.collection("Communities").doc(communityId);
         const communityDoc = await communityRef.get();
         if (communityDoc.exists) {
             const communityData = communityDoc.data();

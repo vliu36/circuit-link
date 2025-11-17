@@ -28,6 +28,7 @@ export type Post = {
     listOfReplies: Reply[];
     timePosted: string;
     edited: boolean;
+    media: string | null;
 };
 
 export const useReplies = (postId: string, userId?: string) => {

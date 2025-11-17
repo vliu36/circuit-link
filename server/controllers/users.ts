@@ -76,6 +76,7 @@ const userRegistration = async (req: Request, res: Response) => {
             communities: [],
             friendList: [],
             photoURL: "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg",
+            yayScore: 0,
         });
 
         res.status(201).json({ message: "User created successfully", uid: userId })
@@ -121,7 +122,7 @@ const userRegistrationGoogle = async (req: Request, res: Response) => {
             httpOnly: true,
             secure: true,
             maxAge: expiresIn,
-            sameSite: "lax",
+            sameSite: "none",
         });
         console.log("Created session cookie for user: ", uid);
 
@@ -154,6 +155,7 @@ const userRegistrationGoogle = async (req: Request, res: Response) => {
             communities: [],
             photoURL: photoURL,
             friendList: [],
+            yayScore: 0,
         }
 
         try {
@@ -214,7 +216,7 @@ const userLogin = async (req: Request, res: Response) => {
             httpOnly: true,
             secure: true,
             maxAge: expiresIn,
-            sameSite: "lax",
+            sameSite: "none",
         });
         console.log("Created session cookie for user:", uid);
 
@@ -333,7 +335,7 @@ const logoutUser = async (req: Request, res: Response) => {
         res.clearCookie("session", {
             httpOnly: true,
             secure: true,
-            sameSite: "lax",
+            sameSite: "none",
         });
         console.log("Logout successful");
         res.status(200).json({ message: "Logout successful" });

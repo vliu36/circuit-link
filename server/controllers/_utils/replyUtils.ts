@@ -28,12 +28,25 @@ export const deletePostRepliesRecursive = async (replyRefs: DocumentReference[])
         if (rData?.listOfReplies?.length) {
             await deletePostRepliesRecursive(rData.listOfReplies);
         }
-        await rRef.delete();
+
         // Decrement replyCount in parent post
-        const parentPostRef: DocumentReference | undefined = rData?.parentPost;
+        const parentPostRef: FirebaseFirestore.DocumentReference = rData?.parentPost;
         await parentPostRef?.update({
             replyCount: FieldValue.increment(-1),
         });
+        // Update yayScore in parent community
+        const commRef: FirebaseFirestore.DocumentReference = rData?.parentCommunity;
+        await commRef?.update({
+            yayScore: FieldValue.increment(-rData?.yayScore || 0),
+        });
+        // Update yayScore in author user document
+        const authorRef: FirebaseFirestore.DocumentReference = rData?.author;
+        await authorRef?.update({
+            yayScore: FieldValue.increment(-rData?.yayScore || 0),
+        });
+
+        // Delete the reply
+        await rRef.delete();
     }
 };
 

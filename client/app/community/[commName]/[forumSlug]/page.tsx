@@ -3,15 +3,18 @@
 
 import { useState, useEffect } from "react";
 import { useAuth } from "../../../_firebase/context.tsx";
-import { use } from "react";
+import { use, useRef } from "react";
 import Link from "next/link";
-import { fetchPostsByForum, createPost, editPost, deletePostById, votePost } from "./forum.ts";
+import { fetchPostsByForum, createPost, editPost, deletePostById, votePost, editForum, getMediaUrl } from "./forum.ts";
 import styles from "./forumPage.module.css";
 import { Post, Forum } from "../../../_types/types.ts";
 import { useCallback } from "react";
 import NavBar from '../../../_components/navbar/navbar.tsx';
-import * as commApi from "../community";
 import { Community } from "../../../_types/types.ts";
+import { useRouter } from "next/navigation";
+import { fetchStructure } from "../community.ts";
+import { uploadImage, uploadVideo } from "../../../_utils/mediaUpload.ts";
+import Image from "next/image";
 
 export default function ForumPage({
     params,
@@ -28,15 +31,30 @@ export default function ForumPage({
     const [editTitle, setEditTitle] = useState("");
     const [editContents, setEditContents] = useState("");
 
+    const [sortMode, setSortMode] = useState<string>("newest"); // "newest" | "oldest" | "mostYays" | "alphabetical"
+
     const [forum, setForum] = useState<Forum | null>(null);
     const [loading, setLoading] = useState(true);
+
+    const [editPopup, setEditPopup] = useState(false);
+    const [message, setMessage] = useState<string | null>(null);
+    const [mediaFile, setMediaFile] = useState<File | null>(null);
+    const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const router = useRouter();
+
+    // Toggle edit forum popup
+    const toggleEditPopup = () => {
+        setEditPopup(!editPopup);
+        setMessage(null);
+    }
 
     /** Fetch posts by forum
      *  This is used to load posts when the component mounts and after actions like adding, editing, or deleting a post.
      */
     const fetchPosts = useCallback(async () => {
         try {
-            const { forum, posts } = await fetchPostsByForum(commName, forumSlug);
+            const { forum, posts } = await fetchPostsByForum(commName, forumSlug, sortMode);
 
             const formattedPosts = (posts || []).map((p: Post) => ({
                 ...p,
@@ -52,11 +70,22 @@ export default function ForumPage({
         } finally {
             setLoading(false);
         }
-    }, [commName, forumSlug]);
+    }, [commName, forumSlug, sortMode]);
 
+    // Initial fetch and refetch on sort mode change
     useEffect(() => {
         fetchPosts();
     }, [commName, forumSlug, fetchPosts]);
+
+    // Fetch community structure
+    useEffect(() => {
+        setLoading(true);
+        fetchStructure(commName)
+            .then((data) => {
+                if (data) setCommunity(data);
+            })
+            .finally(() => setLoading(false));
+    }, [commName]);
 
     // Handler to add a new post
     const handleAddPost = async () => {
@@ -64,13 +93,35 @@ export default function ForumPage({
         if (!title || !contents) return alert("Please fill out title and contents");
 
         try {
-            const msg = await createPost(user.uid, title, contents, commName, forumSlug);
+
+            const res = await getMediaUrl(mediaFile);
+            const mediaUrl = res.media || null;
+
+            const msg = await createPost(
+                // user.uid, // ! DEPRECATED - now derived from session cookie
+                title, 
+                contents, 
+                commName, 
+                forumSlug,
+                mediaUrl,
+            );
+
             console.log(msg);
             setTitle("");
             setContents("");
+            setMediaFile(null);
+            setMediaPreview(null);
+            if (fileInputRef.current) {
+                fileInputRef.current.value = "";
+            }
             fetchPosts();
         } catch (err) {
-            console.error(err);
+            console.log(err);
+            if (err instanceof Error) {
+                alert(`Failed to add post: ${err.message}`);
+            } else {
+                alert("Failed to add post due to an unknown error.");
+            }
         }
     };
 
@@ -117,212 +168,328 @@ export default function ForumPage({
     if (loading) return <div>Loading forum...</div>;
     if (!forum) return <div>Forum not found.</div>;
 
-    return (
-        <div className={styles.background}>
-            <div className = {styles.navBox}>
-                <NavBar/>
-            </div>
-
-            <div className = {styles.yourCommunitiesBar}>
-                <h1>Your Communities</h1>
-                <button className = {styles.communitiesButtons}>
-                    <img src = "plus.svg" className = {styles.addIcon}></img>
-                    <h1 className = {styles.buttonTextforCommunities}>Add a Community</h1>
-                </button>
-            </div>
-
-            
-            <div className = {styles.serverBar}>
-                <div className = {styles.horizontalLine}></div>
-                <h1>{commName}</h1>
-                <div className = {styles.horizontalLine}></div>
-                <div className = {styles.serverContainer}>
-                    {/* Stuff Goes Here */}
-                </div>
-            </div>
-
-            <div className = {styles.channelInfoBox}>
-                <div className = {styles.channelInfoh1}>{commName}</div>
-                <div className = {styles.channelInfoh2}>{community?.description}</div>
-            </div>
-            
-            <div className = {styles.RightBar}>
-                <div className = {styles.horizontalLine}></div>
-                <div className = {styles.RulesBar}>
-                    Rules
-                </div>
-            </div>
-
-            <div className = {styles.centerPage}>
-                <div className = {styles.bannerBox}></div>
-                <div className = {styles.titleBox}>
-                    <div className = {styles.serverIcon}></div>
-                    <div className = {styles.titleText}>{commName}/{forumSlug}</div>
-                </div>
-                <div className = {styles.blackLine}> </div>
-
-                <h2 className = {styles.descText}>
-                    Description:
-                </h2>
-
-                <h2 className = {styles.descText}>
-                    {forum.description}
-                </h2>
-
-                {/* --- Create New Post Section --- */}
-                {user ? (
-                    <div className={styles.createSection}>
-                        <h2>Create New Post</h2>
-                        <input
-                            placeholder="Post Title"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            className={styles.input}
-                        />
-
-                        <textarea
-                            placeholder="Post Contents"
-                            value={contents}
-                            onChange={(e) => setContents(e.target.value)}
-                            className={styles.textarea}
-                        />
-                        <button className={styles.primaryButton} onClick={handleAddPost}>
-                            Add Post
-                        </button>
-                    </div>
-                ) : (
-                    <p>Please sign in to create posts.</p>
-                )}
-
-                {/* --- Posts List --- */}
+    // Handle edit forum 
+    const handleEdit = async (name?: string, description?: string) => {
+        try {
+            const res = await editForum(forum.id, name, description);
+            const oldName = forum.name;
+            console.log(res.message);
+            setMessage(res.message || null);
+            if (res.status === "ok" && name && name !== oldName) {
+                setTimeout(() => {}, 3000); // Wait for 3 seconds to let user read the message
+                // setEditPopup(false);
+                router.push(`/community/${commName}/${res.newSlug}`);
+            } else if (res.status === "ok") {
+                fetchPosts();
+                toggleEditPopup();
                 
-                <div className = {styles.forumBox}>
-                <div>Forum Posts</div>
-                {posts.length === 0 ? (
-                    <p>No posts found in this forum.</p>
-                ) : (
-                    posts.map((post) => {
-                        // Check if the current user is the author of the post
-                        const isAuthor = post.authorId === user?.uid;
-                        // Check if the post is currently being edited
-                        const isEditing = editingPostId === post.id;
+            }
+        } catch (error) {
+            setMessage("An error occurred while editing the forum.");
+        }
+    }
 
-                        return (
-                            <div key={post.id} className={styles.postCard}>
-                                {/* If the post is being edited, show input fields */}
-                                {isEditing ? (
-                                    <>
-                                        {/* Title input */}
-                                        <input
-                                            value={editTitle}
-                                            onChange={(e) => setEditTitle(e.target.value)}
-                                            className={styles.input}
-                                        />
+    const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+        setMediaFile(file);
+        if (file) setMediaPreview(URL.createObjectURL(file));
+    };    
 
-                                        {/* Contents textarea */}
-                                        <textarea
-                                            value={editContents}
-                                            onChange={(e) => setEditContents(e.target.value)}
-                                            className={styles.textarea}
-                                        />
-                                    
-                                        {/* Save button */}
-                                        <button
-                                            onClick={() => handleSaveEdit(post.id)}
-                                            className={`${styles.button} ${styles.saveButton}`}
-                                        >
-                                            Save
-                                        </button>
-                                        
-                                        {/* Cancel button */}
-                                        <button
-                                            onClick={cancelEditing}
-                                            className={`${styles.button} ${styles.cancelButton}`}
-                                        >   
-                                            Cancel
-                                        </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        {/* Post title and contents, linked to the post details page */}
-                                        <Link href={`/community/${commName}/${forumSlug}/${post.id}`}>
-                                            <h3 className={styles.title}>{post.title}</h3>
-                                            <p className={styles.contents}>{post.contents}</p>
-                                        </Link>
-
-                                        {/* ---- Post metadata ---- */}
-                                        {/* Post author */}
-                                        <p className={styles.meta}>
-                                            <Link href={`/profile/${post.authorId}`}>
-                                                <strong>Author:</strong> {post.authorUsername}
-                                            </Link>
-                                        </p>
-
-                                        {/* Time post was created, and if it was edited */}
-                                        <p className={styles.time}>
-                                            {post.timePosted} {post.edited && "(edited)"}
-                                        </p>
-
-                                        {/* Yay score and reply count */}
-                                        <p className={styles.meta}>
-                                            <strong>Yay Score:</strong> {post.yayScore} | <strong>Replies:</strong> {post.replyCount}
-                                        </p>
-
-                                        <div className={styles.actions}>
-                                            {/* ---- Vote buttons ---- */}
-                                            {/* If the user has already voted, show their vote status (green for yay) */}
-                                            <button
-                                                onClick={() => handleVote(post.id, "yay")}
-                                                className={`${styles.voteButton} ${
-                                                    post.yayList.includes(user?.uid || "") ? styles.yayActive : ""
-                                                }`}
-                                            >
-                                                👍 Yay
-                                            </button>
-
-                                            {/* If the user has already voted, show their vote status (red for nay) */}
-                                            <button
-                                                onClick={() => handleVote(post.id, "nay")}
-                                                className={`${styles.voteButton} ${
-                                                    post.nayList.includes(user?.uid || "") ? styles.nayActive : ""
-                                                }`}
-                                            >
-                                                👎 Nay
-                                            </button>
-
-                                            {/* If the user is the author of the post, show edit and delete buttons */}
-                                            {isAuthor && (
-                                                <>
-                                                    {/* Edit button */}
-                                                    <button
-                                                        onClick={() => {
-                                                            setEditingPostId(post.id);
-                                                            setEditTitle(post.title);
-                                                            setEditContents(post.contents);
-                                                        }}  
-                                                        className={`${styles.button} ${styles.editButton}`}
-                                                    >
-                                                        Edit
-                                                    </button>
-                                                    
-                                                    {/* Delete button */}
-                                                    <button
-                                                        onClick={() => handleDeletePost(post.id)}
-                                                        className={`${styles.button} ${styles.deleteButton}`}
-                                                    >
-                                                        Delete
-                                                    </button>
-                                                </>
-                                            )}
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        );
-                    })
-                )}
+    return (
+        <main>
+            <div className={styles.background}>
+                <div className = {styles.navBox} style={{gridArea: "NavBar"}}>
+                    <NavBar/>
                 </div>
-            </div>  
-        </div>
+
+                <div className = {styles.yourCommunitiesBar} style={{gridArea: "CommunitiesBar"}}>
+                    <h1>Your Communities</h1>
+                    <button className = {styles.communitiesButtons}>
+                        <img src = "plus.svg" className = {styles.addIcon}></img>
+                        <h1 className = {styles.buttonTextforCommunities}>Add a Community</h1>
+                    </button>
+                </div>
+                
+                <div className = {styles.serverBar} style={{gridArea: "ServerBar"}}>
+                    <div className = {styles.horizontalLine}></div>
+                    <h1>{commName}</h1>
+                    <div className = {styles.horizontalLine}></div>
+                    <div className = {styles.serverContainer}>
+                        {/* Stuff Goes Here */}
+                    </div>
+                </div>
+
+                
+                
+                <div className = {styles.RightBar} style={{gridArea: "RightBar"}}>
+                    <div className = {styles.channelInfoBox}>
+                        <div className = {styles.channelInfoh1}>{commName}</div>
+                        <div className = {styles.channelInfoh2}>{community?.description}</div>
+                    </div>
+                    <div className = {styles.horizontalLine}></div>
+                    <div className = {styles.RulesBar}>
+                        Rules
+                    </div>
+                </div>
+
+                <div className = {styles.centerPage} style={{gridArea: "Center"}}>
+                    <div className = {styles.bannerBox}></div>
+                    <div className = {styles.titleBox}>
+                        <div className = {styles.serverIcon}></div>
+                        <div className = {styles.titleText}>
+                            {commName}/{forumSlug}
+                            {/* Button that toggles edit forum popup */}
+                            <button className={styles.editForumButton} onClick={() => setEditPopup(true)}>
+                                Edit
+                            </button>
+                            {/* Drop down menu to change sort mode */}
+                            <div className={styles.sortDropdown}>
+                                <label htmlFor="sortMode">Sort by: </label>
+                                <select
+                                    id="sortMode"
+                                    value={sortMode}
+                                    onChange={(e) => setSortMode(e.target.value)}
+                                >
+                                    <option value="newest">Newest</option>
+                                    <option value="oldest">Oldest</option>
+                                    <option value="mostYays">Most Yays</option>
+                                    <option value="alphabetical">Alphabetical</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div className = {styles.blackLine}> </div>
+
+                    <h2 className = {styles.descText}>
+                        Description:
+                    </h2>
+
+                    <h2 className = {styles.descText}>
+                        {forum.description}
+                    </h2>
+
+                    {/* --- Create New Post Section --- */}
+                    {user ? (
+                        <div className={styles.createSection}>
+                            <h2>Create New Post</h2>
+                            <input
+                                placeholder="Post Title"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                className={styles.input}
+                            />
+                            <div className={styles.input}>
+                                {mediaPreview && (
+                                    <img src={mediaPreview} alt="Media preview" className={styles.mediaPreview} />
+                                )}
+                                <input
+                                    type="file"
+                                    accept="image/*,video/*"
+                                    ref={fileInputRef}
+                                    onChange={handleMediaChange}
+                                    className={styles.input}
+                                />
+                            </div>
+                            <textarea
+                                placeholder="Post Contents"
+                                value={contents}
+                                onChange={(e) => setContents(e.target.value)}
+                                className={styles.textarea}
+                            />
+                            <button className={styles.primaryButton} onClick={handleAddPost}>
+                                Add Post
+                            </button>
+                        </div>
+                    ) : (
+                        <p>Please sign in to create posts.</p>
+                    )}
+
+                    {/* --- Posts List --- */}
+                    
+                    <div className = {styles.forumBox}>
+                    <div>Forum Posts</div>
+                    {posts.length === 0 ? (
+                        <p>No posts found in this forum.</p>
+                    ) : (
+                        posts.map((post) => {
+                            // Check if the current user is the author of the post
+                            const isAuthor = post.authorId === user?.uid;
+                            // Check if the post is currently being edited
+                            const isEditing = editingPostId === post.id;
+
+                            return (
+                                <div key={post.id} className={styles.postCard}>
+                                    {/* If the post is being edited, show input fields */}
+                                    {isEditing ? (
+                                        <>
+                                            {/* Title input */}
+                                            <input
+                                                value={editTitle}
+                                                onChange={(e) => setEditTitle(e.target.value)}
+                                                className={styles.input}
+                                            />
+
+                                            {/* Contents textarea */}
+                                            <textarea
+                                                value={editContents}
+                                                onChange={(e) => setEditContents(e.target.value)}
+                                                className={styles.textarea}
+                                            />
+                                        
+                                            {/* Save button */}
+                                            <button
+                                                onClick={() => handleSaveEdit(post.id)}
+                                                className={`${styles.button} ${styles.saveButton}`}
+                                            >
+                                                Save
+                                            </button>
+                                            
+                                            {/* Cancel button */}
+                                            <button
+                                                onClick={cancelEditing}
+                                                className={`${styles.button} ${styles.cancelButton}`}
+                                            >   
+                                                Cancel
+                                            </button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            {/* Post title and contents, linked to the post details page */}
+                                            <Link href={`/community/${commName}/${forumSlug}/${post.id}`}>
+                                                <h3 className={styles.title}>{post.title}</h3>
+                                            </Link>
+                                            {/* Display media if available */}
+                                            {post.media && (
+                                                <div className={styles.mediaPreview}>
+                                                    {post.media.endsWith(".mp4") ? (
+                                                        <video controls>
+                                                            <source src={post.media} type="video/mp4" />
+                                                        </video>
+                                                    ) : (
+                                                        <Image src={post.media} alt="Post Media" width={500} height={300} />
+                                                    )}
+                                                </div>
+                                            )}
+                                            
+                                            <p className={styles.contents}>{post.contents}</p>
+
+                                            {/* ---- Post metadata ---- */}
+                                            {/* Post author */}
+                                            <p className={styles.meta}>
+                                                <Link href={`/profile/${post.authorId}`}>
+                                                    <strong>Author:</strong> {post.authorUsername}
+                                                </Link>
+                                            </p>
+
+                                            {/* Time post was created, and if it was edited */}
+                                            <p className={styles.time}>
+                                                {post.timePosted} {post.edited && "(edited)"}
+                                            </p>
+
+                                            {/* Yay score and reply count */}
+                                            <p className={styles.meta}>
+                                                <strong>Yay Score:</strong> {post.yayScore} | <strong>Replies:</strong> {post.replyCount}
+                                            </p>
+
+                                            <div className={styles.actions}>
+                                                {/* ---- Vote buttons ---- */}
+                                                {/* If the user has already voted, show their vote status (green for yay) */}
+                                                <button
+                                                    onClick={() => handleVote(post.id, "yay")}
+                                                    className={`${styles.voteButton} ${
+                                                        post.yayList.includes(user?.uid || "") ? styles.yayActive : ""
+                                                    }`}
+                                                >
+                                                    👍 Yay
+                                                </button>
+
+                                                {/* If the user has already voted, show their vote status (red for nay) */}
+                                                <button
+                                                    onClick={() => handleVote(post.id, "nay")}
+                                                    className={`${styles.voteButton} ${
+                                                        post.nayList.includes(user?.uid || "") ? styles.nayActive : ""
+                                                    }`}
+                                                >
+                                                    👎 Nay
+                                                </button>
+
+                                                {/* If the user is the author of the post, show edit and delete buttons */}
+                                                {isAuthor && (
+                                                    <>
+                                                        {/* Edit button */}
+                                                        <button
+                                                            onClick={() => {
+                                                                setEditingPostId(post.id);
+                                                                setEditTitle(post.title);
+                                                                setEditContents(post.contents);
+                                                            }}  
+                                                            className={`${styles.button} ${styles.editButton}`}
+                                                        >
+                                                            Edit
+                                                        </button>
+                                                        
+                                                        {/* Delete button */}
+                                                        <button
+                                                            onClick={() => handleDeletePost(post.id)}
+                                                            className={`${styles.button} ${styles.deleteButton}`}
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            );
+                        })
+                    )}
+                    </div>
+                </div>  
+            </div>
+            {/* Edit Forum Popup */}
+            {editPopup && (
+                <div className={styles.popupOverlay} onClick={toggleEditPopup}>
+                    <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                        <h2 className={styles.popupText}>Edit Forum</h2>
+                        <form onSubmit={async (e) => {
+                            e.preventDefault();
+                            const form = e.target as HTMLFormElement;
+                            const nameInput = form.elements.namedItem("name") as HTMLInputElement;
+                            const descInput = form.elements.namedItem("description") as HTMLInputElement;
+                            await handleEdit(nameInput.value, descInput.value);
+                        }}>
+                            <label className={styles.popupText}>
+                                Forum Name:
+                                <input
+                                    type="text"
+                                    name="name"
+                                    placeholder="Forum Name"
+                                    defaultValue={forum?.name}
+                                    className={styles.input}
+                                />
+                            </label>
+                            <label className={styles.popupText}>
+                                Forum Description:
+                                <textarea
+                                    name="description"
+                                    placeholder="Forum Description"
+                                    defaultValue={forum?.description}
+                                className={styles.textarea}
+                            />
+                            </label>
+                            <button type="submit" className={`${styles.popupText} ${styles.saveBtn}`}>
+                                Save Changes
+                            </button>
+                        </form>
+                        <button className={ `${styles.closeBtn} ${styles.popupText}` } onClick={toggleEditPopup}>
+                            Close
+                        </button>
+
+                        {message && <p>{message}</p>}
+                    </div>
+                </div>
+            )}
+        </main>
     );
 }

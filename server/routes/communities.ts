@@ -63,7 +63,15 @@ router.post("/create-group", comm.createGroup);
 
 /** Deletes a Group in Communities
  *  @route DELETE /api/comm/delete-group/:id
- *  @param id - ID of the group to be deleted
+ *  @param groupId - ID of the group to be deleted
+ *  @body commName - Name of the community in which the group belongs in
+ *  @cookie session - Firebase session cookie used to authenticate the request
+ *  @returns {200} - Group successfully deleted
+ *  @returns {400} - Missing parameters
+ *  @returns {401} - Unauthorized (invalid or missing session cookie)
+ *  @returns {403} - Forbidden (user is not the community owner)
+ *  @returns {404} - Group not found
+ *  @returns {500} - Backend failure
  */
 router.delete("/delete-group/:groupId", comm.deleteGroup);
 
@@ -140,5 +148,36 @@ router.post("/promote-owner/:name", comm.promoteToOwner);
  *  @returns {500} - Backend failure
  */
 router.post("/demote-owner/:name", comm.demoteOwner);
+
+/** Edit community details
+ *  @route PUT /api/comm/edit/:name
+ *  @params name - String representing the name of the Community
+ *  @body newName - New name for the community (optional)
+ *  @body description - New description for the community (optional)
+ *  @body isPublic - New public status for the community (optional)
+ *  @cookie session - Firebase session cookie used to authenticate the request (must be an owner)
+ *  @returns {200} - Community successfully updated
+ *  @returns {400} - Missing parameters or invalid data
+ *  @returns {403} - Requester is not an owner
+ *  @returns {404} - Community not found
+ *  @returns {409} - New community name already taken
+ *  @returns {500} - Backend failure
+ */
+router.put("/edit/:name", comm.editComm);
+
+/** Edit group details
+ *  @route PUT /api/comm/edit-group/:groupId
+ *  @params groupId - ID of the group to be edited
+ *  @body commName - Name of the community in which the group belongs in
+ *  @body newName - New name for the group 
+ *  @cookie session - Firebase session cookie used to authenticate the request (must be an owner)
+ *  @returns {200} - Group successfully updated
+ *  @returns {400} - Missing parameters or invalid data
+ *  @returns {403} - Requester is not an owner
+ *  @returns {404} - Group's community not found
+ *  @returns {409} - New group name already taken
+ *  @returns {500} - Backend failure
+ */
+router.put("/edit-group/:groupId", comm.editGroup);
 
 export default router;
