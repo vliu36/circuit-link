@@ -8,7 +8,7 @@ interface RequestData {
 }
 
 interface ResponseData {
-  fileName: any;
+  fileName: unknown; //changed from any to unknown
   url: string;
 }
 

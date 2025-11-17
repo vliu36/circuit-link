@@ -196,29 +196,25 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                             
                         </div>
                         
-                            {/* Edit and Delete buttons */}
+                            {/* Edit and Delete buttons, only shown if the current user is the author */}
+                            {isOwner && (
                                 <div className = {styles.utilityButtons}>
-                                    {/* Edit button; display only if the current user is the author */}
-                                    {isAuthor && (
-                                        <button 
-                                            className={styles.editButton} 
-                                            onClick={() => { setEditingId(item.id); setEditContent(item.contents); if (!isReply) setEditTitle(item.title); }}
-                                        >
-                                            Edit
-                                        </button>
-                                    )}
-                                    {/* Delete button; display only if the current user is the author or a mod/owner */}
-                                    {(isAuthor || isMod || isOwner) && (
-                                        /* Delete button; display if current user is the author or a mod/owner */
-                                        <button 
-                                            className={styles.deleteButton} 
-                                            onClick={() => handleDelete(item.id, isReply)}
-                                        >
-                                            Delete
-                                        </button>
-                                    )}
+                                    {/* Edit button */}
+                                    <button 
+                                        className={styles.editButton} 
+                                        onClick={() => { setEditingId(item.id); setEditContent(item.contents); if (!isReply) setEditTitle(item.title); }}
+                                    >
+                                        Edit
+                                    </button>
+                                    {/* Delete button */}
+                                    <button 
+                                        className={styles.deleteButton} 
+                                        onClick={() => handleDelete(item.id, isReply)}
+                                    >
+                                        Delete
+                                    </button>
                                 </div>
-                            
+                            )}
                             
                     </div>
                 </div>
