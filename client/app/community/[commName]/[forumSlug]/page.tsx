@@ -198,11 +198,11 @@ export default function ForumPage({
     return (
         <main>
             <div className={styles.background}>
-                <div className = {styles.navBox}>
+                <div className = {styles.navBox} style={{gridArea: "NavBar"}}>
                     <NavBar/>
                 </div>
 
-                <div className = {styles.yourCommunitiesBar}>
+                <div className = {styles.yourCommunitiesBar} style={{gridArea: "CommunitiesBar"}}>
                     <h1>Your Communities</h1>
                     <button className = {styles.communitiesButtons}>
                         <img src = "plus.svg" className = {styles.addIcon}></img>
@@ -210,7 +210,7 @@ export default function ForumPage({
                     </button>
                 </div>
                 
-                <div className = {styles.serverBar}>
+                <div className = {styles.serverBar} style={{gridArea: "ServerBar"}}>
                     <div className = {styles.horizontalLine}></div>
                     <h1>{commName}</h1>
                     <div className = {styles.horizontalLine}></div>
@@ -219,19 +219,20 @@ export default function ForumPage({
                     </div>
                 </div>
 
-                <div className = {styles.channelInfoBox}>
-                    <div className = {styles.channelInfoh1}>{commName}</div>
-                    <div className = {styles.channelInfoh2}>{community?.description}</div>
-                </div>
                 
-                <div className = {styles.RightBar}>
+                
+                <div className = {styles.RightBar} style={{gridArea: "RightBar"}}>
+                    <div className = {styles.channelInfoBox}>
+                        <div className = {styles.channelInfoh1}>{commName}</div>
+                        <div className = {styles.channelInfoh2}>{community?.description}</div>
+                    </div>
                     <div className = {styles.horizontalLine}></div>
                     <div className = {styles.RulesBar}>
                         Rules
                     </div>
                 </div>
 
-                <div className = {styles.centerPage}>
+                <div className = {styles.centerPage} style={{gridArea: "Center"}}>
                     <div className = {styles.bannerBox}></div>
                     <div className = {styles.titleBox}>
                         <div className = {styles.serverIcon}></div>

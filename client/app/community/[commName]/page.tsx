@@ -299,7 +299,7 @@ export default function CommunityPage({
       <div className = {Styles.background}>
         
 
-        <div className = {Styles.yourCommunitiesBar}>
+        <div className = {Styles.yourCommunitiesBar} style={{gridArea: "CommunitiesBar"}}>
           <h1>Your Communities</h1>
             <button className = {Styles.communitiesButtons}>
               <img src = "plus.svg" className = {Styles.addIcon}></img>
@@ -308,8 +308,7 @@ export default function CommunityPage({
         </div>
 
               
-        <div className = {Styles.serverBar}>
-          <div className = {Styles.horizontalLine}></div>
+        <div className = {Styles.serverBar} style={{gridArea: "ServerBar"}}>
           <div>{commName}</div>
           <div className = {Styles.horizontalLine}></div>
           <div className = {Styles.serverContainer}>
@@ -399,12 +398,13 @@ export default function CommunityPage({
           </div>
         </div>
 
-        <div className = {Styles.channelInfoBox}>
-          <div className = {Styles.channelInfoh1}>{commName}</div>
-          <div className = {Styles.channelInfoh2}>{community?.description}</div>
-        </div>
+
               
-        <div className = {Styles.RightBar}>
+        <div className = {Styles.RightBar} style={{gridArea: "RightBar"}}>
+          <div className = {Styles.channelInfoBox }>
+            <div className = {Styles.channelInfoh1}>{commName}</div>
+            <div className = {Styles.channelInfoh2}>{community?.description}</div>
+          </div>
           <div className = {Styles.horizontalLine}></div>
 
           <div className = {Styles.RulesBar}>
@@ -413,12 +413,14 @@ export default function CommunityPage({
           
           
           
-          
+          <div className = {Styles.horizontalLine1}></div>
+
           {/* Displays the list of users in the community */}
           <div className = {Styles.usersBar}>
             <div className = {Styles.channelInfoh1}>
-              <div className = {Styles.horizontalLine1}></div>
               User Information
+              
+              
             </div>
               {/* --- OWNERS, MODS, USERS --- */}
               <div>
@@ -493,73 +495,74 @@ export default function CommunityPage({
             </div>
           </div>
 
-        <div className = {Styles.centerPage}>
-          <div className = {Styles.bannerBox}>
-            {/* --- COMMUNITY BANNER --- -------- Click on banner, if mod/owner, to change the banner */}
-            {(isOwner || isMod) ? (
-              <button  
-                className={Styles.bannerBox}
-                onClick={toggleBannerPopup}
-                style={{ padding: 0, border: 'none', background: 'none', display: 'inline-block' }}
-              >
-                <Image 
+        <div className = {Styles.centerPage} style={{gridArea: "Center"}}>
+          <div className = {Styles.firstBox}>
+            <div className = {Styles.bannerBox}>
+              {/* --- COMMUNITY BANNER --- -------- Click on banner, if mod/owner, to change the banner */}
+              {(isOwner || isMod) ? (
+                <button  
+                  className={Styles.bannerBox}
+                  onClick={toggleBannerPopup}
+                  style={{ padding: 0, border: 'none', background: 'none', display: 'inline-block' }}
+                >
+                  <Image 
+                    src={community.banner} 
+                    alt="Community Banner" 
+                    width={800} 
+                    height={200} 
+                    className={Styles.bannerBox}
+                    style={{ display: 'block' }}
+                  />
+                </button>
+              ) : (
+                <Image
                   src={community.banner} 
                   alt="Community Banner" 
                   width={800} 
                   height={200} 
                   className={Styles.bannerBox}
-                  style={{ display: 'block' }}
                 />
-              </button>
-            ) : (
-              <Image
-                src={community.banner} 
-                alt="Community Banner" 
-                width={800} 
-                height={200} 
-                className={Styles.bannerBox}
-              />
-            )}
+              )}
+            </div>
 
-          </div>
-          <div className = {Styles.titleBox}>
-            {/* --- COMMUNITY ICON --- -------- Click on image, if mod/owner, to change the icon */}
-            <div className = {Styles.serverIcon}>
-              {/* If user is an owner or mod, allow them to change the icon */}
-              {isOwner || isMod ? (
-                <button 
-                  className={Styles.editIconButton} 
-                  onClick={toggleIconPopup} 
-                  style={{ padding: 0, border: 'none', background: 'none' }}
-                >
+            <div className = {Styles.titleBox}>
+              {/* --- COMMUNITY ICON --- -------- Click on image, if mod/owner, to change the icon */}
+              <div className = {Styles.serverIcon}>
+                {/* If user is an owner or mod, allow them to change the icon */}
+                {isOwner || isMod ? (
+                  <button 
+                    className={Styles.editIconButton} 
+                    onClick={toggleIconPopup} 
+                    style={{ padding: 0, border: 'none', background: 'none' }}
+                  >
+                    <Image
+                      src={community.icon || "/default_icon.png"}
+                      alt="Community Icon"
+                      width={200}
+                      height={100}
+                      className={Styles.serverIcon}
+                    />
+                  </button>
+                ) : (
+                  // Otherwise, just display the icon
                   <Image
-                    src={community.icon || "/default_icon.png"}
+                    src={community.icon}
                     alt="Community Icon"
-                    width={80}
-                    height={80}
+                    width={100}
+                    height={100}
                     className={Styles.serverIcon}
                   />
-                </button>
-              ) : (
-                // Otherwise, just display the icon
-                <Image
-                  src={community.icon}
-                  alt="Community Icon"
-                  width={80}
-                  height={80}
-                  className={Styles.serverIcon}
-                />
-              )}
+                )}
 
-            </div>
-            <div className = {Styles.titleText}>
-              {community.name || commName}
-              {/* Button that toggles edit community popup */}
-              {isOwner && (
-                <button className={Styles.editCommunityButton} onClick={toggleEditPopup}>
-                  Edit
-                </button>
-              )}
+              </div>
+              <div className = {Styles.titleText}>
+                {community.name || commName}
+                {/* Button that toggles edit community popup */}
+                {isOwner && (
+                  <button className={Styles.editCommunityButton} onClick={toggleEditPopup}>
+                    Edit
+                  </button>
+                )}
             </div>
             {/* If not member, show Join button, otherwise show Leave Button */}
             {!isMember ? (
@@ -568,12 +571,13 @@ export default function CommunityPage({
               <button className={Styles.joinCommunityButton} onClick={handleLeave}>Leave Community</button>
             )}
           </div>
-          <div className = {Styles.blackLine}> </div>
+          </div>
           
-          <div style={{ padding: "1rem" }}>
+          
+          
+          <div>
           {/* Displays community name and description */}
           
-          <p style={{ marginTop: "1rem", marginLeft: "10%"}}>{community.description}</p>
           
           {/* If current user is an owner, show DELETE COMMUNITY button */}
           {isOwner && (
@@ -585,20 +589,25 @@ export default function CommunityPage({
           )}
 
           {/* --- CREATE GROUP FORM --- */}
-          <div style={{ marginTop: "2rem", marginLeft: "10%"}}>
-            <h3>Create a new group in {commName}</h3>
-            <input type="text" value={groupName} onChange={(e) => setGroupName(e.target.value)} placeholder="Group name" />
-            <button onClick={handleCreateGroup}>Create Group</button>
-            {groupMessage && <p>{groupMessage}</p>}
-          </div>
+          <div className={Styles.createBox}>
+            <p style={{ marginTop: "1rem", marginLeft: "10%"}}>{community.description}</p>
 
-        <div style={{ marginTop: "2rem", marginLeft: "10%"}}>
-          <p>Logged in as: {user?.displayName || user?.email}</p>
-        </div>
+            <div style={{ marginTop: "2rem", marginLeft: "10%"}}>
+              <h3>Create a new group in {commName}</h3>
+              <input type="text" value={groupName} onChange={(e) => setGroupName(e.target.value)} placeholder="Group name" />
+              <button onClick={handleCreateGroup}>Create Group</button>
+              {groupMessage && <p>{groupMessage}</p>}
+            </div>
+
+            <div style={{ marginTop: "2rem", marginLeft: "10%"}}>
+              <p>Logged in as: {user?.displayName || user?.email}</p>
+            </div>
+          </div>
+          
       </div>
     </div>
 
-      <div className = {Styles.navBox}>
+      <div className = {Styles.navBox} style={{gridArea: "NavBar"}}>
         <NavBar/>
       </div>
       
