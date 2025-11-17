@@ -34,8 +34,8 @@ export default function AboutUs() {
                     Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah Blah
                 </h2>
             </div>
-
-            <Link className = {Styles.returnButton} href = "./landing" replace>
+{/*Added http://localhost:3000 instead of ./landing since we got rid of it*/}
+            <Link className = {Styles.returnButton} href = "http://localhost:3000" replace>
                 <h1 className = {Styles.returnButtonText}>Return</h1>
             </Link>
         </div>

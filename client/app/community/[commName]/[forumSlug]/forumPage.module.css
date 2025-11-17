@@ -39,12 +39,13 @@
     border-radius: 8px;
     border: 1px solid #ccc;
     font-size: 14px;
-    background-color: #005bb5;
+    background-color: #FFFFFF;
+    color: #5A5454;
 }
 
 .textarea {
     min-height: 100px;
-    background-color: #005bb5;
+    background-color: #FFFFFF;
 }
 
 .primaryButton {
@@ -69,8 +70,8 @@
     padding: 20px;
     margin-bottom: 20px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-    background-color: #5b6680;
-    color: #fff;
+    background-color: #FFFFFF;
+    color: #5A5454;
     position: relative;
     transition: transform 0.15s ease;
 }
@@ -188,7 +189,7 @@
 }
 
 .background {
-    background-color: rgb(28, 38, 66);
+    background-color: #D0E0EB;
     display: grid;
     width: 100%;
     height: 100vh;
@@ -204,7 +205,7 @@
 }
 
 .text {
-    color: rgb(255,255,255);
+    color: #5A5454;
 }
 
 .joinButton{
@@ -245,7 +246,7 @@
 
 .bigBox{
     background-color: rgb(57, 65, 83);
-    color: rgb(255,255,255);
+    color: #5A5454;
     position: relative;
     width: 700px;
     height: 85vh;
@@ -320,26 +321,32 @@
 }
 
 .yourCommunitiesBar{
-    background-color: rgb(11, 11, 44);
+    background-color: #FFFFFF;
     display: flex;
     flex-direction: column;
     font-family: Inria Sans;
-    color: gray;
+    color: #5A5454;
     text-indent: 3%;
     overflow-y: auto;
     overflow-x: hidden;
+    border: 3px #D0E0EB;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .serverBar{
-    background-color: rgb(11, 11, 44);
+    background-color: #FFFFFF;
     display: flex;
     flex-direction: column;
     text-indent: 3%;
     font-family: Inria Sans;
     font-size: 25px;
-    color: rgb(255, 255, 255);
+    color: #5A5454;
     overflow-y: auto;
     overflow-x: hidden;
+    border: 3px #D0E0EB;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .serverContainer{
@@ -358,7 +365,7 @@
     margin-left: 10px;
 }
 
-
+/*
 .horizontalLine{
     background-color: #AAAAAA;
     width: 95%;
@@ -374,6 +381,7 @@
     margin-top: -1.1vh;
     position: fixed;
 }
+*/
 
 .communitiesButtons{
     width: 90%;
@@ -382,6 +390,7 @@
     display: flex;
     flex-wrap: nowrap;
     border-radius: 1em;
+    background-color: #F0F0F0;
 }
 
 .addIcon{
@@ -397,21 +406,21 @@
     margin-top: 15px;
     margin-left: 10px;
     font-family: Inria Sans;
-    color: rgb(255, 255, 255);
+    color: #5A5454;
     position: relative;
     font-size: 0.8rem;
 }
 
 .communitiesButtons:hover{
-    background-color: #394153;
+    background-color: #D9D9D9;
 }
 
 .channelInfoBox{
-    background-color: rgb(11, 11, 44);
+    background-color: #FFFFFF;
     display: flex;
     flex-direction: column;
     font-family: Inria Sans;
-    color: gray;
+    color: #5A5454;
     text-indent: 3%;
     overflow-y: auto;
     overflow-x: hidden;
@@ -419,7 +428,7 @@
 
 .channelInfoh1{
     margin-top: 10px;
-    color: rgb(255, 255, 255);
+    color: #5A5454;
     font-size: 25px;
 }
 
@@ -451,15 +460,18 @@
 }
 
 .RightBar{
-    background-color: rgb(11, 11, 44);
+    background-color: #FFFFFF;
     display: flex;
     flex-direction: column;
     font-family: Inria Sans;
-    color: rgb(255, 255, 255);
+    color: #5A5454;
     font-size: 25px;
     text-indent: 3%;
     overflow-y: auto;
     overflow-x: hidden;
+    border: 3px #D0E0EB;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .RulesBar{
@@ -501,19 +513,23 @@
     top: 2.5vw;
     display: flex;
     flex-direction: column;
-    color: gray;
+    color: #5A5454;
     font-size: 20px;  
 }
 
 .centerPage{
+    margin-top: 1em;
     overflow-y: auto;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    color: rgb(255, 255, 255);
+    color: #5A5454;
     font-size: 20px;
-    background-color: rgba(57, 65, 83, 1);
+    background-color: #EDEDED;
     font-family: Inria Sans;
+    border: 3px #D0E0EB;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .descText{
@@ -525,7 +541,7 @@
     width: 100%;
     min-height: 20vh;
     max-height: 20vh;
-    background-color: rgba(217, 217, 217, 1);
+    background-color: #FFFFFF;
 }
 
 .titleBox{
@@ -691,7 +707,7 @@
 }
 
 .popupText {
-    color: white;
+    color: #5A5454;
     margin-bottom: 1.5rem;
     font-family: Inria Sans;
 }
