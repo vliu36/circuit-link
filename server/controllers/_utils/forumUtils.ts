@@ -20,6 +20,7 @@ export const checkDuplicateForum = async (name: string, slug: string, commRef: D
 
 // -------- Helper functions for getForumBySlug -------- //
 // --- Helper: Get community document by name ---
+// ! Deprecated, use getCommunityByName from commUtils.ts instead
 export async function getCommunityByName(commName: string) {
     const commSnap = await db
         .collection("Communities")
@@ -31,6 +32,7 @@ export async function getCommunityByName(commName: string) {
     const commDoc = commSnap.docs[0];
     return { commDoc, commData: commDoc.data() };
 }
+
 
 // --- Helper: Find a forum reference within a community by slug ---
 export async function findForumRefInCommunity(commData: any, forumSlug: string): Promise<DocumentReference | null> {
@@ -145,4 +147,36 @@ export async function dereferenceForumFromParents(forumRef: DocumentReference, f
             forumsInCommunity: FieldValue.arrayRemove(forumRef),
         });
     }
+}
+
+// --- Helper to get forum data by ID for editForum in forums.ts ---
+export async function getForumById(forumId: string) {
+    // Retrieve forum
+    const forumRef = db.collection("Forums").doc(forumId);
+    const forumSnap = await forumRef.get();
+
+    if (!forumSnap.exists) {
+        throw new Error("Forum not found");
+    }
+
+    const forumData = forumSnap.data();
+    if (!forumData) {
+        throw new Error("Forum data is undefined; could not be retrieved.");
+    }
+    
+    return { forumRef, forumData };
+} 
+
+// --- Helper function to get parent community by reference for editForum in forums.ts ---
+export async function getParentCommByRef(commRef: DocumentReference) {
+    const commSnap = await commRef.get();
+    if (!commSnap.exists) {
+        throw new Error("Parent community not found");
+    }
+    const commData = commSnap.data();
+    if (!commData) {
+        throw new Error("Parent community data is undefined; could not be retrieved.");
+    }
+    
+    return { commRef, commData };
 }

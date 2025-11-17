@@ -82,7 +82,6 @@ export async function createNotification({
 export async function verifyUserIsOwnerOrMod(
     commData: FirebaseFirestore.DocumentData, 
     userId: string, 
-    db: FirebaseFirestore.Firestore, 
     ownerOnly: boolean = false          // If true, only check for owner status
 ) {
     const userRef = db.doc(`/Users/${userId}`);

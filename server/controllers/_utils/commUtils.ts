@@ -197,7 +197,7 @@ export const removeUserFromCommunity = async (
 };
 
 // Helper function to get community by name
-export async function getCommunityByName(db: FirebaseFirestore.Firestore, commName: string) {
+export async function getCommunityByName(commName: string) {
     const nameLower = commName.toLowerCase();
     const commRef = db.collection("Communities");
     const snapshot = await commRef.where("nameLower", "==", nameLower).get();
