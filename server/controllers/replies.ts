@@ -50,6 +50,11 @@ const createReply = async (req: Request, res: Response) => {
 
         const replyRef = await db.collection("Replies").add(data);
 
+        // Update author's yayScore
+        await authorRef.update({
+            yayScore: FieldValue.increment(1),
+        });
+
         res.status(200).json({ status: "OK", message: "Reply added", docId: replyRef.id });
     } catch (err) {
         console.error(err);
@@ -80,7 +85,6 @@ const replyToReply = async (req: Request, res: Response) => {
         await commRef.update({
             yayScore: FieldValue.increment(1),
         });
-
         res.status(200).json({ status: "OK", message: "Reply added to parent reply" });
     } catch (err) {
         console.error(err);
@@ -154,56 +158,20 @@ const voteReply = async (req: Request, res: Response) => {
                 yayScore 
             });
 
-            // Update community's yayScore based on difference
+            // Update author's community's yayScore based on difference
+            const authorRef: FirebaseFirestore.DocumentReference = replyData?.author;
             const diff = yayScore - oldYayScore;
             if (diff !== 0) {
                 // Update community yayScore
                 transaction.update(commRef, {
                     yayScore: FieldValue.increment(diff),
                 });
+                // Update author's yayScore based on difference
+                transaction.update(authorRef, {
+                    yayScore: FieldValue.increment(diff),
+                });
             }
         }); // end of transaction
-
-        // const replySnap = await replyRef.get();
-        // if (!replySnap.exists) return res.status(404).json({ status: "error", message: "Reply not found" });
-
-        // const replyData = replySnap.data();
-        // const userRef = db.doc(`/Users/${userId}`);
-        // const yayList: DocumentReference[] = replyData?.yayList || [];
-        // const nayList: DocumentReference[] = replyData?.nayList || [];
-        // let yayScore = replyData?.yayScore || 0;
-
-        // const liked = yayList.some((ref) => ref.path === userRef.path);
-        // const disliked = nayList.some((ref) => ref.path === userRef.path);
-
-        // let updatedYayList = [...yayList];
-        // let updatedNayList = [...nayList];
-
-        // if (type === "yay") {
-        //     if (liked) {
-        //         updatedYayList = updatedYayList.filter((ref) => ref.path !== userRef.path);
-        //         yayScore -= 1;
-        //     } else {
-        //         if (disliked) {
-        //             updatedNayList = updatedNayList.filter((ref) => ref.path !== userRef.path);
-        //             yayScore += 1;
-        //         }
-        //         updatedYayList.push(userRef);
-        //         yayScore += 1;
-        //     }
-        // } else {
-        //     if (disliked) {
-        //         updatedNayList = updatedNayList.filter((ref) => ref.path !== userRef.path);
-        //         yayScore += 1;
-        //     } else {
-        //         if (liked) {
-        //             updatedYayList = updatedYayList.filter((ref) => ref.path !== userRef.path);
-        //             yayScore -= 1;
-        //         }
-        //         updatedNayList.push(userRef);
-        //         yayScore -= 1;
-        //     }
-        // }
 
         // await replyRef.update({ yayList: updatedYayList, nayList: updatedNayList, yayScore });
         res.status(200).json({ status: "OK", message: "Vote updated" });
@@ -259,6 +227,11 @@ const deleteDoc = async (req: Request, res: Response) => {
         // Update yayScore in parent community
         const commRef: FirebaseFirestore.DocumentReference = replyData?.parentCommunity;
         await commRef.update({
+            yayScore: FieldValue.increment(-replyData?.yayScore || 0),
+        });
+        // Update yayScore in author user document
+        const authorRef: FirebaseFirestore.DocumentReference = replyData?.author;
+        await authorRef.update({
             yayScore: FieldValue.increment(-replyData?.yayScore || 0),
         });
         // Decrement replyCount in parent post
