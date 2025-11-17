@@ -1,10 +1,10 @@
 import { db } from "../firebase.ts"
 import { Request, Response } from "express"
 import { FieldValue, DocumentReference, Timestamp } from "firebase-admin/firestore";
-import { fetchRepliesRecursively, Post, isUserAuthorizedToDeletePost, deleteNestedRepliesRecursive } from "./_utils/postUtils.ts";
+import { fetchRepliesRecursively, Post, deleteNestedRepliesRecursive, getPostForumAndGroup } from "./_utils/postUtils.ts";
 import { getUserIdFromSessionCookie } from "./_utils/generalUtils.ts";
 import { getCommunityByName } from "./_utils/commUtils.ts";
-
+import { isUserAuthorizedToDeleteDoc } from "./_utils/generalUtils.ts";
 
 // -------------------------------- Controller functions -------------------------------- //
 // Retrieves all documents in Posts sorted by date posted (modified to get post authors from Users)
@@ -81,59 +81,10 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
         }
 
         // Get the Community document
-        const commQuery = await db.collection("Communities")
-            .where("name", "==", commName)
-            .limit(1)
-            .get();
+        const { ref: commRef, data: commData } = await getCommunityByName(commName);
 
-        if (commQuery.empty) {
-            return res.status(404).send({
-                status: "Not Found",
-                message: `Community "${commName}" not found.`,
-            });
-        }
-        const commDoc = commQuery.docs[0];
-        const commRef = commDoc.ref;
-        const forumsInCommunity = commDoc.data().forumsInCommunity || [];
-
-        // Find the Forum by slug
-        let forumRef: DocumentReference | null = null;
-        let parentGroupRef: DocumentReference | null = null;
-        for (const fRef of forumsInCommunity) {
-            const fSnap = await fRef.get();
-            const fData = fSnap.data();
-            if (fData?.slug === forumSlug) {
-                forumRef = fRef;
-                parentGroupRef = fData.parentGroup;
-                break;
-            }
-        }
-
-        if (!forumRef) {
-            return res.status(404).send({
-                status: "Not Found",
-                message: `Forum with slug "${forumSlug}" not found in community "${commName}".`,
-            });
-        }
-        if (!parentGroupRef) {
-            return res.status(404).send({
-                status: "Not Found",
-                message: `Parent group for forum "${forumSlug}" not found.`,
-            });
-        }
-
-        // Check for duplicate post by the same author
-        const existingPostQuery = await postsRef
-            .where("author", "==", authorRef)
-            .where("title", "==", title)
-            .where("contents", "==", contents)
-            .get();
-        if (!existingPostQuery.empty) {
-            return res.status(400).send({
-                status: "Bad Request",
-                message: "A similar post from the same user already exists!",
-            });
-        }
+        // Find parent forum by slug, and get its parent group
+        const { forumRef, parentGroupRef } = await getPostForumAndGroup(commData, forumSlug);
 
         // Create post data
         const now = Timestamp.fromDate(new Date());
@@ -162,7 +113,7 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
 
         // Update related collections
         await Promise.all([
-            forumRef.update({
+            forumRef?.update({
                 postsInForum: FieldValue.arrayUnion(newPostRef),
             }),
         ]);
@@ -194,23 +145,22 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
 const editDoc = async (req: Request, res: Response) => {
     try {
         const postId = req.params.id;
-        const userId = req.body.userId; // signed-in user's UID
+        const userId = await getUserIdFromSessionCookie(req);
+        
         const postRef = db.collection("Posts").doc(postId);
         const postDoc = await postRef.get();
-
         if (!postDoc.exists) {
             return res.status(404).send({
                 status: "Not Found",
                 message: "Post not found",
             });
         }
-
         const postData = postDoc.data();
 
         // Get author ID from DocumentReference
         const authorPath = postData?.author?.path; // e.g. "Users/<uid>"
         const authorId = authorPath?.split("/")[1];
-
+        // Check if the requesting user is the author
         if (authorId !== userId) {
             return res.status(403).send({
                 status: "Forbidden",
@@ -218,6 +168,7 @@ const editDoc = async (req: Request, res: Response) => {
             });
         }
 
+        // Prepare updates
         const updates: Partial<Post> = {};
         if (req.body.title) updates.title = req.body.title;
         if (req.body.contents) updates.contents = req.body.contents;
@@ -226,7 +177,7 @@ const editDoc = async (req: Request, res: Response) => {
         }
         updates.timeUpdated = Timestamp.fromDate(new Date());
         updates.edited = true; // Mark post as edited
-
+        // Apply updates
         await postRef.update(updates);
 
         res.status(200).send({
@@ -247,9 +198,8 @@ const editDoc = async (req: Request, res: Response) => {
 const deleteDoc = async (req: Request, res: Response) => {
     try {
         const postId = req.params.id;   // id of the post being deleted
-        const userId = req.body.userId;     // userId of the user requesting deletion
-        // TODO: ↓↓↓ Fix this up once forums are implemented ↓↓↓
-        const communityId = req.body.communityId; // the forum/community this post belongs to
+        const userId = await getUserIdFromSessionCookie(req);
+        const commName = req.body.commName; // the community this post belongs to
 
         const postRef = db.collection("Posts").doc(postId);
         const postDoc = await postRef.get();
@@ -259,10 +209,9 @@ const deleteDoc = async (req: Request, res: Response) => {
         }
 
         const postData = postDoc.data();
-        // const authorPath = postData?.author?.path; // "Users/<uid>"
 
-        // Default: only the author can delete --- checks if the requestor is the author 
-        const authorized = await isUserAuthorizedToDeletePost(userId, postData!, communityId);
+        // Check if the requests comes from the author or a mod/owner of the community
+        const authorized = await isUserAuthorizedToDeleteDoc(userId, postData!, commName);
         if (!authorized) {
             return res.status(403).send({
                 status: "Forbidden",
@@ -280,11 +229,9 @@ const deleteDoc = async (req: Request, res: Response) => {
         console.log("Dereferencing post from parent forum...");
         const parentForumRef: DocumentReference = postData?.parentForum;
         if (parentForumRef) {
-            console.log("Dereferencing post from parent forum...");
             await parentForumRef.update({
                 postsInForum: FieldValue.arrayRemove(postRef),
             });
-            console.log("Dereferencing complete.");
         }
         console.log("Dereferencing complete.");
 
@@ -320,21 +267,20 @@ const deleteDoc = async (req: Request, res: Response) => {
 // Yays and Nays
 const votePost = async (req: Request, res: Response) => {
     try {
-        const { id, userId, type } = req.body; // type: "yay" | "nay"
+        const { id, type } = req.body; // type: "yay" | "nay"
         if (!["yay", "nay"].includes(type)) {
             return res.status(400).send({
                 status: "error", 
                 message: "Invalid vote type" 
             });
         }
+        const userId = await getUserIdFromSessionCookie(req);
 
         const postRef = db.collection("Posts").doc(id);
 
         await db.runTransaction(async (transaction) => {
             const postSnap = await transaction.get(postRef);
-            if (!postSnap.exists) {
-                throw new Error("Post not found");
-            }
+            if (!postSnap.exists) throw new Error("Post not found");
 
             const postData = postSnap.data()!;
             const userRef = db.doc(`/Users/${userId}`);

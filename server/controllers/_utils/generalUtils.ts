@@ -2,6 +2,7 @@
 import { Request } from "express";
 import { DocumentReference, FieldValue, Timestamp } from "firebase-admin/firestore";
 import { auth, db } from "../../firebase";
+import { getCommunityByName } from "./commUtils";
 
 
 
@@ -106,3 +107,20 @@ export async function verifyUserIsOwnerOrMod(
     }
     return { isOwner, isMod };
 }
+
+// --- Helper function for deleteDoc in posts.ts and replies.ts to check if user is authorized to delete a post/reply --- //
+export const isUserAuthorizedToDeleteDoc = async ( userId: string, docData: FirebaseFirestore.DocumentData, commName: string ): Promise<boolean> => {
+    const authorPath = docData?.author?.path;
+    const authorId = authorPath?.split("/")[1];
+
+    // Author can always delete
+    if (authorId === userId) return true;
+
+    // --- If not author, check if user is mod/owner of community ---
+    // Get community data
+    const { data: commData } = await getCommunityByName(commName);
+    const { isOwner, isMod } = await verifyUserIsOwnerOrMod(commData, userId);
+    if (isOwner || isMod) return true;
+
+    return false;
+};

@@ -30,7 +30,6 @@ router.patch("/reply/:id", posts.replyToPost);
 /** Edits a post
  *  @route PUT /api/posts/edit/:id
  *  @params id - The id of the document to be edited
- *  @body userId - The uid for the User that created the post who is requesting an edit
  *  @body title - String representing the new title of the post
  *  @body contents - String representing the new contents of the post
  *  @returns JSON object confirming the success of the edit, or an error
