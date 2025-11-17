@@ -35,7 +35,7 @@ export default function AboutUs() {
                 </h2>
             </div>
 
-            <Link className = {Styles.returnButton} href = "./landing" replace>
+            <Link className = {Styles.returnButton} href = ".." replace>
                 <h1 className = {Styles.returnButtonText}>Return</h1>
             </Link>
         </div>

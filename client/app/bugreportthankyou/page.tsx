@@ -18,7 +18,7 @@ export default function BugReportThankYou() {
                     <br/>
                     Press the return button, to return to the home page.
                 </h2>
-                <Link className = {Styles.returnButton} href = "./landing" replace>
+                <Link className = {Styles.returnButton} href = ".." replace>
                     <h1 className = {Styles.returnButtonText}>Return</h1>
                 </Link>
             </div>

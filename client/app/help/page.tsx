@@ -7,7 +7,7 @@ export default function Help() {{/*function RulesPage*/}
     
     return (
         <div className = {Styles.background}>
-            <Link className = {Styles.returnButton} href = "./landing" replace>
+            <Link className = {Styles.returnButton} href = ".." replace>
                 <h1 className = {Styles.returnButtonText}>Return</h1>
             </Link>
             <div className = {Styles.mainBox}>
