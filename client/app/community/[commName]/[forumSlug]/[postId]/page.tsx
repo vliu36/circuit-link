@@ -36,15 +36,15 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
             .finally(() => setLoading(false));
         }, [commName]);
     
-        if (load) return <div>Loading community...</div>;
-        if (!community) return <div>Community not found.</div>;
+    if (load) return <div>Loading community...</div>;
+    if (!community) return <div>Community not found.</div>;
 
     // Handler for editing posts/replies
     const handleEdit = async (id: string, isReply: boolean) => {
         if (!editContent.trim()) return alert("Content cannot be empty.");
         try {
             if (isReply) {
-                await editReply(id, user?.uid, editContent);
+                await editReply(id, editContent);
             } else if (post) {
                 await editPost(post.id, user?.uid, editTitle, editContent);
             }
@@ -62,10 +62,10 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
         if (!confirm("Are you sure you want to delete this?")) return;
         try {
             if (isReply) {
-                await deleteReplyById(id, user?.uid);
+                await deleteReplyById(id, commName);
                 fetchPost();
             } else if (post) {
-                await deletePostById(id, user?.uid);
+                await deletePostById(id, commName);
                 window.location.href = `/community/${commName}/${forumSlug}`;
             }
         } catch (err) {
@@ -73,11 +73,14 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
         }
     };
 
+    const isMod = community.modList.some(m => m.id === user?.uid);
+    const isOwner = community.ownerList.some(o => o.id === user?.uid);
+
     // Recursive rendering function for posts and replies
     const renderPostOrReply = (item: Post | Reply, depth = 0) => {
         if (depth >= MAX_DEPTH) return null;
         const isReply = "timeReply" in item;
-        const isOwner = item.authorId === user?.uid;
+        const isAuthor = item.authorId === user?.uid;
 
         return (
             <div 

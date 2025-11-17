@@ -98,7 +98,7 @@ export default function ForumPage({
             const mediaUrl = res.media || null;
 
             const msg = await createPost(
-                user.uid, 
+                // user.uid, // ! DEPRECATED - now derived from session cookie
                 title, 
                 contents, 
                 commName, 
@@ -128,7 +128,7 @@ export default function ForumPage({
     // Handler to save edited post
     const handleSaveEdit = async (postId: string) => {
         try {
-            const msg = await editPost(postId, user?.uid, editTitle, editContents);
+            const msg = await editPost(postId, editTitle, editContents);
             console.log(msg);
             cancelEditing();
             fetchPosts();
@@ -143,10 +143,10 @@ export default function ForumPage({
     };
 
     // Handler to delete a post
-    const handleDeletePost = async (postId: string) => {
+    const handleDeletePost = async (postId: string, commName: string) => {
         if (!confirm("Are you sure you want to delete this post?")) return;
         try {
-            const msg = await deletePostById(postId, user?.uid);
+            const msg = await deletePostById(postId, commName);
             alert(msg);
             fetchPosts();
         } catch (err) {
@@ -158,7 +158,7 @@ export default function ForumPage({
     const handleVote = async (postId: string, type: "yay" | "nay") => {
         if (!user) return alert("Sign in to vote!");
         try {
-            await votePost(postId, user.uid, type);
+            await votePost(postId, type);
             fetchPosts();
         } catch (err) {
             console.error(err);
@@ -194,6 +194,9 @@ export default function ForumPage({
         setMediaFile(file);
         if (file) setMediaPreview(URL.createObjectURL(file));
     };    
+
+    const isMod = community?.modList.some(m => m.id === user?.uid);
+    const isOwner = community?.ownerList.some(o => o.id === user?.uid);
 
     return (
         <main>
@@ -413,29 +416,30 @@ export default function ForumPage({
                                                     👎 Nay
                                                 </button>
 
-                                                {/* If the user is the author of the post, show edit and delete buttons */}
+                                                {/* Edit and delete buttons */}
+                                                
+                                            
+                                                {/* Edit button */}
                                                 {isAuthor && (
-                                                    <>
-                                                        {/* Edit button */}
-                                                        <button
-                                                            onClick={() => {
-                                                                setEditingPostId(post.id);
-                                                                setEditTitle(post.title);
-                                                                setEditContents(post.contents);
-                                                            }}  
-                                                            className={`${styles.button} ${styles.editButton}`}
-                                                        >
-                                                            Edit
-                                                        </button>
-                                                        
-                                                        {/* Delete button */}
-                                                        <button
-                                                            onClick={() => handleDeletePost(post.id)}
-                                                            className={`${styles.button} ${styles.deleteButton}`}
-                                                        >
-                                                            Delete
-                                                        </button>
-                                                    </>
+                                                    <button
+                                                        onClick={() => {
+                                                            setEditingPostId(post.id);
+                                                            setEditTitle(post.title);
+                                                            setEditContents(post.contents);
+                                                        }}  
+                                                        className={`${styles.button} ${styles.editButton}`}
+                                                    >
+                                                        Edit
+                                                    </button>
+                                                )}
+                                                {/* Delete button */}
+                                                {(isAuthor || isMod || isOwner) && (
+                                                    <button
+                                                        onClick={() => handleDeletePost(post.id, commName)}
+                                                        className={`${styles.button} ${styles.deleteButton}`}
+                                                    >
+                                                        Delete
+                                                    </button>
                                                 )}
                                             </div>
                                         </>

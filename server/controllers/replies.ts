@@ -2,6 +2,7 @@ import { DocumentReference, FieldValue, Timestamp } from "firebase-admin/firesto
 import { db } from "../firebase.ts"
 import { Request, Response } from "express"
 import { deletePostRepliesRecursive } from "./_utils/replyUtils.ts";
+import { getUserIdFromSessionCookie, isUserAuthorizedToDeleteDoc } from "./_utils/generalUtils.ts";
 
 // Retrieves all documents in Replies collection
 const getAllDocuments = async (req: Request, res: Response) => {
@@ -20,7 +21,8 @@ const getAllDocuments = async (req: Request, res: Response) => {
 // --- Create a new reply ---
 const createReply = async (req: Request, res: Response) => {
     try {
-        const { author, postId, contents } = req.body;
+        const { postId, contents } = req.body;
+        const author = await getUserIdFromSessionCookie(req);
         if (!author || !postId || !contents) {
             return res.status(400).json({ status: "error", message: "Missing fields" });
         }
@@ -49,6 +51,11 @@ const createReply = async (req: Request, res: Response) => {
         };
 
         const replyRef = await db.collection("Replies").add(data);
+
+        // Update author's yayScore
+        await authorRef.update({
+            yayScore: FieldValue.increment(1),
+        });
 
         res.status(200).json({ status: "OK", message: "Reply added", docId: replyRef.id });
     } catch (err) {
@@ -80,7 +87,6 @@ const replyToReply = async (req: Request, res: Response) => {
         await commRef.update({
             yayScore: FieldValue.increment(1),
         });
-
         res.status(200).json({ status: "OK", message: "Reply added to parent reply" });
     } catch (err) {
         console.error(err);
@@ -91,8 +97,9 @@ const replyToReply = async (req: Request, res: Response) => {
 // --- Vote on a reply ---
 const voteReply = async (req: Request, res: Response) => {
     try {
-        const { id, userId, type } = req.body;
+        const { id, type } = req.body;
         if (!["yay", "nay"].includes(type)) return res.status(400).json({ status: "error", message: "Invalid vote type" });
+        const userId = await getUserIdFromSessionCookie(req);
 
         const replyRef = db.collection("Replies").doc(id);
 
@@ -102,23 +109,24 @@ const voteReply = async (req: Request, res: Response) => {
 
             const replyData = replySnap.data();
             const userRef = db.doc(`/Users/${userId}`);
+            // Fetch parent community
+            const commRef: FirebaseFirestore.DocumentReference = replyData?.parentCommunity;
             
+            // Extract current yayList and nayList
             const yayList: DocumentReference[] = replyData?.yayList || [];
             const nayList: DocumentReference[] = replyData?.nayList || [];
 
-            // Old score
-            const oldYayScore = replyData?.yayScore || 0;
-            let yayScore = oldYayScore;
-
             const liked = yayList.some((ref) => ref.path === userRef.path);
             const disliked = nayList.some((ref) => ref.path === userRef.path);
-            let updatedYayList = [...yayList];
-            let updatedNayList = [...nayList];
 
-            // Fetch parent community
-            const commRef: FirebaseFirestore.DocumentReference = replyData?.parentCommunity;
-            const commSnap = await transaction.get(commRef);
-            if (!commSnap.exists) throw new Error("Community not found");
+            // let updatedYayList = [...yayList];
+            // let updatedNayList = [...nayList];
+            let updatedYayList = yayList;
+            let updatedNayList = nayList;
+            let yayScore = replyData?.yayScore || 0;
+
+            // Old score to calculate difference later
+            const oldYayScore = yayScore;
             
             // Vote logic
             if (type === "yay") {
@@ -154,56 +162,20 @@ const voteReply = async (req: Request, res: Response) => {
                 yayScore 
             });
 
-            // Update community's yayScore based on difference
+            // Update author's and community's yayScore based on difference
+            const authorRef: FirebaseFirestore.DocumentReference = replyData?.author;
             const diff = yayScore - oldYayScore;
             if (diff !== 0) {
                 // Update community yayScore
                 transaction.update(commRef, {
                     yayScore: FieldValue.increment(diff),
                 });
+                // Update author's yayScore based on difference
+                transaction.update(authorRef, {
+                    yayScore: FieldValue.increment(diff),
+                });
             }
         }); // end of transaction
-
-        // const replySnap = await replyRef.get();
-        // if (!replySnap.exists) return res.status(404).json({ status: "error", message: "Reply not found" });
-
-        // const replyData = replySnap.data();
-        // const userRef = db.doc(`/Users/${userId}`);
-        // const yayList: DocumentReference[] = replyData?.yayList || [];
-        // const nayList: DocumentReference[] = replyData?.nayList || [];
-        // let yayScore = replyData?.yayScore || 0;
-
-        // const liked = yayList.some((ref) => ref.path === userRef.path);
-        // const disliked = nayList.some((ref) => ref.path === userRef.path);
-
-        // let updatedYayList = [...yayList];
-        // let updatedNayList = [...nayList];
-
-        // if (type === "yay") {
-        //     if (liked) {
-        //         updatedYayList = updatedYayList.filter((ref) => ref.path !== userRef.path);
-        //         yayScore -= 1;
-        //     } else {
-        //         if (disliked) {
-        //             updatedNayList = updatedNayList.filter((ref) => ref.path !== userRef.path);
-        //             yayScore += 1;
-        //         }
-        //         updatedYayList.push(userRef);
-        //         yayScore += 1;
-        //     }
-        // } else {
-        //     if (disliked) {
-        //         updatedNayList = updatedNayList.filter((ref) => ref.path !== userRef.path);
-        //         yayScore += 1;
-        //     } else {
-        //         if (liked) {
-        //             updatedYayList = updatedYayList.filter((ref) => ref.path !== userRef.path);
-        //             yayScore -= 1;
-        //         }
-        //         updatedNayList.push(userRef);
-        //         yayScore -= 1;
-        //     }
-        // }
 
         // await replyRef.update({ yayList: updatedYayList, nayList: updatedNayList, yayScore });
         res.status(200).json({ status: "OK", message: "Vote updated" });
@@ -225,7 +197,8 @@ const voteReply = async (req: Request, res: Response) => {
 const deleteDoc = async (req: Request, res: Response) => {
     try {
         const { replyId } = req.params;
-        const { userId, communityId } = req.body;
+        const { commName } = req.body;
+        const userId = await getUserIdFromSessionCookie(req);
 
         const replyRef = db.collection("Replies").doc(replyId);
         const replySnap = await replyRef.get();
@@ -235,21 +208,8 @@ const deleteDoc = async (req: Request, res: Response) => {
         });
 
         const replyData = replySnap.data();
-        const authorPath = replyData?.author?.path;
-        const authorId = authorPath?.split("/")[1];
-        let authorized = authorId === userId;
+        const authorized = await isUserAuthorizedToDeleteDoc(userId, replyData!, commName);
 
-        if (!authorized && communityId) {
-            const communityRef = db.collection("Communities").doc(communityId);
-            const communitySnap = await communityRef.get();
-            if (communitySnap.exists) {
-                const communityData = communitySnap.data();
-                const userRef = db.doc(`/Users/${userId}`);
-                const ownerList: DocumentReference[] = communityData?.ownerList || [];
-                const modList: DocumentReference[] = communityData?.modList || [];
-                authorized = ownerList.some((ref) => ref.path === userRef.path) || modList.some((ref) => ref.path === userRef.path);
-            }
-        }
         if (!authorized) return res.status(403).json({ status: "Forbidden", message: "Not authorized to delete this reply" });
 
         const childReplies: DocumentReference[] = replyData?.listOfReplies || [];
@@ -259,6 +219,11 @@ const deleteDoc = async (req: Request, res: Response) => {
         // Update yayScore in parent community
         const commRef: FirebaseFirestore.DocumentReference = replyData?.parentCommunity;
         await commRef.update({
+            yayScore: FieldValue.increment(-replyData?.yayScore || 0),
+        });
+        // Update yayScore in author user document
+        const authorRef: FirebaseFirestore.DocumentReference = replyData?.author;
+        await authorRef.update({
             yayScore: FieldValue.increment(-replyData?.yayScore || 0),
         });
         // Decrement replyCount in parent post
@@ -278,7 +243,8 @@ const deleteDoc = async (req: Request, res: Response) => {
 const editDoc = async (req: Request, res: Response) => {
     try {
         const { replyId } = req.params;
-        const { userId, contents } = req.body;
+        const { contents } = req.body;
+        const userId = await getUserIdFromSessionCookie(req);
 
         const replyRef = db.collection("Replies").doc(replyId);
         const replySnap = await replyRef.get();

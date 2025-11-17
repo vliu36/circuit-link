@@ -2,6 +2,7 @@
 
 import { DocumentReference, FieldValue, Timestamp } from "firebase-admin/firestore";
 import { db } from "../../firebase.ts"
+import { verifyUserIsOwnerOrMod } from "./generalUtils.ts";
 
 export interface Post {
     author: DocumentReference;
@@ -15,6 +16,7 @@ export interface Post {
     timeUpdated: Timestamp;
     listOfReplies: DocumentReference[];
     edited: boolean;
+    keywords: Array<string>;
 }
 
 // Reply interface for nested replies
@@ -93,6 +95,17 @@ export const deleteNestedRepliesRecursive = async (replyRefs: FirebaseFirestore.
             await deleteNestedRepliesRecursive(replyData.listOfReplies);
         }
 
+        // Update community's yayScore by decrementing the reply's yayScore
+        const commRef: FirebaseFirestore.DocumentReference = replyData?.parentCommunity;
+        await commRef.update({
+            yayScore: FieldValue.increment(-replyData?.yayScore || 0),
+        });
+        // Update author's yayScore by decrementing the reply's yayScore
+        const authorRef: FirebaseFirestore.DocumentReference = replyData?.author;
+        await authorRef.update({
+            yayScore: FieldValue.increment(-replyData?.yayScore || 0),
+        });
+
         // Delete the reply
         await replyRef.delete();
 
@@ -104,30 +117,30 @@ export const deleteNestedRepliesRecursive = async (replyRefs: FirebaseFirestore.
     } // end for
 } // end helper function deleteRepliesRecursive
 
-// --- Helper function for deleteDoc in posts.ts to check if user is authorized to delete a post --- //
-export const isUserAuthorizedToDeletePost = async ( userId: string, postData: FirebaseFirestore.DocumentData, communityId?: string ): Promise<boolean> => {
-    const authorPath = postData?.author?.path;
-    const authorId = authorPath?.split("/")[1];
 
-    // Author can always delete
-    if (authorId === userId) return true;
 
-    // If not author, check if user is mod/owner of community
-    if (communityId) {
-        const communityRef = db.collection("Communities").doc(communityId);
-        const communityDoc = await communityRef.get();
-        if (communityDoc.exists) {
-            const communityData = communityDoc.data();
-            const userRef = db.doc(`/Users/${userId}`);
-            const ownerList: FirebaseFirestore.DocumentReference[] = communityData?.ownerList || [];
-            const modList: FirebaseFirestore.DocumentReference[] = communityData?.modList || [];
+// --- Helper function for addDoc in posts.ts to get its forum by slug, and subsequently the forum's parent group --- //
+export const getPostForumAndGroup = async ( commData: FirebaseFirestore.DocumentData, forumSlug: string ): Promise<{ forumRef: DocumentReference | null; parentGroupRef: DocumentReference | null }> => {
+    const forumsInCommunity: DocumentReference[] = commData.forumsInCommunity || [];
+    let forumRef: DocumentReference | null = null;
+    let parentGroupRef: DocumentReference | null = null;
 
-            const isOwner = ownerList.some(ref => ref.path === userRef.path);
-            const isMod = modList.some(ref => ref.path === userRef.path);
-
-            if (isOwner || isMod) return true;
+    for (const fRef of forumsInCommunity) {
+        const fSnap = await fRef.get();
+        const fData = fSnap.data();
+        if (fData?.slug === forumSlug) {
+            forumRef = fRef;
+            parentGroupRef = fData?.parentGroup;
+            break;
         }
     }
 
-    return false;
-};
+    if (!forumRef) {
+        throw new Error(`Forum with slug '${forumSlug}' not found in the specified community.`);
+    }
+    if (!parentGroupRef) {
+        throw new Error(`Parent group for forum '${forumSlug}' not found.`);
+    }
+
+    return { forumRef, parentGroupRef };
+}

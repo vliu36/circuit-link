@@ -31,7 +31,7 @@ export async function fetchPostsByForum(commName: string, forumSlug: string, sor
 }
 
 export async function createPost(
-    author: string,
+    // ! author: string, DEPRECATED - now derived from session cookie
     title: string,
     contents: string,
     commName: string,
@@ -41,37 +41,41 @@ export async function createPost(
     const res = await fetch(`${BASE_URL}/posts/make-post`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ author, title, contents, commName, forumSlug, media }),
+        body: JSON.stringify({ title, contents, commName, forumSlug, media }),
+        credentials: "include",
     });
     const data = await res.json();
     return data.message || "Post added!";
 }
 
-export async function editPost(postId: string, userId: string | undefined, title: string, contents: string) {
+export async function editPost(postId: string, title: string, contents: string) {
     const res = await fetch(`${BASE_URL}/posts/edit/${postId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, contents, userId }),
+        body: JSON.stringify({ title, contents }),
+        credentials: "include",
     });
     const data = await res.json();
     return data.message || "Post updated!";
 }
 
-export async function deletePostById(postId: string, userId: string | undefined) {
+export async function deletePostById(postId: string, commName: string) {
     const res = await fetch(`${BASE_URL}/posts/delete/${postId}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId }),
+        body: JSON.stringify({ commName }),
+        credentials: "include",
     });
     const data = await res.json();
     return data.message || "Post deleted!";
 }
 
-export async function votePost(id: string, userId: string, type: "yay" | "nay") {
+export async function votePost(id: string, type: "yay" | "nay") {
     await fetch(`${BASE_URL}/posts/vote`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, userId, type }),
+        body: JSON.stringify({ id, type }),
+        credentials: "include",
     });
 }
 

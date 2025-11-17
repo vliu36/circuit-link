@@ -131,6 +131,7 @@ export default function NavBar() {
                 </div>
                 <div className={Styles.line} style={{gridArea: 'line'}}>
                 </div>
+                <div className={Styles.line} style={{gridArea: 'line'}}></div>
             </div>
             
         )

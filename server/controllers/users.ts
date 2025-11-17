@@ -76,6 +76,7 @@ const userRegistration = async (req: Request, res: Response) => {
             communities: [],
             friendList: [],
             photoURL: "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg",
+            yayScore: 0,
         });
 
         res.status(201).json({ message: "User created successfully", uid: userId })
@@ -154,6 +155,7 @@ const userRegistrationGoogle = async (req: Request, res: Response) => {
             communities: [],
             photoURL: photoURL,
             friendList: [],
+            yayScore: 0,
         }
 
         try {

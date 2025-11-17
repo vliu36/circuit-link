@@ -29,7 +29,6 @@ export const deletePostRepliesRecursive = async (replyRefs: DocumentReference[])
             await deletePostRepliesRecursive(rData.listOfReplies);
         }
 
-        await rRef.delete();
         // Decrement replyCount in parent post
         const parentPostRef: FirebaseFirestore.DocumentReference = rData?.parentPost;
         await parentPostRef?.update({
@@ -40,6 +39,14 @@ export const deletePostRepliesRecursive = async (replyRefs: DocumentReference[])
         await commRef?.update({
             yayScore: FieldValue.increment(-rData?.yayScore || 0),
         });
+        // Update yayScore in author user document
+        const authorRef: FirebaseFirestore.DocumentReference = rData?.author;
+        await authorRef?.update({
+            yayScore: FieldValue.increment(-rData?.yayScore || 0),
+        });
+
+        // Delete the reply
+        await rRef.delete();
     }
 };
 
