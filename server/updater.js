@@ -12,35 +12,69 @@ initializeApp({
 
 const db = getFirestore();
 
-async function addMediaFieldToPosts() {
-  const postsRef = db.collection("Posts");
-  const snapshot = await postsRef.get();
+async function addYayScoreToUsers() {
+    const usersRef = db.collection("Users");
+    const snapshot = await usersRef.get();
 
-  console.log(`Found ${snapshot.size} posts.`);
+    console.log(`Found ${snapshot.size} users. Updating...`);
 
-  for (const docSnap of snapshot.docs) {
-    const data = docSnap.data();
+    const batch = db.batch();
+    let batchCount = 0;
 
-    if (("parentCommunity" in data)) {
-      await docSnap.ref.update({ media: null }); // Or null if you prefer
-      console.log(`Updated post ${docSnap.id} with empty media field.`);
+    snapshot.forEach((doc) => {
+        const data = doc.data();
+
+        // Only add yayScore if missing
+        if (data.yayScore === undefined) {
+            batch.update(doc.ref, { yayScore: 0 });
+            batchCount++;
+        }
+    });
+
+    if (batchCount > 0) {
+        await batch.commit();
+        console.log(`Updated ${batchCount} user documents.`);
     } else {
-      console.log(`Post ${docSnap.id} already has media field.`);
+        console.log("No users needed updating.");
     }
-  }
 
-  console.log("All posts processed.");
+    process.exit(0);
 }
 
-addMediaFieldToPosts()
-  .then(() => {
-    console.log("Update complete!");
-    process.exit(0);
-  })
-  .catch((err) => {
-    console.error("Error updating posts:", err);
+addYayScoreToUsers().catch((err) => {
+    console.error("Error updating users:", err);
     process.exit(1);
-  });
+});
+
+// async function addMediaFieldToPosts() {
+//   const postsRef = db.collection("Posts");
+//   const snapshot = await postsRef.get();
+
+//   console.log(`Found ${snapshot.size} posts.`);
+
+//   for (const docSnap of snapshot.docs) {
+//     const data = docSnap.data();
+
+//     if (("parentCommunity" in data)) {
+//       await docSnap.ref.update({ media: null }); // Or null if you prefer
+//       console.log(`Updated post ${docSnap.id} with empty media field.`);
+//     } else {
+//       console.log(`Post ${docSnap.id} already has media field.`);
+//     }
+//   }
+
+//   console.log("All posts processed.");
+// }
+
+// addMediaFieldToPosts()
+//   .then(() => {
+//     console.log("Update complete!");
+//     process.exit(0);
+//   })
+//   .catch((err) => {
+//     console.error("Error updating posts:", err);
+//     process.exit(1);
+//   });
 
 // async function deletePostsWithoutParentCommunity() {
 //   const postsRef = db.collection("Replies");

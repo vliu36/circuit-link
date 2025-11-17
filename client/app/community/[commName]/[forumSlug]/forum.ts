@@ -31,7 +31,7 @@ export async function fetchPostsByForum(commName: string, forumSlug: string, sor
 }
 
 export async function createPost(
-    author: string,
+    // ! author: string, DEPRECATED - now derived from session cookie
     title: string,
     contents: string,
     commName: string,
@@ -41,7 +41,8 @@ export async function createPost(
     const res = await fetch(`${BASE_URL}/posts/make-post`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ author, title, contents, commName, forumSlug, media }),
+        body: JSON.stringify({ title, contents, commName, forumSlug, media }),
+        credentials: "include",
     });
     const data = await res.json();
     return data.message || "Post added!";

@@ -11,9 +11,12 @@ router.get("/all", posts.getAllDocuments)
 
 /** Creates and adds a document to Posts
  *  @route POST /api/posts/make-post
- *  @body author - The document id for the User that created the post
  *  @body title - String representing the title of the post
  *  @body contents - String representing the contents of the post (can be text or a url to the cloud storage location of the media)
+ *  @body commName - String representing the name of the community the post belongs to
+ *  @body forumSlug - String representing the slug of the forum the post belongs to
+ *  @body media - [OPTIONAL] String representing the media URL if the post contains media
+ *  @returns JSON object confirming the success of the addition, or an error
 */
 router.post("/make-post", posts.addDoc);
 
