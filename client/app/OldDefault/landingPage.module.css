@@ -1,6 +1,6 @@
 @font-face {
   font-family: Jura;
-  src: url('../public/fonts/Jura-Light.ttf');
+  src: url(/fonts/Jura-Light.ttf);
 }
 .background {
     background-color: rgb(57, 65, 83);

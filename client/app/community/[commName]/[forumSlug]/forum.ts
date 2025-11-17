@@ -105,10 +105,10 @@ export async function getMediaUrl(mediaFile: File | null) {
     try {
         if (mediaFile) {
             if (mediaFile.type.startsWith("image/")) {
-                fileName = await uploadImage(mediaFile);
+                fileName = await uploadImage(mediaFile) as string;
                 mediaUrl += `images/${fileName}`;
             } else if (mediaFile.type.startsWith("video/")) {
-                fileName = await uploadVideo(mediaFile);
+                fileName = await uploadVideo(mediaFile) as string;
                 mediaUrl += `videos/${fileName}`;
             } else {
                 alert("Unsupported media type. Please upload an image or video.");
