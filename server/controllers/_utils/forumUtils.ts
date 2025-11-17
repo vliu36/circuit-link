@@ -21,17 +21,17 @@ export const checkDuplicateForum = async (name: string, slug: string, commRef: D
 // -------- Helper functions for getForumBySlug -------- //
 // --- Helper: Get community document by name ---
 // ! Deprecated, use getCommunityByName from commUtils.ts instead
-export async function getCommunityByName(commName: string) {
-    const commSnap = await db
-        .collection("Communities")
-        .where("name", "==", commName)
-        .limit(1)
-        .get();
+// export async function getCommunityByName(commName: string) {
+//     const commSnap = await db
+//         .collection("Communities")
+//         .where("name", "==", commName)
+//         .limit(1)
+//         .get();
 
-    if (commSnap.empty) return null;
-    const commDoc = commSnap.docs[0];
-    return { commDoc, commData: commDoc.data() };
-}
+//     if (commSnap.empty) return null;
+//     const commDoc = commSnap.docs[0];
+//     return { commDoc, commData: commDoc.data() };
+// }
 
 
 // --- Helper: Find a forum reference within a community by slug ---
@@ -177,6 +177,6 @@ export async function getParentCommByRef(commRef: DocumentReference) {
     if (!commData) {
         throw new Error("Parent community data is undefined; could not be retrieved.");
     }
-    
+
     return { commRef, commData };
 }

@@ -98,7 +98,7 @@ export default function ForumPage({
             const mediaUrl = res.media || null;
 
             const msg = await createPost(
-                user.uid, 
+                // user.uid, // ! DEPRECATED - now derived from session cookie
                 title, 
                 contents, 
                 commName, 
