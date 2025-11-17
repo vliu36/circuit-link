@@ -158,7 +158,7 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
             parentGroup: parentGroupRef,
             parentForum: forumRef,
             media: media || null,
-            keywords: Array.from(extractedKeywords)
+            keywords: [...new Set(["",...req.body.contents.split(" "),...req.body.title.split(" ")])] // Stores words into an array for post searching
         };
 
         // Add to Posts collection
@@ -226,7 +226,7 @@ const editDoc = async (req: Request, res: Response) => {
         if (req.body.title) updates.title = req.body.title;
         if (req.body.contents) updates.contents = req.body.contents;
         if (req.body.contents || req.body.title) {
-            updates.keywords = Array.from(new Set(req.body.contents.split(" ").push(req.body.title.split(" "))));
+            updates.keywords = [...new Set(["",...req.body.contents.split(" "),...req.body.title.split(" ")])];
         }
         updates.timeUpdated = Timestamp.fromDate(new Date());
         updates.edited = true; // Mark post as edited
