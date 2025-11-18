@@ -6,6 +6,7 @@ import { DocumentReference } from "firebase-admin/firestore";
 import * as forumUtils from "./_utils/forumUtils.ts";
 import { getUserIdFromSessionCookie, verifyUserIsOwnerOrMod } from "./_utils/generalUtils.ts";
 import { getCommunityByName } from "./_utils/commUtils.ts";
+import { match } from "assert";
 
 // Retrieves all documents in Forums
 const getAllDocuments = async (req: Request, res: Response) => {
@@ -312,9 +313,45 @@ const editForum = async (req: Request, res: Response) => {
     }
 };
 
-// Runs prefix search on post titles 
+// Runs partial-text keyword search on post titles 
 const searchForum = async (req: Request, res: Response) => {
-    
+    try {
+        const { commName, slug, query } = req.params;
+        const { data: commData } = await getCommunityByName(commName);
+
+        // Find forum in that community 
+        const forumRef = await forumUtils.findForumRefInCommunity(commData, slug);
+        if (!forumRef) {
+            return res.status(404).send({
+                status: "Not Found",
+                message: `Forum with slug "${slug}" not found in community "${commName}".`,
+            });
+        }
+
+        // Retrieve post ref of all matching posts
+        const searchArr = [...query.split(" ", 30)];
+        const matchingPosts = db.collection("Posts").where("parentForum", "==", forumRef).where("keywords", "array-contains-any", searchArr);
+        const postSnapshot = await matchingPosts.get();
+
+        let postsRef: DocumentReference[] = [];
+        postSnapshot.docs.map((doc) => {
+            postsRef.push(doc.ref);
+        })
+
+        const searchResults = await forumUtils.getFormattedPosts(postsRef, "mostYays");
+
+        res.status(200).send({
+            status: "OK",
+            posts: searchResults
+        });
+    }
+    catch (err) {
+        console.error("SearchForum Error", err);
+        res.status(500).send({
+            status: "Backend error",
+            message: err instanceof Error ? err.message : err
+        });
+    }
 }
 
 export {
@@ -323,4 +360,5 @@ export {
     getForumBySlug,
     deleteForum,
     editForum,
+    searchForum
 }
