@@ -16,6 +16,11 @@ import { fetchStructure } from "../community.ts";
 import { uploadImage, uploadVideo } from "../../../_utils/mediaUpload.ts";
 import Image from "next/image";
 import * as commApi from "../community";
+import thumbsDown from "../../../../public/thumbs-down-regular-full.svg"
+import thumbsUp from "../../../../public/thumbs-up-regular-full.svg"
+import commentIcon from "../../../../public/comment-regular-full.svg"
+import checkedthumbsDown from "../../../../public/thumbs-down-glow-full.svg"
+import checkedthumbsUp from "../../../../public/thumbs-up-glow-full.svg"
 
 export default function ForumPage({
     params,
@@ -46,6 +51,7 @@ export default function ForumPage({
     const [mediaPreview, setMediaPreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const router = useRouter();
+
     // --- DELETE GROUP ---
     const handleDeleteGroup = async (groupId: string) => {
         if (!user) return;
@@ -57,7 +63,7 @@ export default function ForumPage({
             console.error("Error deleting group:", err);
         }
     };
-    
+
     const toggleEditGroupPopup = () => {
         setEditGroupOpen(!editGroupOpen);
         setError(null);
@@ -295,7 +301,11 @@ export default function ForumPage({
                                     {group.forumsInGroup.length > 0 ? (
                                         <div>
                                             {group.forumsInGroup.map((forum) => (
-                                                <div key={forum.id} className={styles.channelHeader}>
+                                                <div
+                                                    key={forum.id}
+                                                    className={`${styles.channelHeader} ${forum.slug === forumSlug ? styles.activeChannel : ""
+                                                        }`}
+                                                >
                                                     {/* Link to the forum (displays its posts) */}
                                                     <div className={styles.channelName}>
                                                         <Link href={`/community/${commName}/${forum.slug}`}>
@@ -492,56 +502,92 @@ export default function ForumPage({
 
 
 
-                                                {/* Yay score and reply count */}
-                                                <p className={styles.meta}>
-                                                    <strong>Yay Score:</strong> {post.yayScore} | <strong>Replies:</strong> {post.replyCount}
-                                                </p>
 
-                                                <div className={styles.actions}>
-                                                    {/* ---- Vote buttons ---- */}
-                                                    {/* If the user has already voted, show their vote status (green for yay) */}
-                                                    <button
-                                                        onClick={() => handleVote(post.id, "yay")}
-                                                        className={`${styles.voteButton} ${post.yayList.includes(user?.uid || "") ? styles.yayActive : ""
-                                                            }`}
-                                                    >
-                                                        👍 Yay
-                                                    </button>
-
-                                                    {/* If the user has already voted, show their vote status (red for nay) */}
-                                                    <button
-                                                        onClick={() => handleVote(post.id, "nay")}
-                                                        className={`${styles.voteButton} ${post.nayList.includes(user?.uid || "") ? styles.nayActive : ""
-                                                            }`}
-                                                    >
-                                                        👎 Nay
-                                                    </button>
-
-                                                    {/* Edit and delete buttons */}
-
-
-                                                    {/* Edit button */}
-                                                    {isAuthor && (
+                                                <div className={styles.likesCommentsShare}>
+                                                    <div className={styles.actions}>
+                                                        {/* ---- Vote buttons ---- */}
+                                                        {/* If the user has already voted, show their vote status (green for yay) */}
                                                         <button
-                                                            onClick={() => {
-                                                                setEditingPostId(post.id);
-                                                                setEditTitle(post.title);
-                                                                setEditContents(post.contents);
-                                                            }}
-                                                            className={`${styles.button} ${styles.editButton}`}
+                                                            onClick={() => handleVote(post.id, "yay")}
+                                                            className={`${styles.voteButton} ${post.yayList.includes(user?.uid || "") ? styles.yayActive : ""
+                                                                }`}
+                                                            style={{ gridArea: "Yays" }}
                                                         >
-                                                            Edit
+                                                            <div className={styles.imageAlignmentInButton}>
+                                                                <Image
+                                                                    src={post.yayList.includes(user?.uid || "") ? checkedthumbsUp : thumbsUp}
+                                                                    alt="Yays"
+                                                                    width={30}
+                                                                    height={30}
+                                                                />
+                                                            </div>
                                                         </button>
-                                                    )}
-                                                    {/* Delete button */}
-                                                    {(isAuthor || isMod || isOwner) && (
+
+
+                                                        {/* Yay score and reply count */}
+                                                        <p className={styles.yayScore} style={{ gridArea: "score" }}>
+                                                            {post.yayScore}
+                                                        </p>
+
+                                                        {/* If the user has already voted, show their vote status (red for nay) */}
                                                         <button
-                                                            onClick={() => handleDeletePost(post.id, commName)}
-                                                            className={`${styles.button} ${styles.deleteButton}`}
+                                                            onClick={() => handleVote(post.id, "nay")}
+                                                            className={`${styles.voteButton} ${post.nayList.includes(user?.uid || "") ? styles.nayActive : ""
+                                                                }`}
+                                                            style={{ gridArea: "Nays", borderRadius: "0 1vw 1vw 0" }}
                                                         >
-                                                            Delete
+                                                            <div className={styles.imageAlignmentInButton}>
+                                                                <Image
+                                                                    src={post.nayList.includes(user?.uid || "") ? checkedthumbsDown : thumbsDown}
+                                                                    alt="Nays"
+                                                                    width={30}
+                                                                    height={30}
+                                                                />
+                                                            </div>
+
                                                         </button>
-                                                    )}
+
+                                                        {/* Edit and delete buttons */}
+
+
+                                                        {/* Edit button */}
+                                                        {isAuthor && (
+                                                            <button
+                                                                onClick={() => {
+                                                                    setEditingPostId(post.id);
+                                                                    setEditTitle(post.title);
+                                                                    setEditContents(post.contents);
+                                                                }}
+                                                                className={`${styles.button} ${styles.editButton}`}
+                                                            >
+                                                                Edit
+                                                            </button>
+                                                        )}
+                                                        {/* Delete button */}
+                                                        {(isAuthor || isMod || isOwner) && (
+                                                            <button
+                                                                onClick={() => handleDeletePost(post.id, commName)}
+                                                                className={`${styles.button} ${styles.deleteButton}`}
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                    <div style={{ marginLeft: "2vw" }}></div>
+                                                    <div className={styles.commentsBox}>
+                                                        <div className={styles.commentIcon} style={{ gridArea: "icon" }}>
+                                                            <Image
+                                                                src={commentIcon}
+                                                                width={30}
+                                                                height={30}
+                                                                alt="commentIcon"
+                                                            />
+                                                        </div>
+                                                        <div className={styles.ratioScore} style={{ gridArea: "ratio" }}>
+                                                            {post.replyCount}
+                                                        </div>
+
+                                                    </div>
                                                 </div>
                                             </>
                                         )}

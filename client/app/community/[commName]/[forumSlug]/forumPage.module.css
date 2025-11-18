@@ -133,8 +133,41 @@
     text-wrap: unset;
 }
 
+.likesCommentsShare{
+    margin-top: 2%;
+    display: flex;
+    width: 100%;
+    height: 3.5vh;
+}
+
+.commentsBox{
+    display: flex;
+    width: 8%;
+    height: 3.5vh;
+    background-color: rgba(217, 217, 217, 1);
+    text-indent: 1vw;
+    border-radius: 1vw;
+}
+
+.commentIcon{
+    margin-left: 10%;
+    margin-top:5%;
+    width: 30%;
+}
+
+.ratioScore{
+   width: 70%; 
+}
+
 .actions {
-    margin-top: 10px;
+    display: grid;
+    grid-template-columns: 23.33% 53.33% 23.34%;
+    grid-row: 100%;
+    width:  15%;
+    height: 3.5vh;
+    background-color: rgba(217, 217, 217, 1);
+    grid-template-areas: "Yays score Nays";
+    border-radius: 1em;
 }
 
 .button {
@@ -180,34 +213,28 @@
 }
 
 .voteButton {
-    background-color: #6c757d;
+    background-color: rgba(217, 217, 217, 1);
     color: white;
-    padding: 5px 10px;
     border: none;
-    border-radius: 6px;
+    border-radius: 1vw 0 0 1vw;
     cursor: pointer;
-    margin-right: 10px;
     transition: background-color 0.2s ease;
+    width: 100%;
+    height: 3.5vh;
+}
+
+.imageAlignmentInButton{
+    margin-left: 5%;
 }
 
 .voteButton:hover {
     background-color: #5a6268;
 }
 
-.yayActive {
-    background-color: #4caf50;
-}
-
-.yayActive:hover {
-    background-color: #45a049;
-}
-
-.nayActive {
-    background-color: #d9534f;
-}
-
-.nayActive:hover {
-    background-color: #c9302c;
+.yayScore{
+    color: black;
+    text-align: center;
+    margin-right: 10%;
 }
 
 .header {
@@ -818,4 +845,9 @@
 
 .sortText{
     font-size: 12px;
+}
+
+.activeChannel a {
+    width: 1000px;
+    background-color: #7c7c7c;
 }
