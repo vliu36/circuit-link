@@ -108,12 +108,6 @@ export const deleteNestedRepliesRecursive = async (replyRefs: FirebaseFirestore.
 
         // Delete the reply
         await replyRef.delete();
-
-        // Update community's yayScore by decrementing the reply's yayScore
-        const commRef: FirebaseFirestore.DocumentReference = replyData?.parentCommunity;
-        await commRef.update({
-            yayScore: FieldValue.increment(-replyData?.yayScore || 0),
-        });
     } // end for
 } // end helper function deleteRepliesRecursive
 
