@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { fetchStructure } from "../community.ts";
 import { uploadImage, uploadVideo } from "../../../_utils/mediaUpload.ts";
 import Image from "next/image";
+import * as commApi from "../community";
 
 export default function ForumPage({
     params,
@@ -30,18 +31,64 @@ export default function ForumPage({
     const [editingPostId, setEditingPostId] = useState<string | null>(null);
     const [editTitle, setEditTitle] = useState("");
     const [editContents, setEditContents] = useState("");
-
+    const [error, setError] = useState<string | null>(null);
+    const [groupName, setGroupName] = useState("");
+    const [groupMessage, setGroupMessage] = useState("");
     const [sortMode, setSortMode] = useState<string>("newest"); // "newest" | "oldest" | "mostYays" | "alphabetical"
-
+    const [forumInputs, setForumInputs] = useState<{ [groupId: string]: { name: string; description: string; message: string } }>({});
+    const [editGroupOpen, setEditGroupOpen] = useState(false);
     const [forum, setForum] = useState<Forum | null>(null);
     const [loading, setLoading] = useState(true);
-
+    const [editGroupId, setEditGroupId] = useState<string>("");
     const [editPopup, setEditPopup] = useState(false);
     const [message, setMessage] = useState<string | null>(null);
     const [mediaFile, setMediaFile] = useState<File | null>(null);
     const [mediaPreview, setMediaPreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const router = useRouter();
+    // --- DELETE GROUP ---
+    const handleDeleteGroup = async (groupId: string) => {
+        if (!user) return;
+        try {
+            const result = await commApi.deleteGroup(groupId, commName);
+            console.log("Group deleted successfully:", result);
+            await refreshCommunity();
+        } catch (err) {
+            console.error("Error deleting group:", err);
+        }
+    };
+    
+    const toggleEditGroupPopup = () => {
+        setEditGroupOpen(!editGroupOpen);
+        setError(null);
+    };
+
+    // Refresh the current community structure and update state
+    const refreshCommunity = async () => {
+        try {
+            const updated = await commApi.fetchStructure(commName);
+            if (updated) {
+                setCommunity(updated);
+            } else {
+                // TODO: This causes an error when changing the community name; refreshing returns no data because the old name is used
+                console.error("Failed to refresh community: no data returned");
+            }
+        } catch (err) {
+            console.error("Error refreshing community:", err);
+        }
+    };
+
+    // --- DELETE FORUM ---
+    const handleDeleteForum = async (forumId: string) => {
+        if (!user) return;
+        try {
+            const result = await commApi.deleteForum(forumId, commName);
+            console.log("Forum deleted successfully:", result);
+            await refreshCommunity();
+        } catch (err) {
+            console.error("Error deleting forum:", err);
+        }
+    };
 
     // Toggle edit forum popup
     const toggleEditPopup = () => {
@@ -86,6 +133,8 @@ export default function ForumPage({
             })
             .finally(() => setLoading(false));
     }, [commName]);
+
+    if (!community) return <div>Community not found.</div>;
 
     // Handler to add a new post
     const handleAddPost = async () => {
@@ -218,7 +267,56 @@ export default function ForumPage({
                     <h1>{commName}</h1>
                     <div className={styles.horizontalLine}></div>
                     <div className={styles.serverContainer}>
-                        {/* Stuff Goes Here */}
+                        {/* --- GROUPS AND FORUMS --- */}
+                        <section>
+                            {community.groupsInCommunity.length === 0 && <p>No groups in this community yet.</p>}
+
+                            {/* Displays a group and its forums */}
+                            {community.groupsInCommunity.map((group) => (
+                                <div key={group.id} style={{ marginBottom: "2rem" }}>
+                                    <div className={styles.groupHeader}>
+                                        <div className={styles.groupName}>{group.name}</div>
+                                        {/* Only displays if user is an owner or a mod */}
+                                        {
+                                            (isOwner || isMod) &&
+                                            <>
+                                                <button className={styles.deleteGroup} onClick={() => handleDeleteGroup(group.id)}>
+                                                    Delete Group
+                                                </button>
+                                                <button className={styles.editGroup} onClick={() => { toggleEditGroupPopup(); setEditGroupId(group.id); }}>
+                                                    Edit Group
+                                                </button>
+                                            </>
+                                        }
+                                    </div>
+
+
+                                    {/* Displays the forums in this group */}
+                                    {group.forumsInGroup.length > 0 ? (
+                                        <div>
+                                            {group.forumsInGroup.map((forum) => (
+                                                <div key={forum.id} className={styles.channelHeader}>
+                                                    {/* Link to the forum (displays its posts) */}
+                                                    <div className={styles.channelName}>
+                                                        <Link href={`/community/${commName}/${forum.slug}`}>
+                                                            &gt;{forum.name}
+                                                        </Link>
+                                                    </div>
+                                                    {/* -------- Delete Forum Button -------- */}
+                                                    {/* Only shows if user is owner or mod */}
+                                                    {(isOwner || isMod) &&
+                                                        <button className={styles.deleteChannel} onClick={() => handleDeleteForum(forum.id)}>
+                                                            Delete Forum
+                                                        </button>
+                                                    }
+                                                </div>
+                                            ))}
+
+                                        </div>
+                                    ) : <p>No forums in this group.</p>}
+                                </div>
+                            ))}
+                        </section>
                     </div>
                 </div>
 
