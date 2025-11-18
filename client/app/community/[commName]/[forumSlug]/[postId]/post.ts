@@ -120,7 +120,8 @@ export const useReplies = (postId: string, userId?: string) => {
             await fetch(isReply ? `${BASE_URL}/replies/vote` : `${BASE_URL}/posts/vote`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ id, userId, type }),
+                body: JSON.stringify({ id, type }),
+                credentials: "include",
             });
             fetchPost();
         } catch (err) {
@@ -138,7 +139,8 @@ export const useReplies = (postId: string, userId?: string) => {
             const res = await fetch(`${BASE_URL}/replies/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ author: userId, contents, postId }),
+                body: JSON.stringify({ contents, postId }),
+                credentials: "include",
             });
             const data = await res.json();
             const newReplyId = data.docId;
@@ -163,22 +165,24 @@ export const useReplies = (postId: string, userId?: string) => {
     };
 
     // --- Edit reply ---
-    const editReply = async (replyId: string, userId: string | undefined, contents: string) => {
+    const editReply = async (replyId: string, contents: string) => {
         const res = await fetch(`${BASE_URL}/replies/edit/${replyId}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ contents, userId }),
+            body: JSON.stringify({ contents }),
+            credentials: "include",
         });
         const data = await res.json();
         return data.message || "Reply updated!";
     };
 
     // --- Delete reply ---
-    const deleteReplyById = async (replyId: string, userId: string | undefined) => {
+    const deleteReplyById = async (replyId: string, commName: string) => {
         const res = await fetch(`${BASE_URL}/replies/delete/${replyId}`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId }),
+            body: JSON.stringify({ commName }),
+            credentials: "include",
         });
         const data = await res.json();
         return data.message || "Reply deleted!";
@@ -196,11 +200,12 @@ export const useReplies = (postId: string, userId?: string) => {
     };
 
     // --- Delete post ---
-    const deletePostById = async (postId: string, userId: string | undefined) => {
+    const deletePostById = async (postId: string, commName: string) => {
         const res = await fetch(`${BASE_URL}/posts/delete/${postId}`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userId }),
+            body: JSON.stringify({ commName }),
+            credentials: "include",
         });
         const data = await res.json();
         return data.message || "Post deleted!";

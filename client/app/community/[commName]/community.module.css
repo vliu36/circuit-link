@@ -378,6 +378,12 @@ I dont think we need this
     background-color: white;
 }
 
+.firstBox{
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+}
+
 .titleText{
     display: flex;
     align-items: center;
