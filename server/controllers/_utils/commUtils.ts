@@ -151,7 +151,7 @@ export const removeUserFromCommunity = async (
     commRef: DocumentReference, 
     userRef: DocumentReference, 
     userId: string, 
-    communityName: string
+    // communityName: string
 ) => {
     await db.runTransaction(async (transaction) => {
         const commSnap = await transaction.get(commRef);

@@ -46,4 +46,5 @@ export interface Community {
     public: boolean;
     icon: string;
     banner: string;
+    rules: string;
 }

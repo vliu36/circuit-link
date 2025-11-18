@@ -335,14 +335,15 @@ export async function editCommunity(
     commName: string,           // current community name
     newName?: string,           // new name for the community (optional)
     description?: string,       // new description for the community (optional)
-    isPublic?: boolean          // new public status for the community (optional)
+    isPublic?: boolean,          // new public status for the community (optional)
+    rules?: string               // new rules for the community (optional)
 ): Promise<{ status: string; message: string }> {
     try {
         const res = await fetch(`${BASE_URL}/comm/edit/${commName}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({ newName, description, isPublic }),
+            body: JSON.stringify({ newName, description, isPublic, rules }),
         });
         const data = await res.json();
 

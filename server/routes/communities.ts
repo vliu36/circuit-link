@@ -22,9 +22,7 @@ router.get("/search/:query", comm.prefixSearch);
  *  @body description - String representing the user defined description for the Community
  *  @body isPublic - Boolean determining whether the community is public or not
  *  @cookie session - Firebase session cookie used to authenticate the request
- *  @returns {201} - Community successfully created
- *  @returns {400} - Community already exists
- *  @returns {500} - Backend failure
+ *  @returns JSON Object of the created document, or an error
  */
 router.post("/create", comm.addDoc);
 
@@ -46,10 +44,7 @@ router.get("/get-structure/:name", comm.getCommunityStructure);
  *  @route DELETE /api/comm/delete
  *  @param name - String name of the community to be deleted
  *  @cookie session - Firebase session cookie used to authenticate the request
- *  @returns {200} - Community successfully deleted
- *  @returns {401} - Unauthorized (invalid or missing session cookie)
- *  @returns {403} - Forbidden (user is not the community owner)
- *  @returns {404} - Community not found
+ *  @returns JSON Object indicating success or an error
  */
 router.delete("/delete/:name", comm.deleteDoc);
 
@@ -57,7 +52,8 @@ router.delete("/delete/:name", comm.deleteDoc);
  *  @route POST /api/comm/create-group
  *  @body commName - Name of the community in which the group belongs in 
  *  @body name - Name of the group being created
- *  @body userId - String ID of the user requesting the creation of a group
+ *  @cookie session - Firebase session cookie used to authenticate the request (must be an owner)
+ *  @returns JSON Object indicating success or an error
  */
 router.post("/create-group", comm.createGroup);
 
@@ -66,12 +62,7 @@ router.post("/create-group", comm.createGroup);
  *  @param groupId - ID of the group to be deleted
  *  @body commName - Name of the community in which the group belongs in
  *  @cookie session - Firebase session cookie used to authenticate the request
- *  @returns {200} - Group successfully deleted
- *  @returns {400} - Missing parameters
- *  @returns {401} - Unauthorized (invalid or missing session cookie)
- *  @returns {403} - Forbidden (user is not the community owner)
- *  @returns {404} - Group not found
- *  @returns {500} - Backend failure
+ *  @returns JSON Object indicating success or an error
  */
 router.delete("/delete-group/:groupId", comm.deleteGroup);
 
@@ -79,10 +70,7 @@ router.delete("/delete-group/:groupId", comm.deleteGroup);
  *  @route POST /api/comm/join/:name
  *  @params name - String representing the name of the Community
  *  @cookie session - Firebase session cookie used to authenticate the request
- *  @returns {200} - User successfully joined the community
- *  @returns {400} - Missing parameters or user already a member
- *  @returns {404} - Community or user not found
- *  @returns {500} - Backend failure
+ *  @returns JSON Object with success message, or an error
  */
 router.post("/join/:name", comm.joinCommunity);
 
@@ -90,10 +78,7 @@ router.post("/join/:name", comm.joinCommunity);
  *  @route POST /api/comm/leave/:name
  *  @params name - String representing the name of the Community
  *  @cookie session - Firebase session cookie used to authenticate the request
- *  @returns {200} - User successfully left the community
- *  @returns {400} - Missing parameters or user cannot leave (e.g., only owner)
- *  @returns {404} - Community or user not found
- *  @returns {500} - Backend failure
+ *  @returns JSON Object with success message, or an error
  */
 router.post("/leave/:name", comm.leaveCommunity);
 
@@ -102,11 +87,7 @@ router.post("/leave/:name", comm.leaveCommunity);
  *  @params name - String representing the name of the Community
  *  @body userId - UID of the user to be promoted
  *  @cookie session - Firebase session cookie used to authenticate the request (must be an owner)
- *  @returns {200} - User successfully promoted to mod
- *  @returns {400} - Missing parameters or target is not a member
- *  @returns {403} - Requester is not an owner
- *  @returns {404} - Community or user not found
- *  @returns {500} - Backend failure
+ *  @returns JSON Object with success message, or an error
  */
 router.post("/promote-mod/:name", comm.promoteToMod);
 
@@ -115,11 +96,7 @@ router.post("/promote-mod/:name", comm.promoteToMod);
  *  @params name - String representing the name of the Community
  *  @body userId - UID of the user to be demoted
  *  @cookie session - Firebase session cookie used to authenticate the request (must be an owner)
- *  @returns {200} - User successfully demoted from mod
- *  @returns {400} - Missing parameters or target is not a mod
- *  @returns {403} - Requester is not an owner
- *  @returns {404} - Community or user not found
- *  @returns {500} - Backend failure
+ *  @returns JSON Object with success message, or an error
  */
 router.post("/demote-mod/:name", comm.demoteMod);
 
@@ -128,11 +105,7 @@ router.post("/demote-mod/:name", comm.demoteMod);
  *  @params name - String representing the name of the Community
  *  @body userId - UID of the user to be promoted
  *  @cookie session - Firebase session cookie used to authenticate the request (must be an owner)
- *  @returns {200} - User successfully promoted to owner
- *  @returns {400} - Missing parameters or target is not a member
- *  @returns {403} - Requester is not an owner
- *  @returns {404} - Community or user not found
- *  @returns {500} - Backend failure
+ *  @returns JSON Object with success message, or an error
  */
 router.post("/promote-owner/:name", comm.promoteToOwner);
 
@@ -141,11 +114,7 @@ router.post("/promote-owner/:name", comm.promoteToOwner);
  *  @params name - String representing the name of the Community
  *  @body userId - UID of the user to be demoted
  *  @cookie session - Firebase session cookie used to authenticate the request (must be an owner)
- *  @returns {200} - User successfully demoted from owner
- *  @returns {400} - Missing parameters or cannot demote (e.g., only owner)
- *  @returns {403} - Requester is not an owner
- *  @returns {404} - Community or user not found
- *  @returns {500} - Backend failure
+ *  @returns JSON Object with success message, or an error
  */
 router.post("/demote-owner/:name", comm.demoteOwner);
 
@@ -156,12 +125,7 @@ router.post("/demote-owner/:name", comm.demoteOwner);
  *  @body description - New description for the community (optional)
  *  @body isPublic - New public status for the community (optional)
  *  @cookie session - Firebase session cookie used to authenticate the request (must be an owner)
- *  @returns {200} - Community successfully updated
- *  @returns {400} - Missing parameters or invalid data
- *  @returns {403} - Requester is not an owner
- *  @returns {404} - Community not found
- *  @returns {409} - New community name already taken
- *  @returns {500} - Backend failure
+ *  @returns JSON Object indicating success or an error
  */
 router.put("/edit/:name", comm.editComm);
 
@@ -171,13 +135,34 @@ router.put("/edit/:name", comm.editComm);
  *  @body commName - Name of the community in which the group belongs in
  *  @body newName - New name for the group 
  *  @cookie session - Firebase session cookie used to authenticate the request (must be an owner)
- *  @returns {200} - Group successfully updated
- *  @returns {400} - Missing parameters or invalid data
- *  @returns {403} - Requester is not an owner
- *  @returns {404} - Group's community not found
- *  @returns {409} - New group name already taken
- *  @returns {500} - Backend failure
+ *  @returns JSON Object indicating success or an error
  */
 router.put("/edit-group/:groupId", comm.editGroup);
+
+/** Kick a user from the community
+ *  @route POST /api/comm/kick-user/:name
+ *  @params name - String representing the name of the Community
+ *  @body userId - UID of the user to be kicked
+ *  @cookie session - Firebase session cookie used to authenticate the request (must be an owner or mod)
+ *  @returns JSON Object with success message, or an error
+ */
+router.post("/kick-user/:name", comm.kickUser);
+
+/** Unban a user from the community
+ *  @route POST /api/comm/unban-user/:name
+ *  @params name - String representing the name of the Community
+ *  @body userId - UID of the user to be unbanned
+ *  @cookie session - Firebase session cookie used to authenticate the request (must be an owner or mod)
+ *  @returns JSON Object with success message, or an error
+ */
+router.post("/unban-user/:name", comm.unbanUser);
+
+/** Get the blacklist of a community
+ *  @route GET /api/comm/blacklist/:name
+ *  @params name - String representing the name of the Community
+ *  @cookie session - Firebase session cookie used to authenticate the request (must be an owner or mod)
+ *  @returns JSON Object containing an array of blacklisted users, or an error
+ */
+router.get("/blacklist/:name", comm.getBlacklist);
 
 export default router;

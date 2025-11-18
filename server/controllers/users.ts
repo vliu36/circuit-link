@@ -116,7 +116,7 @@ const userRegistrationGoogle = async (req: Request, res: Response) => {
         const docSnap = await userDoc.get();
 
         // Create session cookie via Admin SDK
-        const expiresIn = 60 * 60 * 24 * 3 * 1000; // 3 days
+        const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
         const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
         res.cookie("session", sessionCookie, {
             httpOnly: true,
@@ -210,7 +210,7 @@ const userLogin = async (req: Request, res: Response) => {
         console.log("Verified Firebase token for user:", email, uid);
 
         // Create session cookie via Admin SDK
-        const expiresIn = 60 * 60 * 24 * 3 * 1000; // 3 days
+        const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
         const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
         res.cookie("session", sessionCookie, {
             httpOnly: true,

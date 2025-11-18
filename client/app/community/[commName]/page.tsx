@@ -217,9 +217,9 @@ export default function CommunityPage({
   };
 
   // --- EDIT COMMUNITY ---
-  const handleEditCommunity = async (newName?: string, description?: string, isPublic?: boolean) => {
+  const handleEditCommunity = async (newName?: string, description?: string, isPublic?: boolean, rules?: string) => {
     try {
-      const res = await commApi.editCommunity(commName, newName, description, isPublic);
+      const res = await commApi.editCommunity(commName, newName, description, isPublic, rules);
       console.log(res.message);
       setError(res.message || null);
       await refreshCommunity();
@@ -624,7 +624,8 @@ export default function CommunityPage({
                   const newName = formData.get("newName") as string;
                   const description = formData.get("description") as string;
                   const isPublic = formData.get("isPublic") === "on" ? true : false;
-                  await handleEditCommunity(newName || undefined, description || undefined, isPublic);
+                  const rules = formData.get("rules") as string;
+                  await handleEditCommunity(newName || undefined, description || undefined, isPublic, rules || undefined);
                 }}>
                     <label className={Styles.popupText}>
                       New Name: <br />
@@ -647,6 +648,17 @@ export default function CommunityPage({
                         defaultValue={community.description}
                         maxLength={100}
                         title="100 characters max."
+                      />
+                    </label>
+                    <br /><br />
+                    <label className={Styles.popupText}>
+                      Rules: <br />
+                      <textarea
+                        name="rules"
+                        className={`${Styles.popupText} ${Styles.inputField}`}
+                        defaultValue={community.rules}
+                        maxLength={200}
+                        title="200 characters max."
                       />
                     </label>
                     <br /><br />
