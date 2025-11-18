@@ -44,4 +44,12 @@ router.delete("/delete/:forumId", forums.deleteForum);
  */
 router.put("/edit/:forumId", forums.editForum);
 
+/** Search the forum for posts matching keywords within the query
+ * @route GET /api/forums/search/:commName/:forum/:query
+ * @param commName - The name of the community the forum belongs to
+ * @param slug - The slug of the forum within the community
+ * @param query - The search string, where keywords are whitespace delimited (max of 30 keywords due to Firestore limits)
+ */
+router.get("/search/:commName/:slug/:query", forums.searchForum);
+
 export default router;
