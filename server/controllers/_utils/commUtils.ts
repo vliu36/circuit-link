@@ -2,6 +2,7 @@
 
 import { DocumentReference, FieldValue } from "firebase-admin/firestore";
 import { db } from "../../firebase";
+import * as genUtil from "./generalUtils";
 
 export interface Forum {
     id: string,
@@ -208,4 +209,38 @@ export async function getCommunityByName(commName: string) {
 
     const doc = snapshot.docs[0];
     return { ref: doc.ref, data: doc.data() };
+}
+
+// Helper function to kick or ban a user from a community
+export async function kickUserLogic(requesterId: string, targetId: string, commName: string) {
+    if (!commName || !targetId) {
+        throw new Error("Missing community name or target user ID");
+    }
+
+    // Get community by name
+    const { ref: commRef, data: commData } = await getCommunityByName(commName);
+
+    const { isOwner } = await genUtil.verifyUserIsOwnerOrMod(commData, requesterId, false);
+
+    // Get the target user reference
+    const targetRef = db.doc(`/Users/${targetId}`);
+    const userList: FirebaseFirestore.DocumentReference[] = commData.userList || [];
+
+    const targetIsMember = userList.some(ref => ref.path === targetRef.path);
+    if (!targetIsMember) {
+        throw new Error("Target user is not a member of this community");
+    }
+
+    const modList: FirebaseFirestore.DocumentReference[] = commData.modList || [];
+    const ownerList: FirebaseFirestore.DocumentReference[] = commData.ownerList || [];
+    const targetIsMod = modList.some(ref => ref.path === targetRef.path);
+    const targetIsOwner = ownerList.some(ref => ref.path === targetRef.path);
+
+    if ((targetIsOwner || targetIsMod) && !isOwner) {
+        throw new Error("Only owners can kick other owners or moderators.");
+    }
+
+    // Perform the kick
+    await removeUserFromCommunity(commRef, targetRef, targetId);
+    return { success: true };
 }

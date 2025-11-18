@@ -140,27 +140,36 @@ router.put("/edit/:name", comm.editComm);
 router.put("/edit-group/:groupId", comm.editGroup);
 
 /** Kick a user from the community
- *  @route POST /api/comm/kick-user/:name
- *  @params name - String representing the name of the Community
+ *  @route POST /api/comm/kick-user
  *  @body userId - UID of the user to be kicked
+ *  @body commName - String representing the name of the Community
  *  @cookie session - Firebase session cookie used to authenticate the request (must be an owner or mod)
  *  @returns JSON Object with success message, or an error
  */
-router.post("/kick-user/:name", comm.kickUser);
+router.post("/kick-user/", comm.kickUser);
+
+/** Ban a user from the community
+ *  @route POST /api/comm/ban-user
+ *  @body userId - UID of the user to be banned
+ *  @body commName - String representing the name of the Community
+ *  @cookie session - Firebase session cookie used to authenticate the request (must be an owner or mod)
+ *  @returns JSON Object with success message, or an error
+ */
+router.post("/ban-user/", comm.banUser);
+
 
 /** Unban a user from the community
- *  @route POST /api/comm/unban-user/:name
- *  @params name - String representing the name of the Community
+ *  @route POST /api/comm/unban-user
  *  @body userId - UID of the user to be unbanned
+ *  @body commName - String representing the name of the Community
  *  @cookie session - Firebase session cookie used to authenticate the request (must be an owner or mod)
  *  @returns JSON Object with success message, or an error
  */
-router.post("/unban-user/:name", comm.unbanUser);
+router.post("/unban-user/", comm.unbanUser);
 
 /** Get the blacklist of a community
  *  @route GET /api/comm/blacklist/:name
  *  @params name - String representing the name of the Community
- *  @cookie session - Firebase session cookie used to authenticate the request (must be an owner or mod)
  *  @returns JSON Object containing an array of blacklisted users, or an error
  */
 router.get("/blacklist/:name", comm.getBlacklist);

@@ -167,13 +167,56 @@ export default function ForumPage({
     };
 
     // Handler to vote on a post
+    // !!! UPDATED !!! ---------------- This now uses optimistic UI updates for a snappier experience
     const handleVote = async (postId: string, type: "yay" | "nay") => {
         if (!user) return alert("Sign in to vote!");
+
+        setPosts((prevPosts) =>
+            prevPosts.map((p) => {
+                if (p.id !== postId) return p;
+
+                const hasYay = p.yayList.includes(user.uid);
+                const hasNay = p.nayList.includes(user.uid);
+
+                let newYayList = [...p.yayList];
+                let newNayList = [...p.nayList];
+
+                if (type === "yay") {
+                    if (hasYay) {
+                        // Undo yay
+                        newYayList = newYayList.filter((id) => id !== user.uid);
+                    } else {
+                        newYayList.push(user.uid);
+                        // Remove nay if exists
+                        if (hasNay) newNayList = newNayList.filter((id) => id !== user.uid);
+                    }
+                } else if (type === "nay") {
+                    if (hasNay) {
+                        // Undo nay
+                        newNayList = newNayList.filter((id) => id !== user.uid);
+                    } else {
+                        newNayList.push(user.uid);
+                        // Remove yay if exists
+                        if (hasYay) newYayList = newYayList.filter((id) => id !== user.uid);
+                    }
+                }
+
+                return {
+                    ...p,
+                    yayList: newYayList,
+                    nayList: newNayList,
+                    yayScore: newYayList.length - newNayList.length,
+                };
+            })
+        );
+
+        // Send vote request in background
         try {
             await votePost(postId, type);
-            fetchPosts();
         } catch (err) {
-            console.error(err);
+            console.error("Voting failed, rolling back", err);
+            // Optionally, refetch posts to rollback
+            fetchPosts();
         }
     };
 
@@ -227,6 +270,11 @@ export default function ForumPage({
 
     const isMod = community?.modList.some(m => m.id === user?.uid);
     const isOwner = community?.ownerList.some(o => o.id === user?.uid);
+    const isBanned = community?.blacklist.some(b => b.id === user?.uid);
+
+    if (isBanned) {
+        return <div>You are banned from this community.</div>;
+    }
 
     return (
         <main>

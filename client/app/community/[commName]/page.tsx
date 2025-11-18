@@ -28,12 +28,15 @@ export default function CommunityPage({
   const [groupName, setGroupName] = useState("");
   const [groupMessage, setGroupMessage] = useState("");
   const [forumInputs, setForumInputs] = useState<{ [groupId: string]: { name: string; description: string; message: string } }>({});
+  const [targetUserId, setTargetUserId] = useState<string>("");
 
-  // Popup boolean states for edit community, change icon, and change banner
+  // Popup boolean states for edit community, change icon, change banner, kick/ban user, and show blacklist
   const [editOpen, setEditOpen] = useState(false);
   const [iconOpen, setIconOpen] = useState(false);
   const [bannerOpen, setBannerOpen] = useState(false);
   const [editGroupOpen, setEditGroupOpen] = useState(false);
+  const [modOptionsOpen, setModOptionsOpen] = useState(false);
+  const [blacklistOpen, setBlacklistOpen] = useState(false);
 
   // Files and previews for changing icon and banner
   const [iconFile, setIconFile] = useState<File | null>(null);
@@ -60,6 +63,16 @@ export default function CommunityPage({
 
   const toggleEditGroupPopup = () => {
     setEditGroupOpen(!editGroupOpen);
+    setError(null);
+  };
+
+  const toggleModOptionsPopup = () => {
+    setModOptionsOpen(!modOptionsOpen);
+    setError(null);
+  };
+
+  const toggleBlacklistPopup = () => {
+    setBlacklistOpen(!blacklistOpen);
     setError(null);
   };
 
@@ -263,7 +276,8 @@ export default function CommunityPage({
     if (file) setBannerPreview(URL.createObjectURL(file));
   };
 
-  // Handle file submission
+  // --- Handle file submission ---
+  // Submission for icon
   const submitIcon = async () => {
     if (!iconFile) return;
     try {
@@ -277,6 +291,7 @@ export default function CommunityPage({
     }
   };
 
+  // Submission for banner
   const submitBanner = async () => {
     if (!bannerFile) return;
     try {
@@ -290,9 +305,64 @@ export default function CommunityPage({
     }
   };
 
+  // Handle kick
+  const handleKickUser = async () => {
+    try {
+      const res = await commApi.kickMember(commName, targetUserId);
+      console.log(res.message);
+      setError(res.message || null);
+      // Wait 1 second and close the popup
+      setTimeout(() => {
+        toggleModOptionsPopup();
+      }, 1000);
+      await refreshCommunity();
+    } catch (err) {
+      console.error("Failed to kick user:", err);
+    }
+  };
+
+  // Handle ban
+  const handleBanUser = async () => {
+    try {
+      const res = await commApi.banMember(commName, targetUserId);
+      console.log(res.message);
+      setError(res.message || null);
+      // Wait 1 second and close the popup
+      setTimeout(() => {
+        toggleModOptionsPopup();
+      }, 1000);
+      await refreshCommunity();
+    } catch (err) {
+      console.error("Failed to ban user:", err);
+    }
+  };
+
+  // Handle unban
+  const handleUnbanUser = async (targetUserId: string) => {
+    try {
+      const res = await commApi.unbanMember(commName, targetUserId);
+      console.log(res.message);
+      setError(res.message || null);
+      // Wait 1 second and close the popup
+      setTimeout(() => {
+        toggleBlacklistPopup();
+      }, 1000);
+      await refreshCommunity();
+    } catch (err) {
+      console.error("Failed to unban user:", err);
+    }
+  };
+
+
   const isMember = community.userList.some(u => u.id === user?.uid);
   const isMod = community.modList.some(m => m.id === user?.uid);
   const isOwner = community.ownerList.some(o => o.id === user?.uid);
+  const isBanned = community.blacklist.some(b => b.id === user?.uid);
+
+  // If the user is banned, show a message and do not render the community page
+  if (isBanned) {
+    return <div>You are banned from this community.</div>;
+  }
 
   return (
     <main>
@@ -335,7 +405,6 @@ export default function CommunityPage({
                     }
                   </div>
                   
-
                   {/* Displays the forums in this group */}
                   {group.forumsInGroup.length > 0 ? (
                     <div>
@@ -420,7 +489,12 @@ export default function CommunityPage({
             <div className = {Styles.channelInfoh1}>
               User Information
               
-              
+              {/* If current user is mod/owner, display button to toggle show blacklist */}
+              {(isOwner || isMod) && (
+                <button style={{ marginLeft: "0.5rem" }} onClick={toggleBlacklistPopup}>
+                  [Show Blacklist]
+                </button>
+              )}
             </div>
               {/* --- OWNERS, MODS, USERS --- */}
               <div>
@@ -433,11 +507,16 @@ export default function CommunityPage({
                         &gt;{owner.username || owner.id}
                       </Link>
 
-                      {/* If current user is an owner, display demote owner button */}
+                      {/* If current user is an owner, display demote owner button and mod options */}
                       {isOwner && owner.id !== user?.uid && (
-                        <button style={{ marginLeft: "0.5rem" }} onClick={() => handleDemoteOwner(owner.id)}>
-                          [Demote Owner]
-                        </button>
+                        <>
+                          <button style={{ marginLeft: "0.5rem" }} onClick={() => handleDemoteOwner(owner.id)}>
+                            [Demote Owner]
+                          </button>
+                          <button style={{ marginLeft: "0.5rem" }} onClick={() => { toggleModOptionsPopup(); setTargetUserId(owner.id); }}>
+                            [Mod Options]
+                          </button>
+                        </>
                       )}
                     </li>
                   )}
@@ -452,7 +531,7 @@ export default function CommunityPage({
                         &gt;{mod.username || mod.id}
                       </Link>
 
-                      {/* If current user is an owner, display buttons to promote or demote a mod */}
+                      {/* If current user is an owner and the listed mod is not an owner, display buttons to promote or demote a mod and mod options */}
                       {isOwner && !community.ownerList.some(o => o.id === mod.id) && (
                       <>
                         <button style={{ marginLeft: "0.5rem" }} onClick={() => handlePromoteToOwner(mod.id)}>
@@ -460,6 +539,9 @@ export default function CommunityPage({
                         </button>
                         <button style={{ marginLeft: "0.5rem" }} onClick={() => handleDemoteMod(mod.id)}>
                           [Demote Mod]
+                        </button>
+                        <button style={{ marginLeft: "0.5rem" }} onClick={() => { toggleModOptionsPopup(); setTargetUserId(mod.id); }}>
+                          [Mod Options]
                         </button>
                       </>
                       )}
@@ -476,7 +558,7 @@ export default function CommunityPage({
                       &gt;{u.username || u.id}
                     </Link>
 
-                    {/* If current user is an owner, display buttons to promote user to a mod or owner */}
+                    {/* If current user is an owner and the listed user is not a mod or owner; display buttons to promote user to a mod or owner */}
                     {isOwner && !community.modList.some(m => m.id === u.id) && !community.ownerList.some(o => o.id === u.id) && (
                     <>
                       <button style={{ marginLeft: "0.5rem" }} onClick={() => handlePromoteToMod(u.id)}>
@@ -486,6 +568,12 @@ export default function CommunityPage({
                         [Promote to Owner]
                       </button>
                     </>
+                    )}
+                    {/* If current user is an owner or mod and the listed user is not a mod or owner, show mod options button */}
+                    {(isOwner || isMod) && !community.modList.some(m => m.id === u.id) && !community.ownerList.some(o => o.id === u.id) && (
+                      <button style={{ marginLeft: "0.5rem" }} onClick={() => { toggleModOptionsPopup(); setTargetUserId(u.id); }}>
+                        [Mod Options]
+                      </button>
                     )}
                   </li>
                   )}
@@ -763,6 +851,57 @@ export default function CommunityPage({
             Save Banner
           </button>
           <button className={`${Styles.closeBtn} ${Styles.popupText}`} onClick={toggleBannerPopup}>
+            Close
+          </button>
+        </div>
+      </div>
+    )}
+    {/* --- MOD OPTIONS POPUP --- */}
+    {modOptionsOpen && (
+      <div className={Styles.popupOverlay} onClick={toggleModOptionsPopup}>
+        <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
+          <h2 className={Styles.popupText}>Mod Options</h2>
+          {/* Add mod options content here */}
+          <button className={`${Styles.popupText} ${Styles.closeBtn}`} onClick={handleKickUser}>
+            Kick User
+          </button>
+          <button className={`${Styles.popupText} ${Styles.closeBtn}`} onClick={handleBanUser}>
+            Ban User
+          </button>
+          {error && <p style={{ color: "yellow" }}>{error}</p>}
+        </div>
+      </div>
+    )}
+    {/* --- BLACKLIST POPUP --- */}
+    {blacklistOpen && (
+      <div className={Styles.popupOverlay} onClick={toggleBlacklistPopup}>
+        <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
+          <h2 className={Styles.popupText}>Blacklist</h2>
+          {/* Displays each user's name in the blacklist; if empty show a message */}
+          <ul>
+            {community.blacklist.length === 0 ? (
+              <p>The blacklist is empty.</p>
+            ) : (
+              community.blacklist.map((bannedUser) => (
+                <li key={bannedUser.id} className={Styles.popupText}>
+                  {/* User's profile picture */}
+                  <Image src={bannedUser.photoURL} alt={bannedUser.username} width={40} height={40} />
+                  {/* Link to their profile */}
+                  <Link href={`/profile/${bannedUser.id}`}>
+                    {bannedUser.username}
+                  </Link>
+                  {/* Button to unban the user */}
+                  <button className={`${Styles.popupText} ${Styles.saveBtn}`} onClick={() => {
+                    handleUnbanUser(bannedUser.id);
+                  }}>
+                    Unban User
+                  </button>
+                </li>
+              ))
+            )}
+          </ul>
+          {error && <p style={{ color: "yellow" }}>{error}</p>}
+          <button className={`${Styles.popupText} ${Styles.closeBtn}`} onClick={toggleBlacklistPopup}>
             Close
           </button>
         </div>

@@ -19,7 +19,7 @@ export interface User {
     id: string;
     username: string;
     email: string;
-    // photoUrl: string;
+    photoURL: string;
 }
 
 export interface Forum {
@@ -43,6 +43,7 @@ export interface Community {
     userList: User[];
     ownerList: User[];
     modList: User[];
+    blacklist: User[];
     public: boolean;
     icon: string;
     banner: string;

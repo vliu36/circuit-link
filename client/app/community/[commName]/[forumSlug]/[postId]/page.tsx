@@ -36,7 +36,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
             .finally(() => setLoading(false));
         }, [commName]);
 
-        // ! Changes made here ----------------------------------------------------------------------------------------
+    // TODO ---------------- Use this in notifications when reporting a reply
     useEffect(() => {
         const hash = window.location.hash;
         if (hash) {
@@ -86,6 +86,10 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
 
     const isMod = community.modList.some(m => m.id === user?.uid);
     const isOwner = community.ownerList.some(o => o.id === user?.uid);
+    const isBanned = community.blacklist.some(b => b.id === user?.uid);
+    if (isBanned) {
+        return <div>You are banned from this community.</div>;
+    }
 
     // Recursive rendering function for posts and replies
     const renderPostOrReply = (item: Post | Reply, depth = 0) => {

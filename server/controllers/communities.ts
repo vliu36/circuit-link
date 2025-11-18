@@ -642,44 +642,19 @@ const prefixSearch = async (req: Request, res: Response) => {
 // Kick a user from the community
 const kickUser = async (req: Request, res: Response) => {
     try {
-        const { commName } = req.params;
-        const { userId: targetId } = req.body; // UID of the user being kicked
+        const { userId: targetId, commName } = req.body; // UID of the user being kicked
+        console.log("Received kick request for user ID:", targetId, "from community:", commName);
         // Verify and get userId from session cookie
         const requesterId = await genUtil.getUserIdFromSessionCookie(req); // UID of the user making the request; must be owner or mod
         if (!commName || !targetId) {
             return res.status(400).send({ message: "Missing community name or target user ID" });
         }
 
-        // Get community by name
-        const { ref: commRef, data: commData } = await commUtil.getCommunityByName(commName);
-        const { isOwner } = await genUtil.verifyUserIsOwnerOrMod(commData, requesterId, false); // false indicates owner or mod check
-        console.log(`Confirmed user with ID ${requesterId} is authorized to kick users from community "${commName}".`);
+        await commUtil.kickUserLogic(requesterId, targetId, commName);
 
-        // Get the target user reference
-        const targetRef = db.doc(`/Users/${targetId}`);
-        const userList: FirebaseFirestore.DocumentReference[] = commData.userList || [];
-        // Ensure target is a member
-        const targetIsMember = userList.some(ref => ref.path === targetRef.path);
-        if (!targetIsMember) {
-            return res.status(400).send({ status: "Bad Request", message: "Target user is not a member of this community" });
-        }
 
-        // Kick logic: Owners and mods can kick regular members; only owners can kick mods; owners can only be kicked by other owners
-        const modList: FirebaseFirestore.DocumentReference[] = commData.modList || [];
-        const ownerList: FirebaseFirestore.DocumentReference[] = commData.ownerList || [];
-        const targetIsMod = modList.some(ref => ref.path === targetRef.path);
-        const targetIsOwner = ownerList.some(ref => ref.path === targetRef.path);
-
-        if (targetIsOwner || targetIsMod) { // Ensure only owners can kick other owners or mods
-            if (!isOwner) {
-                return res.status(403).send({ status: "Forbidden", message: "Only owners can kick other owners or moderators." });
-            }
-        }
-
-        // Kick the user: remove from userList and remove community from user's communities field
-        await commUtil.removeUserFromCommunity(commRef, targetRef, targetId);
+        console.log(`User ${targetId} kicked from community ${commName} by requester ${requesterId}.`);
         return res.status(200).send({ status: "ok", message: "User kicked successfully" });
-
     } catch (err) {
         console.error("Error kicking user:", err);
         return res.status(500).send({
@@ -692,15 +667,17 @@ const kickUser = async (req: Request, res: Response) => {
 // Updates the blacklist of an existing document; this bans a user from the community
 const banUser = async (req: Request, res: Response) => {
     try {
-        // Kick the user; this verifies permissions as well
-        const response = await kickUser(req, res);
-        if (response.statusCode !== 200) {
-            console.log("Kicking user failed; cannot proceed to ban.");
-            return; // If kicking failed, do not proceed to ban
-        }
-        const { commName } = req.params;
-        const { userId: targetId } = req.body; // UID of the user being banned
-        // Get community by name
+        
+        const { userId: targetId, commName } = req.body; // UID of the user being banned
+        // Verify and get userId from session cookie
+        const requesterId = await genUtil.getUserIdFromSessionCookie(req); // UID of the user making the request; must be owner or mod
+        console.log("Received ban request for user ID:", targetId, "from community:", commName);
+        
+        // Kick the user first
+        await commUtil.kickUserLogic(requesterId, targetId, commName);
+
+        // Then proceed to ban
+        // Get community by name and target user reference
         const { ref: commRef, data: commData } = await commUtil.getCommunityByName(commName);
         const targetRef = db.doc(`/Users/${targetId}`);
 
@@ -709,7 +686,7 @@ const banUser = async (req: Request, res: Response) => {
             blacklist: FieldValue.arrayUnion(targetRef)
         });
         console.log(`User ${targetId} banned from community ${commName}.`);
-        return res.status(200).send({ message: `User ${targetId} successfully banned from community` });
+        return res.status(200).send({ message: `User banned successfully` });
     } catch (err) {
         console.error("Error banning user:", err);
         return res.status(500).send({
@@ -722,8 +699,7 @@ const banUser = async (req: Request, res: Response) => {
 // Unban a user from the community; removes them from the blacklist
 const unbanUser = async (req: Request, res: Response) => {
     try {
-        const { commName } = req.params;
-        const { userId: targetId } = req.body; // UID of the user being unbanned
+        const { userId: targetId, commName } = req.body; // UID of the user being unbanned
         // Verify and get userId from session cookie
         const requesterId = await genUtil.getUserIdFromSessionCookie(req); // UID of the user making the request; must be owner or mod
         if (!commName || !targetId) {
@@ -785,7 +761,6 @@ const reportPost = async (req: Request, res: Response) => {
         const { commName, postId, reason } = req.body;
         // Verify and get userId from session cookie
         const reporterId = await genUtil.getUserIdFromSessionCookie(req);
-        console.log("Debug: commName =", commName, "postId =", postId, "reason =", reason, "reporterId =", reporterId);
         if (!commName || !postId || !reason) {
             return res.status(400).send({ message: "Missing community name, post ID, or reason" });
         }
@@ -968,6 +943,7 @@ const getCommunityStructure = async (req: Request, res: Response) => {
         const ownerList = await commUtil.fetchUserData(communityData.ownerList || []);
         const modList = await commUtil.fetchUserData(communityData.modList || []);
         const userList = await commUtil.fetchUserData(communityData.userList || []);
+        const blacklist = await commUtil.fetchUserData(communityData.blacklist || []);
 
         // Fetch all groups
         const groupsInCommunity: commUtil.Group[] = [];
@@ -1004,6 +980,7 @@ const getCommunityStructure = async (req: Request, res: Response) => {
                 ownerList,
                 modList,
                 userList,
+                blacklist,
                 groupsInCommunity,
                 icon: communityData.icon,
                 banner: communityData.banner,
