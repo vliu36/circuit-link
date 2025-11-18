@@ -35,7 +35,18 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
             })
             .finally(() => setLoading(false));
         }, [commName]);
-    
+
+        // ! Changes made here ----------------------------------------------------------------------------------------
+    useEffect(() => {
+        const hash = window.location.hash;
+        if (hash) {
+            const element = document.querySelector(hash);
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth", block: "center" });
+            }
+        }
+    }, [post]);
+
     if (load) return <div>Loading community...</div>;
     if (!community) return <div>Community not found.</div>;
 
@@ -85,6 +96,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
         return (
             <div 
                 key={item.id} 
+                id={`reply-${item.id}`}
                 className={styles.replyCard}>
                 {/* If editing, show input fields instead */}
                 {editingId === item.id ? (

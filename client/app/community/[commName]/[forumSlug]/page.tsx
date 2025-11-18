@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../../_firebase/context.tsx";
 import { use, useRef } from "react";
 import Link from "next/link";
-import { fetchPostsByForum, createPost, editPost, deletePostById, votePost, editForum, getMediaUrl } from "./forum.ts";
+import { fetchPostsByForum, createPost, editPost, deletePostById, votePost, editForum, getMediaUrl, reportPost } from "./forum.ts";
 import styles from "./forumPage.module.css";
 import { Post, Forum } from "../../../_types/types.ts";
 import { useCallback } from "react";
@@ -43,11 +43,23 @@ export default function ForumPage({
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const router = useRouter();
 
+    const [reportPopup, setReportPopup] = useState(false);
+    const [reportReason, setReportReason] = useState("");
+    const [postId, setPostId] = useState<string>("");
+
     // Toggle edit forum popup
     const toggleEditPopup = () => {
         setEditPopup(!editPopup);
         setMessage(null);
     }
+
+    // Toggle report post popup
+    const toggleReportPopup = () => {
+        setReportPopup(!reportPopup);
+        setReportReason("");
+        setPostId("");
+        setMessage(null);
+    };
 
     /** Fetch posts by forum
      *  This is used to load posts when the component mounts and after actions like adding, editing, or deleting a post.
@@ -176,24 +188,42 @@ export default function ForumPage({
             console.log(res.message);
             setMessage(res.message || null);
             if (res.status === "ok" && name && name !== oldName) {
-                setTimeout(() => {}, 3000); // Wait for 3 seconds to let user read the message
+                // setTimeout(() => {}, 3000); // Wait for 3 seconds to let user read the message
                 // setEditPopup(false);
                 router.push(`/community/${commName}/${res.newSlug}`);
             } else if (res.status === "ok") {
                 fetchPosts();
                 toggleEditPopup();
-                
             }
         } catch (error) {
             setMessage("An error occurred while editing the forum.");
         }
     }
 
+    // Handle media file selection
     const handleMediaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0] || null;
         setMediaFile(file);
         if (file) setMediaPreview(URL.createObjectURL(file));
     };    
+
+    // Handle report post
+    const handleReportPost = async () => {
+        if (!user) return alert("Sign in to report posts!");
+        if (!reportReason) return alert("Please provide a reason for the report.");
+        try {
+            const res = await reportPost(commName, postId, reportReason);
+            console.log(res.message);
+            setMessage(res.message || null);
+            // wait a bit then close popup
+            setTimeout(() => {
+                toggleReportPopup();
+            }, 3000);
+        } catch (error) {
+            console.error("Error reporting post:", error);
+            alert("An error occurred while reporting the post.");
+        }
+    };
 
     const isMod = community?.modList.some(m => m.id === user?.uid);
     const isOwner = community?.ownerList.some(o => o.id === user?.uid);
@@ -221,8 +251,6 @@ export default function ForumPage({
                         {/* Stuff Goes Here */}
                     </div>
                 </div>
-
-                
                 
                 <div className = {styles.RightBar} style={{gridArea: "RightBar"}}>
                     <div className = {styles.channelInfoBox}>
@@ -441,6 +469,18 @@ export default function ForumPage({
                                                         Delete
                                                     </button>
                                                 )}
+                                                {/* Report button */}
+                                                <div>
+                                                    <button
+                                                        onClick={() => {
+                                                            toggleReportPopup();
+                                                            setPostId(post.id);
+                                                        }}
+                                                        className={`${styles.button} ${styles.deleteButton}`}
+                                                    >
+                                                        Report
+                                                    </button>
+                                                </div>
                                             </div>
                                         </>
                                     )}
@@ -491,6 +531,38 @@ export default function ForumPage({
                         </button>
 
                         {message && <p>{message}</p>}
+                    </div>
+                </div>
+            )}
+            {/* Report Post Popup */}
+            {reportPopup && (
+                <div className={styles.popupOverlay} onClick={toggleReportPopup}>
+                    <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                        <h2 className={styles.popupText}>Report Post</h2>
+                        <form onSubmit={async (e) => {
+                            e.preventDefault();
+                            await handleReportPost();
+                        }}>
+                            <label className={styles.popupText}>
+                                Reason for Report:
+                                <textarea
+                                    name="reason"
+                                    placeholder="Describe the reason for reporting this post. (100 character max)"
+                                    value={reportReason}
+                                    onChange={(e) => setReportReason(e.target.value)}
+                                    className={styles.textarea}
+                                    maxLength={100}
+                                />
+                            </label>
+
+                            {message && <p>{message}</p>}
+                            <button type="submit" className={`${styles.popupText} ${styles.saveBtn}`}>
+                                Submit Report
+                            </button>
+                        </form>
+                        <button className={ `${styles.closeBtn} ${styles.popupText}` } onClick={toggleReportPopup}>
+                            Close
+                        </button>
                     </div>
                 </div>
             )}

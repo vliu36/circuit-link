@@ -691,7 +691,6 @@ const kickUser = async (req: Request, res: Response) => {
 
 // Updates the blacklist of an existing document; this bans a user from the community
 const banUser = async (req: Request, res: Response) => {
-    //TODO: Complete code stub
     try {
         // Kick the user; this verifies permissions as well
         const response = await kickUser(req, res);
@@ -775,6 +774,56 @@ const getBlacklist = async (req: Request, res: Response) => {
         console.error("Error getting blacklist:", err);
         return res.status(500).send({
             message: "Failed to get blacklist",
+            error: err instanceof Error ? err.message : String(err),
+        });
+    }
+}
+
+// Report a user's post to the community moderators and owners
+const reportPost = async (req: Request, res: Response) => {
+    try {
+        const { commName, postId, reason } = req.body;
+        // Verify and get userId from session cookie
+        const reporterId = await genUtil.getUserIdFromSessionCookie(req);
+        console.log("Debug: commName =", commName, "postId =", postId, "reason =", reason, "reporterId =", reporterId);
+        if (!commName || !postId || !reason) {
+            return res.status(400).send({ message: "Missing community name, post ID, or reason" });
+        }
+        // Get reporter's username
+        const reporterRef = db.doc(`/Users/${reporterId}`);
+        const reporterSnap = await reporterRef.get();
+        const reporterData = reporterSnap.data();
+        const reporterUsername = reporterData?.username || "Unknown User";
+
+        // Get all moderators and owners of the community
+        const { data: commData } = await commUtil.getCommunityByName(commName);
+        const modRefs: FirebaseFirestore.DocumentReference[] = commData.modList || [];
+        
+        // ! Removed - owners are already included in modList, this causes duplicate ids
+        // ! This comment is kept for reference in case we need to revert
+        // const ownerRefs: FirebaseFirestore.DocumentReference[] = commData.ownerList || [];
+        // const recipientRefs = Array.from(new Set([...modRefs, ...ownerRefs])); // Combine and deduplicate
+        // // Retrieve a string array of recipient IDs
+        // const recipientIds = recipientRefs.map(ref => ref.id);
+
+        // Retrieve a string array of mod IDs
+        const recipientIds = Array.from(new Set(modRefs.map(ref => ref.id))); 
+
+        // Create notification and send to each recipient
+        genUtil.createNotification({
+            senderId: reporterId,
+            recipientIds: recipientIds,
+            type: "report",
+            message: `Post ${postId} from "${commName}" reported by user ${reporterUsername} for reason: "${reason}"`,
+            relatedDocRef: db.collection("Posts").doc(postId),
+        });
+
+        console.log(`Post ${postId} reported to moderators and owners of community ${commName} by user ${reporterId}.`);
+        return res.status(200).send({ message: "Post reported successfully" });
+    } catch (err) {
+        console.error("Error reporting post:", err);
+        return res.status(500).send({
+            message: "Failed to report post",
             error: err instanceof Error ? err.message : String(err),
         });
     }
@@ -991,4 +1040,5 @@ export {
     demoteOwner,
     editComm,
     editGroup,
+    reportPost,
 }

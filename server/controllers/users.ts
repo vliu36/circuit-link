@@ -435,7 +435,7 @@ const sendFriendRequest = async (req: Request, res: Response) => {
         // Notify the recipient
         const notifRef = await createNotification({
             senderId,
-            recipientId,
+            recipientIds: [recipientId],
             type: "friend_request",
             message: `${senderUsername} has sent you a friend request.`,
             relatedDocRef: requestRef,
@@ -497,7 +497,7 @@ const respondToFriendRequest = async (req: Request, res: Response) => {
 
             await createNotification({
                 senderId: recipientId,
-                recipientId: senderId,
+                recipientIds: [senderId],
                 type: "friend_request_accepted",
                 message: `User ${recipientUsername} has accepted your friend request.`,
             });

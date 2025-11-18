@@ -127,3 +127,26 @@ export async function getMediaUrl(mediaFile: File | null) {
         return { status: "error", message: "Media upload failed.", media: null };
     }
 }
+
+// Report a post
+export async function reportPost(
+    commName: string,
+    postId: string,
+    reason: string
+) {
+    try {
+        const res = await fetch(`${BASE_URL}/comm/report-post`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ commName, postId, reason }),
+            credentials: "include",
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            return { status: "error", message: data.message || "Failed to report post." };
+        }
+        return { status: "ok", message: data.message || "Post reported successfully." };
+    } catch (error) {
+        return { status: "error", message: "Failed to report post." };
+    } // end try catch
+} // end function reportPost

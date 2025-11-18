@@ -165,4 +165,14 @@ router.post("/unban-user/:name", comm.unbanUser);
  */
 router.get("/blacklist/:name", comm.getBlacklist);
 
+/** Report a post in a community
+ *  @route POST /api/comm/report-post
+ *  @body commName - Name of the community where the post is located
+ *  @body postId - ID of the post being reported
+ *  @body reason - Reason for reporting the post
+ *  @cookie session - Firebase session cookie used to authenticate the request
+ *  @returns JSON Object indicating success or an error
+ */
+router.post("/report-post", comm.reportPost);
+
 export default router;
