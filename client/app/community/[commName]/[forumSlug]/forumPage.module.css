@@ -18,10 +18,12 @@
 }
 
 .forumBox{
-    width: 80%;
-    height: 25vh;
-    margin-left: 10%;
+    width: 100%;
+    height: auto;
     margin-top:1%;
+    background-color: rgba(245, 245, 245, 1);
+    border-radius: 1em;
+    box-shadow: 5px 4px 8px rgba(0,0,0,0.05);
 }
 
 .createContainer{
@@ -72,8 +74,10 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.05);
     background-color: #FFFFFF;
     color: #5A5454;
-    position: relative;
     transition: transform 0.15s ease;
+    width: 90%;
+    min-height: 20vh;
+    margin-left: 5%;
 }
 
 .postCard:hover {
@@ -88,6 +92,8 @@
 .contents {
     font-size: 16px;
     font-weight: 400;
+    min-height: 2vh;
+    width: 100%;
 }
 
 .meta {
@@ -95,14 +101,36 @@
     font-weight: 100;
     color: #ccc;
     margin-top: 5px;
+    width: 100%;
+    height: 3vh;
+}
+
+.user {
+    font-size: 14px;
+    font-weight: 100;
+    color: #ccc;
+    width: 50%;
+    height: 3vh;
+    text-wrap: unset;
+    display: flex;
+}
+
+.userProfile{
+    width:20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: black;
+    margin-top: -0.5%;
+    margin-right: 2%;
 }
 
 .time {
+    width: 50%;
+    height: 3vh;
     font-size: 14px;
     color: #ccc;
-    position: absolute;
-    top: 20px;
-    right: 20px;
+    text-align: right;
+    text-wrap: unset;
 }
 
 .actions {
@@ -188,20 +216,25 @@
     color: rgb(255,255,255);
 }
 
+.postHeading{
+    display: flex;
+    height:2vh;
+    width:100%;
+}
+
 .background {
     background-color: #D0E0EB;
     display: grid;
     width: 100%;
     height: 100vh;
     overflow-x:hidden;
-    grid-template-columns: 16.67vw 58.67vw 16.67vw;
+    grid-template-columns: 1vw 15.67vw 3vw 60.7vw 3vw 15.67vw 1vw;
     grid-template-rows: 6vh 34vh 54vh;
     grid-template-areas: 
-    "NavBar NavBar NavBar"
-    "CommunitiesBar Center RightBar"
-    "ServerBar Center RightBar";
+    "NavBar NavBar NavBar NavBar NavBar NavBar NavBar"
+    "margin1 CommunitiesBar margin3 Center margin4 RightBar margin2"
+    "margin1 ServerBar margin3 Center margin4 RightBar margin2";
     row-gap: 3%;
-    column-gap: 4%;
 }
 
 .text {
@@ -365,7 +398,7 @@
     margin-left: 10px;
 }
 
-/*
+
 .horizontalLine{
     background-color: #AAAAAA;
     width: 95%;
@@ -381,7 +414,7 @@
     margin-top: -1.1vh;
     position: fixed;
 }
-*/
+
 
 .communitiesButtons{
     width: 90%;
@@ -416,7 +449,7 @@
 }
 
 .channelInfoBox{
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     display: flex;
     flex-direction: column;
     font-family: Inria Sans;
@@ -424,6 +457,8 @@
     text-indent: 3%;
     overflow-y: auto;
     overflow-x: hidden;
+    width:100%;
+    height:20vh;
 }
 
 .channelInfoh1{
@@ -517,19 +552,25 @@
     font-size: 20px;  
 }
 
+.createBox{
+    width: 100%;
+    min-height: 40vh;
+    background-color: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    border-radius: 1em;
+    margin-bottom: 1vw;
+}
+
 .centerPage{
-    margin-top: 1em;
     overflow-y: auto;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
     color: #5A5454;
     font-size: 20px;
-    background-color: #EDEDED;
     font-family: Inria Sans;
     border: 3px #D0E0EB;
-    border-radius: 0.5em;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
+    border-radius: 1em;
 }
 
 .descText{
@@ -541,7 +582,7 @@
     width: 100%;
     min-height: 20vh;
     max-height: 20vh;
-    background-color: #FFFFFF;
+    background-color: #3a3a3a;
 }
 
 .titleBox{
@@ -752,7 +793,7 @@
 
 .mediaPreview {
     max-width: 100%;
-    max-height: 200px;
+    min-height: 20vh;
     margin-top: 1rem;
     border-radius: 0.5em;
 }
@@ -765,4 +806,17 @@
 @font-face {
   font-family: Inria Sans;
   src: url('../../../../public/fonts/InriaSans-Light.ttf');
+}
+
+.topBox{
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(255, 255, 255);
+    margin-bottom: 1vw;
+    border-radius: 1em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.sortText{
+    font-size: 12px;
 }
