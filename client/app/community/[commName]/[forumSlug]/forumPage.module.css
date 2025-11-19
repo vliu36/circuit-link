@@ -75,20 +75,21 @@
 .textarea {
     min-height: 100px;
     background-color: #FFFFFF;
+    color: #5A5454;
 }
 
 .primaryButton {
     padding: 10px 20px;
     border: none;
     border-radius: 8px;
-    background-color: #0070f3;
-    color: #fff;
+    background-color: #F0F0F0;
+    color: #5A5454;
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
 
 .primaryButton:hover {
-    background-color: #005bb5;
+    background-color: #D9D9D9;
 }
 
 .postCard {
@@ -155,7 +156,7 @@
     width: 50%;
     height: 3vh;
     font-size: 14px;
-    color: #ccc;
+    color: #5A5454;
     text-align: right;
     text-wrap: unset;
 }
@@ -204,7 +205,7 @@
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    margin-left: 10px;
+    margin-left: 10em;
     transition: background-color 0.2s ease;
 }
 
@@ -409,7 +410,7 @@
 }
 
 .yourCommunitiesBar{
-    background-color: #FFFFFF;
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
     font-family: Inria Sans;
@@ -423,12 +424,12 @@
 }
 
 .serverBar{
-    background-color: #FFFFFF;
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
     text-indent: 3%;
     font-family: Inria Sans;
-    font-size: 25px;
+    font-size: 1.5em;
     color: #5A5454;
     overflow-y: auto;
     overflow-x: hidden;
@@ -442,13 +443,13 @@
     flex-direction: column;
     font-family: Inria Sans;
     font-size: 15px;
-    color: rgb(0, 0, 0);
+    color: #5A5454;
 }
 
 .channelText{
     font-family: Inria Sans;
     font-size: 15px;
-    color: rgb(0, 0, 0);
+    color: #5A5454;
     margin-left: 10px;
 }
 
@@ -503,7 +504,7 @@
 }
 
 .channelInfoBox{
-    background-color: #ffffff;
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
     font-family: Inria Sans;
@@ -549,7 +550,7 @@
 }
 
 .RightBar{
-    background-color: #FFFFFF;
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
     font-family: Inria Sans;
@@ -608,8 +609,9 @@
 
 .createBox{
     width: 100%;
-    height: auto;
+    min-height: 55vh;
     background-color: white;
+    color: #5A5454;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     border-radius: 1em;
     margin-bottom: 1vw;
@@ -671,14 +673,15 @@
 }
 
 .groupHeader{
-    width: 95%;
-    height: 2vh;
+    width: 100%;
+    height: 4vh;
     margin-left: 0.5%;
     display: flex;
+    font-size: 0.9em;
 }
 
 .groupName{
-    width: 72%;
+    width: 40%;
     height: 100%;
     overflow: hidden;
 }
@@ -690,7 +693,7 @@
 
 .channelHeader{
     width: 95%;
-    height: 2vh;
+    height: 3vh;
     display:flex;
 }
 
@@ -698,8 +701,8 @@
     width: 65.5%;
     height: 100%;
     font-family: Inria Sans;
-    font-size: 15px;
-    color: rgb(0, 0, 0);
+    font-size: 1em;
+    color: #5A5454;
     margin-left: 10px;
     margin-left: 4%;
     overflow: hidden;
@@ -707,13 +710,13 @@
 }
 
 .deleteChannel{
-    width: 25%;
+    width: 30%;
     height: 100%;
     font-family: Inria Sans;
-    font-size: 15px;
-    color: rgb(255, 255, 255);
-    margin-left: 10px;
-    margin-left: 4%;
+    font-weight: bold;
+    font-size: 0.5em;
+    color: #5A5454;
+    margin-left: 20%;
 }
 
 .createForumContainer{
@@ -773,7 +776,7 @@
     margin-left: 2vw;
     padding: 0.5vw 1vw;
     border: none;
-    color: #fff;
+    color: #5A5454;
     cursor: pointer;
     transition: background-color 0.2s ease;
     font-size: 1vw;
