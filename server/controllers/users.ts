@@ -527,6 +527,38 @@ const removeFriend = async (req: Request, res: Response) => {
     } // end try catch
 } // end removeFriend
 
+// Get top 10 users by yayScore
+const getTopUsers = async (req: Request, res: Response) => {
+    try {
+        const usersSnap = await db
+            .collection("Users")
+            .orderBy("yayScore", "desc")
+            .limit(10)
+            .get();
+
+        const users = usersSnap.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                username: data.username || "",
+                photoURL: data.photoURL || "",
+                yayScore: data.yayScore || 0,
+            };
+        });
+
+        res.status(200).send({
+            status: "ok",
+            users,
+        });
+    } catch (err) {
+        console.error("Error fetching top users:", err);
+        res.status(500).send({
+            status: "error",
+            message: "Failed to fetch top users",
+        });
+    }
+};
+
 export {
     getAllDocuments,
     userRegistration,
@@ -541,4 +573,5 @@ export {
     sendFriendRequest,
     respondToFriendRequest,
     removeFriend,
+    getTopUsers,
 }

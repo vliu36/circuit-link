@@ -184,4 +184,10 @@ router.get("/blacklist/:name", comm.getBlacklist);
  */
 router.post("/report-post", comm.reportPost);
 
+/** Get top 10 communities by yay score
+ *  @route GET /api/comm/top
+ *  @returns Array of top communities sorted by yay score, or an error
+ */
+router.get("/top", comm.getTopCommunities);
+
 export default router;

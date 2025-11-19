@@ -995,6 +995,39 @@ const getCommunityStructure = async (req: Request, res: Response) => {
     } // end try catch
 } // end getCommunityStructure
 
+// Get top 10 communities based on yayScore
+const getTopCommunities = async (req: Request, res: Response) => {
+    try {
+        const snap = await db
+            .collection("Communities")
+            .orderBy("yayScore", "desc")
+            .limit(10)
+            .get();
+
+        const communities = snap.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                name: data.name || "",
+                icon: data.icon || "",
+                numUsers: data.numUsers || 0,
+                yayScore: data.yayScore || 0,
+            };
+        });
+
+        res.status(200).send({
+            status: "ok",
+            communities,
+        });
+    } catch (err) {
+        console.error("Error fetching top communities:", err);
+        res.status(500).send({
+            status: "error",
+            message: "Failed to fetch top communities",
+        });
+    }
+};
+
 
 export {
     getAllDocuments,
@@ -1018,4 +1051,5 @@ export {
     editComm,
     editGroup,
     reportPost,
+    getTopCommunities,
 }

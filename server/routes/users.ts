@@ -107,4 +107,10 @@ router.post("/respond-friend-request", users.respondToFriendRequest);
  */
 router.post("/remove-friend", users.removeFriend);
 
+/** Get top 10 users by yayscore
+ *  @route GET /api/users/top
+ *  @returns Array of top users sorted by yay score, or an error
+ */
+router.get("/top", users.getTopUsers);
+
 export default router;

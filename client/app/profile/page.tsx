@@ -147,7 +147,6 @@ export default function Profile() {
             </div>
             {/* Additional information */}
             <div className="account-info">
-                <p>Email: {user?.email}</p>
                 <p>Email Verified: {user?.emailVerified ? "Yes" : "No"}</p>
                 {/* Show verify email button when user isn't verified */}
                 {!user?.emailVerified && <span><button onClick={profileFunctions.verifyEmail}><u>&gt; Verify Email</u></button></span>}

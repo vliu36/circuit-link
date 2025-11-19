@@ -105,8 +105,6 @@ export default function OtherProfile({ params }: { params: Promise<{ uid: string
                 <p>{other.user.profileDesc}</p>
             </div>
             <div className="account-info">
-                <p>Email: {other.user.email}</p>
-                {/* <p>Email Verified: {other.user.emailVerified ? "Yes" : "No"}</p> */}
                 <p>Account Created: {createdTime?.toLocaleString() || "N/A"}</p>
             </div>
             {/* If other user is not in current user's friend list, show button to add friend */}
