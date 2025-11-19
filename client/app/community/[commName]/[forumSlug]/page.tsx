@@ -365,10 +365,10 @@ export default function ForumPage({
                                             (isOwner || isMod) &&
                                             <>
                                                 <button className={styles.deleteGroup} onClick={() => handleDeleteGroup(group.id)}>
-                                                    Delete Group
+                                                    Delete
                                                 </button>
                                                 <button className={styles.editGroup} onClick={() => { toggleEditGroupPopup(); setEditGroupId(group.id); }}>
-                                                    Edit Group
+                                                    Edit
                                                 </button>
                                             </>
                                         }

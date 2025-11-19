@@ -13,7 +13,7 @@
     padding: 20px;
     margin-bottom: 20px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-    background-color: rgba(57, 65, 83, 1);
+    background-color: #FFFFFF;
     color: #5A5454;
     position: relative;
     transition: transform 0.15s ease;
@@ -34,6 +34,7 @@
     display: flex;
     flex-direction: column;
     border-radius: 10px;
+    background-color: #FFFFFF;
     color: #5A5454;
     transition: transform 0.15s ease;
     width: 100%;
@@ -46,20 +47,24 @@
 }
 
 .title {
-    font-size: 24px;
+    font-size: 1em;
     font-weight: 600;
+    margin-left: 0.5em;
 }
 
 .contents {
-    font-size: 16px;
+    font-size: 1em;
     font-weight: 400;
+    margin-left: 0.5em;
+    color: #5A5454
 }
 
 .meta {
     font-size: 14px;
     font-weight: 100;
-    color: #ccc;
-    margin-top: 5px;
+    color: #5A5454;
+    margin-top: 0.2em;
+    margin-left: 0.5em;
     display: flex;
     width: 10%;
     height: 2.5vh;
@@ -80,13 +85,14 @@
 
 .userTextAlignPosts{
     font-size: 12px;
-    margin-left: 5px;
+    margin-left: 0.1em;
 }
 
 .time {
     font-size: 12px;
-    color: #bbb;
-    margin-top: 3px;
+    color: #5A5454;
+    margin-top: 0.3em;
+    margin-left: 0.5em;
 }
 
 .actions {
@@ -94,7 +100,7 @@
     margin-top: 10px;
     width: 20%;
     height: 4.5vh;
-    background-color: #6c757d;
+    background-color: #F0F0F0;
     justify-content: space-between;
     border-radius: 1em;
     margin-bottom: 5%;
@@ -132,7 +138,7 @@
 }
 
 .voteButton:hover {
-    background-color: #5a6268;
+    background-color: #D9D9D9;
 }
 
 .yayActive {
@@ -150,7 +156,8 @@
 
 .replyButton {
     font-size: 14px;
-    color: #fff;
+    color: #5A5454;
+    background-color: #EDEDED;
     padding: 5px 10px;
     border: none;
     border-radius: 40px;
@@ -166,7 +173,8 @@
 
 .submitButton {
     font-size: 0.75vw;
-    color: #fff;
+    color: #5A5454;
+    background-color: #F0F0F0;
     padding: 5px 10px;
     border: none;
     border-radius: 40px;
@@ -181,11 +189,11 @@
 }
 
 .submitButton:hover{
-    background-color: green;
+    background-color: #D9D9D9;
 }
 
 .replyButton:hover {
-    background-color: #517cad;
+    background-color: #D9D9D9;
 }
 
 .editButton {
@@ -259,7 +267,7 @@
 }
 
 .background {
-    background-color: rgba(57, 65, 83, 1);
+    background-color: #D0E0EB;
     display: grid;
     width: 100%;
     height: 100vh;
@@ -315,47 +323,59 @@
 }
 
 .yourCommunitiesBar{
-    background-color: rgb(11, 11, 44);
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
-    font-family: Inria Sans;
-    color: gray;
+    font-family: Jura;
+    font-weight: bold;
+    color: #5A5454;
     text-indent: 3%;
     overflow-y: auto;
     overflow-x: hidden;
+    margin-left: 0.5em;
+    margin-top: 0.5em;
+    border: 3px;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .serverBar{
-    background-color: rgb(11, 11, 44);
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
     text-indent: 3%;
-    font-family: Inria Sans;
+    font-family: Jura;
+    font-weight: bold;
     font-size: 25px;
-    color: rgb(255, 255, 255);
+    color: #5A5454;
     overflow-y: auto;
     overflow-x: hidden;
+    margin-left: 0.5em;
+    margin-bottom: 0.7em;
+    border: 3px;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .serverContainer{
-    background-color: rgb(11, 11, 44);
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
-    font-family: Inria Sans;
+    font-family: Jura;
     font-size: 15px;
-    color: gray;
+    color: #5A5454;
 }
 
 .channelText{
     font-family: Inria Sans;
     font-size: 15px;
-    color: rgb(255, 255, 255);
+    color: #5A5454;
     margin-left: 10px;
 }
 
 
 .horizontalLine{
-    background-color: #AAAAAA;
+    background-color: #EDEDED;
     width: 95%;
     height: 1px;
     margin-left: 8px;
@@ -384,21 +404,21 @@
     margin-top: 15px;
     margin-left: 10px;
     font-family: Inria Sans;
-    color: rgb(255, 255, 255);
+    color: #5A5454;
     position: relative;
     font-size: 0.8rem;
 }
 
 .communitiesButtons:hover{
-    background-color: #394153;
+    background-color: #D9D9D9;
 }
 
 .channelInfoBox{
-    background-color: rgb(11, 11, 44);
+    background-color: #D0E0EB;
     display: flex;
     flex-direction: column;
     font-family: Inria Sans;
-    color: gray;
+    color: #5A5454;
     text-indent: 3%;
     overflow-y: auto;
     overflow-x: hidden;
@@ -406,7 +426,7 @@
 
 .channelInfoh1{
     margin-top: 10px;
-    color: rgb(255, 255, 255);
+    color: #5A5454;
     font-size: 25px;
 }
 
@@ -420,7 +440,7 @@
 .UserContainer{
     margin-left: 3%;
     display: flex;
-    color: gray;
+    color: #5A5454;
     font-size: 17px;
     
 }
@@ -431,23 +451,30 @@
 }
 
 .RulesBar{
-    background-color: rgb(11, 11, 44);
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
-    font-family: Inria Sans;
-    color: rgb(255, 255, 255);
+    font-family: Jura;
+    font-weight: bold;
+    color: #5A5454;
     font-size: 25px;
     text-indent: 3%;
     overflow-y: auto;
     overflow-x: hidden;
+    margin-right: 0.5em;
+    margin-top: 0.3em;
+    margin-bottom: 0.6em;
+    border: 3px;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .usersBar{
-    background-color: rgb(11, 11, 44);
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
-    font-family: Inria Sans;
-    color: rgb(255, 255, 255);
+    font-family: Jura;
+    color: #5A5454;
     font-size: 25px;
     text-indent: 3%;
     overflow-y: auto;
@@ -482,8 +509,14 @@
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    color: gray;
+    color: #5A5454;
     font-size: 2vw;
+    margin-top: 0.3em;
+    margin-bottom: 0.6em;
+    background-color: #F5F5F5;
+    border: 3px #D0E0EB;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .backDisplay{
@@ -491,10 +524,16 @@
     border-radius: 1em;
     height: 1.25vw;
     text-align: center;
-    background-color: rgb(107, 107, 107);
+    margin-left: 0.2em;
+    margin-top: 0.2em;
+    background-color: #F0F0F0;
     border: 1px solid white;
-    color: white;
+    color: #5A5454;
     font-size: 0.75vw;
+}
+
+.backDisplay:hover{
+    background-color: #D9D9D9;
 }
 
 .utilityButtons{
