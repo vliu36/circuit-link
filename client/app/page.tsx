@@ -10,8 +10,8 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function Landing() {
-    const { user } = useAuth();
-
+    const { user, userData } = useAuth();
+    
     // keep as any[] so you can inspect the shape in console.log first
     const [topCommunities, setTopCommunities] = useState<any[]>([]);
     const [topUsers, setTopUsers] = useState<any[]>([]);

@@ -399,17 +399,7 @@ export default function CommunityPage({
                 <div key={group.id} style={{ marginBottom: "2rem" }}>
                   <div className={Styles.groupHeader}>
                     <div className={Styles.groupName}>{group.name}</div>
-                    {/* Only displays if user is an owner or a mod */}
-                    {
-                      (isOwner || isMod) &&
-                      <>
-                        <button className={Styles.deleteGroup} onClick={() => handleDeleteGroup(group.id)}>
-                          Delete
-                        </button>
-                        <button className={Styles.editGroup} onClick={() => { toggleEditGroupPopup(); setEditGroupId(group.id); }}>
-                          Edit
-                        </button>
-                        <button
+                    <button
                           className={Styles.plusButton}
                           onClick={() =>
                             setShowCreateForum(() => ({
@@ -472,6 +462,17 @@ export default function CommunityPage({
                             )}
                           </div>
                         )}
+                    {/* Only displays if user is an owner or a mod */}
+                    {
+                      (isOwner || isMod) &&
+                      <>
+                        <button className={Styles.deleteGroup} onClick={() => handleDeleteGroup(group.id)}>
+                          Delete
+                        </button>
+                        <button className={Styles.editGroup} onClick={() => { toggleEditGroupPopup(); setEditGroupId(group.id); }}>
+                          Edit
+                        </button>
+                        
                       </>
                     }
                   </div>
