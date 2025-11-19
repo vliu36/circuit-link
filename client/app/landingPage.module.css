@@ -172,6 +172,7 @@
     border: 3px #D9D9D9;
     border-radius: 0.5em;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
+    overflow-y: auto;
 }
 
 .topCommunitiesBar{
@@ -307,4 +308,69 @@
     border-radius: 1em;
     background-color: #394153;
     margin-left: 10px;
+}
+
+.topUserItem{
+    width: 100%;
+    height: 5vh;
+    display: flex;
+    margin-bottom: 1vw;
+}
+
+.topUserIcon{
+    width: 14%;
+    height: 4.6vh;
+    border-radius: 50%;
+    margin-right: 2%;
+    margin-left: 4%;
+    background-color: black;
+}
+
+.topUserName{
+    width: 84%;
+    font-size: 0.8vw;
+    display: flex;
+    flex-direction: column;
+}
+
+.topCommunitiesIcon{
+    width: 18%;
+    height: 6vh;
+    border-radius: 1em;
+    margin-right: 2%;
+    margin-left: 4%;
+    background-color: black;
+}
+
+.topCommunitiesItem{
+    width: 100%;
+    height: 6vh;
+    display: flex;
+    margin-bottom: 1vw;
+    border-radius: 1em;
+}
+
+.topCommunitiesName{
+    width: 84%;
+    height: 100%;
+    font-size: 0.6vw;
+    display: flex;
+    flex-direction: column;
+}
+
+.communitiesTitle{
+    font-size: 0.8vw;
+}
+
+.topCommunitesScroll{
+    overflow-y: auto;
+}
+
+.topCommunitiesItem :hover{
+    background-color: #5A5454;
+}
+
+.topCommunitiesIcon :hover{
+    background-color: #5A5454;
+
 }
