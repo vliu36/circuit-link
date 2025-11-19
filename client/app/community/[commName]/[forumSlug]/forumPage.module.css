@@ -12,9 +12,11 @@
 
 .createSection {
     width: 80%;
-    height: 70vh;
+    height: 50vh;
     margin-left: 10%;
     margin-top: 3vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .forumBox{
@@ -32,8 +34,7 @@
 
 }
 
-.input,
-.textarea {
+.input{
     display: block;
     width: 100%;
     margin-bottom: 10px;
@@ -43,6 +44,32 @@
     font-size: 14px;
     background-color: #FFFFFF;
     color: #5A5454;
+}
+
+.textarea{
+    display: block;
+    width: 100%;
+    height: 20vh;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background-color: #FFFFFF;
+    color: #5A5454;
+}
+
+.mediaOut{
+    display: block;
+    width: 100%;
+    height: 10vh;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background-color: #FFFFFF;
+    color: #5A5454;
+    overflow-y: auto;
 }
 
 .textarea {
@@ -148,6 +175,7 @@
     background-color: rgba(217, 217, 217, 1);
     text-indent: 1vw;
     border-radius: 1vw;
+    margin-left: 3%;
 }
 
 .commentIcon{
@@ -587,6 +615,8 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     border-radius: 1em;
     margin-bottom: 1vw;
+    display: flex;
+    flex-direction: column;
 }
 
 .centerPage{
@@ -690,25 +720,38 @@
 }
 
 .createForumContainer{
-    width: 100%;
-    height: 30vh;
+    width: 50%;
+    height: 50vh;
     display: flex;
     flex-direction: column;
+    background-color: #ffffff;
+    position: absolute;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    left:25%;
+    bottom: 25%;
+    border: 2px solid black;
+    border-radius: 1em;
 }
 
 .forumCreationInfomation{
     margin-left: 10%;
-    background-color: rgb(19, 19, 19);
+    background-color: #F0F0F0;
     border-radius: 1em;
     width: 80%;
+    padding-left: 1em;
+    padding-right: 1em;
 }
 
 .forumDescCreationInfomation{
-    margin-top: 1vh;
+    margin-top: 3vh;
     margin-left: 10%;
-    background-color: rgb(19, 19, 19);
+    background-color: #F0F0F0;
     border-radius: 1em;
     width: 80%;
+    height: 30vh;
+    margin-bottom: 5vh;
+    padding-left: 1em;
+    padding-right: 1em;
 }
 
 .createForumButton{
@@ -716,7 +759,8 @@
     margin-left: 35%;
     margin-top: 1vh;
     border-radius: 1em;
-    background-color: rgb(1, 92, 1);
+    background-color: #F0F0F0;
+    color: #5A5454;
 }
 
 .joinCommunityButton{
@@ -853,4 +897,21 @@
 .activeChannel a {
     width: 1000px;
     background-color: #7c7c7c;
+}
+
+
+.postReportButton{
+    width: 10%;
+    height: 3.5vh;
+    background-color: rgba(217, 217, 217, 1);
+    border-radius: 1em;
+    text-align: center;
+    margin-left: 3%;
+}
+
+.postReportButton :hover{
+    background-color: rgb(139, 139, 139);
+    width: 100%;
+    height: 100%;
+    border-radius: 1em;
 }
