@@ -48,3 +48,4 @@ else {
     console.error("ERROR: Failed to initialize storage bucket");
 }
 
+export default io;

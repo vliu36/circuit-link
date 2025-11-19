@@ -5,6 +5,7 @@ import { GoogleAuthProvider } from "firebase/auth";
 import { auth, db } from "../_firebase/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { FirebaseError } from "firebase/app";
+import socket from "../_utils/socket.ts";
 
 const provider = new GoogleAuthProvider();
 
@@ -28,6 +29,12 @@ export async function login(email: string, password: string) {
             return { status: "error", message: "Login failed after registration" };
         }
 
+        // Link socket to auth
+        if (userCredential.user) {
+            socket.auth = userCredential.user;
+            socket.connect();
+        }
+        
         console.log("")
         window.location.href = "http://localhost:3000"
         return { status: "ok", message: "Login success."};
