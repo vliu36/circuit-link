@@ -807,9 +807,14 @@ const reportPost = async (req: Request, res: Response) => {
 // Update a community's data
 const editComm = async (req: Request, res: Response) => {
     try {
-        const { name } = req.params; // community name
+        let { name } = req.params; // community name
         const { description, isPublic, rules } = req.body;
         let { newName } = req.body; // new community name
+
+        // Clean up community name
+        let cleanName = name.trim();                           // remove trailing spaces
+        cleanName = cleanName.replace(/[^a-zA-Z0-9-_ ]/g, ""); // Remove special characters except letters, numbers, hyphens, and underscores
+        cleanName = cleanName.replace(/\s+/g, "")              // Remove spaces from the name
 
         // Verify and get userId from session cookie
         const userId = await genUtil.getUserIdFromSessionCookie(req);
@@ -832,7 +837,7 @@ const editComm = async (req: Request, res: Response) => {
         if (
             (description === undefined || description === commData.description) &&
             (isPublic === undefined || isPublic === commData.public) &&
-            (newName === undefined || newName === name) &&
+            (newName === undefined || newName === cleanName) &&
             (rules === undefined || rules === commData.rules)
         ) {
             console.log("No changes detected in the update request.");
@@ -851,7 +856,7 @@ const editComm = async (req: Request, res: Response) => {
         // Verify newName uniqueness if it is being changed
         if (newName) {
             const newNameLower = newName.toLowerCase();
-            const oldNameLower = name.toLowerCase();
+            const oldNameLower = cleanName.toLowerCase();
 
             // If the new name (case insensitive) is different, check for uniqueness
             if (newNameLower !== oldNameLower) {
@@ -873,10 +878,10 @@ const editComm = async (req: Request, res: Response) => {
         
         // Update community document
         await commRef.update(updates);
-        console.log(`Community "${name}" successfully updated.`);
+        console.log(`Community "${cleanName}" successfully updated.`);
         res.status(200).send({
             status: "ok",
-            message: `Community "${name}" successfully updated.`,
+            message: `Community "${cleanName}" successfully updated.`,
         });
     } catch (err) {
         res.status(500).send({

@@ -240,6 +240,11 @@ export default function CommunityPage({
   // --- EDIT COMMUNITY ---
   const handleEditCommunity = async (newName?: string, description?: string, isPublic?: boolean, rules?: string) => {
     try {
+      const namePattern = /^[a-zA-Z0-9_-]{1,24}$/;
+      if (newName && !namePattern.test(newName)) {
+        setError("Community name must be 1-24 characters long and can only contain letters, numbers, underscores, and hyphens.");
+        return;
+      }
       const res = await commApi.editCommunity(commName, newName, description, isPublic, rules);
       console.log(res.message);
       setError(res.message || null);
