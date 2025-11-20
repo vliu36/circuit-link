@@ -108,6 +108,7 @@ export const deleteNestedRepliesRecursive = async (replyRefs: FirebaseFirestore.
 
         // Delete the reply
         await replyRef.delete();
+
     } // end for
 } // end helper function deleteRepliesRecursive
 
