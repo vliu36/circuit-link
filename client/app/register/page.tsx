@@ -5,6 +5,7 @@ import Styles from './register.module.css';
 import Image from 'next/image';
 import googleIcon from '../../public/googleIcon.png';
 import Link from "next/link";
+import NavBar from "../_components/navbar/navbar.tsx";
 
 export default function Registration() {
 
@@ -44,6 +45,9 @@ export default function Registration() {
 
     return (
     <div className = {Styles.background}>
+        <div className={Styles.navBox} style={{gridArea: 'navBar'}}>
+                <NavBar/>
+            </div>
         <div className = {Styles.box}>
             <h1 className = {Styles.lblBox}>Sign Up</h1>
             <form onSubmit={handleSubmitReg}>

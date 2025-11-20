@@ -4,6 +4,7 @@ import { useAuth } from "../../_firebase/context";
 import { DocumentReference, getDoc } from "firebase/firestore";
 import { useState, useEffect } from "react";
 import { getNotifications, NotificationData, markNotificationAsRead, respondToFriendRequest } from "./notifications";
+import  NavBar  from "../../_components/navbar/navbar.tsx";
 
 export default function Notifications() {
     const { user, userData, loading } = useAuth();
@@ -86,6 +87,7 @@ export default function Notifications() {
 
     return (
         <div>
+            <NavBar/>
             <h1>Notifications Page</h1>
             <p>This is where user notifications will be displayed.</p>
 
