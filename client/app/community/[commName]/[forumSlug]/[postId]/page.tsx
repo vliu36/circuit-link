@@ -44,10 +44,29 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
     const [deleteForumId, setDeleteForumId] = useState("");
     const [deleteForumName, setDeleteForumName] = useState("");
     const [message, setMessage] = useState<string | null>(null);
-
+    const [groupName, setGroupName] = useState("");
     const router = useRouter();
-
+    const [groupMessage, setGroupMessage] = useState("");
     const MAX_DEPTH = 5;
+
+
+    const [createGroupOpen, setCreateGroupOpen] = useState(false);
+
+    const toggleCreateGroupPopup = () => {
+        setCreateGroupOpen(!createGroupOpen);
+        setError(null);
+    };
+
+    // --- CREATE GROUP ---
+    const handleCreateGroup = async () => {
+        if (!user) {
+            return;
+        }
+        const result = await commApi.createGroup(commName, groupName);
+        setGroupMessage(result.message);
+        setGroupName("");
+        refreshCommunity();
+    };
 
     useEffect(() => {
         if (loading) return;
@@ -486,7 +505,52 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
 
 
                 <div className={styles.serverBar} style={{ gridArea: "ServerBar" }}>
-                    <div>{commName}</div>
+                    <div style={{ display: "flex" }}>
+                        <h1 className={styles.commName}>{commName}</h1>
+                        <div className={styles.createGroupBtn}>
+                            <button
+                                onClick={toggleCreateGroupPopup}
+                            >
+                                +
+                            </button>
+                            {createGroupOpen && (
+                                <div className={styles.popupOverlay} onClick={toggleCreateGroupPopup}>
+                                    <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                                        <h2 className={styles.popupText}>Create Group</h2>
+
+                                        <input
+                                            type="text"
+                                            className={`${styles.popupText} ${styles.inputField}`}
+                                            placeholder="Group Name"
+                                            value={groupName}
+                                            onChange={(e) => setGroupName(e.target.value)}
+                                        />
+
+                                        {groupMessage && (
+                                            <p className={styles.popupText}>{groupMessage}</p>
+                                        )}
+
+                                        <button
+                                            className={`${styles.saveBtn} ${styles.popupText}`}
+                                            onClick={async () => {
+                                                await handleCreateGroup();
+                                                if (!error) toggleCreateGroupPopup();
+                                            }}
+                                        >
+                                            Create
+                                        </button>
+
+                                        <button
+                                            className={`${styles.closeBtn} ${styles.popupText}`}
+                                            onClick={toggleCreateGroupPopup}
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                     <div className={styles.horizontalLine}></div>
                     <div className={styles.serverContainer}>
                         {/* --- GROUPS AND FORUMS --- */}
@@ -620,7 +684,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                         <h1>Rules</h1>
                     </div>
                 </div>
-                    
+
 
 
                 <div className={styles.navBox} style={{ gridArea: "NavBar" }}>

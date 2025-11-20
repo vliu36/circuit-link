@@ -660,3 +660,14 @@ I dont think we need this
   text-decoration: none;   /* optional */
   color: inherit;          /* optional */
 }
+
+.commName{
+    width:80%;
+    height:100%;
+    overflow: hidden;
+}
+
+.createGroupBtn{
+    width: 20%;
+    margin-left: 40%;
+}

@@ -86,6 +86,8 @@
     color: #5A5454;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    margin-top:80vh;
 }
 
 .primaryButton:hover {
@@ -622,15 +624,14 @@
 }
 
 .createBox{
-    width: 100%;
-    min-height: 55vh;
-    background-color: white;
+    width: 15vw;
     color: #5A5454;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     border-radius: 1em;
-    margin-bottom: 1vw;
-    display: flex;
     flex-direction: column;
+    position:sticky;
+    left: 70%;
+
+    z-index: 99999;
 }
 
 .centerPage{
@@ -880,7 +881,7 @@
 
 .mediaInPost{
     width: 200%;
-    margin-left: 10%;
+    overflow:hidden;
 }
 
 @font-face {
@@ -1005,3 +1006,16 @@
 .plusButton:hover{
     color:#00ccff;
 }
+
+.commName{
+    width:80%;
+    height:100%;
+    overflow: hidden;
+    font-size: 20px;
+}
+
+.createGroupBtn{
+    width: 20%;
+    margin-left: 40%;
+}
+

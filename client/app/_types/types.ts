@@ -38,6 +38,7 @@ export interface Group {
 }
 
 export interface Community {
+    groups: any;
     id: string;
     name: string;
     description: string;

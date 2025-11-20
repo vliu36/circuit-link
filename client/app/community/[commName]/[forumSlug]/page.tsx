@@ -66,6 +66,13 @@ export default function ForumPage({
     const [deleteGroupId, setDeleteGroupId] = useState<string>("");
     const [deleteGroupName, setDeleteGroupName] = useState<string>("");
 
+    const [createPostOpen, setCreatePostOpen] = useState(false);
+
+    const toggleCreatePostPopup = () => {
+        setCreatePostOpen(!createPostOpen);
+        setError(null);
+    };
+
     useEffect(() => {
         if (loading) return;
 
@@ -89,10 +96,28 @@ export default function ForumPage({
     }, [userData, loading]);
 
 
+    const [createGroupOpen, setCreateGroupOpen] = useState(false);
+
+    const toggleCreateGroupPopup = () => {
+        setCreateGroupOpen(!createGroupOpen);
+        setError(null);
+    };
+
     const handleCreateForumBox = async (groupId: string) => {
         setShowCreateForum({});
     };
-    
+
+    // --- CREATE GROUP ---
+    const handleCreateGroup = async () => {
+        if (!user) {
+            return;
+        }
+        const result = await commApi.createGroup(commName, groupName);
+        setGroupMessage(result.message);
+        setGroupName("");
+        refreshCommunity();
+    };
+
 
     // --- CREATE FORUM ---
     const handleCreateForum = async (groupId: string) => {
@@ -437,6 +462,8 @@ export default function ForumPage({
         return <div>You are banned from this community.</div>;
     }
 
+
+
     return (
         <main>
             <div className={styles.background}>
@@ -477,8 +504,53 @@ export default function ForumPage({
                 </div>
 
                 <div className={styles.serverBar} style={{ gridArea: "ServerBar" }}>
-                    <div className={styles.horizontalLine}></div>
-                    <h1>{commName}</h1>
+                    <div style={{ display: "flex" }}>
+                        <h1 className={styles.commName}>{commName}</h1>
+                        <div className={styles.createGroupBtn}>
+                            <button
+
+                                onClick={toggleCreateGroupPopup}
+                            >
+                                +
+                            </button>
+                            {createGroupOpen && (
+                                <div className={styles.popupOverlay} onClick={toggleCreateGroupPopup}>
+                                    <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                                        <h2 className={styles.popupText}>Create Group</h2>
+
+                                        <input
+                                            type="text"
+                                            className={`${styles.popupText} ${styles.inputField}`}
+                                            placeholder="Group Name"
+                                            value={groupName}
+                                            onChange={(e) => setGroupName(e.target.value)}
+                                        />
+
+                                        {groupMessage && (
+                                            <p className={styles.popupText}>{groupMessage}</p>
+                                        )}
+
+                                        <button
+                                            className={`${styles.saveBtn} ${styles.popupText}`}
+                                            onClick={async () => {
+                                                await handleCreateGroup();
+                                                if (!error) toggleCreateGroupPopup();
+                                            }}
+                                        >
+                                            Create
+                                        </button>
+
+                                        <button
+                                            className={`${styles.closeBtn} ${styles.popupText}`}
+                                            onClick={toggleCreateGroupPopup}
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                     <div className={styles.horizontalLine}></div>
                     <div className={styles.serverContainer}>
                         {/* --- GROUPS AND FORUMS --- */}
@@ -615,6 +687,80 @@ export default function ForumPage({
                     </div>
                 </div>
 
+                <div className={styles.createBox}>
+                    {user ? (
+                        <button className={styles.primaryButton} onClick={toggleCreatePostPopup}>
+                            + Create New Post
+                        </button>
+                    ) : (
+                        <p>Please sign in to create posts.</p>
+                    )}
+                    {createPostOpen && (
+                        <div className={styles.popupOverlay} onClick={toggleCreatePostPopup}>
+                            <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+
+                                <h2 className={styles.popupText}>Create New Post</h2>
+
+                                {/* Post Title */}
+                                <input
+                                    placeholder="Post Title"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    className={`${styles.popupText} ${styles.inputField}`}
+                                    style={{ marginBottom: "1rem" }}
+                                />
+
+                                {/* Media Upload w/ Preview */}
+                                <div className={styles.mediaOut}>
+                                    {mediaPreview && (
+                                        <img
+                                            src={mediaPreview}
+                                            alt="Media preview"
+                                            className={styles.mediaPreview}
+                                        />
+                                    )}
+
+                                    <input
+                                        type="file"
+                                        accept="image/*,video/*"
+                                        ref={fileInputRef}
+                                        onChange={handleMediaChange}
+                                        className={`${styles.inputField}`}
+                                    />
+                                </div>
+
+                                {/* Content */}
+                                <textarea
+                                    placeholder="Post Contents"
+                                    value={contents}
+                                    onChange={(e) => setContents(e.target.value)}
+                                    className={`${styles.popupText} ${styles.inputField}`}
+                                    style={{ height: "120px" }}
+                                />
+
+                                {/* Submit Button */}
+                                <button
+                                    className={`${styles.saveBtn} ${styles.popupText}`}
+                                    onClick={async () => {
+                                        await handleAddPost();
+                                        toggleCreatePostPopup();
+                                    }}
+                                >
+                                    Add Post
+                                </button>
+
+                                {/* Close Button */}
+                                <button
+                                    className={`${styles.closeBtn} ${styles.popupText}`}
+                                    onClick={toggleCreatePostPopup}
+                                >
+                                    Close
+                                </button>
+
+                            </div>
+                        </div>
+                    )}
+                </div>
                 <div className={styles.centerPage} style={{ gridArea: "Center" }}>
                     <div className={styles.topBox}>
                         <div className={styles.bannerBox}></div>
@@ -646,50 +792,14 @@ export default function ForumPage({
                         </div>
 
                         <textarea className={styles.postSearchBar}>
-                            
+
                         </textarea>
                         <button className={styles.enterSearch}>Search</button>
-                        
-                    </div>
-
-
-                    <div className={styles.createBox}>
-                        {/* --- Create New Post Section --- */}
-                        {user ? (
-                            <div className={styles.createSection}>
-                                <h2>Create New Post</h2>
-                                <input
-                                    placeholder="Post Title"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    className={styles.input}
-                                />
-                                <div className={styles.mediaOut}>
-                                    {mediaPreview && (
-                                        <img src={mediaPreview} alt="Media preview" className={styles.mediaPreview} />
-                                    )}
-                                    <input
-                                        type="file"
-                                        accept="image/*,video/*"
-                                        ref={fileInputRef}
-                                        onChange={handleMediaChange}
-                                    />
-                                </div>
-                                <textarea
-                                    placeholder="Post Contents"
-                                    value={contents}
-                                    onChange={(e) => setContents(e.target.value)}
-                                    className={styles.textarea}
-                                />
-                                <button className={styles.primaryButton} onClick={handleAddPost}>
-                                    Add Post
-                                </button>
-                            </div>
-                        ) : (
-                            <p>Please sign in to create posts.</p>
-                        )}
 
                     </div>
+
+
+
 
 
                     {/* --- Posts List --- */}
@@ -772,7 +882,7 @@ export default function ForumPage({
                                                                 <source src={post.media} type="video/mp4" />
                                                             </video>
                                                         ) : (
-                                                            <Image src={post.media} alt="Post Media" width={800} height={400} />
+                                                            <Image src={post.media} alt="Post Media" width={350} height={150} />
                                                         )}
                                                     </div>
                                                 )}
@@ -971,26 +1081,26 @@ export default function ForumPage({
                     </div>
                 )}
             </div>
-        {confirmDeleteForum && (
-            <div className={styles.popupOverlay} onClick={toggleConfirmDeleteForum}>
-                <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
-                    <h2 className={styles.popupText}>Confirm Delete Forum</h2>
-                    <p className={styles.popupText}>Are you sure you want to delete forum "{deleteForumName}"? <br /> This action cannot be undone.</p>
-                    <button onClick={toggleConfirmDeleteForum} className={styles.cancelButton}>Cancel</button>
-                    <button onClick={() => { handleDeleteForum(deleteForumId); toggleConfirmDeleteForum(); }} className={styles.deleteButton}>Delete</button>
+            {confirmDeleteForum && (
+                <div className={styles.popupOverlay} onClick={toggleConfirmDeleteForum}>
+                    <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                        <h2 className={styles.popupText}>Confirm Delete Forum</h2>
+                        <p className={styles.popupText}>Are you sure you want to delete forum "{deleteForumName}"? <br /> This action cannot be undone.</p>
+                        <button onClick={toggleConfirmDeleteForum} className={styles.cancelButton}>Cancel</button>
+                        <button onClick={() => { handleDeleteForum(deleteForumId); toggleConfirmDeleteForum(); }} className={styles.deleteButton}>Delete</button>
+                    </div>
                 </div>
-            </div>
-        )}
-        {confirmDeleteGroup && (
-        <div className={styles.popupOverlay} onClick={toggleConfirmDeleteGroup}>
-            <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
-                <h2 className={styles.popupText}>Confirm Delete Group</h2>
-                <p className={styles.popupText}>Are you sure you want to delete group "{deleteGroupName}"? <br /> This will delete all of its forums and cannot be undone.</p>
-                <button onClick={toggleConfirmDeleteGroup} className={styles.cancelButton}>Cancel</button>
-                <button onClick={() => { handleDeleteGroup(deleteGroupId); toggleConfirmDeleteGroup(); }} className={styles.deleteButton}>Delete</button>
-            </div>
-        </div>
-        )}
+            )}
+            {confirmDeleteGroup && (
+                <div className={styles.popupOverlay} onClick={toggleConfirmDeleteGroup}>
+                    <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                        <h2 className={styles.popupText}>Confirm Delete Group</h2>
+                        <p className={styles.popupText}>Are you sure you want to delete group "{deleteGroupName}"? <br /> This will delete all of its forums and cannot be undone.</p>
+                        <button onClick={toggleConfirmDeleteGroup} className={styles.cancelButton}>Cancel</button>
+                        <button onClick={() => { handleDeleteGroup(deleteGroupId); toggleConfirmDeleteGroup(); }} className={styles.deleteButton}>Delete</button>
+                    </div>
+                </div>
+            )}
         </main>
     );
 }
