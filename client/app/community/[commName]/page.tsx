@@ -426,6 +426,12 @@ export default function CommunityPage({
     return <div>You are banned from this community.</div>;
   }
 
+  // If the community is private and the user is not a member, show this community is private message
+  if (!community.public && !isMember) {
+    return (<div>This community is private.</div>);
+    // TODO : Add request to join functionality
+  }
+
   return (
     <main>
       <div className={Styles.background}>
@@ -470,12 +476,13 @@ export default function CommunityPage({
           <div style={{ display: "flex"}}>
             <h1 className={Styles.commName}>{commName}</h1>
             <div className={Styles.createGroupBtn}>
-              <button
-                
-                onClick={toggleCreateGroupPopup}
-              >
-                +
-              </button>
+              {(isOwner || isMod) && (
+                <button 
+                  onClick={toggleCreateGroupPopup}
+                >
+                  +
+                </button>
+              )}
               {createGroupOpen && (
                 <div className={Styles.popupOverlay} onClick={toggleCreateGroupPopup}>
                   <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
@@ -525,17 +532,20 @@ export default function CommunityPage({
                 <div key={group.id} style={{ marginBottom: "2rem" }}>
                   <div className={Styles.groupHeader}>
                     <div className={Styles.groupName}>{group.name}</div>
-                    <button
-                      className={Styles.plusButton}
-                      onClick={() =>
-                        setShowCreateForum(() => ({
-                          // close ALL popups, only toggle the one clicked
-                          [group.id]: !showCreateForum[group.id]
-                        }))
-                      }
-                    >
-                      +
-                    </button>
+                      {/* Display create forum button if user is mod or owner */}
+                      {(isOwner || isMod) && (
+                      <button
+                        className={Styles.plusButton}
+                        onClick={() =>
+                          setShowCreateForum(() => ({
+                            // close ALL popups, only toggle the one clicked
+                            [group.id]: !showCreateForum[group.id]
+                          }))
+                        }
+                      >
+                        +
+                      </button>
+                    )}
                     {/* --- CREATE FORUM FORM (only shown if toggled on) --- */}
                     {showCreateForum[group.id] && (
                       <div className={Styles.createForumContainer} style={{ marginTop: "1rem" }}>

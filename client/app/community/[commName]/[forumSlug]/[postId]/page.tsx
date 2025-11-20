@@ -266,11 +266,17 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
         }
     };
 
+    const isMember = community.userList.some(m => m.id === user?.uid);
     const isMod = community.modList.some(m => m.id === user?.uid);
     const isOwner = community.ownerList.some(o => o.id === user?.uid);
     const isBanned = community.blacklist.some(b => b.id === user?.uid);
     if (isBanned) {
         return <div>You are banned from this community.</div>;
+    }
+
+    if (!community.public && !isMember) {
+        return (<div>This community is private.</div>);
+        // TODO : Add request to join functionality
     }
 
     // Recursive rendering function for posts and replies
@@ -509,11 +515,13 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                     <div style={{ display: "flex" }}>
                         <h1 className={styles.commName}>{commName}</h1>
                         <div className={styles.createGroupBtn}>
-                            <button
-                                onClick={toggleCreateGroupPopup}
-                            >
-                                +
-                            </button>
+                            {(isOwner || isMod) && (
+                                <button
+                                    onClick={toggleCreateGroupPopup}
+                                >
+                                    +
+                                </button>
+                            )}
                             {createGroupOpen && (
                                 <div className={styles.popupOverlay} onClick={toggleCreateGroupPopup}>
                                     <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
@@ -563,17 +571,20 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                                 <div key={group.id} style={{ marginBottom: "2rem" }}>
                                     <div className={styles.groupHeader}>
                                         <div className={styles.groupName}>{group.name}</div>
-                                        <button
-                                            className={styles.plusButton}
-                                            onClick={() =>
-                                                setShowCreateForum(() => ({
-                                                    // close ALL popups, only toggle the one clicked
-                                                    [group.id]: !showCreateForum[group.id]
-                                                }))
-                                            }
-                                        >
-                                            +
-                                        </button>
+                                        {/* Only displays if user is an owner or a mod */}
+                                        {(isOwner || isMod) && (
+                                            <button
+                                                className={styles.plusButton}
+                                                onClick={() =>
+                                                    setShowCreateForum(() => ({
+                                                        // close ALL popups, only toggle the one clicked
+                                                        [group.id]: !showCreateForum[group.id]
+                                                    }))
+                                                }
+                                            >
+                                                +
+                                            </button>
+                                        )}
                                         {/* --- CREATE FORUM FORM (only shown if toggled on) --- */}
                                         {showCreateForum[group.id] && (
                                             <div className={styles.createForumContainer} style={{ marginTop: "1rem" }}>
