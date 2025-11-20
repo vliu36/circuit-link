@@ -16,6 +16,7 @@ import Image from 'next/image'
 import { useRouter } from "next/navigation";
 import * as commApi from "../../community";
 import { fetchTopCommunities, fetchTopUsers, getCommunities } from "@/app/landing.ts";
+import { DocumentData } from "firebase/firestore";
 
 export default function PostDetail({ params }: { params: Promise<{ commName: string; forumSlug: string; postId: string }> }) {
     const { userData } = useAuth();
@@ -35,7 +36,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
     const [error, setError] = useState<string | null>(null);
     const [editGroupId, setEditGroupId] = useState<string>("");
     const [forumInputs, setForumInputs] = useState<{ [groupId: string]: { name: string; description: string; message: string } }>({});
-    const [userCommunities, setUserCommunities] = useState<any[]>([]);
+    const [userCommunities, setUserCommunities] = useState<DocumentData[]>([]);
     const [dataLoading, setDataLoading] = useState(true);
     const [confirmDeleteGroup, setConfirmDeleteGroup] = useState(false);
     const [deleteGroupId, setDeleteGroupId] = useState("");
@@ -478,7 +479,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                         {userCommunities.length === 0 ? (
                             <p>No joined communities.</p>
                         ) : (
-                            userCommunities.map((c: any, i: number) => (
+                            userCommunities.map((c: DocumentData, i: number) => (
                                 <Link
                                     key={c.id}
                                     className={styles.communitiesButtons}
@@ -709,7 +710,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                 <div className={styles.popupOverlay} onClick={toggleConfirmDeleteForum}>
                     <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
                         <h2 className={styles.popupText}>Confirm Delete Forum</h2>
-                        <p className={styles.popupText}>Are you sure you want to delete forum "{deleteForumName}"? <br /> This action cannot be undone.</p>
+                        <p className={styles.popupText}>Are you sure you want to delete forum &quot;{deleteForumName}&quot;? <br /> This action cannot be undone.</p>
                         <button onClick={toggleConfirmDeleteForum} className={styles.cancelButton}>Cancel</button>
                         <button onClick={() => { handleDeleteForum(deleteForumId); toggleConfirmDeleteForum(); }} className={styles.deleteButton}>Delete</button>
                     </div>
@@ -719,7 +720,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                 <div className={styles.popupOverlay} onClick={toggleConfirmDeleteGroup}>
                     <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
                         <h2 className={styles.popupText}>Confirm Delete Group</h2>
-                        <p className={styles.popupText}>Are you sure you want to delete group "{deleteGroupName}"? <br /> This will delete all of its forums and cannot be undone.</p>
+                        <p className={styles.popupText}>Are you sure you want to delete group &quot;{deleteGroupName}&quot;? <br /> This will delete all of its forums and cannot be undone.</p>
                         <button onClick={toggleConfirmDeleteGroup} className={styles.cancelButton}>Cancel</button>
                         <button onClick={() => { handleDeleteGroup(deleteGroupId); toggleConfirmDeleteGroup(); }} className={styles.deleteButtonCard}>Delete</button>
                     </div>

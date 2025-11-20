@@ -121,7 +121,7 @@ export async function getPostRedirectUrl(postRef: DocumentReference) {
     const postSnap = await getDoc(postRef);
     if (!postSnap.exists()) return "#";
 
-    const postData = postSnap.data() as any;
+    const postData = postSnap.data();
     const postId = postSnap.id;
 
     // Fetch forum
@@ -129,7 +129,7 @@ export async function getPostRedirectUrl(postRef: DocumentReference) {
     const forumSnap = await getDoc(forumRef);
     if (!forumSnap.exists()) return "#";
 
-    const forumData = forumSnap.data() as any;
+    const forumData = forumSnap.data();
     const forumSlug = forumData.slug;
 
     // Fetch community
@@ -137,7 +137,7 @@ export async function getPostRedirectUrl(postRef: DocumentReference) {
     const commSnap = await getDoc(commRef);
     if (!commSnap.exists()) return "#";
 
-    const commData = commSnap.data() as any;
+    const commData = commSnap.data();
     const commName = commData.name;
 
     return `/community/${commName}/${forumSlug}/${postId}`;

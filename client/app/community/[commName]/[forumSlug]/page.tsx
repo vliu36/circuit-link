@@ -22,6 +22,7 @@ import commentIcon from "../../../../public/comment-regular-full.svg"
 import checkedthumbsDown from "../../../../public/thumbs-down-glow-full.svg"
 import checkedthumbsUp from "../../../../public/thumbs-up-glow-full.svg"
 import { fetchTopCommunities, fetchTopUsers, getCommunities } from "@/app/landing.ts";
+import { DocumentData } from "firebase/firestore";
 
 export default function ForumPage({
     params,
@@ -57,7 +58,7 @@ export default function ForumPage({
     const [reportPopup, setReportPopup] = useState(false);
     const [reportReason, setReportReason] = useState("");
     const [postId, setPostId] = useState<string>("");
-    const [userCommunities, setUserCommunities] = useState<any[]>([]);
+    const [userCommunities, setUserCommunities] = useState<DocumentData[]>([]);
     const [dataLoading, setDataLoading] = useState(true);
     const [confirmDeleteForum, setConfirmDeleteForum] = useState(false);
     const [deleteForumId, setDeleteForumId] = useState<string>("");
@@ -478,7 +479,7 @@ export default function ForumPage({
                         {userCommunities.length === 0 ? (
                             <p>No joined communities.</p>
                         ) : (
-                            userCommunities.map((c: any, i: number) => (
+                            userCommunities.map((c: DocumentData, i: number) => (
                                 <Link
                                     key={c.id}
                                     className={styles.communitiesButtons}
@@ -1085,7 +1086,7 @@ export default function ForumPage({
                 <div className={styles.popupOverlay} onClick={toggleConfirmDeleteForum}>
                     <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
                         <h2 className={styles.popupText}>Confirm Delete Forum</h2>
-                        <p className={styles.popupText}>Are you sure you want to delete forum "{deleteForumName}"? <br /> This action cannot be undone.</p>
+                        <p className={styles.popupText}>Are you sure you want to delete forum &quot;{deleteForumName}&quot;? <br /> This action cannot be undone.</p>
                         <button onClick={toggleConfirmDeleteForum} className={styles.cancelButton}>Cancel</button>
                         <button onClick={() => { handleDeleteForum(deleteForumId); toggleConfirmDeleteForum(); }} className={styles.deleteButton}>Delete</button>
                     </div>
@@ -1095,7 +1096,7 @@ export default function ForumPage({
                 <div className={styles.popupOverlay} onClick={toggleConfirmDeleteGroup}>
                     <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
                         <h2 className={styles.popupText}>Confirm Delete Group</h2>
-                        <p className={styles.popupText}>Are you sure you want to delete group "{deleteGroupName}"? <br /> This will delete all of its forums and cannot be undone.</p>
+                        <p className={styles.popupText}>Are you sure you want to delete group &quot;{deleteGroupName}&quot;? <br /> This will delete all of its forums and cannot be undone.</p>
                         <button onClick={toggleConfirmDeleteGroup} className={styles.cancelButton}>Cancel</button>
                         <button onClick={() => { handleDeleteGroup(deleteGroupId); toggleConfirmDeleteGroup(); }} className={styles.deleteButton}>Delete</button>
                     </div>
