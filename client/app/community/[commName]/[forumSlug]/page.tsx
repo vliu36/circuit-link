@@ -452,6 +452,69 @@ export default function ForumPage({
                                     <div className={styles.groupHeader}>
                                         <div className={styles.groupName}>{group.name}</div>
                                         {/* Only displays if user is an owner or a mod */}
+                                        <button
+                                            className={styles.plusButton}
+                                            onClick={() =>
+                                                setShowCreateForum(() => ({
+                                                    // close ALL popups, only toggle the one clicked
+                                                    [group.id]: !showCreateForum[group.id]
+                                                }))
+                                            }
+                                        >
+                                            +
+                                        </button>
+                                        {/* --- CREATE FORUM FORM (only shown if toggled on) --- */}
+                                        {showCreateForum[group.id] && (
+                                            <div className={styles.createForumContainer} style={{ marginTop: "1rem" }}>
+                                                <h4 className={styles.createForumText}>Create a new forum in {group.name}</h4>
+
+                                                {/* -------- Forum Name -------- */}
+                                                <input
+                                                    type="text"
+                                                    placeholder="Forum name"
+                                                    className={styles.forumCreationInfomation}
+                                                    value={forumInputs[group.id]?.name || ""}
+                                                    onChange={(e) =>
+                                                        setForumInputs((prev) => ({
+                                                            ...prev,
+                                                            [group.id]: {
+                                                                ...prev[group.id],
+                                                                name: e.target.value,
+                                                                message: "",
+                                                            },
+                                                        }))
+                                                    }
+                                                />
+
+                                                {/* -------- Forum Description -------- */}
+                                                <textarea
+                                                    placeholder="Type description here"
+                                                    className={styles.forumDescCreationInfomation}
+                                                    value={forumInputs[group.id]?.description || ""}
+                                                    onChange={(e) =>
+                                                        setForumInputs((prev) => ({
+                                                            ...prev,
+                                                            [group.id]: { ...prev[group.id], description: e.target.value, message: "" },
+                                                        }))
+                                                    }
+                                                />
+
+                                                {/* -------- Submit -------- */}
+                                                <button
+                                                    className={styles.createForumButton}
+                                                    onClick={() => {
+                                                        handleCreateForumBox(group.id);
+                                                        handleCreateForum(group.id);
+                                                    }}
+                                                >
+                                                    Create Forum
+                                                </button>
+
+                                                {forumInputs[group.id]?.message && (
+                                                    <p>{forumInputs[group.id].message}</p>
+                                                )}
+                                            </div>
+                                        )}
                                         {
                                             (isOwner || isMod) &&
                                             <>
@@ -461,69 +524,7 @@ export default function ForumPage({
                                                 <button className={styles.editGroup} onClick={() => { toggleEditGroupPopup(); setEditGroupId(group.id); }}>
                                                     Edit
                                                 </button>
-                                                <button
-                                                    className={styles.plusButton}
-                                                    onClick={() =>
-                                                        setShowCreateForum(() => ({
-                                                            // close ALL popups, only toggle the one clicked
-                                                            [group.id]: !showCreateForum[group.id]
-                                                        }))
-                                                    }
-                                                >
-                                                    +
-                                                </button>
-                                                {/* --- CREATE FORUM FORM (only shown if toggled on) --- */}
-                                                {showCreateForum[group.id] && (
-                                                    <div className={styles.createForumContainer} style={{ marginTop: "1rem" }}>
-                                                        <h4 className={styles.createForumText}>Create a new forum in {group.name}</h4>
 
-                                                        {/* -------- Forum Name -------- */}
-                                                        <input
-                                                            type="text"
-                                                            placeholder="Forum name"
-                                                            className={styles.forumCreationInfomation}
-                                                            value={forumInputs[group.id]?.name || ""}
-                                                            onChange={(e) =>
-                                                                setForumInputs((prev) => ({
-                                                                    ...prev,
-                                                                    [group.id]: {
-                                                                        ...prev[group.id],
-                                                                        name: e.target.value,
-                                                                        message: "",
-                                                                    },
-                                                                }))
-                                                            }
-                                                        />
-
-                                                        {/* -------- Forum Description -------- */}
-                                                        <textarea
-                                                            placeholder="Type description here"
-                                                            className={styles.forumDescCreationInfomation}
-                                                            value={forumInputs[group.id]?.description || ""}
-                                                            onChange={(e) =>
-                                                                setForumInputs((prev) => ({
-                                                                    ...prev,
-                                                                    [group.id]: { ...prev[group.id], description: e.target.value, message: "" },
-                                                                }))
-                                                            }
-                                                        />
-
-                                                        {/* -------- Submit -------- */}
-                                                        <button
-                                                            className={styles.createForumButton}
-                                                            onClick={() => {
-                                                                handleCreateForumBox(group.id);
-                                                                handleCreateForum(group.id);
-                                                            }}
-                                                        >
-                                                            Create Forum
-                                                        </button>
-
-                                                        {forumInputs[group.id]?.message && (
-                                                            <p>{forumInputs[group.id].message}</p>
-                                                        )}
-                                                    </div>
-                                                )}
                                             </>
                                         }
                                     </div>

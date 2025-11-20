@@ -261,15 +261,20 @@ export default function CommunityPage({
   // --- EDIT COMMUNITY ---
   const handleEditCommunity = async (newName?: string, description?: string, isPublic?: boolean, rules?: string) => {
     try {
+      const namePattern = /^[a-zA-Z0-9_-]{1,24}$/;
+      if (newName && !namePattern.test(newName)) {
+        setError("Community name must be 1-24 characters long and can only contain letters, numbers, underscores, and hyphens.");
+        return;
+      }
       const res = await commApi.editCommunity(commName, newName, description, isPublic, rules);
       console.log(res.message);
       setError(res.message || null);
-      await refreshCommunity();
-      if (res.status === "ok" && newName && newName !== commName) {
+      if (res.status === "ok" && newName && newName.toLowerCase() !== commName.toLowerCase()) {
         router.push(`/community/${newName}`);
       } else if (res.status === "ok") {
         // Close the edit popup only if the name hasn't changed
         toggleEditPopup();
+        await refreshCommunity();
       }
     } catch (err) {
       setError("Failed to edit community. Please try again.");
@@ -446,17 +451,7 @@ export default function CommunityPage({
                 <div key={group.id} style={{ marginBottom: "2rem" }}>
                   <div className={Styles.groupHeader}>
                     <div className={Styles.groupName}>{group.name}</div>
-                    {/* Only displays if user is an owner or a mod */}
-                    {
-                      (isOwner || isMod) &&
-                      <>
-                        <button className={Styles.deleteGroup} onClick={() => handleDeleteGroup(group.id)}>
-                          Delete
-                        </button>
-                        <button className={Styles.editGroup} onClick={() => { toggleEditGroupPopup(); setEditGroupId(group.id); }}>
-                          Edit
-                        </button>
-                        <button
+                    <button
                           className={Styles.plusButton}
                           onClick={() =>
                             setShowCreateForum(() => ({
@@ -519,6 +514,17 @@ export default function CommunityPage({
                             )}
                           </div>
                         )}
+                    {/* Only displays if user is an owner or a mod */}
+                    {
+                      (isOwner || isMod) &&
+                      <>
+                        <button className={Styles.deleteGroup} onClick={() => handleDeleteGroup(group.id)}>
+                          Delete
+                        </button>
+                        <button className={Styles.editGroup} onClick={() => { toggleEditGroupPopup(); setEditGroupId(group.id); }}>
+                          Edit
+                        </button>
+                        
                       </>
                     }
                   </div>
