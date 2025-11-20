@@ -8,38 +8,74 @@ import NavBar from "./_components/navbar/navbar.tsx";
 import { fetchTopCommunities, fetchTopUsers, logout } from "./landing.ts";
 import Image from "next/image";
 import Link from "next/link";
+import { getCommunities } from "./landing.ts";
+
 
 export default function Landing() {
-    const { user } = useAuth();
+    const { user, userData, loading } = useAuth();
 
-    // keep as any[] so you can inspect the shape in console.log first
     const [topCommunities, setTopCommunities] = useState<any[]>([]);
     const [topUsers, setTopUsers] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [userCommunities, setUserCommunities] = useState<any[]>([]);
+    const [dataLoading, setDataLoading] = useState(true);
 
     useEffect(() => {
+        if (loading) return;
+
         async function loadData() {
             const comms = await fetchTopCommunities();
             const users = await fetchTopUsers();
 
-            console.log("RAW top communities:", comms);
-            console.log("RAW top users:", users);
+            setTopCommunities(comms.communities ?? []);
+            setTopUsers(users.users ?? []);
 
-            setTopCommunities(comms.communities ?? []); // <-- FIX HERE
-            setTopUsers(users.users ?? []);             // (Check your users API shape)
+            if (userData?.communities) {
+                try {
+                    const joined = await getCommunities(userData.communities);
+                    setUserCommunities(joined);
+                } catch (err) {
+                    console.error("Error loading user's communities:", err);
+                }
+            }
+
+            setDataLoading(false);
         }
-        loadData();
-    }, []);
 
+        loadData();
+    }, [userData, loading]);
 
     return (
         <div className={Styles.background}>
             <div className={Styles.yourCommunitiesBar} style={{ gridArea: "communities" }}>
                 <h1>Your Communities</h1>
-                <button className={Styles.communitiesButtons}>
-                    <Image src="plus.svg" className={Styles.addIcon} alt="Add icon" width={16} height={16} />
+
+                <div>
+                    {userCommunities.length === 0 ? (
+                        <p>No joined communities.</p>
+                    ) : (
+                        userCommunities.map((c: any, i: number) => (
+                            <Link
+                                key={c.id}
+                                className={Styles.communitiesButtons}
+                                href={`/community/${c.name}`}
+                            >
+                                <Image
+                                    src={c.icon ?? "/defaultCommunity.svg"}
+                                    alt={c.name}
+                                    width={30}
+                                    height={30}
+                                    className={Styles.addIcon}
+                                />
+                                <h1 className={Styles.buttonTextforCommunities}>{c.name}</h1>
+                            </Link>
+                        ))
+                    )}
+                </div>
+
+                <Link className={Styles.communitiesButtons} href={`/community`}>
+                    <Image src="/plus.svg" className={Styles.addIcon} alt="Add icon" width={16} height={16} />
                     <h1 className={Styles.buttonTextforCommunities}>Add a Community</h1>
-                </button>
+                </Link>
             </div>
 
             <div className={Styles.resourcesBar} style={{ gridArea: "resources" }}>
@@ -66,7 +102,7 @@ export default function Landing() {
                 <h1>Top Users</h1>
 
                 <div className={Styles.topCommunitesScroll}>
-                    {loading && topUsers.length === 0 ? (
+                    {dataLoading && topUsers.length === 0 ? (
                         <p>Loading...</p>
                     ) : topUsers.length === 0 ? (
                         <p>No users found.</p>
@@ -76,6 +112,7 @@ export default function Landing() {
                             const username = u.username ?? u.displayName ?? u.name ?? "Unknown user";
                             const photo = u.photoURL ?? u.avatar ?? u.photo ?? "/defaultUser.svg";
                             const yay = typeof u.yayScore === "number" ? u.yayScore : Number(u.yays) || 0;
+
                             return (
                                 <div key={key} className={Styles.topUserItem}>
                                     <Image src={photo} alt={username} width={30} height={30} className={Styles.topUserIcon} />
@@ -89,15 +126,13 @@ export default function Landing() {
                         })
                     )}
                 </div>
-
             </div>
-
 
             <div className={Styles.topCommunitiesBar} style={{ gridArea: "topCommunities" }}>
                 <h1>Top Communities</h1>
 
                 <div className={Styles.topCommunitesScroll}>
-                    {loading && topCommunities.length === 0 ? (
+                    {dataLoading && topCommunities.length === 0 ? (
                         <p>Loading...</p>
                     ) : topCommunities.length === 0 ? (
                         <p>No communities found.</p>
@@ -108,6 +143,7 @@ export default function Landing() {
                             const icon = c.icon ?? c.image ?? "/defaultCommunity.svg";
                             const yay = typeof c.yayScore === "number" ? c.yayScore : Number(c.yays) || 0;
                             const numUsers = typeof c.numUsers === "number" ? c.numUsers : Number(c.numUsers) || 0;
+
                             return (
                                 <Link key={key} className={Styles.topCommunitiesItem} href={`/community/${name}`}>
                                     <Image src={icon} alt={name} width={30} height={30} className={Styles.topCommunitiesIcon} />
@@ -116,13 +152,11 @@ export default function Landing() {
                                         <h1>{yay} Yays</h1>
                                         <h1>{numUsers} Followers</h1>
                                     </div>
-
                                 </Link>
                             );
                         })
                     )}
                 </div>
-
             </div>
 
             <div className={Styles.navBox} style={{ gridArea: "navBar" }}>

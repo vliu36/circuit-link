@@ -34,10 +34,11 @@
     display: flex;
     flex-direction: column;
     border-radius: 10px;
-    background-color: #FFFFFF;
+    background-color: #ffffff;
     color: #5A5454;
     transition: transform 0.15s ease;
-    width: 100%;
+    width: 90%;
+    margin-left: 5%;
 }
 
 .replyCard p,
@@ -47,15 +48,15 @@
 }
 
 .title {
-    font-size: 1em;
+    font-size: 25px;
     font-weight: 600;
-    margin-left: 0.5em;
+    margin-left: 2vw;
 }
 
 .contents {
-    font-size: 1em;
+    font-size: 20px;
     font-weight: 400;
-    margin-left: 0.5em;
+    margin-left: 2vw;
     color: #5A5454
 }
 
@@ -64,7 +65,7 @@
     font-weight: 100;
     color: #5A5454;
     margin-top: 0.2em;
-    margin-left: 0.5em;
+    margin-left: 2vw;
     display: flex;
     width: 10%;
     height: 2.5vh;
@@ -74,6 +75,8 @@
     height: auto;
     width: 100%;
     font-family: Inria Sans;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
+    border-radius: 1em;
 }
 
 .userIcon{
@@ -85,25 +88,26 @@
 
 .userTextAlignPosts{
     font-size: 12px;
-    margin-left: 0.1em;
+    margin-left: 0.5vw;
 }
 
 .time {
     font-size: 12px;
     color: #5A5454;
     margin-top: 0.3em;
-    margin-left: 0.5em;
+    margin-left: 2vw;
 }
 
 .actions {
     display: flex;
     margin-top: 10px;
-    width: 20%;
-    height: 4.5vh;
+    width: 150px;
+    height: 40px;
     background-color: #F0F0F0;
     justify-content: space-between;
     border-radius: 1em;
     margin-bottom: 5%;
+    margin-left: 2vw;
 }
 
 .voteButton {
@@ -112,7 +116,6 @@
     border: none;
     cursor: pointer;
     width: 33%;
-    height: 4.49vh;
     transition: background-color 0.2s ease;
     text-align: center;
     border-radius: 1vw 0 0 1vw;
@@ -134,7 +137,7 @@
     height: 3.9vh;
     margin-top: 3%;
     text-align: center;
-    font-size: 1vw;
+    font-size: 20px;
 }
 
 .voteButton:hover {
@@ -164,6 +167,7 @@
     cursor: pointer;
     margin-top: 30px;
     margin-right: 32px;
+    margin-left: 2vw;
     width: 90%;
     transition: background-color 0.2s ease;
     border: 1px solid white;
@@ -219,12 +223,13 @@
 }
 
 .replyBox{
-    margin-top: 10%;
+    margin-top: 2.5%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     width: 90%;
     height: 20vh;
+    margin-left: 5%;
 }
 
 .replyInput {
@@ -513,7 +518,7 @@
     font-size: 2vw;
     margin-top: 0.3em;
     margin-bottom: 0.6em;
-    background-color: #F5F5F5;
+    background-color: #ffffff;
     border: 3px #D0E0EB;
     border-radius: 0.5em;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
@@ -540,4 +545,60 @@
     width: 100%;
     height: 100%;
     display: flex;
+}
+
+.mediaContainer{
+    margin-left: 2vw;
+}
+
+.groupName{
+    width: 60%;
+}
+
+.groupHeader{
+    display: flex;
+}
+
+.createForumContainer{
+    width: 50%;
+    height: 50vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    position: absolute;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    left:25%;
+    bottom: 25%;
+    border: 2px solid black;
+    border-radius: 1em;
+}
+
+.forumCreationInfomation{
+    margin-left: 10%;
+    background-color: #F0F0F0;
+    border-radius: 1em;
+    width: 80%;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.forumDescCreationInfomation{
+    margin-top: 3vh;
+    margin-left: 10%;
+    background-color: #F0F0F0;
+    border-radius: 1em;
+    width: 80%;
+    height: 30vh;
+    margin-bottom: 5vh;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.createForumButton{
+    width: 25%;
+    margin-left: 35%;
+    margin-top: 1vh;
+    border-radius: 1em;
+    background-color: #F0F0F0;
+    color: #5A5454;
 }

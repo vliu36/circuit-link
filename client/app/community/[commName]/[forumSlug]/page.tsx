@@ -21,6 +21,7 @@ import thumbsUp from "../../../../public/thumbs-up-regular-full.svg"
 import commentIcon from "../../../../public/comment-regular-full.svg"
 import checkedthumbsDown from "../../../../public/thumbs-down-glow-full.svg"
 import checkedthumbsUp from "../../../../public/thumbs-up-glow-full.svg"
+import { fetchTopCommunities, fetchTopUsers, getCommunities } from "@/app/landing.ts";
 
 export default function ForumPage({
     params,
@@ -29,6 +30,7 @@ export default function ForumPage({
 }) {
     const { commName, forumSlug } = use(params);
     const { user } = useAuth();
+    const { userData } = useAuth();
     const [community, setCommunity] = useState<Community | null | undefined>(undefined);
     const [posts, setPosts] = useState<Post[]>([]);
     const [title, setTitle] = useState("");
@@ -55,6 +57,31 @@ export default function ForumPage({
     const [reportPopup, setReportPopup] = useState(false);
     const [reportReason, setReportReason] = useState("");
     const [postId, setPostId] = useState<string>("");
+    const [userCommunities, setUserCommunities] = useState<any[]>([]);
+    const [dataLoading, setDataLoading] = useState(true);
+
+    useEffect(() => {
+        if (loading) return;
+
+        async function loadData() {
+            const comms = await fetchTopCommunities();
+            const users = await fetchTopUsers();
+
+            if (userData?.communities) {
+                try {
+                    const joined = await getCommunities(userData.communities);
+                    setUserCommunities(joined);
+                } catch (err) {
+                    console.error("Error loading user's communities:", err);
+                }
+            }
+
+            setDataLoading(false);
+        }
+
+        loadData();
+    }, [userData, loading]);
+
 
     const handleCreateForumBox = async (groupId: string) => {
         setShowCreateForum({});
@@ -380,10 +407,34 @@ export default function ForumPage({
 
                 <div className={styles.yourCommunitiesBar} style={{ gridArea: "CommunitiesBar" }}>
                     <h1>Your Communities</h1>
-                    <button className={styles.communitiesButtons}>
-                        <img src="plus.svg" className={styles.addIcon}></img>
+
+                    <div>
+                        {userCommunities.length === 0 ? (
+                            <p>No joined communities.</p>
+                        ) : (
+                            userCommunities.map((c: any, i: number) => (
+                                <Link
+                                    key={c.id}
+                                    className={styles.communitiesButtons}
+                                    href={`/community/${c.name}`}
+                                >
+                                    <Image
+                                        src={c.icon ?? "/defaultCommunity.svg"}
+                                        alt={c.name}
+                                        width={30}
+                                        height={30}
+                                        className={styles.addIcon}
+                                    />
+                                    <h1 className={styles.buttonTextforCommunities}>{c.name}</h1>
+                                </Link>
+                            ))
+                        )}
+                    </div>
+
+                    <Link className={styles.communitiesButtons} href={`/community`}>
+                        <Image src="/plus.svg" className={styles.addIcon} alt="Add icon" width={16} height={16} />
                         <h1 className={styles.buttonTextforCommunities}>Add a Community</h1>
-                    </button>
+                    </Link>
                 </div>
 
                 <div className={styles.serverBar} style={{ gridArea: "ServerBar" }}>
@@ -727,7 +778,7 @@ export default function ForumPage({
 
                                                         </button>
 
-                                                        
+
                                                     </div>
 
                                                     <div className={styles.commentsBox}>
@@ -759,32 +810,32 @@ export default function ForumPage({
 
                                                     {/* Edit and delete buttons */}
 
-                                                        <div className={styles.postReportButton}>
-                                                            {/* Edit button */}
-                                                            {isAuthor && (
-                                                                <button
-                                                                    onClick={() => {
-                                                                        setEditingPostId(post.id);
-                                                                        setEditTitle(post.title);
-                                                                        setEditContents(post.contents);
-                                                                    }}
-                                                                >
-                                                                    Edit
-                                                                </button>
-                                                            )}
-                                                        </div>
+                                                    <div className={styles.postReportButton}>
+                                                        {/* Edit button */}
+                                                        {isAuthor && (
+                                                            <button
+                                                                onClick={() => {
+                                                                    setEditingPostId(post.id);
+                                                                    setEditTitle(post.title);
+                                                                    setEditContents(post.contents);
+                                                                }}
+                                                            >
+                                                                Edit
+                                                            </button>
+                                                        )}
+                                                    </div>
 
 
-                                                        <div className={styles.postReportButton}>
-                                                            {/* Delete button */}
-                                                            {(isAuthor || isMod || isOwner) && (
-                                                                <button
-                                                                    onClick={() => handleDeletePost(post.id, commName)}
-                                                                >
-                                                                    Delete
-                                                                </button>
-                                                            )}
-                                                        </div>
+                                                    <div className={styles.postReportButton}>
+                                                        {/* Delete button */}
+                                                        {(isAuthor || isMod || isOwner) && (
+                                                            <button
+                                                                onClick={() => handleDeletePost(post.id, commName)}
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </>
                                         )}
@@ -794,82 +845,83 @@ export default function ForumPage({
                         )}
                     </div>
                 </div>
-            </div>
-            {/* Edit Forum Popup */}
-            {editPopup && (
-                <div className={styles.popupOverlay} onClick={toggleEditPopup}>
-                    <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
-                        <h2 className={styles.popupText}>Edit Forum</h2>
-                        <form onSubmit={async (e) => {
-                            e.preventDefault();
-                            const form = e.target as HTMLFormElement;
-                            const nameInput = form.elements.namedItem("name") as HTMLInputElement;
-                            const descInput = form.elements.namedItem("description") as HTMLInputElement;
-                            await handleEdit(nameInput.value, descInput.value);
-                        }}>
-                            <label className={styles.popupText}>
-                                Forum Name:
-                                <input
-                                    type="text"
-                                    name="name"
-                                    placeholder="Forum Name"
-                                    defaultValue={forum?.name}
-                                    className={styles.input}
-                                />
-                            </label>
-                            <label className={styles.popupText}>
-                                Forum Description:
-                                <textarea
-                                    name="description"
-                                    placeholder="Forum Description"
-                                    defaultValue={forum?.description}
-                                    className={styles.textarea}
-                                />
-                            </label>
-                            <button type="submit" className={`${styles.popupText} ${styles.saveBtn}`}>
-                                Save Changes
+                {/* Edit Forum Popup */}
+                {editPopup && (
+                    <div className={styles.popupOverlay} onClick={toggleEditPopup}>
+                        <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                            <h2 className={styles.popupText}>Edit Forum</h2>
+                            <form onSubmit={async (e) => {
+                                e.preventDefault();
+                                const form = e.target as HTMLFormElement;
+                                const nameInput = form.elements.namedItem("name") as HTMLInputElement;
+                                const descInput = form.elements.namedItem("description") as HTMLInputElement;
+                                await handleEdit(nameInput.value, descInput.value);
+                            }}>
+                                <label className={styles.popupText}>
+                                    Forum Name:
+                                    <input
+                                        type="text"
+                                        name="name"
+                                        placeholder="Forum Name"
+                                        defaultValue={forum?.name}
+                                        className={styles.input}
+                                    />
+                                </label>
+                                <label className={styles.popupText}>
+                                    Forum Description:
+                                    <textarea
+                                        name="description"
+                                        placeholder="Forum Description"
+                                        defaultValue={forum?.description}
+                                        className={styles.textarea}
+                                    />
+                                </label>
+                                <button type="submit" className={`${styles.popupText} ${styles.saveBtn}`}>
+                                    Save Changes
+                                </button>
+                            </form>
+                            <button className={`${styles.closeBtn} ${styles.popupText}`} onClick={toggleEditPopup}>
+                                Close
                             </button>
-                        </form>
-                        <button className={`${styles.closeBtn} ${styles.popupText}`} onClick={toggleEditPopup}>
-                            Close
-                        </button>
-
-                        {message && <p>{message}</p>}
-                    </div>
-                </div>
-            )}
-            {/* Report Post Popup */}
-            {reportPopup && (
-                <div className={styles.popupOverlay} onClick={toggleReportPopup}>
-                    <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
-                        <h2 className={styles.popupText}>Report Post</h2>
-                        <form onSubmit={async (e) => {
-                            e.preventDefault();
-                            await handleReportPost();
-                        }}>
-                            <label className={styles.popupText}>
-                                Reason for Report:
-                                <textarea
-                                    name="reason"
-                                    placeholder="Describe the reason for reporting this post. (100 character max)"
-                                    value={reportReason}
-                                    onChange={(e) => setReportReason(e.target.value)}
-                                    className={styles.textarea}
-                                    maxLength={100}
-                                />
-                            </label>
 
                             {message && <p>{message}</p>}
-                            <button type="submit" className={`${styles.popupText} ${styles.saveBtn}`}>
-                                Submit Report
-                            </button>
-                        </form>
-                        <button className={`${styles.closeBtn} ${styles.popupText}`} onClick={toggleReportPopup}>
-                            Close
-                        </button>
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
+                {/* Report Post Popup */}
+                {reportPopup && (
+                    <div className={styles.popupOverlay} onClick={toggleReportPopup}>
+                        <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                            <h2 className={styles.popupText}>Report Post</h2>
+                            <form onSubmit={async (e) => {
+                                e.preventDefault();
+                                await handleReportPost();
+                            }}>
+                                <label className={styles.popupText}>
+                                    Reason for Report:
+                                    <textarea
+                                        name="reason"
+                                        placeholder="Describe the reason for reporting this post. (100 character max)"
+                                        value={reportReason}
+                                        onChange={(e) => setReportReason(e.target.value)}
+                                        className={styles.textarea}
+                                        maxLength={100}
+                                    />
+                                </label>
+
+                                {message && <p>{message}</p>}
+                                <button type="submit" className={`${styles.popupText} ${styles.saveBtn}`}>
+                                    Submit Report
+                                </button>
+                            </form>
+                            <button className={`${styles.closeBtn} ${styles.popupText}`} onClick={toggleReportPopup}>
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+
         </main>
     );
 }

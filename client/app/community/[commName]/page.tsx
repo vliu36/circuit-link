@@ -3,7 +3,7 @@
 import React, { use, useState, useEffect } from "react";
 import Styles from "./community.module.css";
 import { useAuth } from "../../_firebase/context.tsx";
-import { logout } from "../../landing.ts";
+import { fetchTopCommunities, fetchTopUsers, logout } from "../../landing.ts";
 import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -11,7 +11,7 @@ import * as commApi from "./community";
 import { Community } from "../../_types/types.ts";
 import { useRouter } from "next/navigation";
 import NavBar from '../../_components/navbar/navbar.tsx';
-
+import { getCommunities } from "../../landing.ts"
 
 export default function CommunityPage({
   params,
@@ -20,10 +20,11 @@ export default function CommunityPage({
 }) {
   const { commName } = use(params);
   const { user } = useAuth();
-
+  const { userData } = useAuth();
   const [community, setCommunity] = useState<Community | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userCommunities, setUserCommunities] = useState<any[]>([]);
 
   const [groupName, setGroupName] = useState("");
   const [groupMessage, setGroupMessage] = useState("");
@@ -48,6 +49,26 @@ export default function CommunityPage({
 
   // setEditGroupDetails
   const [editGroupId, setEditGroupId] = useState<string>("");
+
+  useEffect(() => {
+    if (loading) return;
+
+    async function loadData() {
+
+      if (userData?.communities) {
+        try {
+          const joined = await getCommunities(userData.communities);
+          setUserCommunities(joined);
+        } catch (err) {
+          console.error("Error loading user's communities:", err);
+        }
+      }
+
+      setLoading(false);
+    }
+
+    loadData();
+  }, [userData, loading]);
 
 
 
@@ -378,11 +399,37 @@ export default function CommunityPage({
 
 
         <div className={Styles.yourCommunitiesBar} style={{ gridArea: "CommunitiesBar" }}>
-          <h1>Your Communities</h1>
-          <button className={Styles.communitiesButtons}>
-            <img src="plus.svg" className={Styles.addIcon}></img>
-            <h1 className={Styles.buttonTextforCommunities}>Add a Community</h1>
-          </button>
+          <div className={Styles.yourCommunitiesBar} style={{ gridArea: "communities" }}>
+            <h1>Your Communities</h1>
+
+            <div>
+              {userCommunities.length === 0 ? (
+                <p>No joined communities.</p>
+              ) : (
+                userCommunities.map((c: any, i: number) => (
+                  <Link
+                    key={c.id}
+                    className={Styles.communitiesButtons}
+                    href={`/community/${c.name}`}
+                  >
+                    <Image
+                      src={c.icon ?? "/defaultCommunity.svg"}
+                      alt={c.name}
+                      width={30}
+                      height={30}
+                      className={Styles.addIcon}
+                    />
+                    <h1 className={Styles.buttonTextforCommunities}>{c.name}</h1>
+                  </Link>
+                ))
+              )}
+            </div>
+
+            <Link className={Styles.communitiesButtons} href={`/community`}>
+              <Image src="/plus.svg" className={Styles.addIcon} alt="Add icon" width={16} height={16} />
+              <h1 className={Styles.buttonTextforCommunities}>Add a Community</h1>
+            </Link>
+          </div>
         </div>
 
 
