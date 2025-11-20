@@ -59,6 +59,12 @@ export default function ForumPage({
     const [postId, setPostId] = useState<string>("");
     const [userCommunities, setUserCommunities] = useState<any[]>([]);
     const [dataLoading, setDataLoading] = useState(true);
+    const [confirmDeleteForum, setConfirmDeleteForum] = useState(false);
+    const [deleteForumId, setDeleteForumId] = useState<string>("");
+    const [deleteForumName, setDeleteForumName] = useState<string>("");
+    const [confirmDeleteGroup, setConfirmDeleteGroup] = useState(false);
+    const [deleteGroupId, setDeleteGroupId] = useState<string>("");
+    const [deleteGroupName, setDeleteGroupName] = useState<string>("");
 
     useEffect(() => {
         if (loading) return;
@@ -86,6 +92,7 @@ export default function ForumPage({
     const handleCreateForumBox = async (groupId: string) => {
         setShowCreateForum({});
     };
+    
 
     // --- CREATE FORUM ---
     const handleCreateForum = async (groupId: string) => {
@@ -127,18 +134,41 @@ export default function ForumPage({
     const handleDeleteGroup = async (groupId: string) => {
         if (!user) return;
         try {
+            // Check if user is currently viewing a forum within the group being deleted
+            let reroute = false;
+            if (forum && forum.parentGroup === groupId) {
+                reroute = true;
+            }
+
             const result = await commApi.deleteGroup(groupId, commName);
             console.log("Group deleted successfully:", result);
-            await refreshCommunity();
+            // Reroute user to community main page after deleting the group, or refresh community structure
+            if (reroute) {
+                router.push(`/community/${commName}`);
+            } else {
+                await refreshCommunity();
+            }
         } catch (err) {
             console.error("Error deleting group:", err);
         }
     };
 
+    // ------ Toggles for popups ------
     const toggleEditGroupPopup = () => {
         setEditGroupOpen(!editGroupOpen);
         setError(null);
     };
+
+    const toggleConfirmDeleteForum = () => {
+        setConfirmDeleteForum(!confirmDeleteForum);
+        setMessage(null);
+    };
+
+    const toggleConfirmDeleteGroup = () => {
+        setConfirmDeleteGroup(!confirmDeleteGroup);
+        setMessage(null);
+    };
+
 
     // Refresh the current community structure and update state
     const refreshCommunity = async () => {
@@ -159,9 +189,20 @@ export default function ForumPage({
     const handleDeleteForum = async (forumId: string) => {
         if (!user) return;
         try {
+            // Check if user is currently viewing the forum being deleted
+            let reroute = false;
+            if (forum?.name === deleteForumName) {
+                reroute = true;
+            }
             const result = await commApi.deleteForum(forumId, commName);
             console.log("Forum deleted successfully:", result);
-            await refreshCommunity();
+
+            // Reroute user to community main page after deleting the forum, or refresh community structure
+            if (reroute) {
+                router.push(`/community/${commName}`);
+            } else {
+                await refreshCommunity();
+            }
         } catch (err) {
             console.error("Error deleting forum:", err);
         }
@@ -353,8 +394,6 @@ export default function ForumPage({
             console.log(res.message);
             setMessage(res.message || null);
             if (res.status === "ok" && name && name !== oldName) {
-                // setTimeout(() => {}, 3000); // Wait for 3 seconds to let user read the message
-                // setEditPopup(false);
                 router.push(`/community/${commName}/${res.newSlug}`);
             } else if (res.status === "ok") {
                 fetchPosts();
@@ -518,7 +557,7 @@ export default function ForumPage({
                                         {
                                             (isOwner || isMod) &&
                                             <>
-                                                <button className={styles.deleteGroup} onClick={() => handleDeleteGroup(group.id)}>
+                                                <button className={styles.deleteGroup} onClick={() => { setDeleteGroupId(group.id); setDeleteGroupName(group.name); toggleConfirmDeleteGroup(); }}>
                                                     Delete
                                                 </button>
                                                 <button className={styles.editGroup} onClick={() => { toggleEditGroupPopup(); setEditGroupId(group.id); }}>
@@ -548,7 +587,7 @@ export default function ForumPage({
                                                     {/* -------- Delete Forum Button -------- */}
                                                     {/* Only shows if user is owner or mod */}
                                                     {(isOwner || isMod) &&
-                                                        <button className={styles.deleteChannel} onClick={() => handleDeleteForum(forum.id)}>
+                                                        <button className={styles.deleteChannel} onClick={() => { setDeleteForumName(forum.name); setDeleteForumId(forum.id); toggleConfirmDeleteForum(); }}>
                                                             Delete Forum
                                                         </button>
                                                     }
@@ -666,7 +705,9 @@ export default function ForumPage({
                                         {/* Post author */}
                                         <div className={styles.postHeading}>
                                             <div className={styles.user}>
-                                                <div className={styles.userProfile}></div>
+                                                <div className={styles.userProfile}>
+                                                    <Image src={post.authorPFP} alt={`${post.authorUsername}'s profile picture`} width={20} height={20} className={styles.userProfile} />
+                                                </div>
                                                 <Link href={`/profile/${post.authorId}`}>
                                                     {post.authorUsername}
                                                 </Link>
@@ -922,7 +963,26 @@ export default function ForumPage({
                     </div>
                 )}
             </div>
-
+        {confirmDeleteForum && (
+            <div className={styles.popupOverlay} onClick={toggleConfirmDeleteForum}>
+                <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                    <h2 className={styles.popupText}>Confirm Delete Forum</h2>
+                    <p className={styles.popupText}>Are you sure you want to delete forum "{deleteForumName}"? <br /> This action cannot be undone.</p>
+                    <button onClick={toggleConfirmDeleteForum} className={styles.cancelButton}>Cancel</button>
+                    <button onClick={() => { handleDeleteForum(deleteForumId); toggleConfirmDeleteForum(); }} className={styles.deleteButton}>Delete</button>
+                </div>
+            </div>
+        )}
+        {confirmDeleteGroup && (
+        <div className={styles.popupOverlay} onClick={toggleConfirmDeleteGroup}>
+            <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                <h2 className={styles.popupText}>Confirm Delete Group</h2>
+                <p className={styles.popupText}>Are you sure you want to delete group "{deleteGroupName}"? <br /> This will delete all of its forums and cannot be undone.</p>
+                <button onClick={toggleConfirmDeleteGroup} className={styles.cancelButton}>Cancel</button>
+                <button onClick={() => { handleDeleteGroup(deleteGroupId); toggleConfirmDeleteGroup(); }} className={styles.deleteButton}>Delete</button>
+            </div>
+        </div>
+        )}
         </main>
     );
 }

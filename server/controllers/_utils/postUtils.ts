@@ -6,6 +6,7 @@ import { verifyUserIsOwnerOrMod } from "./generalUtils.ts";
 
 export interface Post {
     author: DocumentReference;
+    authorPFP: string;
     title: string;
     contents: string;
     yayScore: number;
@@ -24,6 +25,7 @@ export interface Reply {
     id: string,
     authorUsername: string,
     authorId: string,
+    authorPFP: string,
     yayList: string[],
     nayList: string[],
     timeReply: Timestamp;
@@ -48,10 +50,12 @@ export const fetchRepliesRecursively = async (replyRefs: DocumentReference[] = [
         // Dereference reply author
         let replyAuthorUsername = "Unknown";
         let replyAuthorId = "Unknown";
+        let replyAuthorPFP = "Unknown";
         if (replyData?.author?.get) {
             const authorSnap = await replyData.author.get();
             replyAuthorUsername = authorSnap.exists ? authorSnap.data()?.username || "Unknown" : "Unknown";
             replyAuthorId = replyData.author.path.split("/").pop() || "Unknown";
+            replyAuthorPFP = authorSnap.exists ? authorSnap.data()?.photoURL || "Unknown" : "Unknown";
         }
 
         // Convert yayList/nayList references to user IDs
@@ -72,6 +76,7 @@ export const fetchRepliesRecursively = async (replyRefs: DocumentReference[] = [
             ...replyData,
             authorUsername: replyAuthorUsername,
             authorId: replyAuthorId,
+            authorPFP: replyAuthorPFP,
             yayList,
             nayList,
             timeReply: replyData?.timeReply?.toMillis(),

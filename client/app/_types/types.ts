@@ -6,6 +6,7 @@ export type Post = {
     media: string | null;
     authorUsername: string;
     authorId: string;
+    authorPFP: string;
     yayScore: number;
     replyCount: number;
     yayList: string[];
@@ -27,6 +28,7 @@ export interface Forum {
     name: string;
     slug: string;
     description: string;
+    parentGroup: string; // Originally DocumentReference, but fetched to string ID here
 }
 
 export interface Group {

@@ -13,6 +13,7 @@ import thumbsUpGlow from '../../../../../public/thumbs-up-glow-full.svg';
 import thumbsDown from '../../../../../public/thumbs-down-regular-full.svg';
 import thumbsDownGlow from '../../../../../public/thumbs-down-glow-full.svg';
 import Image from 'next/image'
+import { useRouter } from "next/navigation";
 import * as commApi from "../../community";
 import { fetchTopCommunities, fetchTopUsers, getCommunities } from "@/app/landing.ts";
 
@@ -36,6 +37,16 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
     const [forumInputs, setForumInputs] = useState<{ [groupId: string]: { name: string; description: string; message: string } }>({});
     const [userCommunities, setUserCommunities] = useState<any[]>([]);
     const [dataLoading, setDataLoading] = useState(true);
+    const [confirmDeleteGroup, setConfirmDeleteGroup] = useState(false);
+    const [deleteGroupId, setDeleteGroupId] = useState("");
+    const [deleteGroupName, setDeleteGroupName] = useState("");
+    const [confirmDeleteForum, setConfirmDeleteForum] = useState(false);
+    const [deleteForumId, setDeleteForumId] = useState("");
+    const [deleteForumName, setDeleteForumName] = useState("");
+    const [message, setMessage] = useState<string | null>(null);
+
+    const router = useRouter();
+
     const MAX_DEPTH = 5;
 
     useEffect(() => {
@@ -63,13 +74,25 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
     const handleDeleteForum = async (forumId: string) => {
         if (!user) return;
         try {
+            // Check if user is currently viewing the forum being deleted
+            let reroute = false;
+            if (forumId === post?.parentForum) {
+                reroute = true;
+            }
             const result = await commApi.deleteForum(forumId, commName);
             console.log("Forum deleted successfully:", result);
-            await refreshCommunity();
+            // Reroute user to community main page after deleting the forum, or refresh community structure
+            if (reroute) {
+                router.push(`/community/${commName}`);
+            } else {
+                await refreshCommunity();
+            }
         } catch (err) {
             console.error("Error deleting forum:", err);
         }
     };
+
+    
 
     // Refresh the current community structure and update state
     const refreshCommunity = async () => {
@@ -166,10 +189,24 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
         }
     };
 
+    // ------ Toggle popups ------
+
     const toggleEditGroupPopup = () => {
         setEditGroupOpen(!editGroupOpen);
         setError(null);
     };
+
+    const toggleConfirmDeleteForum = () => {
+        setConfirmDeleteForum(!confirmDeleteForum);
+        setMessage(null);
+    };
+
+    const toggleConfirmDeleteGroup = () => {
+        setConfirmDeleteGroup(!confirmDeleteGroup);
+        setMessage(null);
+    };
+
+
 
     // Handler for deleting posts/replies
     const handleDelete = async (id: string, isReply: boolean) => {
@@ -191,9 +228,19 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
     const handleDeleteGroup = async (groupId: string) => {
         if (!user) return;
         try {
+            // Check if user is currently viewing a post in the group being deleted
+            let reroute = false;
+            if (groupId === post?.parentGroup) {
+                reroute = true;
+            }
             const result = await commApi.deleteGroup(groupId, commName);
             console.log("Group deleted successfully:", result);
-            await refreshCommunity();
+            // Reroute user to community main page after deleting the group, or refresh community structure
+            if (reroute) {
+                router.push(`/community/${commName}`);
+            } else {
+                await refreshCommunity();
+            }
         } catch (err) {
             console.error("Error deleting group:", err);
         }
@@ -260,7 +307,9 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                         {/* Otherwise, show the post/reply */}
                         {/* Show the author's username and display total yay score */}
                         <div className={styles.meta}>
-                            <div className={styles.userIcon}></div>
+                            <div className={styles.userIcon}>
+                                <Image src={item.authorPFP} alt={"Profile picture"} width={64} height={64} className={styles.userIcon} />
+                            </div>
                             <div className={styles.userTextAlignPosts}>
                                 <Link href={`/profile/${item.authorId}`}>
                                     {item.authorUsername}
@@ -401,7 +450,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
     if (authLoading || !post) return <div>Loading post...</div>;
 
     return (
-
+    <main>
         <div className={styles.background}>
             <div className={styles.yourCommunitiesBar} style={{ gridArea: "CommunitiesBar" }}>
                 <h1>Your Communities</h1>
@@ -516,13 +565,12 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                                     {
                                         (isOwner || isMod) &&
                                         <>
-                                            <button className={styles.deleteGroup} onClick={() => handleDeleteGroup(group.id)}>
+                                            <button className={styles.deleteGroup} onClick={() => { setDeleteGroupId(group.id); setDeleteGroupName(group.name); toggleConfirmDeleteGroup(); }}>
                                                 Delete
                                             </button>
                                             <button className={styles.editGroup} onClick={() => { toggleEditGroupPopup(); setEditGroupId(group.id); }}>
                                                 Edit
                                             </button>
-
                                         </>
                                     }
                                 </div>
@@ -541,7 +589,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                                                 {/* -------- Delete Forum Button -------- */}
                                                 {/* Only shows if user is owner or mod */}
                                                 {(isOwner || isMod) &&
-                                                    <button className={styles.deleteChannel} onClick={() => handleDeleteForum(forum.id)}>
+                                                    <button className={styles.deleteChannel} onClick={() => { setDeleteForumId(forum.id); setDeleteForumName(forum.name); toggleConfirmDeleteForum(); }}>
                                                         Delete Forum
                                                     </button>
                                                 }
@@ -574,7 +622,9 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                     <ul>
                         {community.userList.map((u) => (
                             <li key={u.id} className={styles.UserContainer}>
-                                <div className={styles.addIcon}></div>
+                                <div className={styles.addIcon}>
+                                    <Image src={u.photoURL || "/defaultPFP.svg"} alt={"PFP"} width={64} height={64} className={styles.addIcon} />
+                                </div>
                                 <div className={styles.userTextAlign}>
                                     <Link href={`/profile/${u.id}`}>
                                         {u.username}
@@ -602,6 +652,28 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                 {renderPostOrReply(post)}
 
             </div>
+
+    </div>
+        {confirmDeleteForum && (
+            <div className={styles.popupOverlay} onClick={toggleConfirmDeleteForum}>
+                <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                    <h2 className={styles.popupText}>Confirm Delete Forum</h2>
+                    <p className={styles.popupText}>Are you sure you want to delete forum "{deleteForumName}"? <br /> This action cannot be undone.</p>
+                    <button onClick={toggleConfirmDeleteForum} className={styles.cancelButton}>Cancel</button>
+                    <button onClick={() => { handleDeleteForum(deleteForumId); toggleConfirmDeleteForum(); }} className={styles.deleteButton}>Delete</button>
+                </div>
+            </div>
+        )}
+        {confirmDeleteGroup && (
+        <div className={styles.popupOverlay} onClick={toggleConfirmDeleteGroup}>
+            <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                <h2 className={styles.popupText}>Confirm Delete Group</h2>
+                <p className={styles.popupText}>Are you sure you want to delete group "{deleteGroupName}"? <br /> This will delete all of its forums and cannot be undone.</p>
+                <button onClick={toggleConfirmDeleteGroup} className={styles.cancelButton}>Cancel</button>
+                <button onClick={() => { handleDeleteGroup(deleteGroupId); toggleConfirmDeleteGroup(); }} className={styles.deleteButtonCard}>Delete</button>
+            </div>
         </div>
+        )}
+    </main>
     );
 }

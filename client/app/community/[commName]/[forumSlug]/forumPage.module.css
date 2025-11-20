@@ -217,14 +217,6 @@
     background-color: #ec971f;
 }
 
-.deleteButton {
-    background-color: #d9534f;
-}
-
-.deleteButton:hover {
-    background-color: #c9302c;
-}
-
 .saveButton {
     background-color: #4caf50;
 }
@@ -235,10 +227,32 @@
 
 .cancelButton {
     background-color: #888;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-right: 1rem;
 }
 
 .cancelButton:hover {
     background-color: #666;
+}
+
+.deleteButton {
+    background-color: #d9534f;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-left: 1rem;
+}
+
+.deleteButton:hover {
+    background-color: #c9302c;
 }
 
 .voteButton {
@@ -800,7 +814,7 @@
 }
 
 .popupBox {
-    background-color: #5B6680;
+    background-color: white;
     padding: 2rem;
     border-radius: 1em;
     width: 400px;
@@ -808,6 +822,7 @@
     text-align: center;
     animation: fadeIn 0.2s ease-in-out;
 }
+
 
 @keyframes fadeIn {
     from {
@@ -914,4 +929,12 @@
     width: 100%;
     height: 100%;
     border-radius: 1em;
+}
+
+.userLink {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;   /* optional */
+    color: inherit;          /* optional */
 }

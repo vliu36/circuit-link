@@ -31,7 +31,7 @@ export default function CommunityPage({
   const [forumInputs, setForumInputs] = useState<{ [groupId: string]: { name: string; description: string; message: string } }>({});
   const [targetUserId, setTargetUserId] = useState<string>("");
 
-  // Popup boolean states for edit community, change icon, change banner, kick/ban user, and show blacklist
+  // Popup boolean states for edit community, change icon, change banner, kick/ban user, show blacklist, delete forum
   const [editOpen, setEditOpen] = useState(false);
   const [iconOpen, setIconOpen] = useState(false);
   const [bannerOpen, setBannerOpen] = useState(false);
@@ -39,12 +39,20 @@ export default function CommunityPage({
   const [showCreateForum, setShowCreateForum] = useState<{ [key: string]: boolean }>({});
   const [modOptionsOpen, setModOptionsOpen] = useState(false);
   const [blacklistOpen, setBlacklistOpen] = useState(false);
+  const [confirmDeleteForum, setConfirmDeleteForum] = useState(false);
+  const [confirmDeleteGroup, setConfirmDeleteGroup] = useState(false);
 
   // Files and previews for changing icon and banner
   const [iconFile, setIconFile] = useState<File | null>(null);
   const [iconPreview, setIconPreview] = useState<string | null>(null);
   const [bannerFile, setBannerFile] = useState<File | null>(null);
   const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+
+  // For deleting
+  const [deleteForumId, setDeleteForumId] = useState<string>("");
+  const [deleteForumName, setDeleteForumName] = useState<string>("");
+  const [deleteGroupId, setDeleteGroupId] = useState<string>("");
+  const [deleteGroupName, setDeleteGroupName] = useState<string>("");
 
 
   // setEditGroupDetails
@@ -101,6 +109,16 @@ export default function CommunityPage({
     setError(null);
   };
 
+  const toggleConfirmDeleteForum = () => {
+    setConfirmDeleteForum(!confirmDeleteForum);
+    setError(null);
+  };
+
+  const toggleConfirmDeleteGroup = () => {
+    setConfirmDeleteGroup(!confirmDeleteGroup);
+    setError(null);
+  };
+
   const router = useRouter();
 
   useEffect(() => {
@@ -153,7 +171,7 @@ export default function CommunityPage({
     }
 
     try {
-      const forumId = await commApi.createForum({
+      const newSlug = await commApi.createForum({
         name,
         description,
         groupId,
@@ -161,9 +179,10 @@ export default function CommunityPage({
       });
       setForumInputs((prev) => ({ ...prev, [groupId]: { name: "", description: "", message: "" } }));
 
-      // Refresh community structure
-      // commApi.fetchStructure(commName).then((data) => data && setCommunity(data));
-      refreshCommunity();
+      // Redirect to the new forum page
+      router.push(`/community/${commName}/${newSlug}`);
+      // // Refresh community structure
+      // refreshCommunity();
     } catch (err) {
       const message =
         err instanceof Error ? err.message : "Failed to create forum.";
@@ -518,7 +537,7 @@ export default function CommunityPage({
                     {
                       (isOwner || isMod) &&
                       <>
-                        <button className={Styles.deleteGroup} onClick={() => handleDeleteGroup(group.id)}>
+                        <button className={Styles.deleteGroup} onClick={() => { setDeleteGroupId(group.id); setDeleteGroupName(group.name); toggleConfirmDeleteGroup(); }}>
                           Delete
                         </button>
                         <button className={Styles.editGroup} onClick={() => { toggleEditGroupPopup(); setEditGroupId(group.id); }}>
@@ -543,7 +562,7 @@ export default function CommunityPage({
                           {/* -------- Delete Forum Button -------- */}
                           {/* Only shows if user is owner or mod */}
                           {(isOwner || isMod) &&
-                            <button className={Styles.deleteChannel} onClick={() => handleDeleteForum(forum.id)}>
+                            <button className={Styles.deleteChannel} onClick={() => { setDeleteForumId(forum.id); setDeleteForumName(forum.name); toggleConfirmDeleteForum(); }}>
                               Delete Forum
                             </button>
                           }
@@ -594,8 +613,10 @@ export default function CommunityPage({
                 {/* Display each owner */}
                 {community.ownerList.map((owner) =>
                   <li key={owner.id}>
-                    <Link href={`/profile/${owner.id}`}>
-                      &gt;{owner.username || owner.id}
+                    <Link href={`/profile/${owner.id}`} className={Styles.userLink}>
+                      
+                      <Image src={owner.photoURL} alt="User Avatar" width={64} height={64} style={{ borderRadius: "50%", marginRight: "0.5rem" }} />
+                      {owner.username || owner.id}
                     </Link>
 
                     {/* If current user is an owner, display demote owner button and mod options */}
@@ -618,8 +639,9 @@ export default function CommunityPage({
                 {/* Display each moderator */}
                 {community.modList.map((mod) =>
                   <li key={mod.id}>
-                    <Link href={`/profile/${mod.id}`}>
-                      &gt;{mod.username || mod.id}
+                    <Link href={`/profile/${mod.id}`} className={Styles.userLink}>
+                      <Image src={mod.photoURL} alt="User Avatar" width={64} height={64} style={{ borderRadius: "50%", marginRight: "0.5rem" }} />
+                      <span>{mod.username || mod.id}</span>
                     </Link>
 
                     {/* If current user is an owner and the listed mod is not an owner, display buttons to promote or demote a mod and mod options */}
@@ -645,8 +667,9 @@ export default function CommunityPage({
                 {/* Display each user */}
                 {community.userList.map((u) =>
                   <li key={u.id}>
-                    <Link href={`/profile/${u.id}`}>
-                      &gt;{u.username || u.id}
+                    <Link href={`/profile/${u.id}`} className={Styles.userLink}>
+                      <Image src={u.photoURL} alt="User Avatar" width={64} height={64} style={{ borderRadius: "50%", marginRight: "0.5rem" }} />
+                      {u.username || u.id}
                     </Link>
 
                     {/* If current user is an owner and the listed user is not a mod or owner; display buttons to promote user to a mod or owner */}
@@ -881,6 +904,7 @@ export default function CommunityPage({
                   type="text"
                   name="newName"
                   className={`${Styles.popupText} ${Styles.inputField}`}
+                  style={{ border: "2px solid darkgrey" }}
                   maxLength={24}
                   pattern="^[a-zA-Z0-9_-]+$"
                   title="24 characters max. Name can only contain letters, numbers, underscores, and hyphens."
@@ -998,6 +1022,26 @@ export default function CommunityPage({
           </div>
         </div>
       )}
+      {confirmDeleteForum && (
+        <div className={Styles.popupOverlay} onClick={toggleConfirmDeleteForum}>
+          <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
+            <h2 className={Styles.popupText}>Confirm Delete Forum</h2>
+            <p className={Styles.popupText}>Are you sure you want to delete forum "{deleteForumName}"? <br /> This action cannot be undone.</p>
+            <button onClick={toggleConfirmDeleteForum} className={Styles.cancelButton}>Cancel</button>
+            <button onClick={() => { handleDeleteForum(deleteForumId); toggleConfirmDeleteForum(); }} className={Styles.deleteButton}>Delete</button>
+          </div>
+        </div>
+        )}
+      {confirmDeleteGroup && (
+        <div className={Styles.popupOverlay} onClick={toggleConfirmDeleteGroup}>
+          <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
+            <h2 className={Styles.popupText}>Confirm Delete Group</h2>
+            <p className={Styles.popupText}>Are you sure you want to delete group "{deleteGroupName}"? <br /> This will delete all of its forums and cannot be undone.</p>
+            <button onClick={toggleConfirmDeleteGroup} className={Styles.cancelButton}>Cancel</button>
+            <button onClick={() => { handleDeleteGroup(deleteGroupId); toggleConfirmDeleteGroup(); }} className={Styles.deleteButton}>Delete</button>
+          </div>
+        </div>
+        )}
     </main>
   );
 }

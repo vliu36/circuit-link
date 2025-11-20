@@ -32,6 +32,37 @@
     border-radius: 1em;
 }
 
+.cancelButton {
+    background-color: #888;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-right: 1rem;
+}
+
+.cancelButton:hover {
+    background-color: #666;
+}
+
+.deleteButton {
+    background-color: #d9534f;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-left: 1rem;
+}
+
+.deleteButton:hover {
+    background-color: #c9302c;
+}
+
+
 .homeLogo{
     height: 50px;
     width: 200px;
@@ -538,7 +569,7 @@ I dont think we need this
 }
 
 .popupBox {
-    background-color: #5B6680;
+    background-color: white;
     padding: 2rem;
     border-radius: 1em;
     width: 400px;
@@ -559,7 +590,7 @@ I dont think we need this
 }
 
 .popupText {
-    color: white;
+    color: #5A5454;
     margin-bottom: 1.5rem;
     font-family: Inria Sans;
 }
@@ -620,4 +651,12 @@ I dont think we need this
 
 .createForumText{
     text-align: center;
+}
+
+.userLink {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;   /* optional */
+  color: inherit;          /* optional */
 }

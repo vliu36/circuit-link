@@ -63,11 +63,13 @@ export async function getFormattedPosts(
             // Author dereferencing 
             let authorUsername = "Unknown";
             let authorId = "Unknown";
+            let authorPFP = "Unknown";
             if (data?.author?.get) {
                 const authorSnap = await data.author.get();
                 if (authorSnap.exists) {
                     authorUsername = authorSnap.data()?.username || "Unknown";
                     authorId = authorSnap.id;
+                    authorPFP = authorSnap.data()?.photoURL || "Unknown";
                 }
             }
 
@@ -84,6 +86,7 @@ export async function getFormattedPosts(
                 ...data,
                 authorUsername,
                 authorId,
+                authorPFP,
                 yayList,
                 nayList,
                 timePosted: data?.timePosted?.toMillis() || null,
