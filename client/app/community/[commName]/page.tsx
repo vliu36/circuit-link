@@ -243,12 +243,12 @@ export default function CommunityPage({
       const res = await commApi.editCommunity(commName, newName, description, isPublic, rules);
       console.log(res.message);
       setError(res.message || null);
-      await refreshCommunity();
-      if (res.status === "ok" && newName && newName !== commName) {
+      if (res.status === "ok" && newName && newName.toLowerCase() !== commName.toLowerCase()) {
         router.push(`/community/${newName}`);
       } else if (res.status === "ok") {
         // Close the edit popup only if the name hasn't changed
         toggleEditPopup();
+        await refreshCommunity();
       }
     } catch (err) {
       setError("Failed to edit community. Please try again.");

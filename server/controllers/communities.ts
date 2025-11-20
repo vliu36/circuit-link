@@ -849,20 +849,26 @@ const editComm = async (req: Request, res: Response) => {
         if (rules !== undefined) updates.rules = rules;
 
         // Verify newName uniqueness if it is being changed
-        if (newName && newName !== name) {
+        if (newName) {
             const newNameLower = newName.toLowerCase();
-            const nameCheckSnap = await commsRef.where("nameLower", "==", newNameLower).get();
-            if (!nameCheckSnap.empty) {
-                console.log(`Community name "${newName}" is already taken.`);
-                return res.status(409).send({
-                    status: "Conflict",
-                    message: `Community name "${newName}" is already taken.`,
-                });
-            }
+            const oldNameLower = name.toLowerCase();
 
+            // If the new name (case insensitive) is different, check for uniqueness
+            if (newNameLower !== oldNameLower) {
+                const nameCheckSnap = await commsRef.where("nameLower", "==", newNameLower).get();
+
+                if (!nameCheckSnap.empty) {
+                    console.log(`Community name "${newName}" is already taken.`);
+                    return res.status(409).send({
+                        status: "Conflict",
+                        message: `Community name "${newName}" is already taken.`,
+                    });
+                }
+                // Set lowercase name update
+                updates.nameLower = newNameLower;
+            }
             // Set name updates
             updates.name = newName;
-            updates.nameLower = newNameLower;
         }
         
         // Update community document
