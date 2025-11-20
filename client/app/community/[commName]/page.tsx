@@ -459,6 +459,7 @@ export default function CommunityPage({
 
         <div className={Styles.serverBar} style={{ gridArea: "ServerBar" }}>
           <div>{commName}</div>
+          
           <div className={Styles.horizontalLine}></div>
           <div className={Styles.serverContainer}>
             {/* --- GROUPS AND FORUMS --- */}

@@ -766,13 +766,13 @@ export default function ForumPage({
                                                 </Link>
                                                 {/* Display media if available */}
                                                 {post.media && (
-                                                    <div className={styles.mediaPreview}>
+                                                    <div className={styles.mediaInPost}>
                                                         {post.media.endsWith(".mp4") ? (
                                                             <video controls>
                                                                 <source src={post.media} type="video/mp4" />
                                                             </video>
                                                         ) : (
-                                                            <Image src={post.media} alt="Post Media" width={200} height={100} />
+                                                            <Image src={post.media} alt="Post Media" width={800} height={400} />
                                                         )}
                                                     </div>
                                                 )}
@@ -858,10 +858,11 @@ export default function ForumPage({
 
                                                     {/* Edit and delete buttons */}
 
-                                                    <div className={styles.postReportButton}>
+                                                    <div >
                                                         {/* Edit button */}
                                                         {isAuthor && (
                                                             <button
+                                                                className={styles.editButton}
                                                                 onClick={() => {
                                                                     setEditingPostId(post.id);
                                                                     setEditTitle(post.title);
@@ -874,10 +875,11 @@ export default function ForumPage({
                                                     </div>
 
 
-                                                    <div className={styles.postReportButton}>
+                                                    <div >
                                                         {/* Delete button */}
                                                         {(isAuthor || isMod || isOwner) && (
                                                             <button
+                                                                className={styles.deleteButton}
                                                                 onClick={() => handleDeletePost(post.id, commName)}
                                                             >
                                                                 Delete
