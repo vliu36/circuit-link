@@ -150,3 +150,21 @@ export async function reportPost(
         return { status: "error", message: "Failed to report post." };
     } // end try catch
 } // end function reportPost
+
+export async function searchPosts(commName: string, slug: string, query: string) {
+    const res = await fetch(
+        `${BASE_URL}/forums/search/${commName}/${slug}/${encodeURIComponent(query)}`,
+        {
+            method: "GET",
+            headers: { "Content-Type": "application/json" }
+        }
+    );
+
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Search error: ${text}`);
+    }
+
+    const data = await res.json();
+    return data.posts; 
+}

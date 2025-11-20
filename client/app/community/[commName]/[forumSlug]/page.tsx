@@ -644,6 +644,12 @@ export default function ForumPage({
                                 </div>
                             </div>
                         </div>
+
+                        <textarea className={styles.postSearchBar}>
+                            
+                        </textarea>
+                        <button className={styles.enterSearch}>Search</button>
+                        
                     </div>
 
 
