@@ -88,6 +88,7 @@ const addDoc = async (req: Request, res: Response) => {
             status: "OK",
             message: `Successfully created Forum ${forumRef.id}`,
             docId: forumRef.id,
+            newSlug: slug,
         });
     } catch (err) {
         console.error("Error creating forum:", err);
@@ -129,6 +130,11 @@ const getForumBySlug = async (req: Request, res: Response) => {
         // Retrieve and format posts 
         const postRefs: DocumentReference[] = forumData.postsInForum || [];
         const sortedPosts = await forumUtils.getFormattedPosts(postRefs, sortMode || "newest");
+
+        // Return parentGroup as id string
+        const parentGroupId = forumData.parentGroup ? (forumData.parentGroup as DocumentReference).id : null;
+        forumData.parentGroup = parentGroupId;
+
 
         // Return combined data 
         res.status(200).json({

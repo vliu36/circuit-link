@@ -119,7 +119,7 @@ export async function createForum({ name, description, groupId, commName, }: Cre
             throw new Error(data.message || "Failed to create forum");
         }
 
-        return data.docId; // return the newly created forum's ID
+        return data.newSlug; // return the newly created forum's ID
     } catch (err) {
         console.error("Error creating forum:", err);
         throw err;

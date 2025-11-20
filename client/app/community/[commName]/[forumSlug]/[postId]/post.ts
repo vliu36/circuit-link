@@ -8,6 +8,7 @@ export type Reply = {
     contents: string;
     authorUsername: string;
     authorId: string;
+    authorPFP: string;
     yayScore: number;
     yayList: string[];
     nayList: string[];
@@ -16,6 +17,7 @@ export type Reply = {
     edited: boolean;
 };
 
+// Post type exclusive to this hook
 export type Post = {
     id: string;
     title: string;
@@ -28,7 +30,10 @@ export type Post = {
     listOfReplies: Reply[];
     timePosted: string;
     edited: boolean;
+    authorPFP: string;
     media: string | null;
+    parentForum: string | null;
+    parentGroup: string | null;
 };
 
 export const useReplies = (postId: string, userId?: string) => {
