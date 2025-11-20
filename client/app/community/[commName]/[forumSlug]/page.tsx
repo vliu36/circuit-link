@@ -59,7 +59,7 @@ export default function ForumPage({
     const [postId, setPostId] = useState<string>("");
     const [userCommunities, setUserCommunities] = useState<any[]>([]);
     const [dataLoading, setDataLoading] = useState(true);
-
+    
     useEffect(() => {
         if (loading) return;
 
@@ -605,6 +605,12 @@ export default function ForumPage({
                                 </div>
                             </div>
                         </div>
+
+                        <textarea className={styles.postSearchBar}>
+                            
+                        </textarea>
+                        <button className={styles.enterSearch}>Search</button>
+                        
                     </div>
 
 
