@@ -89,26 +89,24 @@ export default function NavBar() {
                 </Link>
             </div>
                 
-            <div className = {Styles.logInInfo} style={{gridArea: 'login'}}>
-                    <Link className = {Styles.logInSignUpButton} href="./signin" replace> Log In </Link>
-                    <h1 className = {Styles.orText}> or </h1>
-                    <Link className = {Styles.logInSignUpButton} href="./register" replace> Sign Up </Link>
-            </div>
+                <Link className = {Styles.logInSignUpButton} href="./signin" replace style={{gridArea: 'register'}}> Log In </Link>
+                <div className = {Styles.orText} style={{gridArea: 'orTh'}}> or </div>
+                <Link className = {Styles.logInSignUpButton} href="./register" replace style={{gridArea: 'signUp'}}> Sign Up </Link>
             <div className={Styles.line} style={{gridArea: 'line'}}></div>
         </div>
         )
         :(
-            <div className = {Styles.navBox}>
+            <div className = {Styles.navBox2}>
                 {/*user signed in*/}
                 <div className = {Styles.homeLogo} style={{gridArea: 'Home'}}>
                     <Link href="/" replace>
                         <Image src={HomeLogo} alt="Logo" width={200} height={200}></Image>
                     </Link>
                 </div>
-                <div className = {Styles.logInInfo} style={{gridArea: 'login'}}>
-                    <div className = {Styles.notifDropdown} ref = {notifRef}>
+                
+                    <div className = {Styles.notifDropdown} ref = {notifRef} style={{gridArea: 'notification'}}>
                         <button onClick={() => setIsNotifOpen(prev => !prev)}>
-                             <Image src = "./notification.svg" alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
+                             <Image src = {notificationBell} alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
                         </button>
                           {isNotifOpen && (
                             <div className = {Styles.notifDropdownMenu}>
@@ -116,7 +114,7 @@ export default function NavBar() {
                             </div>
                             )}
                     </div>
-                    <div className = {Styles.dropdown} ref = {dropdownRef}>
+                    <div className = {Styles.dropdown} ref = {dropdownRef} style={{gridArea: 'settings'}}>
                         <button onClick={() => setIsDropdownOpen(prev => !prev)}>
                             <Image src = {user?.photoURL || "/circleUser.svg"} className = {Styles.settingsIcon} alt="User profile" width = {10} height = {10}></Image>
                         </button>
@@ -128,7 +126,6 @@ export default function NavBar() {
                             </div>
                             )}
                     </div>
-                </div>
                 <div className={Styles.line} style={{gridArea: 'line'}}>
                 </div>
                 <div className={Styles.line} style={{gridArea: 'line'}}></div>

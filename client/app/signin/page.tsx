@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import googleIcon from '../../public/googleIcon.png';
 import NavBar from "../_components/navbar/navbar.tsx";
+import { block } from "sharp";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -97,11 +98,11 @@ export default function Login() {
             <br/>
             <div className={Styles.googleButton}>
                 <Image
-                        src={googleIcon}
-                        width={40}
-                        height={40}
-                        alt="Sign up with Google"
-                        style={{marginLeft: '10px'}}
+                    src="https://www.svgrepo.com/show/475656/google-color.svg"
+                    width={20}
+                    height={20}
+                    alt="Sign up with Google"
+                    style={{marginRight: '12px'}}
                 ></Image>
                 <button className = {Styles.signUpWithGoogleText} onClick={loginWithGoogle}>Sign in with Google</button>
             </div>

@@ -86,6 +86,8 @@
     color: #5A5454;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    margin-top:80vh;
 }
 
 .primaryButton:hover {
@@ -469,7 +471,7 @@
 
 
 .horizontalLine{
-    background-color: #AAAAAA;
+    background-color: #000000;
     width: 95%;
     height: 1px;
     margin-left: 8px;
@@ -622,15 +624,14 @@
 }
 
 .createBox{
-    width: 100%;
-    min-height: 55vh;
-    background-color: white;
+    width: 15vw;
     color: #5A5454;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
     border-radius: 1em;
-    margin-bottom: 1vw;
-    display: flex;
     flex-direction: column;
+    position:sticky;
+    left: 70%;
+
+    z-index: 99999;
 }
 
 .centerPage{
@@ -687,23 +688,15 @@
 }
 
 .groupHeader{
-    width: 100%;
-    height: 4vh;
-    margin-left: 0.5%;
     display: flex;
-    font-size: 0.9em;
 }
 
 .groupName{
     width: 40%;
-    height: 100%;
+    height: 50%;
     overflow: hidden;
 }
 
-.deleteGroup{
-    width: 30%;
-    height: 100%;
-}
 
 .channelHeader{
     width: 95%;
@@ -886,6 +879,11 @@
     border-radius: 0.5em;
 }
 
+.mediaInPost{
+    width: 200%;
+    overflow:hidden;
+}
+
 @font-face {
   font-family: Jura;
   src: url('../../../../public/fonts/Jura-Light.ttf');
@@ -903,6 +901,7 @@
     margin-bottom: 1vw;
     border-radius: 1em;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
+    
 }
 
 .sortText{
@@ -931,6 +930,58 @@
     border-radius: 1em;
 }
 
+.editButton {
+    background-color: #f0ad4e;
+    font-size: 14px;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 5%;
+    margin-right: 5%;
+    transition: background-color 0.2s ease;
+    font-family: Inria Sans;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+.deleteButton {
+    background-color: #d9534f;
+    font-size: 14px;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 100%;
+    height: 100%;
+    margin-right: 5%;
+    cursor: pointer;
+    font-family: Inria Sans;
+}
+
+.postSearchBar{
+    background-color: rgba(90, 84, 84, 1);
+    width: 60%;
+    height: 4vh;
+    border-radius: 1em;
+    position: relative;
+    bottom: 10%;
+    left:20%;
+    color: white;
+}
+
+.enterSearch{
+    width: 10%;
+    height: 4vh;
+    border-radius: 1em;
+    background-color: rgba(240, 240, 240, 1);
+    text-align: center;
+    position: relative;
+    left:75%;
+    bottom: 19.5%;
+}
+
 .userLink {
     display: flex;
     align-items: center;
@@ -938,3 +989,33 @@
     text-decoration: none;   /* optional */
     color: inherit;          /* optional */
 }
+
+.deleteGroup{
+    margin-right: 3%;
+    margin-left: 3%;
+}
+
+.deleteGroup:hover{
+    color: red;
+}
+
+.editGroup:hover{
+    color: orange;
+}
+
+.plusButton:hover{
+    color:#00ccff;
+}
+
+.commName{
+    width:80%;
+    height:100%;
+    overflow: hidden;
+    font-size: 20px;
+}
+
+.createGroupBtn{
+    width: 20%;
+    margin-left: 40%;
+}
+

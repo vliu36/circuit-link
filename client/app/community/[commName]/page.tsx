@@ -58,6 +58,14 @@ export default function CommunityPage({
   // setEditGroupDetails
   const [editGroupId, setEditGroupId] = useState<string>("");
 
+
+  const [createGroupOpen, setCreateGroupOpen] = useState(false);
+
+  const toggleCreateGroupPopup = () => {
+    setCreateGroupOpen(!createGroupOpen);
+    setError(null);
+  };
+
   useEffect(() => {
     if (loading) return;
 
@@ -458,7 +466,53 @@ export default function CommunityPage({
 
 
         <div className={Styles.serverBar} style={{ gridArea: "ServerBar" }}>
-          <div>{commName}</div>
+          <div style={{ display: "flex"}}>
+            <h1 className={Styles.commName}>{commName}</h1>
+            <div className={Styles.createGroupBtn}>
+              <button
+                
+                onClick={toggleCreateGroupPopup}
+              >
+                +
+              </button>
+              {createGroupOpen && (
+                <div className={Styles.popupOverlay} onClick={toggleCreateGroupPopup}>
+                  <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                    <h2 className={Styles.popupText}>Create Group</h2>
+
+                    <input
+                      type="text"
+                      className={`${Styles.popupText} ${Styles.inputField}`}
+                      placeholder="Group Name"
+                      value={groupName}
+                      onChange={(e) => setGroupName(e.target.value)}
+                    />
+
+                    {groupMessage && (
+                      <p className={Styles.popupText}>{groupMessage}</p>
+                    )}
+
+                    <button
+                      className={`${Styles.saveBtn} ${Styles.popupText}`}
+                      onClick={async () => {
+                        await handleCreateGroup();
+                        if (!error) toggleCreateGroupPopup();
+                      }}
+                    >
+                      Create
+                    </button>
+
+                    <button
+                      className={`${Styles.closeBtn} ${Styles.popupText}`}
+                      onClick={toggleCreateGroupPopup}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
           <div className={Styles.horizontalLine}></div>
           <div className={Styles.serverContainer}>
             {/* --- GROUPS AND FORUMS --- */}
@@ -471,68 +525,68 @@ export default function CommunityPage({
                   <div className={Styles.groupHeader}>
                     <div className={Styles.groupName}>{group.name}</div>
                     <button
-                          className={Styles.plusButton}
-                          onClick={() =>
-                            setShowCreateForum(() => ({
-                              // close ALL popups, only toggle the one clicked
-                              [group.id]: !showCreateForum[group.id]
+                      className={Styles.plusButton}
+                      onClick={() =>
+                        setShowCreateForum(() => ({
+                          // close ALL popups, only toggle the one clicked
+                          [group.id]: !showCreateForum[group.id]
+                        }))
+                      }
+                    >
+                      +
+                    </button>
+                    {/* --- CREATE FORUM FORM (only shown if toggled on) --- */}
+                    {showCreateForum[group.id] && (
+                      <div className={Styles.createForumContainer} style={{ marginTop: "1rem" }}>
+                        <h4 className={Styles.createForumText}>Create a new forum in {group.name}</h4>
+
+                        {/* -------- Forum Name -------- */}
+                        <input
+                          type="text"
+                          placeholder="Forum name"
+                          className={Styles.forumCreationInfomation}
+                          value={forumInputs[group.id]?.name || ""}
+                          onChange={(e) =>
+                            setForumInputs((prev) => ({
+                              ...prev,
+                              [group.id]: {
+                                ...prev[group.id],
+                                name: e.target.value,
+                                message: "",
+                              },
                             }))
                           }
+                        />
+
+                        {/* -------- Forum Description -------- */}
+                        <textarea
+                          placeholder="Type description here"
+                          className={Styles.forumDescCreationInfomation}
+                          value={forumInputs[group.id]?.description || ""}
+                          onChange={(e) =>
+                            setForumInputs((prev) => ({
+                              ...prev,
+                              [group.id]: { ...prev[group.id], description: e.target.value, message: "" },
+                            }))
+                          }
+                        />
+
+                        {/* -------- Submit -------- */}
+                        <button
+                          className={Styles.createForumButton}
+                          onClick={() => {
+                            handleCreateForumBox(group.id);
+                            handleCreateForum(group.id);
+                          }}
                         >
-                          +
+                          Create Forum
                         </button>
-                        {/* --- CREATE FORUM FORM (only shown if toggled on) --- */}
-                        {showCreateForum[group.id] && (
-                          <div className={Styles.createForumContainer} style={{ marginTop: "1rem" }}>
-                            <h4 className={Styles.createForumText}>Create a new forum in {group.name}</h4>
 
-                            {/* -------- Forum Name -------- */}
-                            <input
-                              type="text"
-                              placeholder="Forum name"
-                              className={Styles.forumCreationInfomation}
-                              value={forumInputs[group.id]?.name || ""}
-                              onChange={(e) =>
-                                setForumInputs((prev) => ({
-                                  ...prev,
-                                  [group.id]: {
-                                    ...prev[group.id],
-                                    name: e.target.value,
-                                    message: "",
-                                  },
-                                }))
-                              }
-                            />
-
-                            {/* -------- Forum Description -------- */}
-                            <textarea
-                              placeholder="Type description here"
-                              className={Styles.forumDescCreationInfomation}
-                              value={forumInputs[group.id]?.description || ""}
-                              onChange={(e) =>
-                                setForumInputs((prev) => ({
-                                  ...prev,
-                                  [group.id]: { ...prev[group.id], description: e.target.value, message: "" },
-                                }))
-                              }
-                            />
-
-                            {/* -------- Submit -------- */}
-                            <button
-                              className={Styles.createForumButton}
-                              onClick={() => {
-                                handleCreateForumBox(group.id);
-                                handleCreateForum(group.id);
-                              }}
-                            >
-                              Create Forum
-                            </button>
-
-                            {forumInputs[group.id]?.message && (
-                              <p>{forumInputs[group.id].message}</p>
-                            )}
-                          </div>
+                        {forumInputs[group.id]?.message && (
+                          <p>{forumInputs[group.id].message}</p>
                         )}
+                      </div>
+                    )}
                     {/* Only displays if user is an owner or a mod */}
                     {
                       (isOwner || isMod) &&
@@ -543,7 +597,7 @@ export default function CommunityPage({
                         <button className={Styles.editGroup} onClick={() => { toggleEditGroupPopup(); setEditGroupId(group.id); }}>
                           Edit
                         </button>
-                        
+
                       </>
                     }
                   </div>
@@ -614,7 +668,7 @@ export default function CommunityPage({
                 {community.ownerList.map((owner) =>
                   <li key={owner.id}>
                     <Link href={`/profile/${owner.id}`} className={Styles.userLink}>
-                      
+
                       <Image src={owner.photoURL} alt="User Avatar" width={64} height={64} style={{ borderRadius: "50%", marginRight: "0.5rem" }} />
                       {owner.username || owner.id}
                     </Link>
@@ -794,12 +848,7 @@ export default function CommunityPage({
             <div className={Styles.createBox}>
               <p style={{ marginTop: "1rem", marginLeft: "10%" }}>{community.description}</p>
 
-              <div style={{ marginTop: "2rem", marginLeft: "10%" }}>
-                <h3>Create a new group in {commName}</h3>
-                <input type="text" value={groupName} onChange={(e) => setGroupName(e.target.value)} placeholder="Group name" />
-                <button onClick={handleCreateGroup}>Create Group</button>
-                {groupMessage && <p>{groupMessage}</p>}
-              </div>
+
 
               <div style={{ marginTop: "2rem", marginLeft: "10%" }}>
                 <p>Logged in as: {user?.displayName || user?.email}</p>
@@ -1031,7 +1080,7 @@ export default function CommunityPage({
             <button onClick={() => { handleDeleteForum(deleteForumId); toggleConfirmDeleteForum(); }} className={Styles.deleteButton}>Delete</button>
           </div>
         </div>
-        )}
+      )}
       {confirmDeleteGroup && (
         <div className={Styles.popupOverlay} onClick={toggleConfirmDeleteGroup}>
           <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
@@ -1041,7 +1090,7 @@ export default function CommunityPage({
             <button onClick={() => { handleDeleteGroup(deleteGroupId); toggleConfirmDeleteGroup(); }} className={Styles.deleteButton}>Delete</button>
           </div>
         </div>
-        )}
+      )}
     </main>
   );
 }
