@@ -182,7 +182,7 @@
 
 @media(max-height: 800px){
   .hint {
-    font-size: 0px;
+    font-size: 5px;
     color: #ffffff00;
   }
   .lineBox{
