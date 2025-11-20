@@ -3,13 +3,32 @@
 import { useAuth } from "../../_firebase/context";
 import { DocumentReference, getDoc } from "firebase/firestore";
 import { useState, useEffect } from "react";
-import { getNotifications, NotificationData, markNotificationAsRead, respondToFriendRequest } from "./notifications";
+import { getNotifications, NotificationData, markNotificationAsRead, respondToFriendRequest, deleteNotification, getPostRedirectUrl } from "./notifications";
+import Link from "next/link";
 
 export default function Notifications() {
     const { user, userData, loading } = useAuth();
     
     const [notifications, setNotifications] = useState<NotificationData[]>([]);
     const [requestStatus, setRequestStatus] = useState<Record<string, string>>({});
+
+    const [redirectUrls, setRedirectUrls] = useState<Record<string, string>>({});
+
+    useEffect(() => {
+        const fetchUrls = async () => {
+            const urls: Record<string, string> = {};
+            await Promise.all(
+                notifications.map(async (notif) => {
+                    if (notif.type === "report" && notif.relatedDocRef) {
+                        urls[notif.id] = await getPostRedirectUrl(notif.relatedDocRef);
+                    }
+                })
+            );
+            setRedirectUrls(urls);
+        };
+
+        fetchUrls();
+    }, [notifications]);
 
     // Fetch notifications and their friend request statuses if applicable
     useEffect(() => {
@@ -24,6 +43,7 @@ export default function Notifications() {
                 const statuses: Record<string, string> = {};
                 await Promise.all(
                     notifDocs.map(async (notif) => {
+                        // Fetches the status of the notification's related document, which is a FriendRequest
                         if (notif.type === "friend_request" && notif.relatedDocRef) {
                             const docsSnap = await getDoc(notif.relatedDocRef);
                             if (docsSnap.exists()) {
@@ -76,6 +96,19 @@ export default function Notifications() {
         } // end try catch
     } // end function respondToRequest
 
+    // Handle deleteing a notification
+    async function handleDelete(notifId: string) {
+        try {
+            await deleteNotification(notifId, user!.uid);
+            // Update local state
+            setNotifications((prevNotifs) =>
+                prevNotifs.filter((notif) => notif.id !== notifId)
+            );
+        } catch (error) {
+            console.error("Error deleting notification:", error);
+        } // end try catch
+    } // end function handleDelete
+
     // Loading states
     if (loading) {
         return <div>Loading...</div>;
@@ -114,6 +147,9 @@ export default function Notifications() {
                                         [Unread]
                                     </button>
                                 )}
+                                <button onClick={() => handleDelete(notif.id)}>
+                                    [Delete Notification]
+                                </button>
 
                                 {/* If notification type is a 'friend_request', show it */}
                                 {notif.type === "friend_request" && notif.relatedDocRef && (
@@ -139,6 +175,21 @@ export default function Notifications() {
                                         )}
                                     </div>
                                 )} {/* End friend_request handling */}
+
+                                {/* If notification type is a report, show it */}
+                                {notif.type === "report" && notif.relatedDocRef && (
+                                    // Link to view the reported post
+                                    <div>
+                                        <Link href={redirectUrls[notif.id] || "#"} target="_blank" rel="noopener noreferrer">
+                                            [View Reported Post]
+                                        </Link>
+                                        {/* Show report status */}
+                                        {requestStatus[notif.id] && (
+                                            <span><em>Report Status: {requestStatus[notif.id]}</em></span>
+                                        )}
+                                    </div>
+                                )} {/* End report handling */}
+
                             </li>
                         ))} {/* End mapping notifications */}
                     </ul> 

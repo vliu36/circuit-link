@@ -8,19 +8,19 @@ import { auth, db } from "./firebase";
 import { doc, DocumentData, getDoc } from "firebase/firestore";
 
 // Define the shape of userData
-// interface userData {
-//     communities: [],
-//     createdAt: Date,
-//     darkMode: boolean,
-//     email: string,
-//     font: string,
-//     notifications: [],
-//     privateMode: boolean,
-//     profileDesc: string,
-//     restrictedMode: boolean,
-//     textSize: number,
-//     username: string,
-// }
+interface userData {
+    communities: [],
+    createdAt: Date,
+     darkMode: boolean,
+     email: string,
+     font: string,
+     notifications: [],
+     privateMode: boolean,
+     profileDesc: string,
+     restrictedMode: boolean,
+     textSize: number,
+     username: string,
+}
 
 // Define the shape of the context value
 interface AuthContextType {

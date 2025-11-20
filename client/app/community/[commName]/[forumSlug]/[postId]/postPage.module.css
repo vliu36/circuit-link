@@ -13,7 +13,7 @@
     padding: 20px;
     margin-bottom: 20px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-    background-color: rgba(57, 65, 83, 1);
+    background-color: #FFFFFF;
     color: #5A5454;
     position: relative;
     transition: transform 0.15s ease;
@@ -34,9 +34,11 @@
     display: flex;
     flex-direction: column;
     border-radius: 10px;
+    background-color: #ffffff;
     color: #5A5454;
     transition: transform 0.15s ease;
-    width: 100%;
+    width: 90%;
+    margin-left: 5%;
 }
 
 .replyCard p,
@@ -46,20 +48,24 @@
 }
 
 .title {
-    font-size: 24px;
+    font-size: 25px;
     font-weight: 600;
+    margin-left: 2vw;
 }
 
 .contents {
-    font-size: 16px;
+    font-size: 20px;
     font-weight: 400;
+    margin-left: 2vw;
+    color: #5A5454
 }
 
 .meta {
     font-size: 14px;
     font-weight: 100;
-    color: #ccc;
-    margin-top: 5px;
+    color: #5A5454;
+    margin-top: 0.2em;
+    margin-left: 2vw;
     display: flex;
     width: 10%;
     height: 2.5vh;
@@ -69,6 +75,8 @@
     height: auto;
     width: 100%;
     font-family: Inria Sans;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
+    border-radius: 1em;
 }
 
 .userIcon{
@@ -80,24 +88,26 @@
 
 .userTextAlignPosts{
     font-size: 12px;
-    margin-left: 5px;
+    margin-left: 0.5vw;
 }
 
 .time {
     font-size: 12px;
-    color: #bbb;
-    margin-top: 3px;
+    color: #5A5454;
+    margin-top: 0.3em;
+    margin-left: 2vw;
 }
 
 .actions {
     display: flex;
     margin-top: 10px;
-    width: 20%;
-    height: 4.5vh;
-    background-color: #6c757d;
+    width: 150px;
+    height: 40px;
+    background-color: #F0F0F0;
     justify-content: space-between;
     border-radius: 1em;
     margin-bottom: 5%;
+    margin-left: 2vw;
 }
 
 .voteButton {
@@ -106,7 +116,6 @@
     border: none;
     cursor: pointer;
     width: 33%;
-    height: 4.49vh;
     transition: background-color 0.2s ease;
     text-align: center;
     border-radius: 1vw 0 0 1vw;
@@ -128,11 +137,11 @@
     height: 3.9vh;
     margin-top: 3%;
     text-align: center;
-    font-size: 1vw;
+    font-size: 20px;
 }
 
 .voteButton:hover {
-    background-color: #5a6268;
+    background-color: #D9D9D9;
 }
 
 .yayActive {
@@ -150,13 +159,15 @@
 
 .replyButton {
     font-size: 14px;
-    color: #fff;
+    color: #5A5454;
+    background-color: #EDEDED;
     padding: 5px 10px;
     border: none;
     border-radius: 40px;
     cursor: pointer;
     margin-top: 30px;
     margin-right: 32px;
+    margin-left: 2vw;
     width: 90%;
     transition: background-color 0.2s ease;
     border: 1px solid white;
@@ -166,7 +177,8 @@
 
 .submitButton {
     font-size: 0.75vw;
-    color: #fff;
+    color: #5A5454;
+    background-color: #F0F0F0;
     padding: 5px 10px;
     border: none;
     border-radius: 40px;
@@ -181,11 +193,11 @@
 }
 
 .submitButton:hover{
-    background-color: green;
+    background-color: #D9D9D9;
 }
 
 .replyButton:hover {
-    background-color: #517cad;
+    background-color: #D9D9D9;
 }
 
 .editButton {
@@ -211,12 +223,13 @@
 }
 
 .replyBox{
-    margin-top: 10%;
+    margin-top: 2.5%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     width: 90%;
     height: 20vh;
+    margin-left: 5%;
 }
 
 .replyInput {
@@ -259,7 +272,7 @@
 }
 
 .background {
-    background-color: rgba(57, 65, 83, 1);
+    background-color: #D0E0EB;
     display: grid;
     width: 100%;
     height: 100vh;
@@ -315,47 +328,59 @@
 }
 
 .yourCommunitiesBar{
-    background-color: rgb(11, 11, 44);
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
-    font-family: Inria Sans;
-    color: gray;
+    font-family: Jura;
+    font-weight: bold;
+    color: #5A5454;
     text-indent: 3%;
     overflow-y: auto;
     overflow-x: hidden;
+    margin-left: 0.5em;
+    margin-top: 0.5em;
+    border: 3px;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .serverBar{
-    background-color: rgb(11, 11, 44);
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
     text-indent: 3%;
-    font-family: Inria Sans;
+    font-family: Jura;
+    font-weight: bold;
     font-size: 25px;
-    color: rgb(255, 255, 255);
+    color: #5A5454;
     overflow-y: auto;
     overflow-x: hidden;
+    margin-left: 0.5em;
+    margin-bottom: 0.7em;
+    border: 3px;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .serverContainer{
-    background-color: rgb(11, 11, 44);
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
-    font-family: Inria Sans;
+    font-family: Jura;
     font-size: 15px;
-    color: gray;
+    color: #5A5454;
 }
 
 .channelText{
     font-family: Inria Sans;
     font-size: 15px;
-    color: rgb(255, 255, 255);
+    color: #5A5454;
     margin-left: 10px;
 }
 
 
 .horizontalLine{
-    background-color: #AAAAAA;
+    background-color: #EDEDED;
     width: 95%;
     height: 1px;
     margin-left: 8px;
@@ -384,21 +409,21 @@
     margin-top: 15px;
     margin-left: 10px;
     font-family: Inria Sans;
-    color: rgb(255, 255, 255);
+    color: #5A5454;
     position: relative;
     font-size: 0.8rem;
 }
 
 .communitiesButtons:hover{
-    background-color: #394153;
+    background-color: #D9D9D9;
 }
 
 .channelInfoBox{
-    background-color: rgb(11, 11, 44);
+    background-color: #D0E0EB;
     display: flex;
     flex-direction: column;
     font-family: Inria Sans;
-    color: gray;
+    color: #5A5454;
     text-indent: 3%;
     overflow-y: auto;
     overflow-x: hidden;
@@ -406,7 +431,7 @@
 
 .channelInfoh1{
     margin-top: 10px;
-    color: rgb(255, 255, 255);
+    color: #5A5454;
     font-size: 25px;
 }
 
@@ -420,7 +445,7 @@
 .UserContainer{
     margin-left: 3%;
     display: flex;
-    color: gray;
+    color: #5A5454;
     font-size: 17px;
     
 }
@@ -431,23 +456,30 @@
 }
 
 .RulesBar{
-    background-color: rgb(11, 11, 44);
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
-    font-family: Inria Sans;
-    color: rgb(255, 255, 255);
+    font-family: Jura;
+    font-weight: bold;
+    color: #5A5454;
     font-size: 25px;
     text-indent: 3%;
     overflow-y: auto;
     overflow-x: hidden;
+    margin-right: 0.5em;
+    margin-top: 0.3em;
+    margin-bottom: 0.6em;
+    border: 3px;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .usersBar{
-    background-color: rgb(11, 11, 44);
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
-    font-family: Inria Sans;
-    color: rgb(255, 255, 255);
+    font-family: Jura;
+    color: #5A5454;
     font-size: 25px;
     text-indent: 3%;
     overflow-y: auto;
@@ -482,8 +514,14 @@
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
-    color: gray;
+    color: #5A5454;
     font-size: 2vw;
+    margin-top: 0.3em;
+    margin-bottom: 0.6em;
+    background-color: #ffffff;
+    border: 3px #D0E0EB;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 .backDisplay{
@@ -491,14 +529,76 @@
     border-radius: 1em;
     height: 1.25vw;
     text-align: center;
-    background-color: rgb(107, 107, 107);
+    margin-left: 0.2em;
+    margin-top: 0.2em;
+    background-color: #F0F0F0;
     border: 1px solid white;
-    color: white;
+    color: #5A5454;
     font-size: 0.75vw;
+}
+
+.backDisplay:hover{
+    background-color: #D9D9D9;
 }
 
 .utilityButtons{
     width: 100%;
     height: 100%;
     display: flex;
+}
+
+.mediaContainer{
+    margin-left: 2vw;
+}
+
+.groupName{
+    width: 60%;
+}
+
+.groupHeader{
+    display: flex;
+}
+
+.createForumContainer{
+    width: 50%;
+    height: 50vh;
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    position: absolute;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    left:25%;
+    bottom: 25%;
+    border: 2px solid black;
+    border-radius: 1em;
+}
+
+.forumCreationInfomation{
+    margin-left: 10%;
+    background-color: #F0F0F0;
+    border-radius: 1em;
+    width: 80%;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.forumDescCreationInfomation{
+    margin-top: 3vh;
+    margin-left: 10%;
+    background-color: #F0F0F0;
+    border-radius: 1em;
+    width: 80%;
+    height: 30vh;
+    margin-bottom: 5vh;
+    padding-left: 1em;
+    padding-right: 1em;
+}
+
+.createForumButton{
+    width: 25%;
+    margin-left: 35%;
+    margin-top: 1vh;
+    border-radius: 1em;
+    background-color: #F0F0F0;
+    color: #5A5454;
 }

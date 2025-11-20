@@ -3,7 +3,7 @@
 import React, { use, useState, useEffect } from "react";
 import Styles from "./community.module.css";
 import { useAuth } from "../../_firebase/context.tsx";
-import { logout } from "../../landing.ts";
+import { fetchTopCommunities, fetchTopUsers, logout } from "../../landing.ts";
 import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -11,7 +11,7 @@ import * as commApi from "./community";
 import { Community } from "../../_types/types.ts";
 import { useRouter } from "next/navigation";
 import NavBar from '../../_components/navbar/navbar.tsx';
-
+import { getCommunities } from "../../landing.ts"
 
 export default function CommunityPage({
   params,
@@ -20,20 +20,25 @@ export default function CommunityPage({
 }) {
   const { commName } = use(params);
   const { user } = useAuth();
-
+  const { userData } = useAuth();
   const [community, setCommunity] = useState<Community | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userCommunities, setUserCommunities] = useState<any[]>([]);
 
   const [groupName, setGroupName] = useState("");
   const [groupMessage, setGroupMessage] = useState("");
   const [forumInputs, setForumInputs] = useState<{ [groupId: string]: { name: string; description: string; message: string } }>({});
+  const [targetUserId, setTargetUserId] = useState<string>("");
 
-  // Popup boolean states for edit community, change icon, and change banner
+  // Popup boolean states for edit community, change icon, change banner, kick/ban user, and show blacklist
   const [editOpen, setEditOpen] = useState(false);
   const [iconOpen, setIconOpen] = useState(false);
   const [bannerOpen, setBannerOpen] = useState(false);
   const [editGroupOpen, setEditGroupOpen] = useState(false);
+  const [showCreateForum, setShowCreateForum] = useState<{ [key: string]: boolean }>({});
+  const [modOptionsOpen, setModOptionsOpen] = useState(false);
+  const [blacklistOpen, setBlacklistOpen] = useState(false);
 
   // Files and previews for changing icon and banner
   const [iconFile, setIconFile] = useState<File | null>(null);
@@ -45,10 +50,33 @@ export default function CommunityPage({
   // setEditGroupDetails
   const [editGroupId, setEditGroupId] = useState<string>("");
 
+  useEffect(() => {
+    if (loading) return;
+
+    async function loadData() {
+
+      if (userData?.communities) {
+        try {
+          const joined = await getCommunities(userData.communities);
+          setUserCommunities(joined);
+        } catch (err) {
+          console.error("Error loading user's communities:", err);
+        }
+      }
+
+      setLoading(false);
+    }
+
+    loadData();
+  }, [userData, loading]);
+
+
+
   const toggleEditPopup = () => {
     setEditOpen(!editOpen);
     setError(null);
   }
+
   const toggleIconPopup = () => {
     setIconOpen(!iconOpen);
     setError(null);
@@ -60,6 +88,16 @@ export default function CommunityPage({
 
   const toggleEditGroupPopup = () => {
     setEditGroupOpen(!editGroupOpen);
+    setError(null);
+  };
+
+  const toggleModOptionsPopup = () => {
+    setModOptionsOpen(!modOptionsOpen);
+    setError(null);
+  };
+
+  const toggleBlacklistPopup = () => {
+    setBlacklistOpen(!blacklistOpen);
     setError(null);
   };
 
@@ -87,7 +125,7 @@ export default function CommunityPage({
     setGroupName("");
     refreshCommunity();
   };
-  
+
   // --- DELETE GROUP ---
   const handleDeleteGroup = async (groupId: string) => {
     if (!user) return;
@@ -98,6 +136,10 @@ export default function CommunityPage({
     } catch (err) {
       console.error("Error deleting group:", err);
     }
+  };
+
+  const handleCreateForumBox = async (groupId: string) => {
+    setShowCreateForum({});
   };
 
   // --- CREATE FORUM ---
@@ -117,7 +159,7 @@ export default function CommunityPage({
         groupId,
         commName,
       });
-      setForumInputs((prev) => ({ ...prev, [groupId]: { name: "", description: "", message: "Forum created successfully!" } }));
+      setForumInputs((prev) => ({ ...prev, [groupId]: { name: "", description: "", message: "" } }));
 
       // Refresh community structure
       // commApi.fetchStructure(commName).then((data) => data && setCommunity(data));
@@ -178,7 +220,7 @@ export default function CommunityPage({
   const handleJoin = async () => {
     const res = await commApi.joinCommunity(commName);
     console.log(res.message);
-    await refreshCommunity(); 
+    await refreshCommunity();
   };
 
   // --- LEAVE THE COMMUNITY ---
@@ -217,17 +259,22 @@ export default function CommunityPage({
   };
 
   // --- EDIT COMMUNITY ---
-  const handleEditCommunity = async (newName?: string, description?: string, isPublic?: boolean) => {
+  const handleEditCommunity = async (newName?: string, description?: string, isPublic?: boolean, rules?: string) => {
     try {
-      const res = await commApi.editCommunity(commName, newName, description, isPublic);
+      const namePattern = /^[a-zA-Z0-9_-]{1,24}$/;
+      if (newName && !namePattern.test(newName)) {
+        setError("Community name must be 1-24 characters long and can only contain letters, numbers, underscores, and hyphens.");
+        return;
+      }
+      const res = await commApi.editCommunity(commName, newName, description, isPublic, rules);
       console.log(res.message);
       setError(res.message || null);
-      await refreshCommunity();
-      if (res.status === "ok" && newName && newName !== commName) {
+      if (res.status === "ok" && newName && newName.toLowerCase() !== commName.toLowerCase()) {
         router.push(`/community/${newName}`);
       } else if (res.status === "ok") {
         // Close the edit popup only if the name hasn't changed
         toggleEditPopup();
+        await refreshCommunity();
       }
     } catch (err) {
       setError("Failed to edit community. Please try again.");
@@ -263,7 +310,8 @@ export default function CommunityPage({
     if (file) setBannerPreview(URL.createObjectURL(file));
   };
 
-  // Handle file submission
+  // --- Handle file submission ---
+  // Submission for icon
   const submitIcon = async () => {
     if (!iconFile) return;
     try {
@@ -277,6 +325,7 @@ export default function CommunityPage({
     }
   };
 
+  // Submission for banner
   const submitBanner = async () => {
     if (!bannerFile) return;
     try {
@@ -290,108 +339,219 @@ export default function CommunityPage({
     }
   };
 
+  // Handle kick
+  const handleKickUser = async () => {
+    try {
+      const res = await commApi.kickMember(commName, targetUserId);
+      console.log(res.message);
+      setError(res.message || null);
+      // Wait 1 second and close the popup
+      setTimeout(() => {
+        toggleModOptionsPopup();
+      }, 1000);
+      await refreshCommunity();
+    } catch (err) {
+      console.error("Failed to kick user:", err);
+    }
+  };
+
+  // Handle ban
+  const handleBanUser = async () => {
+    try {
+      const res = await commApi.banMember(commName, targetUserId);
+      console.log(res.message);
+      setError(res.message || null);
+      // Wait 1 second and close the popup
+      setTimeout(() => {
+        toggleModOptionsPopup();
+      }, 1000);
+      await refreshCommunity();
+    } catch (err) {
+      console.error("Failed to ban user:", err);
+    }
+  };
+
+  // Handle unban
+  const handleUnbanUser = async (targetUserId: string) => {
+    try {
+      const res = await commApi.unbanMember(commName, targetUserId);
+      console.log(res.message);
+      setError(res.message || null);
+      // Wait 1 second and close the popup
+      setTimeout(() => {
+        toggleBlacklistPopup();
+      }, 1000);
+      await refreshCommunity();
+    } catch (err) {
+      console.error("Failed to unban user:", err);
+    }
+  };
+
+
   const isMember = community.userList.some(u => u.id === user?.uid);
   const isMod = community.modList.some(m => m.id === user?.uid);
   const isOwner = community.ownerList.some(o => o.id === user?.uid);
+  const isBanned = community.blacklist.some(b => b.id === user?.uid);
+
+  // If the user is banned, show a message and do not render the community page
+  if (isBanned) {
+    return <div>You are banned from this community.</div>;
+  }
 
   return (
     <main>
-      <div className = {Styles.background}>
-        
+      <div className={Styles.background}>
 
-        <div className = {Styles.yourCommunitiesBar} style={{gridArea: "CommunitiesBar"}}>
-          <h1>Your Communities</h1>
-            <button className = {Styles.communitiesButtons}>
-              <img src = "plus.svg" className = {Styles.addIcon}></img>
-              <h1 className = {Styles.buttonTextforCommunities}>Add a Community</h1>
-            </button>
+
+        <div className={Styles.yourCommunitiesBar} style={{ gridArea: "CommunitiesBar" }}>
+          <div className={Styles.yourCommunitiesBar} style={{ gridArea: "communities" }}>
+            <h1>Your Communities</h1>
+
+            <div>
+              {userCommunities.length === 0 ? (
+                <p>No joined communities.</p>
+              ) : (
+                userCommunities.map((c: any, i: number) => (
+                  <Link
+                    key={c.id}
+                    className={Styles.communitiesButtons}
+                    href={`/community/${c.name}`}
+                  >
+                    <Image
+                      src={c.icon ?? "/defaultCommunity.svg"}
+                      alt={c.name}
+                      width={30}
+                      height={30}
+                      className={Styles.addIcon}
+                    />
+                    <h1 className={Styles.buttonTextforCommunities}>{c.name}</h1>
+                  </Link>
+                ))
+              )}
+            </div>
+
+            <Link className={Styles.communitiesButtons} href={`/community`}>
+              <Image src="/plus.svg" className={Styles.addIcon} alt="Add icon" width={16} height={16} />
+              <h1 className={Styles.buttonTextforCommunities}>Add a Community</h1>
+            </Link>
+          </div>
         </div>
 
-              
-        <div className = {Styles.serverBar} style={{gridArea: "ServerBar"}}>
+
+        <div className={Styles.serverBar} style={{ gridArea: "ServerBar" }}>
           <div>{commName}</div>
-          <div className = {Styles.horizontalLine}></div>
-          <div className = {Styles.serverContainer}>
+          <div className={Styles.horizontalLine}></div>
+          <div className={Styles.serverContainer}>
             {/* --- GROUPS AND FORUMS --- */}
             <section>
               {community.groupsInCommunity.length === 0 && <p>No groups in this community yet.</p>}
-            
+
               {/* Displays a group and its forums */}
               {community.groupsInCommunity.map((group) => (
-                <div key={group.id} style={{ marginBottom: "2rem"}}>
-                  <div className = {Styles.groupHeader}>
-                    <div className = {Styles.groupName}>{group.name}</div>
+                <div key={group.id} style={{ marginBottom: "2rem" }}>
+                  <div className={Styles.groupHeader}>
+                    <div className={Styles.groupName}>{group.name}</div>
+                    <button
+                          className={Styles.plusButton}
+                          onClick={() =>
+                            setShowCreateForum(() => ({
+                              // close ALL popups, only toggle the one clicked
+                              [group.id]: !showCreateForum[group.id]
+                            }))
+                          }
+                        >
+                          +
+                        </button>
+                        {/* --- CREATE FORUM FORM (only shown if toggled on) --- */}
+                        {showCreateForum[group.id] && (
+                          <div className={Styles.createForumContainer} style={{ marginTop: "1rem" }}>
+                            <h4 className={Styles.createForumText}>Create a new forum in {group.name}</h4>
+
+                            {/* -------- Forum Name -------- */}
+                            <input
+                              type="text"
+                              placeholder="Forum name"
+                              className={Styles.forumCreationInfomation}
+                              value={forumInputs[group.id]?.name || ""}
+                              onChange={(e) =>
+                                setForumInputs((prev) => ({
+                                  ...prev,
+                                  [group.id]: {
+                                    ...prev[group.id],
+                                    name: e.target.value,
+                                    message: "",
+                                  },
+                                }))
+                              }
+                            />
+
+                            {/* -------- Forum Description -------- */}
+                            <textarea
+                              placeholder="Type description here"
+                              className={Styles.forumDescCreationInfomation}
+                              value={forumInputs[group.id]?.description || ""}
+                              onChange={(e) =>
+                                setForumInputs((prev) => ({
+                                  ...prev,
+                                  [group.id]: { ...prev[group.id], description: e.target.value, message: "" },
+                                }))
+                              }
+                            />
+
+                            {/* -------- Submit -------- */}
+                            <button
+                              className={Styles.createForumButton}
+                              onClick={() => {
+                                handleCreateForumBox(group.id);
+                                handleCreateForum(group.id);
+                              }}
+                            >
+                              Create Forum
+                            </button>
+
+                            {forumInputs[group.id]?.message && (
+                              <p>{forumInputs[group.id].message}</p>
+                            )}
+                          </div>
+                        )}
                     {/* Only displays if user is an owner or a mod */}
                     {
                       (isOwner || isMod) &&
                       <>
-                        <button className = {Styles.deleteGroup} onClick={() => handleDeleteGroup(group.id)}>
-                          Delete Group
+                        <button className={Styles.deleteGroup} onClick={() => handleDeleteGroup(group.id)}>
+                          Delete
                         </button>
                         <button className={Styles.editGroup} onClick={() => { toggleEditGroupPopup(); setEditGroupId(group.id); }}>
-                          Edit Group
+                          Edit
                         </button>
+                        
                       </>
                     }
                   </div>
-                  
 
                   {/* Displays the forums in this group */}
                   {group.forumsInGroup.length > 0 ? (
                     <div>
                       {group.forumsInGroup.map((forum) => (
-                      <div key={forum.id} className = {Styles.channelHeader}>
-                        {/* Link to the forum (displays its posts) */}
-                        <div className = {Styles.channelName}>
-                          <Link href={`/community/${commName}/${forum.slug}`}>
-                            &gt;{forum.name}
-                          </Link>
+                        <div key={forum.id} className={Styles.channelHeader}>
+                          {/* Link to the forum (displays its posts) */}
+                          <div className={Styles.channelName}>
+                            <Link href={`/community/${commName}/${forum.slug}`}>
+                              &gt;{forum.name}
+                            </Link>
+                          </div>
+                          {/* -------- Delete Forum Button -------- */}
+                          {/* Only shows if user is owner or mod */}
+                          {(isOwner || isMod) &&
+                            <button className={Styles.deleteChannel} onClick={() => handleDeleteForum(forum.id)}>
+                              Delete Forum
+                            </button>
+                          }
                         </div>
-                        {/* -------- Delete Forum Button -------- */}
-                        {/* Only shows if user is owner or mod */}
-                        { (isOwner || isMod) && 
-                          <button className = {Styles.deleteChannel} onClick={() => handleDeleteForum(forum.id)}>
-                            Delete Forum
-                          </button>
-                        }
-                      </div>
                       ))}
-                      
+
                     </div>
                   ) : <p>No forums in this group.</p>}
-
-                  {/* --- CREATE FORUM FORM --- */}
-                  <div className = {Styles.createForumContainer} style={{ marginTop: "1rem" }}>
-                    <h4>Create a new forum in {group.name}</h4>
-
-                    {/* -------- Forum Name -------- */}
-                    <input
-                      type="text"
-                      placeholder="Forum name"
-                      className = {Styles.forumCreationInfomation}
-                      value={forumInputs[group.id]?.name || ""}
-                      onChange={(e) => setForumInputs((prev) => ({
-                        ...prev,
-                        [group.id]: { ...prev[group.id], name: e.target.value, message: "" },
-                      }))}
-                    />
-
-                    {/* -------- Forum Description -------- */}
-                    <input
-                      type="text"
-                      placeholder="Forum description"
-                      className = {Styles.forumDescCreationInfomation}
-                      value={forumInputs[group.id]?.description || ""}
-                      onChange={(e) => setForumInputs((prev) => ({
-                        ...prev,
-                        [group.id]: { ...prev[group.id], description: e.target.value, message: "" },
-                      }))}
-                    />
-
-                    {/* -------- Submit -------- */}
-                    <button className = {Styles.createForumButton} onClick={() => handleCreateForum(group.id)}>Create Forum</button>
-                    {forumInputs[group.id]?.message && <p>{forumInputs[group.id].message}</p>}
-                  </div>
                 </div>
               ))}
             </section>
@@ -399,61 +559,71 @@ export default function CommunityPage({
         </div>
 
 
-              
-        <div className = {Styles.RightBar} style={{gridArea: "RightBar"}}>
-          <div className = {Styles.channelInfoBox }>
-            <div className = {Styles.channelInfoh1}>{commName}</div>
-            <div className = {Styles.channelInfoh2}>{community?.description}</div>
-          </div>
-          <div className = {Styles.horizontalLine}></div>
 
-          <div className = {Styles.RulesBar}>
+        <div className={Styles.RightBar} style={{ gridArea: "RightBar" }}>
+          <div className={Styles.channelInfoBox}>
+            <div className={Styles.channelInfoh1}>{commName}</div>
+            <div className={Styles.channelInfoh2}>{community?.description}</div>
+          </div>
+          <div className={Styles.horizontalLine}></div>
+
+          <div className={Styles.RulesBar}>
             Rules
           </div>
-          
-          
-          
-          <div className = {Styles.horizontalLine1}></div>
+
+
+
+          <div className={Styles.horizontalLine1}></div>
 
           {/* Displays the list of users in the community */}
-          <div className = {Styles.usersBar}>
-            <div className = {Styles.channelInfoh1}>
+          <div className={Styles.usersBar}>
+            <div className={Styles.channelInfoh1}>
               User Information
-              
-              
-            </div>
-              {/* --- OWNERS, MODS, USERS --- */}
-              <div>
-                <h2><u>Owners</u></h2>
-                <ul>
-                  {/* Display each owner */}
-                  {community.ownerList.map((owner) => 
-                    <li key={owner.id}>
-                      <Link href={`/profile/${owner.id}`}>
-                        &gt;{owner.username || owner.id}
-                      </Link>
 
-                      {/* If current user is an owner, display demote owner button */}
-                      {isOwner && owner.id !== user?.uid && (
+              {/* If current user is mod/owner, display button to toggle show blacklist */}
+              {(isOwner || isMod) && (
+                <button style={{ marginLeft: "0.5rem" }} onClick={toggleBlacklistPopup}>
+                  [Show Blacklist]
+                </button>
+              )}
+            </div>
+            {/* --- OWNERS, MODS, USERS --- */}
+            <div>
+              <h2><u>Owners</u></h2>
+              <ul>
+                {/* Display each owner */}
+                {community.ownerList.map((owner) =>
+                  <li key={owner.id}>
+                    <Link href={`/profile/${owner.id}`}>
+                      &gt;{owner.username || owner.id}
+                    </Link>
+
+                    {/* If current user is an owner, display demote owner button and mod options */}
+                    {isOwner && owner.id !== user?.uid && (
+                      <>
                         <button style={{ marginLeft: "0.5rem" }} onClick={() => handleDemoteOwner(owner.id)}>
                           [Demote Owner]
                         </button>
-                      )}
-                    </li>
-                  )}
-                </ul>
+                        <button style={{ marginLeft: "0.5rem" }} onClick={() => { toggleModOptionsPopup(); setTargetUserId(owner.id); }}>
+                          [Mod Options]
+                        </button>
+                      </>
+                    )}
+                  </li>
+                )}
+              </ul>
 
-                <h2><u>Moderators</u></h2>
-                <ul>
-                  {/* Display each moderator */}
-                  {community.modList.map((mod) => 
-                    <li key={mod.id}>
-                      <Link href={`/profile/${mod.id}`}>
-                        &gt;{mod.username || mod.id}
-                      </Link>
+              <h2><u>Moderators</u></h2>
+              <ul>
+                {/* Display each moderator */}
+                {community.modList.map((mod) =>
+                  <li key={mod.id}>
+                    <Link href={`/profile/${mod.id}`}>
+                      &gt;{mod.username || mod.id}
+                    </Link>
 
-                      {/* If current user is an owner, display buttons to promote or demote a mod */}
-                      {isOwner && !community.ownerList.some(o => o.id === mod.id) && (
+                    {/* If current user is an owner and the listed mod is not an owner, display buttons to promote or demote a mod and mod options */}
+                    {isOwner && !community.ownerList.some(o => o.id === mod.id) && (
                       <>
                         <button style={{ marginLeft: "0.5rem" }} onClick={() => handlePromoteToOwner(mod.id)}>
                           [Promote to Owner]
@@ -461,78 +631,87 @@ export default function CommunityPage({
                         <button style={{ marginLeft: "0.5rem" }} onClick={() => handleDemoteMod(mod.id)}>
                           [Demote Mod]
                         </button>
+                        <button style={{ marginLeft: "0.5rem" }} onClick={() => { toggleModOptionsPopup(); setTargetUserId(mod.id); }}>
+                          [Mod Options]
+                        </button>
                       </>
-                      )}
-                    </li>
-                  )}
-                </ul>
+                    )}
+                  </li>
+                )}
+              </ul>
 
-                <h2><u>Users</u></h2>
-                <ul>
-                  {/* Display each user */}
-                  {community.userList.map((u) => 
+              <h2><u>Users</u></h2>
+              <ul>
+                {/* Display each user */}
+                {community.userList.map((u) =>
                   <li key={u.id}>
                     <Link href={`/profile/${u.id}`}>
                       &gt;{u.username || u.id}
                     </Link>
 
-                    {/* If current user is an owner, display buttons to promote user to a mod or owner */}
+                    {/* If current user is an owner and the listed user is not a mod or owner; display buttons to promote user to a mod or owner */}
                     {isOwner && !community.modList.some(m => m.id === u.id) && !community.ownerList.some(o => o.id === u.id) && (
-                    <>
-                      <button style={{ marginLeft: "0.5rem" }} onClick={() => handlePromoteToMod(u.id)}>
-                        [Promote to Mod]
+                      <>
+                        <button style={{ marginLeft: "0.5rem" }} onClick={() => handlePromoteToMod(u.id)}>
+                          [Promote to Mod]
+                        </button>
+                        <button style={{ marginLeft: "0.5rem" }} onClick={() => handlePromoteToOwner(u.id)}>
+                          [Promote to Owner]
+                        </button>
+                      </>
+                    )}
+                    {/* If current user is an owner or mod and the listed user is not a mod or owner, show mod options button */}
+                    {(isOwner || isMod) && !community.modList.some(m => m.id === u.id) && !community.ownerList.some(o => o.id === u.id) && (
+                      <button style={{ marginLeft: "0.5rem" }} onClick={() => { toggleModOptionsPopup(); setTargetUserId(u.id); }}>
+                        [Mod Options]
                       </button>
-                      <button style={{ marginLeft: "0.5rem" }} onClick={() => handlePromoteToOwner(u.id)}>
-                        [Promote to Owner]
-                      </button>
-                    </>
                     )}
                   </li>
-                  )}
-                </ul>
+                )}
+              </ul>
 
-                </div>
             </div>
           </div>
+        </div>
 
-        <div className = {Styles.centerPage} style={{gridArea: "Center"}}>
-          <div className = {Styles.firstBox}>
-            <div className = {Styles.bannerBox}>
+        <div className={Styles.centerPage} style={{ gridArea: "Center" }}>
+          <div className={Styles.firstBox}>
+            <div className={Styles.bannerBox}>
               {/* --- COMMUNITY BANNER --- -------- Click on banner, if mod/owner, to change the banner */}
               {(isOwner || isMod) ? (
-                <button  
+                <button
                   className={Styles.bannerBox}
                   onClick={toggleBannerPopup}
                   style={{ padding: 0, border: 'none', background: 'none', display: 'inline-block' }}
                 >
-                  <Image 
-                    src={community.banner} 
-                    alt="Community Banner" 
-                    width={800} 
-                    height={200} 
+                  <Image
+                    src={community.banner}
+                    alt="Community Banner"
+                    width={800}
+                    height={200}
                     className={Styles.bannerBox}
                     style={{ display: 'block' }}
                   />
                 </button>
               ) : (
                 <Image
-                  src={community.banner} 
-                  alt="Community Banner" 
-                  width={800} 
-                  height={200} 
+                  src={community.banner}
+                  alt="Community Banner"
+                  width={800}
+                  height={200}
                   className={Styles.bannerBox}
                 />
               )}
             </div>
 
-            <div className = {Styles.titleBox}>
+            <div className={Styles.titleBox}>
               {/* --- COMMUNITY ICON --- -------- Click on image, if mod/owner, to change the icon */}
-              <div className = {Styles.serverIcon}>
+              <div className={Styles.serverIcon}>
                 {/* If user is an owner or mod, allow them to change the icon */}
                 {isOwner || isMod ? (
-                  <button 
-                    className={Styles.editIconButton} 
-                    onClick={toggleIconPopup} 
+                  <button
+                    className={Styles.editIconButton}
+                    onClick={toggleIconPopup}
                     style={{ padding: 0, border: 'none', background: 'none' }}
                   >
                     <Image
@@ -555,7 +734,7 @@ export default function CommunityPage({
                 )}
 
               </div>
-              <div className = {Styles.titleText}>
+              <div className={Styles.titleText}>
                 {community.name || commName}
                 {/* Button that toggles edit community popup */}
                 {isOwner && (
@@ -563,199 +742,262 @@ export default function CommunityPage({
                     Edit
                   </button>
                 )}
-            </div>
-            {/* If not member, show Join button, otherwise show Leave Button */}
-            {!isMember ? (
-              <button className = {Styles.joinCommunityButton} onClick={handleJoin}>Join Community</button>
+              </div>
+              {/* If not member, show Join button, otherwise show Leave Button */}
+              {!isMember ? (
+                <button className={Styles.joinCommunityButton} onClick={handleJoin}>Join Community</button>
               ) : (
-              <button className={Styles.joinCommunityButton} onClick={handleLeave}>Leave Community</button>
-            )}
+                <button className={Styles.joinCommunityButton} onClick={handleLeave}>Leave Community</button>
+              )}
+            </div>
           </div>
-          </div>
-          
-          
-          
+
+
+
           <div>
-          {/* Displays community name and description */}
-          
-          
-          {/* If current user is an owner, show DELETE COMMUNITY button */}
-          {isOwner && (
-            <div style={{ marginTop: "1rem", marginLeft: "10%"}}>
-              <button onClick={() => handleDeleteComm(community.name)}>
-                [DELETE COMMUNITY]
-              </button>
-            </div>
-          )}
+            {/* Displays community name and description */}
 
-          {/* --- CREATE GROUP FORM --- */}
-          <div className={Styles.createBox}>
-            <p style={{ marginTop: "1rem", marginLeft: "10%"}}>{community.description}</p>
 
-            <div style={{ marginTop: "2rem", marginLeft: "10%"}}>
-              <h3>Create a new group in {commName}</h3>
-              <input type="text" value={groupName} onChange={(e) => setGroupName(e.target.value)} placeholder="Group name" />
-              <button onClick={handleCreateGroup}>Create Group</button>
-              {groupMessage && <p>{groupMessage}</p>}
+            {/* If current user is an owner, show DELETE COMMUNITY button */}
+            {isOwner && (
+              <div style={{ marginTop: "1rem", marginLeft: "10%" }}>
+                <button onClick={() => handleDeleteComm(community.name)}>
+                  [DELETE COMMUNITY]
+                </button>
+              </div>
+            )}
+
+            {/* --- CREATE GROUP FORM --- */}
+            <div className={Styles.createBox}>
+              <p style={{ marginTop: "1rem", marginLeft: "10%" }}>{community.description}</p>
+
+              <div style={{ marginTop: "2rem", marginLeft: "10%" }}>
+                <h3>Create a new group in {commName}</h3>
+                <input type="text" value={groupName} onChange={(e) => setGroupName(e.target.value)} placeholder="Group name" />
+                <button onClick={handleCreateGroup}>Create Group</button>
+                {groupMessage && <p>{groupMessage}</p>}
+              </div>
+
+              <div style={{ marginTop: "2rem", marginLeft: "10%" }}>
+                <p>Logged in as: {user?.displayName || user?.email}</p>
+              </div>
             </div>
 
-            <div style={{ marginTop: "2rem", marginLeft: "10%"}}>
-              <p>Logged in as: {user?.displayName || user?.email}</p>
-            </div>
           </div>
-          
-      </div>
-    </div>
+        </div>
 
-      <div className = {Styles.navBox} style={{gridArea: "NavBar"}}>
-        <NavBar/>
+        <div className={Styles.navBox} style={{ gridArea: "NavBar" }}>
+          <NavBar />
+        </div>
+
       </div>
-      
-    </div>
-    {/* --- EDIT COMMUNITY POPUP --- */}
-    {editOpen && (
+      {/* --- EDIT COMMUNITY POPUP --- */}
+      {editOpen && (
         <div className={Styles.popupOverlay} onClick={toggleEditPopup}>
-            <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
-                <h2 className={Styles.popupText}>Edit Community</h2>
-                {/* Form for editing the communiuty */}
-                <form onSubmit={async (e) => {
-                  e.preventDefault();
-                  const formData = new FormData(e.currentTarget);
-                  const newName = formData.get("newName") as string;
-                  const description = formData.get("description") as string;
-                  const isPublic = formData.get("isPublic") === "on" ? true : false;
-                  await handleEditCommunity(newName || undefined, description || undefined, isPublic);
-                }}>
-                    <label className={Styles.popupText}>
-                      New Name: <br />
-                      <input
-                        type="text"
-                        name="newName"
-                        defaultValue={community.name}
-                        className={`${Styles.popupText} ${Styles.inputField}`}
-                        maxLength={24} 
-                        pattern="^[a-zA-Z0-9_-]+$"
-                        title="24 characters max. Name can only contain letters, numbers, underscores, and hyphens."
-                      />
-                    </label>
-                    <br /><br />
-                    <label className={Styles.popupText}>
-                      Description: <br />
-                      <textarea
-                        name="description"
-                        className={`${Styles.popupText} ${Styles.inputField}`}
-                        defaultValue={community.description}
-                        maxLength={100}
-                        title="100 characters max."
-                      />
-                    </label>
-                    <br /><br />
-                    <label className={Styles.popupText}>
-                      Public:{" "}
-                      <input
-                        type="checkbox"
-                        name="isPublic"
-                        defaultChecked={community.public}
-                      />
-                    </label>
-                    <br /><br />
-                    {error && <p style={{ color: "yellow" }}>{error}</p>}
-                    <br/>
-                    <button type="submit" className={`${Styles.popupText} ${Styles.saveBtn}`}>Save Changes</button>
-                </form>
-                <button className={` ${Styles.closeBtn} ${Styles.popupText}`} onClick={toggleEditPopup}>
-                    Close
-                </button>
-            </div>
+          <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
+            <h2 className={Styles.popupText}>Edit Community</h2>
+            {/* Form for editing the communiuty */}
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const newName = formData.get("newName") as string;
+              const description = formData.get("description") as string;
+              const isPublic = formData.get("isPublic") === "on" ? true : false;
+              const rules = formData.get("rules") as string;
+              await handleEditCommunity(newName || undefined, description || undefined, isPublic, rules || undefined);
+            }}>
+              <label className={Styles.popupText}>
+                New Name: <br />
+                <input
+                  type="text"
+                  name="newName"
+                  defaultValue={community.name}
+                  className={`${Styles.popupText} ${Styles.inputField}`}
+                  maxLength={24}
+                  pattern="^[a-zA-Z0-9_-]+$"
+                  title="24 characters max. Name can only contain letters, numbers, underscores, and hyphens."
+                />
+              </label>
+              <br /><br />
+              <label className={Styles.popupText}>
+                Description: <br />
+                <textarea
+                  name="description"
+                  className={`${Styles.popupText} ${Styles.inputField}`}
+                  defaultValue={community.description}
+                  maxLength={100}
+                  title="100 characters max."
+                />
+              </label>
+              <br /><br />
+              <label className={Styles.popupText}>
+                Rules: <br />
+                <textarea
+                  name="rules"
+                  className={`${Styles.popupText} ${Styles.inputField}`}
+                  defaultValue={community.rules}
+                  maxLength={200}
+                  title="200 characters max."
+                />
+              </label>
+              <br /><br />
+              <label className={Styles.popupText}>
+                Public:{" "}
+                <input
+                  type="checkbox"
+                  name="isPublic"
+                  defaultChecked={community.public}
+                />
+              </label>
+              <br /><br />
+              {error && <p style={{ color: "yellow" }}>{error}</p>}
+              <br />
+              <button type="submit" className={`${Styles.popupText} ${Styles.saveBtn}`}>Save Changes</button>
+            </form>
+            <button className={` ${Styles.closeBtn} ${Styles.popupText}`} onClick={toggleEditPopup}>
+              Close
+            </button>
+          </div>
         </div>
-    )}
-    {/* --- EDIT GROUP POPUP --- */}
-    {editGroupOpen && (
+      )}
+      {/* --- EDIT GROUP POPUP --- */}
+      {editGroupOpen && (
         <div className={Styles.popupOverlay} onClick={toggleEditGroupPopup}>
-            <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
-                <h2 className={Styles.popupText}>Edit Group</h2>
-                
-                {/* Form for editing the group */}
-                <form onSubmit={async (e) => {
-                  e.preventDefault();
-                  const formData = new FormData(e.currentTarget);
-                  const newName = formData.get("newName") as string;
-                  const groupId = editGroupId;
-                  
-                  await handleEditGroup(groupId, newName);
-                }}>
-                    <label className={Styles.popupText}>
-                      New Name: <br />
-                      <input
-                        type="text"
-                        name="newName"
-                        className={`${Styles.popupText} ${Styles.inputField}`}
-                        maxLength={24} 
-                        pattern="^[a-zA-Z0-9_-]+$"
-                        title="24 characters max. Name can only contain letters, numbers, underscores, and hyphens."
-                        required
-                      />
-                    </label>
-                    <br /><br />
-                    {error && <p style={{ color: "yellow" }}>{error}</p>}
-                    <br/>
-                    <button type="submit" className={`${Styles.popupText} ${Styles.saveBtn}`}>Save Changes</button>
-                </form>
-                <button className={` ${Styles.closeBtn} ${Styles.popupText}`} onClick={toggleEditGroupPopup}>
-                    Close
-                </button>
-            </div>
+          <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
+            <h2 className={Styles.popupText}>Edit Group</h2>
+
+            {/* Form for editing the group */}
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const newName = formData.get("newName") as string;
+              const groupId = editGroupId;
+
+              await handleEditGroup(groupId, newName);
+            }}>
+              <label className={Styles.popupText}>
+                New Name: <br />
+                <input
+                  type="text"
+                  name="newName"
+                  className={`${Styles.popupText} ${Styles.inputField}`}
+                  maxLength={24}
+                  pattern="^[a-zA-Z0-9_-]+$"
+                  title="24 characters max. Name can only contain letters, numbers, underscores, and hyphens."
+                  required
+                />
+              </label>
+              <br /><br />
+              {error && <p style={{ color: "yellow" }}>{error}</p>}
+              <br />
+              <button type="submit" className={`${Styles.popupText} ${Styles.saveBtn}`}>Save Changes</button>
+            </form>
+            <button className={` ${Styles.closeBtn} ${Styles.popupText}`} onClick={toggleEditGroupPopup}>
+              Close
+            </button>
+          </div>
         </div>
-    )}
-    {/* --- ICON POPUP --- */}
-    {iconOpen && (
-      <div className={Styles.popupOverlay} onClick={toggleIconPopup}>
-        <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
-          <h2 className={Styles.popupText}>Change Community Icon</h2>
+      )}
+      {/* --- ICON POPUP --- */}
+      {iconOpen && (
+        <div className={Styles.popupOverlay} onClick={toggleIconPopup}>
+          <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
+            <h2 className={Styles.popupText}>Change Community Icon</h2>
 
-          {/* Preview the uploaded image */}
-          {iconPreview && (
-            <div style={{ marginBottom: "1rem" }}>
-              <Image src={iconPreview} alt="Preview Icon" width={80} height={80} />
-            </div>
-          )}
+            {/* Preview the uploaded image */}
+            {iconPreview && (
+              <div style={{ marginBottom: "1rem" }}>
+                <Image src={iconPreview} alt="Preview Icon" width={80} height={80} />
+              </div>
+            )}
 
-          {/* File upload input and buttons to change the icon or close the popup */}
-          <input type="file" accept="image/*" className={Styles.inputField} onChange={handleIconChange} />
-          <button className={`${Styles.saveBtn} ${Styles.popupText}`} onClick={submitIcon}>
-            Save Icon
-          </button>
-          <button className={`${Styles.closeBtn} ${Styles.popupText}`} onClick={toggleIconPopup}>
-            Close
-          </button>
+            {/* File upload input and buttons to change the icon or close the popup */}
+            <input type="file" accept="image/*" className={Styles.inputField} onChange={handleIconChange} />
+            <button className={`${Styles.saveBtn} ${Styles.popupText}`} onClick={submitIcon}>
+              Save Icon
+            </button>
+            <button className={`${Styles.closeBtn} ${Styles.popupText}`} onClick={toggleIconPopup}>
+              Close
+            </button>
+          </div>
         </div>
-      </div>
-    )}
+      )}
 
-    {/* --- BANNER POPUP --- */}
-    {bannerOpen && (
-      <div className={Styles.popupOverlay} onClick={toggleBannerPopup}>
-        <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
-          <h2 className={Styles.popupText}>Change Community Banner</h2>
-          
-          {/* Preview the uploaded image */}
-          {bannerPreview && (
-            <div style={{ marginBottom: "1rem" }}>
-              <Image src={bannerPreview} alt="Preview Banner" width={800} height={200} />
-            </div>
-          )}
+      {/* --- BANNER POPUP --- */}
+      {bannerOpen && (
+        <div className={Styles.popupOverlay} onClick={toggleBannerPopup}>
+          <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
+            <h2 className={Styles.popupText}>Change Community Banner</h2>
 
-          {/* File upload input and buttons to change the banner or close the popup */}
-          <input type="file" accept="image/*" className={Styles.inputField} onChange={handleBannerChange} />
-          <button className={`${Styles.saveBtn} ${Styles.popupText}`} onClick={submitBanner}>
-            Save Banner
-          </button>
-          <button className={`${Styles.closeBtn} ${Styles.popupText}`} onClick={toggleBannerPopup}>
-            Close
-          </button>
+            {/* Preview the uploaded image */}
+            {bannerPreview && (
+              <div style={{ marginBottom: "1rem" }}>
+                <Image src={bannerPreview} alt="Preview Banner" width={800} height={200} />
+              </div>
+            )}
+
+            {/* File upload input and buttons to change the banner or close the popup */}
+            <input type="file" accept="image/*" className={Styles.inputField} onChange={handleBannerChange} />
+            <button className={`${Styles.saveBtn} ${Styles.popupText}`} onClick={submitBanner}>
+              Save Banner
+            </button>
+            <button className={`${Styles.closeBtn} ${Styles.popupText}`} onClick={toggleBannerPopup}>
+              Close
+            </button>
+          </div>
         </div>
-      </div>
-    )}
-  </main>
+      )}
+      {/* --- MOD OPTIONS POPUP --- */}
+      {modOptionsOpen && (
+        <div className={Styles.popupOverlay} onClick={toggleModOptionsPopup}>
+          <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
+            <h2 className={Styles.popupText}>Mod Options</h2>
+            {/* Add mod options content here */}
+            <button className={`${Styles.popupText} ${Styles.closeBtn}`} onClick={handleKickUser}>
+              Kick User
+            </button>
+            <button className={`${Styles.popupText} ${Styles.closeBtn}`} onClick={handleBanUser}>
+              Ban User
+            </button>
+            {error && <p style={{ color: "yellow" }}>{error}</p>}
+          </div>
+        </div>
+      )}
+      {/* --- BLACKLIST POPUP --- */}
+      {blacklistOpen && (
+        <div className={Styles.popupOverlay} onClick={toggleBlacklistPopup}>
+          <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
+            <h2 className={Styles.popupText}>Blacklist</h2>
+            {/* Displays each user's name in the blacklist; if empty show a message */}
+            <ul>
+              {community.blacklist.length === 0 ? (
+                <p>The blacklist is empty.</p>
+              ) : (
+                community.blacklist.map((bannedUser) => (
+                  <li key={bannedUser.id} className={Styles.popupText}>
+                    {/* User's profile picture */}
+                    <Image src={bannedUser.photoURL} alt={bannedUser.username} width={40} height={40} />
+                    {/* Link to their profile */}
+                    <Link href={`/profile/${bannedUser.id}`}>
+                      {bannedUser.username}
+                    </Link>
+                    {/* Button to unban the user */}
+                    <button className={`${Styles.popupText} ${Styles.saveBtn}`} onClick={() => {
+                      handleUnbanUser(bannedUser.id);
+                    }}>
+                      Unban User
+                    </button>
+                  </li>
+                ))
+              )}
+            </ul>
+            {error && <p style={{ color: "yellow" }}>{error}</p>}
+            <button className={`${Styles.popupText} ${Styles.closeBtn}`} onClick={toggleBlacklistPopup}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+    </main>
   );
 }

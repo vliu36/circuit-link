@@ -335,14 +335,15 @@ export async function editCommunity(
     commName: string,           // current community name
     newName?: string,           // new name for the community (optional)
     description?: string,       // new description for the community (optional)
-    isPublic?: boolean          // new public status for the community (optional)
+    isPublic?: boolean,          // new public status for the community (optional)
+    rules?: string               // new rules for the community (optional)
 ): Promise<{ status: string; message: string }> {
     try {
         const res = await fetch(`${BASE_URL}/comm/edit/${commName}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({ newName, description, isPublic }),
+            body: JSON.stringify({ newName, description, isPublic, rules }),
         });
         const data = await res.json();
 
@@ -440,5 +441,109 @@ export async function changeCommunityBanner(file: File, commId: string) {
     } catch (error) {
         console.error("Error uploading profile picture:", error);
         throw error;
+    }
+}
+
+// Fetch community blacklisted users
+export async function fetchBlacklistedUsers(commName: string): Promise<string[] | null> {
+    try {
+        const res = await fetch(`${BASE_URL}/comm/blacklist/${commName}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            console.log("Failed to fetch blacklisted users:", data.message);
+            return null;
+        }
+        return data.blacklistedUsers || null;
+    } catch (err) {
+        console.log("Error fetching blacklisted users:", err);
+        return null;
+    }
+}
+
+// Kick a member from the community
+export async function kickMember(commName: string, userId: string): Promise<{ status: string; message: string }> {
+    try {
+        const res = await fetch(`${BASE_URL}/comm/kick-user`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ userId, commName }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            console.log("Failed to kick member:", data.message);
+            return {
+                status: "error",
+                message: data.message || "Failed to kick member.",
+            };
+        }
+        console.log("Member kicked successfully:", data);
+        return data;
+    } catch (err) {
+        console.log("Error kicking member:", err);
+        return {
+            status: "error",
+            message: err instanceof Error ? err.message : "Unknown error",
+        };
+    }
+}
+
+// Ban a member from the community
+export async function banMember(commName: string, userId: string): Promise<{ status: string; message: string }> {
+    try {
+        const res = await fetch(`${BASE_URL}/comm/ban-user`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ userId, commName }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            console.log("Failed to ban member:", data.message);
+            return {
+                status: "error",
+                message: data.message || "Failed to ban member.",
+            };
+        }
+        console.log("Member banned successfully:", data);
+        return data;
+    } catch (err) {
+        console.log("Error banning member:", err);
+        return {
+            status: "error",
+            message: err instanceof Error ? err.message : "Unknown error",
+        };
+    } // end try catch
+} // end banMember
+
+// Unban a member from the community
+export async function unbanMember(commName: string, userId: string): Promise<{ status: string; message: string }> {
+    try {
+        const res = await fetch(`${BASE_URL}/comm/unban-user`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ userId, commName }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            console.log("Failed to unban member:", data.message);
+            return {
+                status: "error",
+                message: data.message || "Failed to unban member.",
+            };
+        }
+        console.log("Member unbanned successfully:", data);
+        return data;
+    } catch (err) {
+        console.log("Error unbanning member:", err);
+        return {
+            status: "error",
+            message: err instanceof Error ? err.message : "Unknown error",
+        };
     }
 }
