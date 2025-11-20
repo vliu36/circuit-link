@@ -90,7 +90,7 @@ export default function OtherProfile({ params }: { params: Promise<{ uid: string
                 <h1>Profile</h1>
                 <p>Welcome to your profile page!</p>
                 {/* // NOTE: This link takes the user back to the landing page, rather than the previous page */}
-                <Link className="go-back-btn" href = "../landing">Go back</Link> 
+                <Link className="go-back-btn" href = "http://localhost:3000/profile">Go back</Link> 
                 <br/>
                 <br/>
                 <div className="profile-header">

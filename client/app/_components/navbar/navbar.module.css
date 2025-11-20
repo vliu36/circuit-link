@@ -16,54 +16,57 @@
 }
 
 .logInInfo{
-    height: 50px;
-    width: 8em;
+    height: 3em;
+    width: 12em;
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
-    margin-left: 55em;
+    margin-left: 53em;
     margin-right: 2em;
 }
 
 .logInSignUpButton{
     background-color: #D0E0EB;
-    height: 32px;
-    width: 80px;
+    color: #5A5454;
+    height: 2em;
+    width: 5em;
     border-radius: 1em;
-    margin-top: 10px;
+    margin-top: 0.7em;
     text-align: center;
-    line-height: 30px;
+    line-height: 2em;
 }
 
 .logInSignUpButton:hover {
-    background-color: #699DD8;
+    background-color: #D9D9D9;
     transform: scale(1.1);
 }
 
 .orText{
-    height: 50px;
-    width: 10px;
-    position: absolute;
-    top: 12px;
-    right: 170px;
+    height: 1em;
+    width: 0.5em;
+    margin-top: 0.8em;
+    margin-right: 0.5em;
+    color: #5A5454;
 }
 
 .notifDropdownMenu {
     background-color: #EDEDED;
-    width: 150px;
-    height: 150px;
+    margin-top: 1em;
+    margin-right: 5em;
+    width: 7em;
+    height: 6em;
     border-radius: 1em;
     opacity: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: rgb(0,0,0);
+    color: #5A5454;
 }
 
 .dropdownMenu {
     background-color: #EDEDED;
-    width: 9em;
-    height: 9em;
+    width: 7em;
+    height: 6em;
     border-radius: 1em;
     opacity: 1;
     display: flex;
@@ -89,19 +92,20 @@
     pointer-events: auto;
 }
 .settingsIcon{
-    margin-top:5px;
-    height: 40px;
-    width: 40px;
-    left: 150px;
+    margin-top:0.3em;
+    height: 2.8em;
+    width: 2.8em;
     border-radius: 50%;
     background-color: #B8B8B8;
+    margin-right: 4em;
 }
 
 .notificationButton{
-    height: 30px;
-    width: 30px;
+    height: 2em;
+    width: 2em;
     border-radius: 1em;
-    background-color: rgb(255,255,255);
+    background-color: #EDEDED;
     margin-left: 10px;
     margin-top:10px;
+    opacity: 10;
 }
