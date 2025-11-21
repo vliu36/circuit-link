@@ -5,18 +5,20 @@ import { useAuth } from "./_firebase/context.tsx";
 import SearchBar from "./_components/searchbar/search.tsx";
 import SearchResults from "./_components/searchbar/table.tsx";
 import NavBar from "./_components/navbar/navbar.tsx";
-import { fetchTopCommunities, fetchTopUsers, logout } from "./landing.ts";
+import { Community, fetchTopCommunities, fetchTopUsers, logout } from "./landing.ts";
 import Image from "next/image";
 import Link from "next/link";
 import { getCommunities } from "./landing.ts";
+import { User } from "firebase/auth";
+import { DocumentData } from "firebase/firestore";
 
 
 export default function Landing() {
     const { user, userData, loading } = useAuth();
 
-    const [topCommunities, setTopCommunities] = useState<any[]>([]);
-    const [topUsers, setTopUsers] = useState<any[]>([]);
-    const [userCommunities, setUserCommunities] = useState<any[]>([]);
+    const [topCommunities, setTopCommunities] = useState<DocumentData[]>([]);
+    const [topUsers, setTopUsers] = useState<DocumentData[]>([]);
+    const [userCommunities, setUserCommunities] = useState<DocumentData[]>([]);
     const [dataLoading, setDataLoading] = useState(true);
 
     useEffect(() => {
@@ -53,7 +55,7 @@ export default function Landing() {
                     {userCommunities.length === 0 ? (
                         <p>No joined communities.</p>
                     ) : (
-                        userCommunities.map((c: any, i: number) => (
+                        userCommunities.map((c: DocumentData, i: number) => (
                             <Link
                                 key={c.id}
                                 className={Styles.communitiesButtons}
@@ -107,7 +109,7 @@ export default function Landing() {
                     ) : topUsers.length === 0 ? (
                         <p>No users found.</p>
                     ) : (
-                        topUsers.map((u: any, idx: number) => {
+                        topUsers.map((u: DocumentData, idx: number) => {
                             const key = u.id ?? u._id ?? `user-${idx}`;
                             const username = u.username ?? u.displayName ?? u.name ?? "Unknown user";
                             const photo = u.photoURL ?? u.avatar ?? u.photo ?? "/defaultUser.svg";
@@ -137,7 +139,7 @@ export default function Landing() {
                     ) : topCommunities.length === 0 ? (
                         <p>No communities found.</p>
                     ) : (
-                        topCommunities.map((c: any, idx: number) => {
+                        topCommunities.map((c: DocumentData, idx: number) => {
                             const key = c.id ?? c._id ?? `comm-${idx}`;
                             const name = c.name ?? c.title ?? "Unnamed community";
                             const icon = c.icon ?? c.image ?? "/defaultCommunity.svg";

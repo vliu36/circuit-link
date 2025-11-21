@@ -654,6 +654,16 @@
     font-family: Inria Sans;
 }
 
+.inputField {
+    width: 100%;
+    padding: 0.5rem;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+    border:floralwhite 1px solid;
+    border-radius: 0.5em;
+    font-family: Inria Sans;
+}
+
 .cancelButton {
     background-color: #888;
     border: none;
@@ -717,4 +727,22 @@
 .createGroupBtn{
     width: 20%;
     margin-left: 40%;
+}
+
+.createForumButton{
+    background-color: #0072BB;
+    font-size: 14px;
+    color: white;
+    border: none;
+    border-radius: 1em;
+    width: 50%;
+    height: 100%;
+    cursor: pointer;
+    font-family: Inria Sans;
+    transition: background-color 0.2s ease;
+    margin: auto;
+}
+
+.createForumButton:hover {
+    background-color: #004570;
 }

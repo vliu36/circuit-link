@@ -13,7 +13,7 @@ import NavBar from '../../../_components/navbar/navbar.tsx';
 import { Community } from "../../../_types/types.ts";
 import { useRouter } from "next/navigation";
 import { fetchStructure } from "../community.ts";
-import { uploadImage, uploadVideo } from "../../../_utils/mediaUpload.ts";
+// import { uploadImage, uploadVideo } from "../../../_utils/mediaUpload.ts";
 import Image from "next/image";
 import * as commApi from "../community";
 import thumbsDown from "../../../../public/thumbs-down-regular-full.svg"
@@ -22,6 +22,7 @@ import commentIcon from "../../../../public/comment-regular-full.svg"
 import checkedthumbsDown from "../../../../public/thumbs-down-glow-full.svg"
 import checkedthumbsUp from "../../../../public/thumbs-up-glow-full.svg"
 import { fetchTopCommunities, fetchTopUsers, getCommunities } from "@/app/landing.ts";
+import { DocumentData } from "firebase/firestore";
 
 export default function ForumPage({
     params,
@@ -53,11 +54,12 @@ export default function ForumPage({
     const [mediaPreview, setMediaPreview] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const router = useRouter();
-    const [showCreateForum, setShowCreateForum] = useState<{ [key: string]: boolean }>({});
+    // const [showCreateForum, setShowCreateForum] = useState<{ [key: string]: boolean }>({});
+    const [showCreateForum, setShowCreateForum] = useState(false);
     const [reportPopup, setReportPopup] = useState(false);
     const [reportReason, setReportReason] = useState("");
     const [postId, setPostId] = useState<string>("");
-    const [userCommunities, setUserCommunities] = useState<any[]>([]);
+    const [userCommunities, setUserCommunities] = useState<DocumentData[]>([]);
     const [dataLoading, setDataLoading] = useState(true);
     const [confirmDeleteForum, setConfirmDeleteForum] = useState(false);
     const [deleteForumId, setDeleteForumId] = useState<string>("");
@@ -69,8 +71,32 @@ export default function ForumPage({
 
     const [createPostOpen, setCreatePostOpen] = useState(false);
 
+    // --- Delete Post State Variables---
+    const [deletePostOpen, setDeletePostOpen] = useState(false);
+    const [deletePostId, setDeletePostId] = useState<string>("");
+
+    const [groupId, setGroupId] = useState<string>("");
+
+    const [createGroupOpen, setCreateGroupOpen] = useState(false);
+
+    // --- Toggle popups ---
     const toggleCreatePostPopup = () => {
         setCreatePostOpen(!createPostOpen);
+        setError(null);
+    };
+
+    const toggleCreateGroupPopup = () => {
+        setCreateGroupOpen(!createGroupOpen);
+        setError(null);
+    };
+
+    const handleCreateForumBox = async () => {
+        setShowCreateForum(!showCreateForum);
+        setError(null);
+    };
+
+    const toggleDeletePostPopup = () => {
+        setDeletePostOpen(!deletePostOpen);
         setError(null);
     };
 
@@ -78,8 +104,8 @@ export default function ForumPage({
         if (loading) return;
 
         async function loadData() {
-            const comms = await fetchTopCommunities();
-            const users = await fetchTopUsers();
+            // const comms = await fetchTopCommunities();
+            // const users = await fetchTopUsers();
 
             if (userData?.communities) {
                 try {
@@ -96,17 +122,6 @@ export default function ForumPage({
         loadData();
     }, [userData, loading]);
 
-
-    const [createGroupOpen, setCreateGroupOpen] = useState(false);
-
-    const toggleCreateGroupPopup = () => {
-        setCreateGroupOpen(!createGroupOpen);
-        setError(null);
-    };
-
-    const handleCreateForumBox = async (groupId: string) => {
-        setShowCreateForum({});
-    };
 
     // --- CREATE GROUP ---
     const handleCreateGroup = async () => {
@@ -139,8 +154,8 @@ export default function ForumPage({
             });
             setForumInputs((prev) => ({ ...prev, [groupId]: { name: "", description: "", message: "" } }));
 
-            // Refresh community structure
-            // commApi.fetchStructure(commName).then((data) => data && setCommunity(data));
+            // Close popup card and refresh community structure
+            handleCreateForumBox();
             refreshCommunity();
         } catch (err) {
             const message =
@@ -342,11 +357,12 @@ export default function ForumPage({
     };
 
     // Handler to delete a post
-    const handleDeletePost = async (postId: string, commName: string) => {
-        if (!confirm("Are you sure you want to delete this post?")) return;
+    const handleDeletePost = async (postId: string) => {
+        // if (!confirm("Are you sure you want to delete this post?")) return;
         try {
-            const msg = await deletePostById(postId, commName);
-            alert(msg);
+            // const msg = await deletePostById(postId, commName);
+            await deletePostById(postId, commName);
+            // alert(msg);
             fetchPosts();
         } catch (err) {
             console.error(err);
@@ -455,6 +471,7 @@ export default function ForumPage({
         }
     };
 
+    const isMember = community?.userList.some(m => m.id === user?.uid);
     const isMod = community?.modList.some(m => m.id === user?.uid);
     const isOwner = community?.ownerList.some(o => o.id === user?.uid);
     const isBanned = community?.blacklist.some(b => b.id === user?.uid);
@@ -463,6 +480,11 @@ export default function ForumPage({
         return <div>You are banned from this community.</div>;
     }
 
+    // If the community is private and the user is not a member, show this community is private message
+    if (!community.public && !isMember) {
+        return (<div>This community is private.</div>);
+        // TODO : Add request to join functionality
+    }
     // Search posts in forum
     const handlePostSearch = async (query: string) => {
         try {
@@ -498,7 +520,7 @@ export default function ForumPage({
                         {userCommunities.length === 0 ? (
                             <p>No joined communities.</p>
                         ) : (
-                            userCommunities.map((c: any, i: number) => (
+                            userCommunities.map((c: DocumentData, i: number) => (
                                 <Link
                                     key={c.id}
                                     className={styles.communitiesButtons}
@@ -527,12 +549,14 @@ export default function ForumPage({
                     <div style={{ display: "flex" }}>
                         <h1 className={styles.commName}>{commName}</h1>
                         <div className={styles.createGroupBtn}>
-                            <button
-
-                                onClick={toggleCreateGroupPopup}
-                            >
-                                +
-                            </button>
+                            
+                            {(isOwner || isMod) && (
+                                <button
+                                    onClick={toggleCreateGroupPopup}
+                                >
+                                    +
+                                </button>
+                            )}
                             {createGroupOpen && (
                                 <div className={styles.popupOverlay} onClick={toggleCreateGroupPopup}>
                                     <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
@@ -583,68 +607,17 @@ export default function ForumPage({
                                     <div className={styles.groupHeader}>
                                         <div className={styles.groupName}>{group.name}</div>
                                         {/* Only displays if user is an owner or a mod */}
-                                        <button
-                                            className={styles.plusButton}
-                                            onClick={() =>
-                                                setShowCreateForum(() => ({
-                                                    // close ALL popups, only toggle the one clicked
-                                                    [group.id]: !showCreateForum[group.id]
-                                                }))
-                                            }
-                                        >
-                                            +
-                                        </button>
-                                        {/* --- CREATE FORUM FORM (only shown if toggled on) --- */}
-                                        {showCreateForum[group.id] && (
-                                            <div className={styles.createForumContainer} style={{ marginTop: "1rem" }}>
-                                                <h4 className={styles.createForumText}>Create a new forum in {group.name}</h4>
-
-                                                {/* -------- Forum Name -------- */}
-                                                <input
-                                                    type="text"
-                                                    placeholder="Forum name"
-                                                    className={styles.forumCreationInfomation}
-                                                    value={forumInputs[group.id]?.name || ""}
-                                                    onChange={(e) =>
-                                                        setForumInputs((prev) => ({
-                                                            ...prev,
-                                                            [group.id]: {
-                                                                ...prev[group.id],
-                                                                name: e.target.value,
-                                                                message: "",
-                                                            },
-                                                        }))
-                                                    }
-                                                />
-
-                                                {/* -------- Forum Description -------- */}
-                                                <textarea
-                                                    placeholder="Type description here"
-                                                    className={styles.forumDescCreationInfomation}
-                                                    value={forumInputs[group.id]?.description || ""}
-                                                    onChange={(e) =>
-                                                        setForumInputs((prev) => ({
-                                                            ...prev,
-                                                            [group.id]: { ...prev[group.id], description: e.target.value, message: "" },
-                                                        }))
-                                                    }
-                                                />
-
-                                                {/* -------- Submit -------- */}
-                                                <button
-                                                    className={styles.createForumButton}
-                                                    onClick={() => {
-                                                        handleCreateForumBox(group.id);
-                                                        handleCreateForum(group.id);
-                                                    }}
-                                                >
-                                                    Create Forum
-                                                </button>
-
-                                                {forumInputs[group.id]?.message && (
-                                                    <p>{forumInputs[group.id].message}</p>
-                                                )}
-                                            </div>
+                                        {(isOwner || isMod) && (
+                                            <button
+                                                className={styles.plusButton}
+                                                onClick={() => {
+                                                    setGroupName(group.name);
+                                                    setGroupId(group.id);
+                                                    setShowCreateForum(!showCreateForum);
+                                                }}
+                                            >
+                                                +
+                                            </button>
                                         )}
                                         {
                                             (isOwner || isMod) &&
@@ -704,13 +677,15 @@ export default function ForumPage({
                     <div className={styles.horizontalLine}></div>
                     <div className={styles.RulesBar}>
                         Rules
+                        {/* Display rules here */}
+                        <p>{community?.rules}</p>
                     </div>
                 </div>
 
                 <div className={styles.createBox}>
                     {user ? (
                         <button className={styles.primaryButton} onClick={toggleCreatePostPopup}>
-                            + Create New Post
+                            <strong>+ Create New Post</strong>
                         </button>
                     ) : (
                         <p>Please sign in to create posts.</p>
@@ -988,13 +963,13 @@ export default function ForumPage({
 
                                                     </div>
                                                     {/* Report button */}
-                                                    <div className={styles.postReportButton}>
+                                                    <div>
                                                         <button
+                                                            className={styles.postReportButton}
                                                             onClick={() => {
                                                                 toggleReportPopup();
                                                                 setPostId(post.id);
                                                             }}
-
                                                         >
                                                             Report
                                                         </button>
@@ -1024,7 +999,10 @@ export default function ForumPage({
                                                         {(isAuthor || isMod || isOwner) && (
                                                             <button
                                                                 className={styles.deleteButton}
-                                                                onClick={() => handleDeletePost(post.id, commName)}
+                                                                onClick={() => {
+                                                                    setDeletePostId(post.id);
+                                                                    toggleDeletePostPopup();
+                                                                }}
                                                             >
                                                                 Delete
                                                             </button>
@@ -1119,9 +1097,9 @@ export default function ForumPage({
                 <div className={styles.popupOverlay} onClick={toggleConfirmDeleteForum}>
                     <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
                         <h2 className={styles.popupText}>Confirm Delete Forum</h2>
-                        <p className={styles.popupText}>Are you sure you want to delete forum "{deleteForumName}"? <br /> This action cannot be undone.</p>
+                        <p className={styles.popupText}>Are you sure you want to delete forum &quot;{deleteForumName}&quot;? <br /> This action cannot be undone.</p>
                         <button onClick={toggleConfirmDeleteForum} className={styles.cancelButton}>Cancel</button>
-                        <button onClick={() => { handleDeleteForum(deleteForumId); toggleConfirmDeleteForum(); }} className={styles.deleteButton}>Delete</button>
+                        <button onClick={() => { handleDeleteForum(deleteForumId); toggleConfirmDeleteForum(); }} className={styles.deleteButtonPopup}>Delete</button>
                     </div>
                 </div>
             )}
@@ -1129,9 +1107,73 @@ export default function ForumPage({
                 <div className={styles.popupOverlay} onClick={toggleConfirmDeleteGroup}>
                     <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
                         <h2 className={styles.popupText}>Confirm Delete Group</h2>
-                        <p className={styles.popupText}>Are you sure you want to delete group "{deleteGroupName}"? <br /> This will delete all of its forums and cannot be undone.</p>
+                        <p className={styles.popupText}>Are you sure you want to delete group &quot;{deleteGroupName}&quot;? <br /> This will delete all of its forums and cannot be undone.</p>
                         <button onClick={toggleConfirmDeleteGroup} className={styles.cancelButton}>Cancel</button>
-                        <button onClick={() => { handleDeleteGroup(deleteGroupId); toggleConfirmDeleteGroup(); }} className={styles.deleteButton}>Delete</button>
+                        <button onClick={() => { handleDeleteGroup(deleteGroupId); toggleConfirmDeleteGroup(); }} className={styles.deleteButtonPopup}>Delete</button>
+                    </div>
+                </div>
+            )}
+            {deletePostOpen && (
+                <div className={styles.popupOverlay} onClick={toggleDeletePostPopup}>
+                    <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                        <h2 className={styles.popupText}>Confirm Delete Post</h2>
+                        <p className={styles.popupText}>Are you sure you want to delete this post? <br /> This action cannot be undone.</p>
+                        <button onClick={toggleDeletePostPopup} className={styles.cancelButton}>Cancel</button>
+                        <button onClick={() => { handleDeletePost(deletePostId); toggleDeletePostPopup(); }} className={styles.deleteButtonPopup}>Delete</button>
+                    </div>
+                </div>
+            )}
+            {/* --- CREATE FORUM FORM (only shown if toggled on) --- */}
+            {showCreateForum && (
+                <div className={styles.popupOverlay} onClick={handleCreateForumBox}>
+                    <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                        <h2 className={styles.popupText}>Create a new forum in {groupName}</h2>
+
+                        {/* -------- Forum Name -------- */}
+                        <input
+                            type="text"
+                            placeholder="Forum name"
+                            className={`${styles.popupText} ${styles.inputField}`}
+                            value={forumInputs[groupId]?.name || ""}
+                            onChange={(e) =>
+                                setForumInputs((prev) => ({
+                                    ...prev,
+                                    [groupId]: {
+                                        ...prev[groupId],
+                                        name: e.target.value,
+                                        message: "",
+                                    },
+                                }))
+                            }
+                            style={{ border: "1px solid #888" }}
+                        />
+
+                        {/* -------- Forum Description -------- */}
+                        <textarea
+                            placeholder="Type description here"
+                            className={`${styles.popupText} ${styles.inputField}`}
+                            value={forumInputs[groupId]?.description || ""}
+                            onChange={(e) =>
+                                setForumInputs((prev) => ({
+                                    ...prev,
+                                    [groupId]: { ...prev[groupId], description: e.target.value, message: "" },
+                                }))
+                            }
+                            style={{ border: "1px solid #888" }}
+                        />
+
+                        {/* -------- Submit -------- */}
+                        <button
+                            className={styles.createForumButton}
+                            onClick={() => {
+                                handleCreateForum(groupId);
+                            }}
+                        >
+                            Create Forum
+                        </button>
+                        {forumInputs[groupId]?.message && (
+                            <p>{forumInputs[groupId].message}</p>
+                        )}
                     </div>
                 </div>
             )}

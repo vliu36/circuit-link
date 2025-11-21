@@ -3,8 +3,8 @@
 import React, { use, useState, useEffect } from "react";
 import Styles from "./community.module.css";
 import { useAuth } from "../../_firebase/context.tsx";
-import { fetchTopCommunities, fetchTopUsers, logout } from "../../landing.ts";
-import { Suspense } from 'react';
+// import { fetchTopCommunities, fetchTopUsers, logout } from "../../landing.ts";
+// import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import * as commApi from "./community";
@@ -12,6 +12,7 @@ import { Community } from "../../_types/types.ts";
 import { useRouter } from "next/navigation";
 import NavBar from '../../_components/navbar/navbar.tsx';
 import { getCommunities } from "../../landing.ts"
+import { DocumentData } from "@firebase/firestore";
 
 export default function CommunityPage({
   params,
@@ -24,7 +25,7 @@ export default function CommunityPage({
   const [community, setCommunity] = useState<Community | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [userCommunities, setUserCommunities] = useState<any[]>([]);
+  const [userCommunities, setUserCommunities] = useState<DocumentData[]>([]);
 
   const [groupName, setGroupName] = useState("");
   const [groupMessage, setGroupMessage] = useState("");
@@ -425,6 +426,12 @@ export default function CommunityPage({
     return <div>You are banned from this community.</div>;
   }
 
+  // If the community is private and the user is not a member, show this community is private message
+  if (!community.public && !isMember) {
+    return (<div>This community is private.</div>);
+    // TODO : Add request to join functionality
+  }
+
   return (
     <main>
       <div className={Styles.background}>
@@ -438,7 +445,7 @@ export default function CommunityPage({
               {userCommunities.length === 0 ? (
                 <p>No joined communities.</p>
               ) : (
-                userCommunities.map((c: any, i: number) => (
+                userCommunities.map((c: DocumentData, i: number) => (
                   <Link
                     key={c.id}
                     className={Styles.communitiesButtons}
@@ -469,12 +476,13 @@ export default function CommunityPage({
           <div style={{ display: "flex"}}>
             <h1 className={Styles.commName}>{commName}</h1>
             <div className={Styles.createGroupBtn}>
-              <button
-                
-                onClick={toggleCreateGroupPopup}
-              >
-                +
-              </button>
+              {(isOwner || isMod) && (
+                <button 
+                  onClick={toggleCreateGroupPopup}
+                >
+                  +
+                </button>
+              )}
               {createGroupOpen && (
                 <div className={Styles.popupOverlay} onClick={toggleCreateGroupPopup}>
                   <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
@@ -524,17 +532,20 @@ export default function CommunityPage({
                 <div key={group.id} style={{ marginBottom: "2rem" }}>
                   <div className={Styles.groupHeader}>
                     <div className={Styles.groupName}>{group.name}</div>
-                    <button
-                      className={Styles.plusButton}
-                      onClick={() =>
-                        setShowCreateForum(() => ({
-                          // close ALL popups, only toggle the one clicked
-                          [group.id]: !showCreateForum[group.id]
-                        }))
-                      }
-                    >
-                      +
-                    </button>
+                      {/* Display create forum button if user is mod or owner */}
+                      {(isOwner || isMod) && (
+                      <button
+                        className={Styles.plusButton}
+                        onClick={() =>
+                          setShowCreateForum(() => ({
+                            // close ALL popups, only toggle the one clicked
+                            [group.id]: !showCreateForum[group.id]
+                          }))
+                        }
+                      >
+                        +
+                      </button>
+                    )}
                     {/* --- CREATE FORUM FORM (only shown if toggled on) --- */}
                     {showCreateForum[group.id] && (
                       <div className={Styles.createForumContainer} style={{ marginTop: "1rem" }}>
@@ -642,6 +653,9 @@ export default function CommunityPage({
 
           <div className={Styles.RulesBar}>
             Rules
+            <div className={Styles.rulesText}>
+              {community?.rules || "No rules have been set for this community."}
+            </div>
           </div>
 
 
@@ -1075,7 +1089,7 @@ export default function CommunityPage({
         <div className={Styles.popupOverlay} onClick={toggleConfirmDeleteForum}>
           <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
             <h2 className={Styles.popupText}>Confirm Delete Forum</h2>
-            <p className={Styles.popupText}>Are you sure you want to delete forum "{deleteForumName}"? <br /> This action cannot be undone.</p>
+            <p className={Styles.popupText}>Are you sure you want to delete forum &quot;{deleteForumName}&quot;? <br /> This action cannot be undone.</p>
             <button onClick={toggleConfirmDeleteForum} className={Styles.cancelButton}>Cancel</button>
             <button onClick={() => { handleDeleteForum(deleteForumId); toggleConfirmDeleteForum(); }} className={Styles.deleteButton}>Delete</button>
           </div>
@@ -1085,7 +1099,7 @@ export default function CommunityPage({
         <div className={Styles.popupOverlay} onClick={toggleConfirmDeleteGroup}>
           <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
             <h2 className={Styles.popupText}>Confirm Delete Group</h2>
-            <p className={Styles.popupText}>Are you sure you want to delete group "{deleteGroupName}"? <br /> This will delete all of its forums and cannot be undone.</p>
+            <p className={Styles.popupText}>Are you sure you want to delete group &quot;{deleteGroupName}&quot;? <br /> This will delete all of its forums and cannot be undone.</p>
             <button onClick={toggleConfirmDeleteGroup} className={Styles.cancelButton}>Cancel</button>
             <button onClick={() => { handleDeleteGroup(deleteGroupId); toggleConfirmDeleteGroup(); }} className={Styles.deleteButton}>Delete</button>
           </div>

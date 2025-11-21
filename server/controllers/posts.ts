@@ -171,6 +171,17 @@ const editDoc = async (req: Request, res: Response) => {
             });
         }
 
+        // Check if changes provided are the same as existing data
+        if (
+            (req.body.title && req.body.title === postData?.title) &&
+            (req.body.contents && req.body.contents === postData?.contents)
+        ) {
+            return res.status(200).send({
+                status: "OK",
+                message: "No changes were made.",
+            });
+        }
+
         // Prepare updates
         const updates: Partial<Post> = {};
         if (req.body.title) updates.title = req.body.title;

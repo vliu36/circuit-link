@@ -255,6 +255,11 @@ const editDoc = async (req: Request, res: Response) => {
         const authorId = authorPath?.split("/")[1];
         if (authorId !== userId) return res.status(403).json({ status: "Forbidden", message: "Not authorized to edit" });
 
+        // Check if contents provided are the same as existing contents
+        if (replyData?.contents === contents) {
+            return res.status(200).json({ status: "OK", message: "No changes were made." });
+        }
+
         await replyRef.update({ contents, timeReply: Timestamp.fromDate(new Date()), edited: true });
         res.status(200).json({ status: "OK", message: "Reply updated" });
     } catch (err) {
