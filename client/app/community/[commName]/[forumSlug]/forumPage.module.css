@@ -80,10 +80,10 @@
 
 .primaryButton {
     padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    background-color: #F0F0F0;
-    color: #5A5454;
+    border: 1px solid #0072BB;
+    border-radius: 1.1em;
+    background-color: #0072BB;
+    color: #fff;
     cursor: pointer;
     transition: background-color 0.2s ease;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
@@ -91,7 +91,7 @@
 }
 
 .primaryButton:hover {
-    background-color: #D9D9D9;
+    background-color: #004570;
 }
 
 .postCard {
@@ -178,6 +178,7 @@
     text-indent: 1vw;
     border-radius: 1vw;
     margin-left: 3%;
+    margin-right: 1%;
 }
 
 .commentIcon{
@@ -211,9 +212,7 @@
     transition: background-color 0.2s ease;
 }
 
-.editButton {
-    background-color: #f0ad4e;
-}
+
 
 .editButton:hover {
     background-color: #ec971f;
@@ -242,6 +241,22 @@
     background-color: #666;
 }
 
+.deleteButtonPopup {
+    background-color: #d9534f;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-left: 1rem;
+}
+
+.deleteButtonPopup:hover {
+    background-color: #c9302c;
+}
+
+/* Delete button for posts */
 .deleteButton {
     background-color: #d9534f;
     border: none;
@@ -915,18 +930,27 @@
 
 
 .postReportButton{
-    width: 10%;
-    height: 3.5vh;
-    background-color: rgba(217, 217, 217, 1);
+    background-color: orangered;
+    font-size: 14px;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
     border-radius: 1em;
-    text-align: center;
-    margin-left: 3%;
-}
-
-.postReportButton :hover{
-    background-color: rgb(139, 139, 139);
+    cursor: pointer;
+    margin-left: 5%;
+    margin-right: 5%;
+    transition: background-color 0.2s ease;
+    font-family: Inria Sans;
     width: 100%;
     height: 100%;
+    text-align: center;
+    padding: 5px 10px;
+}
+
+.postReportButton:hover{
+    background-color: rgb(187, 50, 0);
+    width: 100%;
+    height: 3.5vh;
     border-radius: 1em;
 }
 
@@ -934,12 +958,12 @@
     background-color: #f0ad4e;
     font-size: 14px;
     color: #fff;
-    padding: 5px 10px;
+    padding: 5px 15px;
     border: none;
-    border-radius: 6px;
+    border-radius: 1em;
     cursor: pointer;
-    margin-left: 5%;
-    margin-right: 5%;
+    margin-left: 17%;
+    margin-right: 17%;
     transition: background-color 0.2s ease;
     font-family: Inria Sans;
     width: 100%;
@@ -952,10 +976,11 @@
     font-size: 14px;
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 1em;
     width: 100%;
     height: 100%;
-    margin-right: 5%;
+    margin-right: 25%;
+    margin-left: 25%;
     cursor: pointer;
     font-family: Inria Sans;
 }

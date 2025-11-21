@@ -48,13 +48,24 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
     const [groupName, setGroupName] = useState("");
     const router = useRouter();
     const [groupMessage, setGroupMessage] = useState("");
-    const MAX_DEPTH = 5;
+    const MAX_DEPTH = 6;
 
 
     const [createGroupOpen, setCreateGroupOpen] = useState(false);
 
+    // --- Delete Post State Variables ---
+    const [deletePostOpen, setDeletePostOpen] = useState(false);
+    const [deletePostId, setDeletePostId] = useState<string>("");
+    const [isReplyDelete, setIsReplyDelete] = useState(false);
+
+
     const toggleCreateGroupPopup = () => {
         setCreateGroupOpen(!createGroupOpen);
+        setError(null);
+    };
+
+    const toggleDeletePostPopup = () => {
+        setDeletePostOpen(!deletePostOpen);
         setError(null);
     };
 
@@ -230,7 +241,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
 
     // Handler for deleting posts/replies
     const handleDelete = async (id: string, isReply: boolean) => {
-        if (!confirm("Are you sure you want to delete this?")) return;
+        // if (!confirm("Are you sure you want to delete this?")) return;
         try {
             if (isReply) {
                 await deleteReplyById(id, commName);
@@ -402,8 +413,8 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
 
                             </div>
 
-                            {/* Edit and Delete buttons, only shown if the current user is the author */}
-                            {isOwner && (
+                            {/* Edit and Delete buttons for posts and replies, only shown if the current user is the author */}
+                            {(isOwner || isMod || isAuthor) && (
                                 <div className={styles.utilityButtons}>
                                     {/* Edit button */}
                                     <button
@@ -415,7 +426,11 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                                     {/* Delete button */}
                                     <button
                                         className={styles.deleteButton}
-                                        onClick={() => handleDelete(item.id, isReply)}
+                                        onClick={() => {
+                                            setDeletePostId(item.id);
+                                            setIsReplyDelete(isReply);
+                                            toggleDeletePostPopup();
+                                        }}
                                     >
                                         Delete
                                     </button>
@@ -424,6 +439,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
 
                         </div>
                         <div>
+                            {(depth < MAX_DEPTH - 1) && (
                             <button
                                 className={styles.replyButton}
                                 onClick={() => setActiveReplyTo(activeReplyTo === item.id ? null : item.id)}
@@ -431,6 +447,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                             >
                                 Reply to this post
                             </button>
+                            )}
                         </div>
                         {/* If the current item is being replied to */}
                         {activeReplyTo === item.id && (
@@ -694,6 +711,8 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                         <div className={styles.horizontalLine}></div>
                         <div className={styles.horizontalLine}></div>
                         <h1>Rules</h1>
+                        {/* Display rules here */}
+                        <p>{community?.rules}</p>
                     </div>
                 </div>
 
@@ -734,6 +753,17 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                         <p className={styles.popupText}>Are you sure you want to delete group &quot;{deleteGroupName}&quot;? <br /> This will delete all of its forums and cannot be undone.</p>
                         <button onClick={toggleConfirmDeleteGroup} className={styles.cancelButton}>Cancel</button>
                         <button onClick={() => { handleDeleteGroup(deleteGroupId); toggleConfirmDeleteGroup(); }} className={styles.deleteButtonCard}>Delete</button>
+                    </div>
+                </div>
+            )}
+            {/* --- Delete Post Confirmation Popup --- */}
+            {deletePostOpen && (
+                <div className={styles.popupOverlay} onClick={toggleDeletePostPopup}>
+                    <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                        <h2 className={styles.popupText}>Confirm Delete</h2>
+                        <p className={styles.popupText}>Are you sure you want to delete this {isReplyDelete ? "reply" : "post"}? This action cannot be undone.</p>
+                        <button onClick={toggleDeletePostPopup} className={styles.cancelButton}>Cancel</button>
+                        <button onClick={() => { handleDelete(deletePostId, isReplyDelete); toggleDeletePostPopup(); }} className={styles.deleteButtonCard}>Delete</button>
                     </div>
                 </div>
             )}

@@ -13,7 +13,7 @@ import NavBar from '../../../_components/navbar/navbar.tsx';
 import { Community } from "../../../_types/types.ts";
 import { useRouter } from "next/navigation";
 import { fetchStructure } from "../community.ts";
-import { uploadImage, uploadVideo } from "../../../_utils/mediaUpload.ts";
+// import { uploadImage, uploadVideo } from "../../../_utils/mediaUpload.ts";
 import Image from "next/image";
 import * as commApi from "../community";
 import thumbsDown from "../../../../public/thumbs-down-regular-full.svg"
@@ -69,8 +69,30 @@ export default function ForumPage({
 
     const [createPostOpen, setCreatePostOpen] = useState(false);
 
+    // --- Delete Post State Variables---
+    const [deletePostOpen, setDeletePostOpen] = useState(false);
+    const [deletePostId, setDeletePostId] = useState<string>("");
+
+
+    const [createGroupOpen, setCreateGroupOpen] = useState(false);
+
+    // --- Toggle popups ---
     const toggleCreatePostPopup = () => {
         setCreatePostOpen(!createPostOpen);
+        setError(null);
+    };
+
+    const toggleCreateGroupPopup = () => {
+        setCreateGroupOpen(!createGroupOpen);
+        setError(null);
+    };
+
+    const handleCreateForumBox = async (groupId: string) => {
+        setShowCreateForum({});
+    };
+
+    const toggleDeletePostPopup = () => {
+        setDeletePostOpen(!deletePostOpen);
         setError(null);
     };
 
@@ -78,8 +100,8 @@ export default function ForumPage({
         if (loading) return;
 
         async function loadData() {
-            const comms = await fetchTopCommunities();
-            const users = await fetchTopUsers();
+            // const comms = await fetchTopCommunities();
+            // const users = await fetchTopUsers();
 
             if (userData?.communities) {
                 try {
@@ -96,17 +118,6 @@ export default function ForumPage({
         loadData();
     }, [userData, loading]);
 
-
-    const [createGroupOpen, setCreateGroupOpen] = useState(false);
-
-    const toggleCreateGroupPopup = () => {
-        setCreateGroupOpen(!createGroupOpen);
-        setError(null);
-    };
-
-    const handleCreateForumBox = async (groupId: string) => {
-        setShowCreateForum({});
-    };
 
     // --- CREATE GROUP ---
     const handleCreateGroup = async () => {
@@ -342,11 +353,12 @@ export default function ForumPage({
     };
 
     // Handler to delete a post
-    const handleDeletePost = async (postId: string, commName: string) => {
-        if (!confirm("Are you sure you want to delete this post?")) return;
+    const handleDeletePost = async (postId: string) => {
+        // if (!confirm("Are you sure you want to delete this post?")) return;
         try {
-            const msg = await deletePostById(postId, commName);
-            alert(msg);
+            // const msg = await deletePostById(postId, commName);
+            await deletePostById(postId, commName);
+            // alert(msg);
             fetchPosts();
         } catch (err) {
             console.error(err);
@@ -694,13 +706,15 @@ export default function ForumPage({
                     <div className={styles.horizontalLine}></div>
                     <div className={styles.RulesBar}>
                         Rules
+                        {/* Display rules here */}
+                        <p>{community?.rules}</p>
                     </div>
                 </div>
 
                 <div className={styles.createBox}>
                     {user ? (
                         <button className={styles.primaryButton} onClick={toggleCreatePostPopup}>
-                            + Create New Post
+                            <strong>+ Create New Post</strong>
                         </button>
                     ) : (
                         <p>Please sign in to create posts.</p>
@@ -964,13 +978,13 @@ export default function ForumPage({
 
                                                     </div>
                                                     {/* Report button */}
-                                                    <div className={styles.postReportButton}>
+                                                    <div>
                                                         <button
+                                                            className={styles.postReportButton}
                                                             onClick={() => {
                                                                 toggleReportPopup();
                                                                 setPostId(post.id);
                                                             }}
-
                                                         >
                                                             Report
                                                         </button>
@@ -1000,7 +1014,10 @@ export default function ForumPage({
                                                         {(isAuthor || isMod || isOwner) && (
                                                             <button
                                                                 className={styles.deleteButton}
-                                                                onClick={() => handleDeletePost(post.id, commName)}
+                                                                onClick={() => {
+                                                                    setDeletePostId(post.id);
+                                                                    toggleDeletePostPopup();
+                                                                }}
                                                             >
                                                                 Delete
                                                             </button>
@@ -1097,7 +1114,7 @@ export default function ForumPage({
                         <h2 className={styles.popupText}>Confirm Delete Forum</h2>
                         <p className={styles.popupText}>Are you sure you want to delete forum &quot;{deleteForumName}&quot;? <br /> This action cannot be undone.</p>
                         <button onClick={toggleConfirmDeleteForum} className={styles.cancelButton}>Cancel</button>
-                        <button onClick={() => { handleDeleteForum(deleteForumId); toggleConfirmDeleteForum(); }} className={styles.deleteButton}>Delete</button>
+                        <button onClick={() => { handleDeleteForum(deleteForumId); toggleConfirmDeleteForum(); }} className={styles.deleteButtonPopup}>Delete</button>
                     </div>
                 </div>
             )}
@@ -1107,7 +1124,17 @@ export default function ForumPage({
                         <h2 className={styles.popupText}>Confirm Delete Group</h2>
                         <p className={styles.popupText}>Are you sure you want to delete group &quot;{deleteGroupName}&quot;? <br /> This will delete all of its forums and cannot be undone.</p>
                         <button onClick={toggleConfirmDeleteGroup} className={styles.cancelButton}>Cancel</button>
-                        <button onClick={() => { handleDeleteGroup(deleteGroupId); toggleConfirmDeleteGroup(); }} className={styles.deleteButton}>Delete</button>
+                        <button onClick={() => { handleDeleteGroup(deleteGroupId); toggleConfirmDeleteGroup(); }} className={styles.deleteButtonPopup}>Delete</button>
+                    </div>
+                </div>
+            )}
+            {deletePostOpen && (
+                <div className={styles.popupOverlay} onClick={toggleDeletePostPopup}>
+                    <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                        <h2 className={styles.popupText}>Confirm Delete Post</h2>
+                        <p className={styles.popupText}>Are you sure you want to delete this post? <br /> This action cannot be undone.</p>
+                        <button onClick={toggleDeletePostPopup} className={styles.cancelButton}>Cancel</button>
+                        <button onClick={() => { handleDeletePost(deletePostId); toggleDeletePostPopup(); }} className={styles.deleteButtonPopup}>Delete</button>
                     </div>
                 </div>
             )}

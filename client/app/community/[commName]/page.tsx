@@ -3,8 +3,8 @@
 import React, { use, useState, useEffect } from "react";
 import Styles from "./community.module.css";
 import { useAuth } from "../../_firebase/context.tsx";
-import { fetchTopCommunities, fetchTopUsers, logout } from "../../landing.ts";
-import { Suspense } from 'react';
+// import { fetchTopCommunities, fetchTopUsers, logout } from "../../landing.ts";
+// import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import * as commApi from "./community";
@@ -653,6 +653,9 @@ export default function CommunityPage({
 
           <div className={Styles.RulesBar}>
             Rules
+            <div className={Styles.rulesText}>
+              {community?.rules || "No rules have been set for this community."}
+            </div>
           </div>
 
 
