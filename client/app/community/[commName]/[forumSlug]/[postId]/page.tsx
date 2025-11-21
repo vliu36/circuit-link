@@ -31,7 +31,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
     const [editContent, setEditContent] = useState("");
     const [editTitle, setEditTitle] = useState("");
     const [load, setLoading] = useState(true);
-    const [showCreateForum, setShowCreateForum] = useState<{ [key: string]: boolean }>({});
+    const [showCreateForum, setShowCreateForum] = useState(false);
     const [editGroupOpen, setEditGroupOpen] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [editGroupId, setEditGroupId] = useState<string>("");
@@ -57,6 +57,8 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
     const [deletePostOpen, setDeletePostOpen] = useState(false);
     const [deletePostId, setDeletePostId] = useState<string>("");
     const [isReplyDelete, setIsReplyDelete] = useState(false);
+
+    const [groupId, setGroupId] = useState("");
 
 
     const toggleCreateGroupPopup = () => {
@@ -158,8 +160,8 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
             });
             setForumInputs((prev) => ({ ...prev, [groupId]: { name: "", description: "", message: "" } }));
 
-            // Refresh community structure
-            // commApi.fetchStructure(commName).then((data) => data && setCommunity(data));
+            // Close popup card and refresh community structure
+            handleCreateForumBox();
             refreshCommunity();
         } catch (err) {
             const message =
@@ -184,8 +186,8 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
             .finally(() => setLoading(false));
     }, [commName]);
 
-    const handleCreateForumBox = async (groupId: string) => {
-        setShowCreateForum({});
+    const handleCreateForumBox = async () => {
+        setShowCreateForum(!showCreateForum);
     };
 
     // TODO ---------------- Use this in notifications when reporting a reply
@@ -469,14 +471,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                             </div>
                         )}
                     </div>
-
-
                 )}
-
-
-
-
-
                 <div style={{ marginBottom: "2vw" }}></div>
 
                 {/* Render nested replies, if any */}
@@ -592,67 +587,14 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                                         {(isOwner || isMod) && (
                                             <button
                                                 className={styles.plusButton}
-                                                onClick={() =>
-                                                    setShowCreateForum(() => ({
-                                                        // close ALL popups, only toggle the one clicked
-                                                        [group.id]: !showCreateForum[group.id]
-                                                    }))
-                                                }
+                                                onClick={() => { 
+                                                    setGroupId(group.id); 
+                                                    setGroupName(group.name);
+                                                    handleCreateForumBox(); 
+                                                }}
                                             >
                                                 +
                                             </button>
-                                        )}
-                                        {/* --- CREATE FORUM FORM (only shown if toggled on) --- */}
-                                        {showCreateForum[group.id] && (
-                                            <div className={styles.createForumContainer} style={{ marginTop: "1rem" }}>
-                                                <h4 className={styles.createForumText}>Create a new forum in {group.name}</h4>
-
-                                                {/* -------- Forum Name -------- */}
-                                                <input
-                                                    type="text"
-                                                    placeholder="Forum name"
-                                                    className={styles.forumCreationInfomation}
-                                                    value={forumInputs[group.id]?.name || ""}
-                                                    onChange={(e) =>
-                                                        setForumInputs((prev) => ({
-                                                            ...prev,
-                                                            [group.id]: {
-                                                                ...prev[group.id],
-                                                                name: e.target.value,
-                                                                message: "",
-                                                            },
-                                                        }))
-                                                    }
-                                                />
-
-                                                {/* -------- Forum Description -------- */}
-                                                <textarea
-                                                    placeholder="Type description here"
-                                                    className={styles.forumDescCreationInfomation}
-                                                    value={forumInputs[group.id]?.description || ""}
-                                                    onChange={(e) =>
-                                                        setForumInputs((prev) => ({
-                                                            ...prev,
-                                                            [group.id]: { ...prev[group.id], description: e.target.value, message: "" },
-                                                        }))
-                                                    }
-                                                />
-
-                                                {/* -------- Submit -------- */}
-                                                <button
-                                                    className={styles.createForumButton}
-                                                    onClick={() => {
-                                                        handleCreateForumBox(group.id);
-                                                        handleCreateForum(group.id);
-                                                    }}
-                                                >
-                                                    Create Forum
-                                                </button>
-
-                                                {forumInputs[group.id]?.message && (
-                                                    <p>{forumInputs[group.id].message}</p>
-                                                )}
-                                            </div>
                                         )}
                                         {/* Only displays if user is an owner or a mod */}
                                         {
@@ -722,9 +664,6 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                     <NavBar />
                 </div>
 
-
-
-
                 <div className={styles.postsPage} style={{ gridArea: "Center" }}>
                     <div className={styles.backDisplay}>
                         <Link href={`/community/${commName}/${forumSlug}`}>
@@ -732,7 +671,6 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                         </Link>
                     </div>
                     {renderPostOrReply(post)}
-
                 </div>
 
             </div>
@@ -764,6 +702,60 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                         <p className={styles.popupText}>Are you sure you want to delete this {isReplyDelete ? "reply" : "post"}? This action cannot be undone.</p>
                         <button onClick={toggleDeletePostPopup} className={styles.cancelButton}>Cancel</button>
                         <button onClick={() => { handleDelete(deletePostId, isReplyDelete); toggleDeletePostPopup(); }} className={styles.deleteButtonCard}>Delete</button>
+                    </div>
+                </div>
+            )}
+            {/* --- CREATE FORUM FORM (only shown if toggled on) --- */}
+            {showCreateForum && (
+                <div className={styles.popupOverlay} onClick={handleCreateForumBox}>
+                    <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                        <h2 className={styles.popupText}>Create a new forum in {groupName}</h2>
+
+                        {/* -------- Forum Name -------- */}
+                        <input
+                            type="text"
+                            placeholder="Forum name"
+                            className={`${styles.popupText} ${styles.inputField}`}
+                            value={forumInputs[groupId]?.name || ""}
+                            onChange={(e) =>
+                                setForumInputs((prev) => ({
+                                    ...prev,
+                                    [groupId]: {
+                                        ...prev[groupId],
+                                        name: e.target.value,
+                                        message: "",
+                                    },
+                                }))
+                            }
+                            style={{ border: "1px solid #888" }}
+                        />
+
+                        {/* -------- Forum Description -------- */}
+                        <textarea
+                            placeholder="Type description here"
+                            className={`${styles.popupText} ${styles.inputField}`}
+                            value={forumInputs[groupId]?.description || ""}
+                            onChange={(e) =>
+                                setForumInputs((prev) => ({
+                                    ...prev,
+                                    [groupId]: { ...prev[groupId], description: e.target.value, message: "" },
+                                }))
+                            }
+                            style={{ border: "1px solid #888" }}
+                        />
+
+                        {/* -------- Submit -------- */}
+                        <button
+                            className={styles.createForumButton}
+                            onClick={() => {
+                                handleCreateForum(groupId);
+                            }}
+                        >
+                            Create Forum
+                        </button>
+                        {forumInputs[groupId]?.message && (
+                            <p>{forumInputs[groupId].message}</p>
+                        )}
                     </div>
                 </div>
             )}

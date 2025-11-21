@@ -777,12 +777,20 @@
 }
 
 .createForumButton{
-    width: 25%;
-    margin-left: 35%;
-    margin-top: 1vh;
+    background-color: #0072BB;
+    font-size: 14px;
+    color: white;
+    border: none;
     border-radius: 1em;
-    background-color: #F0F0F0;
-    color: #5A5454;
+    width: 50%;
+    height: 100%;
+    cursor: pointer;
+    font-family: Inria Sans;
+    transition: background-color 0.2s ease;
+}
+
+.createForumButton:hover {
+    background-color: #004570;
 }
 
 .joinCommunityButton{
