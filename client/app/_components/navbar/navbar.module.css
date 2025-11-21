@@ -81,17 +81,18 @@
 
 .logInSignUpButton {
     background-color: #D0E0EB;
-    height: 32px;
-    width: 80px;
+    color: #5A5454;
+    height: 2em;
+    width: 5em;
     border-radius: 1em;
-    margin-top: 10px;
+    margin-top: 0.7em;
     text-align: center;
     line-height: 30px;
     color: black;
 }
 
 .logInSignUpButton:hover {
-    background-color: #699DD8;
+    background-color: #D9D9D9;
     transform: scale(1.1);
 }
 
@@ -120,8 +121,8 @@
 
 .dropdownMenu {
     background-color: #EDEDED;
-    width: 9em;
-    height: 9em;
+    width: 7em;
+    height: 6em;
     border-radius: 1em;
     opacity: 1;
     display: flex;
@@ -159,83 +160,14 @@
     width: 40px;
     border-radius: 50%;
     background-color: #B8B8B8;
+    margin-right: 4em;
 }
 
 .notificationButton {
     height: 30px;
     width: 30px;
     border-radius: 1em;
-    background-color: rgb(255, 255, 255);
-    margin-top: 10px;
-}
-
-@media screen and (max-width:1600px){
-    .navBox {
-        background-color: rgb(237, 237, 237);
-        width: 100%;
-        height: 3.19em;
-        display: grid;
-        grid-template-columns: 16.67vw 65vw 40px 80px 40px;
-        grid-template-rows: 100vh;
-        grid-template-areas:
-            "Home blankSpace signUp orTh register"
-    }
-    .navBox2 {
-    background-color: rgb(237, 237, 237);
-    width: 100%;
-    height: 3.19em;
-    display: grid;
-    grid-template-columns: 16.67vw 75vw 40px 20px 40px;
-    grid-template-rows: 100vh;
-    grid-template-areas:
-        "Home blankSpace notification space settings"
-    }
-}
-
-@media screen and (max-width: 1200px) {
-    .navBox {
-        background-color: rgb(237, 237, 237);
-        width: 100%;
-        height: 3.19em;
-        display: grid;
-        grid-template-columns: 16.67vw 57vw 40px 80px 40px;
-        grid-template-rows: 100vh;
-        grid-template-areas:
-            "Home blankSpace signUp orTh register"
-    }
-
-    .navBox2 {
-    background-color: rgb(237, 237, 237);
-    width: 100%;
-    height: 3.19em;
-    display: grid;
-    grid-template-columns: 16.67vw 70vw 40px 20px 40px;
-    grid-template-rows: 100vh;
-    grid-template-areas:
-        "Home blankSpace notification space settings"
-    }
-}
-
-@media screen and (max-width: 800px) {
-    .navBox {
-        background-color: rgb(237, 237, 237);
-        width: 100%;
-        height: 3.19em;
-        display: grid;
-        grid-template-columns: 16.67vw 50vw 40px 80px 40px;
-        grid-template-rows: 100vh;
-        grid-template-areas:
-            "Home blankSpace signUp orTh register"
-    }
-
-    .navBox2 {
-        background-color: rgb(237, 237, 237);
-        width: 100%;
-        height: 3.19em;
-        display: grid;
-        grid-template-columns: 16.67vw 60vw 40px 20px 40px;
-        grid-template-rows: 100vh;
-        grid-template-areas:
-        "Home blankSpace notification space settings"
-    }
+    background-color: rgb(255,255,255);
+    margin-left: 10px;
+    margin-top:10px;
 }

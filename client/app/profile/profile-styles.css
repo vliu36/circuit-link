@@ -5,29 +5,33 @@ main {
     align-items: center;
     justify-content: flex-start;
     min-height: 100vh;
-    background: #394153;
+    background: #D0E0EB;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 2rem;
 }
 
 /* Profile section box */
 .profile-card {
-    background: #5B6680;
+    background: #F5F5F5;
+    color: #5A5454;
     padding: 2rem;
-    border-radius: 16px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     width: 100%;
     max-width: 500px;
     text-align: center;
     margin-bottom: 1.5rem;
+    border: 3px #D9D9D9;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
 /* Account information box */
 .account-info {
-    background: #5B6680;
+    background: #F5F5F5;
+    color: #5A5454;
     padding: 2rem;
-    border-radius: 16px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border: 3px #D9D9D9;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
     /* width: 80%; */
     max-width: 500px;
     text-align: center;
@@ -51,10 +55,12 @@ form {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.5rem;
-    background: #5B6680;
+    background: #F5F5F5;
+    color: #5A5454;
     padding: 1.5rem;
-    border-radius: 12px;
-    box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+    border: 3px #D9D9D9;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
     width: 100%;
     max-width: 500px;
     margin-bottom: 1.5rem;
@@ -83,22 +89,23 @@ input[type="checkbox"] {
 button {
     background: none;
     border: none;
-    color: #3F6DA1;
+    color: #5A5454;
     font-weight: 600;
     cursor: pointer;
     transition: 0.2s ease;
+    margin-left: 2.5em;
 }
 
 button:hover {
     color: #699DD8;
     text-decoration: underline;
-    color: white;
+    color: #5A5454;
 }
 
 /* Go back button */
 .go-back-btn {
-    background: #007bff;
-    color: white;
+    background: #D0E0EB;
+    color: #5A5454;
     border: none;
     padding: 0.3rem 1rem;
     border-radius: 6px;
@@ -107,11 +114,15 @@ button:hover {
     font-size: 12px;
 }
 
+.go-back-btn:hover {
+    background-color: #D9D9D9;
+}
+
 /* Primary action buttons (Save/Delete) */
 button[type="submit"],
 button.upload-btn {
-    background: #007bff;
-    color: white;
+    background: #D0E0EB;
+    color: #5A5454;
     border: none;
     padding: 0.6rem 1rem;
     border-radius: 6px;
@@ -121,7 +132,7 @@ button.upload-btn {
 
 button[type="submit"]:hover,
 button.upload-btn:hover {
-    background: #0056b3;
+    background: #D9D9D9;
 }
 
 /* Delete button */

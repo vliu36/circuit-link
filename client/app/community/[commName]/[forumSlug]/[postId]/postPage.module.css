@@ -146,10 +146,12 @@
 
 .yayActive {
     color: #4caf50;
+    background-color: green;
 }
 
 .nayActive {
     color: #d9534f;
+    background-color: red;
 }
 
 .replyBorder{
