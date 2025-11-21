@@ -7,8 +7,8 @@ export default function Help() {{/*function RulesPage*/}
     
     return (
         <div className = {Styles.background}>
-            {/*Added http://localhost:3000 instead of ./landing since we got rid of it*/}
-            <Link className = {Styles.returnButton} href = "http://localhost:3000" replace>
+            {/*Added https://circuitlink-160321257010.us-west2.run.app instead of ./landing since we got rid of it*/}
+            <Link className = {Styles.returnButton} href = "https://circuitlink-160321257010.us-west2.run.app" replace>
                 <h1 className = {Styles.returnButtonText}>Return</h1>
             </Link>
             <div className = {Styles.mainBox}>

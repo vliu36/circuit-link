@@ -28,7 +28,7 @@ export default function SearchBar() {
         try {
             if (params.get("query")) {
                 const arg = params.get("query")?.toString();
-                const res = await fetch(`http://localhost:2400/api/comm/search/${arg}`, {     
+                const res = await fetch(`https://api-circuit-link-160321257010.us-west2.run.app/api/comm/search/${arg}`, {     
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
