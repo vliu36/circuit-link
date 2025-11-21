@@ -2,9 +2,9 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    width: 200%;
+    width: 250%;
     height: 50px;
-    right: 10%;
+    right: 20%;
     z-index: 1;
     color: #000000;
 }

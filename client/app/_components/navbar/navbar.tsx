@@ -156,7 +156,7 @@ export default function NavBar() {
                 
                     <div className = {Styles.notifDropdown} ref = {notifRef} style={{gridArea: 'notification'}}>
                         <button onClick={() => setIsNotifOpen(prev => !prev)}>
-                             <Image src = {notificationBell} alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
+                             <Image src = "/notification.svg" alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
                         </button>
                           {isNotifOpen && (
                             <div className = {Styles.notifDropdownMenu}>
