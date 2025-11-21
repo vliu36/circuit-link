@@ -119,6 +119,7 @@ export default function Notifications() {
 
     return (
         <div>
+            <NavBar/>
             <h1>Notifications Page</h1>
             <p>This is where user notifications will be displayed.</p>
 

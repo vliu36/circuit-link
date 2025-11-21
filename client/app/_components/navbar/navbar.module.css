@@ -103,6 +103,15 @@
     text-indent: 65%;
 }
 
+.buttonBox {
+    background-color: #EDEDED;
+    width: 150 px;
+    height: 50 px;
+    color: rgb(0,0,0);
+    margin-top:20px;
+    position: relative;
+}
+
 .notifDropdownMenu {
     background-color: #EDEDED;
     width: 9em;

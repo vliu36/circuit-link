@@ -32,18 +32,14 @@ export async function respondToFriendRequest(requestRef: DocumentReference, acce
 
         console.log("Friend request response sent successfully.");
         
-        // // Mark the notification as read
-        // markNotificationAsRead(notifId);
-
-        if (accept) {
-            alert("Friend request accepted.");
-        } else {
-            alert("Friend request declined.");
-        }
+        // NOTE: We rely on the front-end state (requestStatus) to show feedback, 
+        // not blocking 'alert' calls.
+        
     } catch (error) {
         console.error("Error responding to friend request:", error);
-    } // end try catch
-} // end function respondToFriendRequest
+        throw error; // Re-throw the error so the NavBar can revert the state
+    }
+}
 
 // Fetch the status of a friend request
 export async function fetchFriendRequestStatus(friendRequestRef: DocumentReference) {
@@ -80,8 +76,8 @@ export async function getNotifications(
     } catch (error) {
         console.error("Error fetching notifications:", error);
         throw error;
-    } // end try catch
-} // end function getNotifications
+    }
+}
 
 export async function markNotificationAsRead(notifId: string) {
     try {
