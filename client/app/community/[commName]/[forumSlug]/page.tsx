@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../../../_firebase/context.tsx";
 import { use, useRef } from "react";
 import Link from "next/link";
-import { fetchPostsByForum, createPost, editPost, deletePostById, votePost, editForum, getMediaUrl, reportPost } from "./forum.ts";
+import { fetchPostsByForum, createPost, editPost, deletePostById, votePost, editForum, getMediaUrl, reportPost, searchPosts } from "./forum.ts";
 import styles from "./forumPage.module.css";
 import { Post, Forum } from "../../../_types/types.ts";
 import { useCallback } from "react";
@@ -65,6 +65,7 @@ export default function ForumPage({
     const [confirmDeleteGroup, setConfirmDeleteGroup] = useState(false);
     const [deleteGroupId, setDeleteGroupId] = useState<string>("");
     const [deleteGroupName, setDeleteGroupName] = useState<string>("");
+    const [searchQuery, setSearchQuery] = useState<string>("");
 
     const [createPostOpen, setCreatePostOpen] = useState(false);
 
@@ -462,7 +463,26 @@ export default function ForumPage({
         return <div>You are banned from this community.</div>;
     }
 
+    // Search posts in forum
+    const handlePostSearch = async (query: string) => {
+        try {
+            const { matchingPosts } = await searchPosts(commName, forumSlug, query);
+            
+            const formattedPosts = (matchingPosts || []).map((post: Post) => ({
+                ...post,
+                timePosted: post.timePosted ? new Date(post.timePosted).toLocaleString() : "Unknown",
+                
+            }));
 
+            setPosts(formattedPosts);
+        }
+        catch (err) {
+            console.log("Post search failed: ", err);
+        }
+        finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <main>
@@ -653,7 +673,7 @@ export default function ForumPage({
                                                     {/* Link to the forum (displays its posts) */}
                                                     <div className={styles.channelName}>
                                                         <Link href={`/community/${commName}/${forum.slug}`}>
-                                                            &gt;{forum.name}
+                                                            &gt; {forum.name}
                                                         </Link>
                                                     </div>
                                                     {/* -------- Delete Forum Button -------- */}
@@ -791,10 +811,24 @@ export default function ForumPage({
                             </div>
                         </div>
 
-                        <textarea className={styles.postSearchBar}>
-
-                        </textarea>
-                        <button className={styles.enterSearch}>Search</button>
+                        <input 
+                            className={styles.postSearchBar}
+                            placeholder="Search this forum..."
+                            onChange={(e) => {
+                                setSearchQuery(e.target.value);
+                                if (!searchQuery) {
+                                    fetchPosts();
+                                }
+                            }}
+                        />
+                        <button 
+                            className={styles.enterSearch}
+                            onClick={() => {
+                                handlePostSearch(searchQuery);
+                                setSearchQuery("");
+                            }}>
+                            Search
+                        </button>
 
                     </div>
 
