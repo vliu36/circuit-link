@@ -705,6 +705,7 @@
 
 .groupHeader{
     display: flex;
+    text-indent: 10%;
 }
 
 .groupName{
@@ -718,6 +719,7 @@
     width: 95%;
     height: 3vh;
     display:flex;
+    text-indent: 5%;
 }
 
 .channelName{
@@ -729,7 +731,11 @@
     margin-left: 10px;
     margin-left: 4%;
     overflow: hidden;
-    
+}
+
+.channelName:hover {
+    background-color: #d9d9d9;
+    border-radius: 1em;
 }
 
 .deleteChannel{
