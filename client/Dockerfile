@@ -28,6 +28,8 @@ COPY --from=nextBuild /app/.next ./.next
 
 COPY --from=nextBuild /app/public ./public
 
+COPY --from=nextBuild /app/next.config.js ./
+
 EXPOSE 3000
 
 CMD ["npm", "run", "start"]

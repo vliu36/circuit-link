@@ -564,7 +564,7 @@ export async function ensureDefaultGroup(commName: string) {
 
         // If "general" already exists → return it
         const existing = groups.find(
-            (g: any) => g.name.toLowerCase() === "general"
+            (g: { name: string; }) => g.name.toLowerCase() === "general"
         );
         if (existing) return existing;
 
