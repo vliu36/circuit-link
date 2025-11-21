@@ -12,16 +12,21 @@
 
 .createSection {
     width: 80%;
-    height: 70vh;
+    height: 50vh;
     margin-left: 10%;
     margin-top: 3vh;
+    display: flex;
+    flex-direction: column;
 }
 
 .forumBox{
-    width: 80%;
-    height: 25vh;
-    margin-left: 10%;
+    width: 100%;
+    height: auto;
     margin-top:1%;
+    background-color: rgba(245, 245, 245, 1);
+    border-radius: 1em;
+    box-shadow: 5px 4px 8px rgba(0,0,0,0.05);
+    text-indent: 5%;
 }
 
 .createContainer{
@@ -30,8 +35,7 @@
 
 }
 
-.input,
-.textarea {
+.input{
     display: block;
     width: 100%;
     margin-bottom: 10px;
@@ -43,23 +47,52 @@
     color: #5A5454;
 }
 
+.textarea{
+    display: block;
+    width: 100%;
+    height: 20vh;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background-color: #FFFFFF;
+    color: #5A5454;
+}
+
+.mediaOut{
+    display: block;
+    width: 100%;
+    height: 10vh;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    background-color: #FFFFFF;
+    color: #5A5454;
+    overflow-y: auto;
+}
+
 .textarea {
     min-height: 100px;
     background-color: #FFFFFF;
+    color: #5A5454;
 }
 
 .primaryButton {
     padding: 10px 20px;
-    border: none;
-    border-radius: 8px;
-    background-color: #0070f3;
+    border: 1px solid #0072BB;
+    border-radius: 1.1em;
+    background-color: #0072BB;
     color: #fff;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    margin-top:80vh;
 }
 
 .primaryButton:hover {
-    background-color: #005bb5;
+    background-color: #004570;
 }
 
 .postCard {
@@ -72,8 +105,10 @@
     box-shadow: 0 4px 8px rgba(0,0,0,0.05);
     background-color: #FFFFFF;
     color: #5A5454;
-    position: relative;
     transition: transform 0.15s ease;
+    width: 90%;
+    min-height: 20vh;
+    margin-left: 5%;
 }
 
 .postCard:hover {
@@ -88,6 +123,8 @@
 .contents {
     font-size: 16px;
     font-weight: 400;
+    min-height: 2vh;
+    width: 100%;
 }
 
 .meta {
@@ -95,18 +132,75 @@
     font-weight: 100;
     color: #ccc;
     margin-top: 5px;
+    width: 100%;
+    height: 3vh;
+}
+
+.user {
+    font-size: 14px;
+    font-weight: 100;
+    color: #ccc;
+    width: 50%;
+    height: 3vh;
+    text-wrap: unset;
+    display: flex;
+}
+
+.userProfile{
+    width:20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: black;
+    margin-top: -0.5%;
+    margin-right: 2%;
 }
 
 .time {
+    width: 50%;
+    height: 3vh;
     font-size: 14px;
-    color: #ccc;
-    position: absolute;
-    top: 20px;
-    right: 20px;
+    color: #5A5454;
+    text-align: right;
+    text-wrap: unset;
+}
+
+.likesCommentsShare{
+    margin-top: 2%;
+    display: flex;
+    width: 100%;
+    height: 3.5vh;
+}
+
+.commentsBox{
+    display: flex;
+    width: 8%;
+    height: 3.5vh;
+    background-color: rgba(217, 217, 217, 1);
+    text-indent: 1vw;
+    border-radius: 1vw;
+    margin-left: 3%;
+    margin-right: 1%;
+}
+
+.commentIcon{
+    margin-left: 10%;
+    margin-top:5%;
+    width: 30%;
+}
+
+.ratioScore{
+   width: 70%; 
 }
 
 .actions {
-    margin-top: 10px;
+    display: grid;
+    grid-template-columns: 23.33% 53.33% 23.34%;
+    grid-row: 100%;
+    width:  15%;
+    height: 3.5vh;
+    background-color: rgba(217, 217, 217, 1);
+    grid-template-areas: "Yays score Nays";
+    border-radius: 1em;
 }
 
 .button {
@@ -115,24 +209,14 @@
     border: none;
     border-radius: 6px;
     cursor: pointer;
-    margin-left: 10px;
+    margin-left: 10em;
     transition: background-color 0.2s ease;
 }
 
-.editButton {
-    background-color: #f0ad4e;
-}
+
 
 .editButton:hover {
     background-color: #ec971f;
-}
-
-.deleteButton {
-    background-color: #d9534f;
-}
-
-.deleteButton:hover {
-    background-color: #c9302c;
 }
 
 .saveButton {
@@ -145,41 +229,74 @@
 
 .cancelButton {
     background-color: #888;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-right: 1rem;
 }
 
 .cancelButton:hover {
     background-color: #666;
 }
 
-.voteButton {
-    background-color: #6c757d;
-    color: white;
-    padding: 5px 10px;
+.deleteButtonPopup {
+    background-color: #d9534f;
     border: none;
-    border-radius: 6px;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
     cursor: pointer;
-    margin-right: 10px;
+    font-family: Inria Sans;
+    margin-left: 1rem;
+}
+
+.deleteButtonPopup:hover {
+    background-color: #c9302c;
+}
+
+/* Delete button for posts */
+.deleteButton {
+    background-color: #d9534f;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-left: 1rem;
+}
+
+.deleteButton:hover {
+    background-color: #c9302c;
+}
+
+.voteButton {
+    background-color: rgba(217, 217, 217, 1);
+    color: white;
+    border: none;
+    border-radius: 1vw 0 0 1vw;
+    cursor: pointer;
     transition: background-color 0.2s ease;
+    width: 100%;
+    height: 3.5vh;
+}
+
+.imageAlignmentInButton{
+    margin-left: 5%;
 }
 
 .voteButton:hover {
     background-color: #5a6268;
 }
 
-.yayActive {
-    background-color: #4caf50;
-}
-
-.yayActive:hover {
-    background-color: #45a049;
-}
-
-.nayActive {
-    background-color: #d9534f;
-}
-
-.nayActive:hover {
-    background-color: #c9302c;
+.yayScore{
+    color: black;
+    text-align: center;
+    margin-right: 10%;
+    margin-top: -5%;
 }
 
 .header {
@@ -188,20 +305,25 @@
     color: rgb(255,255,255);
 }
 
+.postHeading{
+    display: flex;
+    height:2vh;
+    width:100%;
+}
+
 .background {
     background-color: #D0E0EB;
     display: grid;
     width: 100%;
     height: 100vh;
     overflow-x:hidden;
-    grid-template-columns: 16.67vw 58.67vw 16.67vw;
+    grid-template-columns: 1vw 15.67vw 3vw 60.7vw 3vw 15.67vw 1vw;
     grid-template-rows: 6vh 34vh 54vh;
     grid-template-areas: 
-    "NavBar NavBar NavBar"
-    "CommunitiesBar Center RightBar"
-    "ServerBar Center RightBar";
+    "NavBar NavBar NavBar NavBar NavBar NavBar NavBar"
+    "margin1 CommunitiesBar margin3 Center margin4 RightBar margin2"
+    "margin1 ServerBar margin3 Center margin4 RightBar margin2";
     row-gap: 3%;
-    column-gap: 4%;
 }
 
 .text {
@@ -269,7 +391,7 @@
 
 .navBox{
     background-color: rgb(11, 11, 44);
-    width: 100vh;
+    width: 100vw;
     height: 51px;
     display: flex;
     justify-content: space-between;
@@ -321,7 +443,7 @@
 }
 
 .yourCommunitiesBar{
-    background-color: #FFFFFF;
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
     font-family: Inria Sans;
@@ -335,12 +457,12 @@
 }
 
 .serverBar{
-    background-color: #FFFFFF;
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
     text-indent: 3%;
     font-family: Inria Sans;
-    font-size: 25px;
+    font-size: 1.5em;
     color: #5A5454;
     overflow-y: auto;
     overflow-x: hidden;
@@ -350,24 +472,23 @@
 }
 
 .serverContainer{
-    background-color: rgb(11, 11, 44);
     display: flex;
     flex-direction: column;
     font-family: Inria Sans;
     font-size: 15px;
-    color: gray;
+    color: #5A5454;
 }
 
 .channelText{
     font-family: Inria Sans;
     font-size: 15px;
-    color: rgb(255, 255, 255);
+    color: #5A5454;
     margin-left: 10px;
 }
 
-/*
+
 .horizontalLine{
-    background-color: #AAAAAA;
+    background-color: #000000;
     width: 95%;
     height: 1px;
     margin-left: 8px;
@@ -381,7 +502,7 @@
     margin-top: -1.1vh;
     position: fixed;
 }
-*/
+
 
 .communitiesButtons{
     width: 90%;
@@ -416,7 +537,7 @@
 }
 
 .channelInfoBox{
-    background-color: #FFFFFF;
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
     font-family: Inria Sans;
@@ -424,6 +545,8 @@
     text-indent: 3%;
     overflow-y: auto;
     overflow-x: hidden;
+    width:100%;
+    height:20vh;
 }
 
 .channelInfoh1{
@@ -460,7 +583,7 @@
 }
 
 .RightBar{
-    background-color: #FFFFFF;
+    background-color: #EDEDED;
     display: flex;
     flex-direction: column;
     font-family: Inria Sans;
@@ -517,19 +640,27 @@
     font-size: 20px;  
 }
 
+.createBox{
+    width: 15vw;
+    color: #5A5454;
+    border-radius: 1em;
+    flex-direction: column;
+    position:sticky;
+    left: 70%;
+
+    z-index: 99999;
+}
+
 .centerPage{
-    margin-top: 1em;
     overflow-y: auto;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
     color: #5A5454;
     font-size: 20px;
-    background-color: #EDEDED;
     font-family: Inria Sans;
     border: 3px #D0E0EB;
-    border-radius: 0.5em;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
+    border-radius: 1em;
 }
 
 .descText{
@@ -541,12 +672,12 @@
     width: 100%;
     min-height: 20vh;
     max-height: 20vh;
-    background-color: #FFFFFF;
+    background-color: #3a3a3a;
 }
 
 .titleBox{
     width: 100%;
-    height: 10vh;
+    height: 14vh;
     display: flex;
 }
 
@@ -574,79 +705,105 @@
 }
 
 .groupHeader{
-    width: 95%;
-    height: 2vh;
-    margin-left: 0.5%;
     display: flex;
+    text-indent: 10%;
 }
 
 .groupName{
-    width: 72%;
-    height: 100%;
+    width: 40%;
+    height: 50%;
     overflow: hidden;
 }
 
-.deleteGroup{
-    width: 30%;
-    height: 100%;
-}
 
 .channelHeader{
     width: 95%;
-    height: 2vh;
+    height: 3vh;
     display:flex;
+    text-indent: 5%;
 }
 
 .channelName{
     width: 65.5%;
     height: 100%;
     font-family: Inria Sans;
-    font-size: 15px;
-    color: rgb(255, 255, 255);
+    font-size: 1em;
+    color: #5A5454;
     margin-left: 10px;
     margin-left: 4%;
     overflow: hidden;
-    
+}
+
+.channelName:hover {
+    background-color: #d9d9d9;
+    border-radius: 1em;
 }
 
 .deleteChannel{
-    width: 25%;
+    width: 30%;
     height: 100%;
     font-family: Inria Sans;
-    font-size: 15px;
-    color: rgb(255, 255, 255);
-    margin-left: 10px;
-    margin-left: 4%;
+    font-weight: bold;
+    font-size: 0.5em;
+    color: #5A5454;
+    margin-left: 20%;
+}
+
+.deleteChannel:hover {
+    background-color: #d9d9d9;
+    border-radius: 1em;
 }
 
 .createForumContainer{
-    width: 100%;
-    height: 30vh;
+    width: 50%;
+    height: 50vh;
     display: flex;
     flex-direction: column;
+    background-color: #ffffff;
+    position: absolute;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    left:25%;
+    bottom: 25%;
+    border: 2px solid black;
+    border-radius: 1em;
 }
 
 .forumCreationInfomation{
     margin-left: 10%;
-    background-color: rgb(19, 19, 19);
+    background-color: #F0F0F0;
     border-radius: 1em;
     width: 80%;
+    padding-left: 1em;
+    padding-right: 1em;
 }
 
 .forumDescCreationInfomation{
-    margin-top: 1vh;
+    margin-top: 3vh;
     margin-left: 10%;
-    background-color: rgb(19, 19, 19);
+    background-color: #F0F0F0;
     border-radius: 1em;
     width: 80%;
+    height: 30vh;
+    margin-bottom: 5vh;
+    padding-left: 1em;
+    padding-right: 1em;
 }
 
 .createForumButton{
-    width: 25%;
-    margin-left: 35%;
-    margin-top: 1vh;
+    background-color: #0072BB;
+    font-size: 14px;
+    color: white;
+    border: none;
     border-radius: 1em;
-    background-color: rgb(1, 92, 1);
+    width: 50%;
+    height: 100%;
+    cursor: pointer;
+    font-family: Inria Sans;
+    transition: background-color 0.2s ease;
+}
+
+.createForumButton:hover {
+    background-color: #004570;
 }
 
 .joinCommunityButton{
@@ -662,7 +819,7 @@
     margin-left: 2vw;
     padding: 0.5vw 1vw;
     border: none;
-    color: #fff;
+    color: #5A5454;
     cursor: pointer;
     transition: background-color 0.2s ease;
     font-size: 1vw;
@@ -686,7 +843,7 @@
 }
 
 .popupBox {
-    background-color: #5B6680;
+    background-color: white;
     padding: 2rem;
     border-radius: 1em;
     width: 400px;
@@ -694,6 +851,7 @@
     text-align: center;
     animation: fadeIn 0.2s ease-in-out;
 }
+
 
 @keyframes fadeIn {
     from {
@@ -752,9 +910,14 @@
 
 .mediaPreview {
     max-width: 100%;
-    max-height: 200px;
+    min-height: 20vh;
     margin-top: 1rem;
     border-radius: 0.5em;
+}
+
+.mediaInPost{
+    width: 200%;
+    overflow:hidden;
 }
 
 @font-face {
@@ -766,3 +929,151 @@
   font-family: Inria Sans;
   src: url('../../../../public/fonts/InriaSans-Light.ttf');
 }
+
+.topBox{
+    display: flex;
+    flex-direction: column;
+    background-color: #F5F5F5;
+    margin-bottom: 1vw;
+    border-radius: 1em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
+    
+}
+
+.sortText{
+    font-size: 12px;
+}
+
+.activeChannel a {
+    width: 150%;
+    background-color: #D9D9D9;
+    border-radius: 1em;
+}
+
+
+.postReportButton{
+    background-color: orangered;
+    font-size: 14px;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 1em;
+    cursor: pointer;
+    margin-left: 5%;
+    margin-right: 5%;
+    transition: background-color 0.2s ease;
+    font-family: Inria Sans;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    padding: 5px 10px;
+}
+
+.postReportButton:hover{
+    background-color: rgb(187, 50, 0);
+    width: 100%;
+    height: 3.5vh;
+    border-radius: 1em;
+}
+
+.editButton {
+    background-color: #f0ad4e;
+    font-size: 14px;
+    color: #fff;
+    padding: 5px 15px;
+    border: none;
+    border-radius: 1em;
+    cursor: pointer;
+    margin-left: 17%;
+    margin-right: 17%;
+    transition: background-color 0.2s ease;
+    font-family: Inria Sans;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    vertical-align: top;
+    margin-bottom: 5%;
+}
+
+.deleteButton {
+    background-color: #d9534f;
+    font-size: 14px;
+    color: white;
+    border: none;
+    border-radius: 1em;
+    width: 100%;
+    height: 100%;
+    margin-right: 25%;
+    margin-left: 25%;
+    cursor: pointer;
+    font-family: Inria Sans;
+    vertical-align: top;
+    margin-bottom: 5%;
+}
+
+.postSearchBar{
+    background-color: #D9D9D9;
+    width: 60%;
+    height: 4vh;
+    border-radius: 1em;
+    position: relative;
+    bottom: 5%;
+    left:20%;
+    color: #5A5454;
+    text-indent: 5%;
+    font-size: 14px;
+}
+
+.enterSearch{
+    width: 10%;
+    height: 4vh;
+    border-radius: 1em;
+    background-color: #F0F0F0;
+    text-align: center;
+    position: relative;
+    left:75%;
+    bottom: 14.5%;
+    font-size: 14px;
+}
+
+.enterSearch:hover {
+    background-color: #ffffff;
+}
+
+.userLink {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;   /* optional */
+    color: inherit;          /* optional */
+}
+
+.deleteGroup{
+    margin-right: 3%;
+    margin-left: 3%;
+}
+
+.deleteGroup:hover{
+    color: red;
+}
+
+.editGroup:hover{
+    color: orange;
+}
+
+.plusButton:hover{
+    color:#00ccff;
+}
+
+.commName{
+    width:80%;
+    height:100%;
+    overflow: hidden;
+    font-size: 20px;
+}
+
+.createGroupBtn{
+    width: 20%;
+    margin-left: 40%;
+}
+

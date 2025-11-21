@@ -13,6 +13,7 @@ export async function login(email: string, password: string) {
     try {
         // Sign in with Firebase Auth
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
         const idToken = await userCredential.user.getIdToken();
         // Send the ID token to the server for verification
         const res = await fetch("http://localhost:2400/api/users/login", {

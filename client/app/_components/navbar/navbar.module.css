@@ -1,51 +1,106 @@
-.navBox{
+.navBox {
     background-color: rgb(237, 237, 237);
     width: 100%;
-    height: 51px;
+    height: 3.19em;
     display: grid;
-    justify-content: space-between;
-    grid-template-columns: 16.67vw 69vw 14.33vw;
-    grid-template-rows: 90vh 10vh;
-    grid-template-areas: 
-    "Home login blankSpace"
+    grid-template-columns: 200px 75vw 40px 80px 40px;
+    grid-template-rows: 100vh;
+    grid-template-areas:
+        "Home blankSpace signUp orTh register"
 }
 
-.homeLogo{
-    height: 50px;
-    width: 200px;
+.navBox2 {
+    width: 100%;
+    height: 3.5em;
+    background: #ededed;
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    position: relative; /* allows absolute children */
 }
 
-.logInInfo{
-    height: 50px;
-    width: 200px;
+/* Left logo */
+.homeLogo {
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+/* ---- RIGHT ICONS FIX ---- */
+.rightIcons {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Notification bell */
+.notificationButton {
+    width: 32px;
+    height: 32px;
+    border-radius: 0.5em;
+    background: white;
+    cursor: pointer;
+}
+
+/* User icon */
+.settingsIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #b8b8b8;
+    cursor: pointer;
+}
+
+/* Dropdown menus */
+.dropdownMenu,
+.notifDropdownMenu {
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: 9em;
+    height: 9em;
+    background: #ededed;
+    border-radius: 1em;
+    display: flex;
+    flex-direction: column;
+    text-align: center;
+    padding: 0.5rem;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.logInInfo {
     display: flex;
     flex-wrap: nowrap;
     justify-content: space-between;
-    margin-left: 1000px;
-    margin-right: 30px;
 }
 
-.logInSignUpButton{
+.logInSignUpButton {
     background-color: #D0E0EB;
-    height: 32px;
-    width: 80px;
+    color: #5A5454;
+    height: 2em;
+    width: 5em;
     border-radius: 1em;
-    margin-top: 10px;
+    margin-top: 0.7em;
     text-align: center;
     line-height: 30px;
+    color: black;
 }
 
 .logInSignUpButton:hover {
-    background-color: #699DD8;
+    background-color: #D9D9D9;
     transform: scale(1.1);
 }
 
-.orText{
-    height: 50px;
-    width: 10px;
-    position: absolute;
-    top: 12px;
-    right: 170px;
+.orText {
+    font-size: 20px;
+    color: rgb(51, 51, 51);
+    margin-top: 10px;
+    text-indent: 65%;
 }
 
 .buttonBox {
@@ -59,57 +114,65 @@
 
 .notifDropdownMenu {
     background-color: #EDEDED;
-    width: 100px;
-    height: 150px;
+    width: 9em;
+    height: 9em;
     border-radius: 1em;
-    position: relative;
-    right:20px;
     opacity: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: rgb(0,0,0);
+    color: rgb(0, 0, 0);
+    z-index: 999;
+    position: relative;
+    right: 120%;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
 }
+
 .dropdownMenu {
     background-color: #EDEDED;
-    width: 150px;
-    height: 150px;
-    right: 20px;
+    width: 7em;
+    height: 6em;
     border-radius: 1em;
-    position: absolute;
     opacity: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: rgb(0,0,0);
+    color: #5A5454;
+    z-index: 999;
+    position: relative;
+    right: 120%;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
 }
 
-.buttonBox:hover{
+.dropdownMenu:hover {
+    background-color: #D9D9D9;
+}
+
+.notifDropdownMenu:hover {
     background-color: rgb(156, 156, 156);
 }
-.notifDropdownMenu:hover{
-    background-color: rgb(156,156,156);
-}
 
-.dropdown:focus-within .dropdownMenu{
+.dropdown:focus-within .dropdownMenu {
     opacity: 1;
     pointer-events: auto;
 }
 
-.dropdown:focus-within .notifDropdownMenu{
+.dropdown:focus-within .notifDropdownMenu {
     opacity: 1;
     pointer-events: auto;
+
 }
-.settingsIcon{
-    margin-top:5px;
+
+.settingsIcon {
+    margin-top: 5px;
     height: 40px;
     width: 40px;
-    left: 150px;
     border-radius: 50%;
     background-color: #B8B8B8;
+    margin-right: 4em;
 }
 
-.notificationButton{
+.notificationButton {
     height: 30px;
     width: 30px;
     border-radius: 1em;

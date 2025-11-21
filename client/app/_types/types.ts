@@ -6,6 +6,7 @@ export type Post = {
     media: string | null;
     authorUsername: string;
     authorId: string;
+    authorPFP: string;
     yayScore: number;
     replyCount: number;
     yayList: string[];
@@ -19,7 +20,7 @@ export interface User {
     id: string;
     username: string;
     email: string;
-    // photoUrl: string;
+    photoURL: string;
 }
 
 export interface Forum {
@@ -27,6 +28,7 @@ export interface Forum {
     name: string;
     slug: string;
     description: string;
+    parentGroup: string; // Originally DocumentReference, but fetched to string ID here
 }
 
 export interface Group {
@@ -36,6 +38,7 @@ export interface Group {
 }
 
 export interface Community {
+    groups: Group[];
     id: string;
     name: string;
     description: string;
@@ -43,7 +46,9 @@ export interface Community {
     userList: User[];
     ownerList: User[];
     modList: User[];
+    blacklist: User[];
     public: boolean;
     icon: string;
     banner: string;
+    rules: string;
 }

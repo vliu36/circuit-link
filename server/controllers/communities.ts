@@ -1,4 +1,4 @@
-import { DocumentReference, Timestamp, Firestore, FieldValue } from "firebase-admin/firestore";
+import { DocumentReference, Timestamp, Firestore, FieldValue, DocumentData } from "firebase-admin/firestore";
 import { db, auth } from "../firebase.ts";
 import { Request, Response } from "express";
 import admin from "firebase-admin";
@@ -81,6 +81,7 @@ const addDoc = async (req: Request, res: Response) => {
             banner: "https://storage.googleapis.com/circuit-link.firebasestorage.app/images/default_banner.png",
             icon: "https://storage.googleapis.com/circuit-link.firebasestorage.app/images/default_icon.jpeg",
             yayScore: 0,
+            rules: "Be respectful to others. No spam or self-promotion.",
         }
         const commRef = await communitiesRef.add(data);
 
@@ -303,7 +304,7 @@ const leaveCommunity = async (req: Request, res: Response) => {
         const userRef = db.collection("Users").doc(userId);
 
         // Remove user from community
-        await commUtil.removeUserFromCommunity(commRef, userRef, userId, name);
+        await commUtil.removeUserFromCommunity(commRef, userRef, userId);
 
         console.log(`User ${userId} successfully left community ${name}`);
         return res.status(200).send({
@@ -353,7 +354,7 @@ const deleteDoc = async (req: Request, res: Response) => {
         const { ref: commRef, data: commData } = await commUtil.getCommunityByName(name);
 
         // Check if requester is an owner
-        const { isOwner } = await genUtil.verifyUserIsOwnerOrMod(commData, userId, true);
+        const { isOwner } = await genUtil.verifyUserIsOwnerOrMod(commData, userId, true); // true indicates ONLY owner check
 
         if (!isOwner) {
             console.log(`User with ID ${userId} is unauthorized to delete this community.`);
@@ -424,7 +425,7 @@ const promoteToMod = async (req: Request, res: Response) => {
         const targetRef = db.doc(`/Users/${targetId}`);
 
         // Only owners can promote
-        await genUtil.verifyUserIsOwnerOrMod(commData, ownerId, true);
+        await genUtil.verifyUserIsOwnerOrMod(commData, ownerId, true); // true indicates ONLY owner check
 
         // Make sure target user exists in userList
         const userList: FirebaseFirestore.DocumentReference[] = commData.userList || [];
@@ -469,7 +470,7 @@ const demoteMod = async (req: Request, res: Response) => {
         const targetRef = db.doc(`/Users/${targetId}`);
 
         // Verify requester is an owner; only owners can demote mods
-        await genUtil.verifyUserIsOwnerOrMod(commData, ownerId, true);
+        await genUtil.verifyUserIsOwnerOrMod(commData, ownerId, true); // true indicates ONLY owner check
 
         // Prevent demoting an owner (owners are always mods)
         const isTargetOwner = ownerList.some(ref => ref.path === targetRef.path);
@@ -512,7 +513,7 @@ const promoteToOwner = async (req: Request, res: Response) => {
         const targetRef = db.doc(`/Users/${targetId}`);
 
         // Only current owners can promote
-        await genUtil.verifyUserIsOwnerOrMod(commData, ownerId, true);
+        await genUtil.verifyUserIsOwnerOrMod(commData, ownerId, true); // true indicates ONLY owner check
 
         // Target must be a member
         const isMember = userList.some(ref => ref.path === targetRef.path);
@@ -552,11 +553,11 @@ const demoteOwner = async (req: Request, res: Response) => {
         const { ref: commRef, data: commData } = await commUtil.getCommunityByName(name);
 
         const ownerList: FirebaseFirestore.DocumentReference[] = commData.ownerList || [];
-        const ownerRef = db.doc(`/Users/${ownerId}`);
+        // ! const ownerRef = db.doc(`/Users/${ownerId}`);
         const targetRef = db.doc(`/Users/${targetId}`);
 
         // Only current owners can demote
-        await genUtil.verifyUserIsOwnerOrMod(commData, ownerId, true);
+        await genUtil.verifyUserIsOwnerOrMod(commData, ownerId, true); // true indicates ONLY owner check
 
         // Check if target is an owner
         const isTargetOwner = ownerList.some(ref => ref.path === targetRef.path);
@@ -638,17 +639,182 @@ const prefixSearch = async (req: Request, res: Response) => {
     }
 }
 
-// Updates the blacklist of an existing document
-const updateDoc = async (req: Request, res: Response) => {
-    //TODO: Complete code stub
+// Kick a user from the community
+const kickUser = async (req: Request, res: Response) => {
+    try {
+        const { userId: targetId, commName } = req.body; // UID of the user being kicked
+        console.log("Received kick request for user ID:", targetId, "from community:", commName);
+        // Verify and get userId from session cookie
+        const requesterId = await genUtil.getUserIdFromSessionCookie(req); // UID of the user making the request; must be owner or mod
+        if (!commName || !targetId) {
+            return res.status(400).send({ message: "Missing community name or target user ID" });
+        }
+
+        await commUtil.kickUserLogic(requesterId, targetId, commName);
+
+
+        console.log(`User ${targetId} kicked from community ${commName} by requester ${requesterId}.`);
+        return res.status(200).send({ status: "ok", message: "User kicked successfully" });
+    } catch (err) {
+        console.error("Error kicking user:", err);
+        return res.status(500).send({
+            message: "Failed to kick user",
+            error: err instanceof Error ? err.message : String(err),
+        });
+    }
+}
+
+// Updates the blacklist of an existing document; this bans a user from the community
+const banUser = async (req: Request, res: Response) => {
+    try {
+        
+        const { userId: targetId, commName } = req.body; // UID of the user being banned
+        // Verify and get userId from session cookie
+        const requesterId = await genUtil.getUserIdFromSessionCookie(req); // UID of the user making the request; must be owner or mod
+        console.log("Received ban request for user ID:", targetId, "from community:", commName);
+        
+        // Kick the user first
+        await commUtil.kickUserLogic(requesterId, targetId, commName);
+
+        // Then proceed to ban
+        // Get community by name and target user reference
+        const { ref: commRef, data: commData } = await commUtil.getCommunityByName(commName);
+        const targetRef = db.doc(`/Users/${targetId}`);
+
+        // Add the target user to the blacklist
+        await commRef.update({
+            blacklist: FieldValue.arrayUnion(targetRef)
+        });
+        console.log(`User ${targetId} banned from community ${commName}.`);
+        return res.status(200).send({ message: `User banned successfully` });
+    } catch (err) {
+        console.error("Error banning user:", err);
+        return res.status(500).send({
+            message: "Failed to ban user",
+            error: err instanceof Error ? err.message : String(err),
+        });
+    }
+}
+
+// Unban a user from the community; removes them from the blacklist
+const unbanUser = async (req: Request, res: Response) => {
+    try {
+        const { userId: targetId, commName } = req.body; // UID of the user being unbanned
+        // Verify and get userId from session cookie
+        const requesterId = await genUtil.getUserIdFromSessionCookie(req); // UID of the user making the request; must be owner or mod
+        if (!commName || !targetId) {
+            return res.status(400).send({ message: "Missing community name or target user ID" });
+        }
+        // Get community by name
+        const { ref: commRef, data: commData } = await commUtil.getCommunityByName(commName);
+        await genUtil.verifyUserIsOwnerOrMod(commData, requesterId); // Verify requester is owner or mod
+
+        const targetRef = db.doc(`/Users/${targetId}`);
+
+        // Remove the target user from the blacklist
+        await commRef.update({
+            blacklist: FieldValue.arrayRemove(targetRef)
+        });
+        console.log(`User ${targetId} unbanned from community ${commName}.`);
+        return res.status(200).send({ message: `User ${targetId} successfully unbanned from community` });
+    } catch (err) {
+        console.error("Error unbanning user:", err);
+        return res.status(500).send({
+            message: "Failed to unban user",
+            error: err instanceof Error ? err.message : String(err),
+        });
+    }
+}
+
+// Get the list of users in a community's blacklist
+const getBlacklist = async (req: Request, res: Response) => {
+    try {
+        const { commName } = req.params;
+        // Get community by name
+        const { data: commData } = await commUtil.getCommunityByName(commName);
+
+        // Retrieve blacklist references
+        const blacklistRefs: FirebaseFirestore.DocumentReference[] = Array.isArray(commData?.blacklist) ? commData.blacklist : [];
+        const blacklist: DocumentData[] = [];
+
+        // Retrieve user data for each blacklisted user
+        for (const userRef of blacklistRefs) {
+            const userSnap = await userRef.get();
+            if (userSnap.exists) {
+                const data = userSnap.data();
+                if (data) blacklist.push(data);
+            }
+        }
+        return res.status(200).send({ blacklist });
+    } catch (err) {
+        console.error("Error getting blacklist:", err);
+        return res.status(500).send({
+            message: "Failed to get blacklist",
+            error: err instanceof Error ? err.message : String(err),
+        });
+    }
+}
+
+// Report a user's post to the community moderators and owners
+const reportPost = async (req: Request, res: Response) => {
+    try {
+        const { commName, postId, reason } = req.body;
+        // Verify and get userId from session cookie
+        const reporterId = await genUtil.getUserIdFromSessionCookie(req);
+        if (!commName || !postId || !reason) {
+            return res.status(400).send({ message: "Missing community name, post ID, or reason" });
+        }
+        // Get reporter's username
+        const reporterRef = db.doc(`/Users/${reporterId}`);
+        const reporterSnap = await reporterRef.get();
+        const reporterData = reporterSnap.data();
+        const reporterUsername = reporterData?.username || "Unknown User";
+
+        // Get all moderators and owners of the community
+        const { data: commData } = await commUtil.getCommunityByName(commName);
+        const modRefs: FirebaseFirestore.DocumentReference[] = commData.modList || [];
+        
+        // ! Removed - owners are already included in modList, this causes duplicate ids
+        // ! This comment is kept for reference in case we need to revert
+        // const ownerRefs: FirebaseFirestore.DocumentReference[] = commData.ownerList || [];
+        // const recipientRefs = Array.from(new Set([...modRefs, ...ownerRefs])); // Combine and deduplicate
+        // // Retrieve a string array of recipient IDs
+        // const recipientIds = recipientRefs.map(ref => ref.id);
+
+        // Retrieve a string array of mod IDs
+        const recipientIds = Array.from(new Set(modRefs.map(ref => ref.id))); 
+
+        // Create notification and send to each recipient
+        genUtil.createNotification({
+            senderId: reporterId,
+            recipientIds: recipientIds,
+            type: "report",
+            message: `Post ${postId} from "${commName}" reported by user ${reporterUsername} for reason: "${reason}"`,
+            relatedDocRef: db.collection("Posts").doc(postId),
+        });
+
+        console.log(`Post ${postId} reported to moderators and owners of community ${commName} by user ${reporterId}.`);
+        return res.status(200).send({ message: "Post reported successfully" });
+    } catch (err) {
+        console.error("Error reporting post:", err);
+        return res.status(500).send({
+            message: "Failed to report post",
+            error: err instanceof Error ? err.message : String(err),
+        });
+    }
 }
 
 // Update a community's data
 const editComm = async (req: Request, res: Response) => {
     try {
-        const { name } = req.params; // community name
-        const { description, isPublic } = req.body;
+        let { name } = req.params; // community name
+        const { description, isPublic, rules } = req.body;
         let { newName } = req.body; // new community name
+
+        // Clean up community name
+        let cleanName = name.trim();                           // remove trailing spaces
+        cleanName = cleanName.replace(/[^a-zA-Z0-9-_ ]/g, ""); // Remove special characters except letters, numbers, hyphens, and underscores
+        cleanName = cleanName.replace(/\s+/g, "")              // Remove spaces from the name
 
         // Verify and get userId from session cookie
         const userId = await genUtil.getUserIdFromSessionCookie(req);
@@ -663,7 +829,7 @@ const editComm = async (req: Request, res: Response) => {
 
         // Verify if user is an owner of the community
         const { ref: commRef, data: commData } = await commUtil.getCommunityByName(name);
-        await genUtil.verifyUserIsOwnerOrMod(commData, userId, true);
+        await genUtil.verifyUserIsOwnerOrMod(commData, userId, true); // true indicates ONLY owner check
 
         const commsRef = db.collection("Communities"); // Reference to Communities collection, different from commRef which is specific community
 
@@ -671,7 +837,8 @@ const editComm = async (req: Request, res: Response) => {
         if (
             (description === undefined || description === commData.description) &&
             (isPublic === undefined || isPublic === commData.public) &&
-            (newName === undefined || newName === name) 
+            (newName === undefined || newName === cleanName) &&
+            (rules === undefined || rules === commData.rules)
         ) {
             console.log("No changes detected in the update request.");
             return res.status(200).send({
@@ -681,33 +848,40 @@ const editComm = async (req: Request, res: Response) => {
         }
 
         // Prepare update data
-        const updates: Partial<{ name: string; nameLower: string; description: string; public: boolean }> = {}
+        const updates: Partial<{ name: string; nameLower: string; description: string; public: boolean; rules: string }> = {}
         if (description !== undefined) updates.description = description;
         if (isPublic !== undefined) updates.public = isPublic;
+        if (rules !== undefined) updates.rules = rules;
 
         // Verify newName uniqueness if it is being changed
-        if (newName && newName !== name) {
+        if (newName) {
             const newNameLower = newName.toLowerCase();
-            const nameCheckSnap = await commsRef.where("nameLower", "==", newNameLower).get();
-            if (!nameCheckSnap.empty) {
-                console.log(`Community name "${newName}" is already taken.`);
-                return res.status(409).send({
-                    status: "Conflict",
-                    message: `Community name "${newName}" is already taken.`,
-                });
-            }
+            const oldNameLower = cleanName.toLowerCase();
 
+            // If the new name (case insensitive) is different, check for uniqueness
+            if (newNameLower !== oldNameLower) {
+                const nameCheckSnap = await commsRef.where("nameLower", "==", newNameLower).get();
+
+                if (!nameCheckSnap.empty) {
+                    console.log(`Community name "${newName}" is already taken.`);
+                    return res.status(409).send({
+                        status: "Conflict",
+                        message: `Community name "${newName}" is already taken.`,
+                    });
+                }
+                // Set lowercase name update
+                updates.nameLower = newNameLower;
+            }
             // Set name updates
             updates.name = newName;
-            updates.nameLower = newNameLower;
         }
         
         // Update community document
         await commRef.update(updates);
-        console.log(`Community "${name}" successfully updated.`);
+        console.log(`Community "${cleanName}" successfully updated.`);
         res.status(200).send({
             status: "ok",
-            message: `Community "${name}" successfully updated.`,
+            message: `Community "${cleanName}" successfully updated.`,
         });
     } catch (err) {
         res.status(500).send({
@@ -780,6 +954,7 @@ const getCommunityStructure = async (req: Request, res: Response) => {
         const ownerList = await commUtil.fetchUserData(communityData.ownerList || []);
         const modList = await commUtil.fetchUserData(communityData.modList || []);
         const userList = await commUtil.fetchUserData(communityData.userList || []);
+        const blacklist = await commUtil.fetchUserData(communityData.blacklist || []);
 
         // Fetch all groups
         const groupsInCommunity: commUtil.Group[] = [];
@@ -811,10 +986,12 @@ const getCommunityStructure = async (req: Request, res: Response) => {
                 id: communityDoc.id,
                 name: communityData.name,
                 description: communityData.description,
+                rules: communityData.rules,
                 public: communityData.public,
                 ownerList,
                 modList,
                 userList,
+                blacklist,
                 groupsInCommunity,
                 icon: communityData.icon,
                 banner: communityData.banner,
@@ -829,13 +1006,49 @@ const getCommunityStructure = async (req: Request, res: Response) => {
     } // end try catch
 } // end getCommunityStructure
 
+// Get top 10 communities based on yayScore
+const getTopCommunities = async (req: Request, res: Response) => {
+    try {
+        const snap = await db
+            .collection("Communities")
+            .orderBy("yayScore", "desc")
+            .limit(10)
+            .get();
+
+        const communities = snap.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                name: data.name || "",
+                icon: data.icon || "",
+                numUsers: data.numUsers || 0,
+                yayScore: data.yayScore || 0,
+            };
+        });
+
+        res.status(200).send({
+            status: "ok",
+            communities,
+        });
+    } catch (err) {
+        console.error("Error fetching top communities:", err);
+        res.status(500).send({
+            status: "error",
+            message: "Failed to fetch top communities",
+        });
+    }
+};
+
 
 export {
     getAllDocuments,
     prefixSearch,
     addDoc,
     getDocByName,
-    updateDoc,
+    kickUser,
+    banUser,
+    unbanUser,
+    getBlacklist,
     getCommunityStructure,
     deleteDoc,
     createGroup,
@@ -847,5 +1060,7 @@ export {
     promoteToOwner,
     demoteOwner,
     editComm,
-    editGroup
+    editGroup,
+    reportPost,
+    getTopCommunities,
 }

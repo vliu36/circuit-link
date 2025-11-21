@@ -17,6 +17,11 @@ export default function CommunityCreatePage() {
         e.preventDefault();
 
         try {
+            const namePattern = /^[a-zA-Z0-9_-]{1,24}$/;
+            if (name && !namePattern.test(name)) {
+                setMessage("Community name must be 1-24 characters long and can only contain letters, numbers, underscores, and hyphens.");
+                return;
+            }
             const res = await createCommunity(name, description, isPublic);
 
             if (res.status === "ok") {
@@ -31,6 +36,8 @@ export default function CommunityCreatePage() {
             setMessage("Error connecting to backend.");
         }
     };
+
+    
 
     return (
         <div>

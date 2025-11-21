@@ -31,7 +31,7 @@
   color: white;
   flex-direction: column;
   width: 50%;
-  height: 80vh;
+  height: 90vh;
   background-color: #FFFFFF; 
   margin: 30px auto;
   position: absolute;
@@ -156,7 +156,7 @@
    font-size: 22px;
    font-family: 'Roboto';
    display: flex;
-   margin-top: 35px;
+   margin-top: 10vh;
    overflow: hidden;
 }
 
@@ -168,7 +168,6 @@
 .signUpWithGoogleText{
   margin-left: 25%;
   font-size: 1.5vw;
-  margin-top: 1.5%;
 }
 
 .transparentButtonBox{
@@ -182,7 +181,7 @@
 
 @media(max-height: 800px){
   .hint {
-    font-size: 0px;
+    font-size: 5px;
     color: #ffffff00;
   }
   .lineBox{

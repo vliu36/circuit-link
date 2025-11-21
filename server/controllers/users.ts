@@ -116,7 +116,7 @@ const userRegistrationGoogle = async (req: Request, res: Response) => {
         const docSnap = await userDoc.get();
 
         // Create session cookie via Admin SDK
-        const expiresIn = 60 * 60 * 24 * 3 * 1000; // 3 days
+        const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
         const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
         res.cookie("session", sessionCookie, {
             httpOnly: true,
@@ -210,7 +210,7 @@ const userLogin = async (req: Request, res: Response) => {
         console.log("Verified Firebase token for user:", email, uid);
 
         // Create session cookie via Admin SDK
-        const expiresIn = 60 * 60 * 24 * 3 * 1000; // 3 days
+        const expiresIn = 60 * 60 * 24 * 5 * 1000; // 5 days
         const sessionCookie = await auth.createSessionCookie(idToken, { expiresIn });
         res.cookie("session", sessionCookie, {
             httpOnly: true,
@@ -435,7 +435,7 @@ const sendFriendRequest = async (req: Request, res: Response) => {
         // Notify the recipient
         const notifRef = await createNotification({
             senderId,
-            recipientId,
+            recipientIds: [recipientId],
             type: "friend_request",
             message: `${senderUsername} has sent you a friend request.`,
             relatedDocRef: requestRef,
@@ -497,7 +497,7 @@ const respondToFriendRequest = async (req: Request, res: Response) => {
 
             await createNotification({
                 senderId: recipientId,
-                recipientId: senderId,
+                recipientIds: [senderId],
                 type: "friend_request_accepted",
                 message: `User ${recipientUsername} has accepted your friend request.`,
             });
@@ -527,6 +527,38 @@ const removeFriend = async (req: Request, res: Response) => {
     } // end try catch
 } // end removeFriend
 
+// Get top 10 users by yayScore
+const getTopUsers = async (req: Request, res: Response) => {
+    try {
+        const usersSnap = await db
+            .collection("Users")
+            .orderBy("yayScore", "desc")
+            .limit(10)
+            .get();
+
+        const users = usersSnap.docs.map(doc => {
+            const data = doc.data();
+            return {
+                id: doc.id,
+                username: data.username || "",
+                photoURL: data.photoURL || "",
+                yayScore: data.yayScore || 0,
+            };
+        });
+
+        res.status(200).send({
+            status: "ok",
+            users,
+        });
+    } catch (err) {
+        console.error("Error fetching top users:", err);
+        res.status(500).send({
+            status: "error",
+            message: "Failed to fetch top users",
+        });
+    }
+};
+
 export {
     getAllDocuments,
     userRegistration,
@@ -541,4 +573,5 @@ export {
     sendFriendRequest,
     respondToFriendRequest,
     removeFriend,
+    getTopUsers,
 }

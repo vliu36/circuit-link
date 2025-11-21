@@ -90,7 +90,7 @@ export default function OtherProfile({ params }: { params: Promise<{ uid: string
                 <h1>Profile</h1>
                 <p>Welcome to your profile page!</p>
                 {/* // NOTE: This link takes the user back to the landing page, rather than the previous page */}
-                <Link className="go-back-btn" href = "../landing">Go back</Link> 
+                <Link className="go-back-btn" href = "..">Go back</Link> 
                 <br/>
                 <br/>
                 <div className="profile-header">
@@ -105,8 +105,6 @@ export default function OtherProfile({ params }: { params: Promise<{ uid: string
                 <p>{other.user.profileDesc}</p>
             </div>
             <div className="account-info">
-                <p>Email: {other.user.email}</p>
-                {/* <p>Email Verified: {other.user.emailVerified ? "Yes" : "No"}</p> */}
                 <p>Account Created: {createdTime?.toLocaleString() || "N/A"}</p>
             </div>
             {/* If other user is not in current user's friend list, show button to add friend */}

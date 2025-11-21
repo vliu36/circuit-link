@@ -1,7 +1,7 @@
 // Functions for managing user notifications
 
 import { db } from "../../../app/_firebase/firebase";
-import { doc, DocumentReference, getDoc, updateDoc } from "firebase/firestore";
+import { arrayRemove, deleteDoc, doc, DocumentReference, getDoc, updateDoc } from "firebase/firestore";
 
 export interface NotificationData {
     id: string;
@@ -87,4 +87,54 @@ export async function markNotificationAsRead(notifId: string) {
     } catch (err) {
         console.error("Error marking notification as read:", err);
     }
+}
+
+export async function deleteNotification(notifId: string, userId: string) {
+    try {
+        // Remove notification reference from user's document
+        const userRef = doc(db, "Users", userId);
+        const notifRef = doc(db, "Notifs", notifId);
+        await updateDoc(userRef, {
+            notifications: arrayRemove(notifRef),
+        });
+        // If the related document is a FriendRequest, consider deleting it as well
+        const notifSnap = await getDoc(notifRef);
+        if (notifSnap.exists() && notifSnap.data().type === "friend_request") {
+            const friendRequestRef = notifSnap.data().relatedDocRef;
+            if (friendRequestRef) {
+                await deleteDoc(friendRequestRef);
+            }
+        }
+        // Delete the notification document
+        await deleteDoc(notifRef);
+        console.log(`Notification ${notifId} deleted.`);
+    } catch (err) {
+        console.error("Error deleting notification:", err);
+    }
+}
+
+export async function getPostRedirectUrl(postRef: DocumentReference) {
+    const postSnap = await getDoc(postRef);
+    if (!postSnap.exists()) return "#";
+
+    const postData = postSnap.data();
+    const postId = postSnap.id;
+
+    // Fetch forum
+    const forumRef: DocumentReference = postData.parentForum;
+    const forumSnap = await getDoc(forumRef);
+    if (!forumSnap.exists()) return "#";
+
+    const forumData = forumSnap.data();
+    const forumSlug = forumData.slug;
+
+    // Fetch community
+    const commRef: DocumentReference = postData.parentCommunity;
+    const commSnap = await getDoc(commRef);
+    if (!commSnap.exists()) return "#";
+
+    const commData = commSnap.data();
+    const commName = commData.name;
+
+    return `/community/${commName}/${forumSlug}/${postId}`;
 }

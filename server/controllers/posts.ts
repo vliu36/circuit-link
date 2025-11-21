@@ -19,10 +19,12 @@ const getAllDocuments = async (req: Request, res: Response) => {
                 // Check if author exists and is a DocumentReference
                 let username = "Unknown";
                 let authorId = "Unknown";
+                let authorPFP = "Unknown";
                 if (data.author?.get) {
                     const userDoc = await data.author.get(); // dereference the DocumentReference
                     username = userDoc.exists ? userDoc.data()?.username || "Unknown" : "Unknown";
                     authorId = data.author.path.split("/").pop(); // extract author uid
+                    authorPFP = userDoc.exists ? userDoc.data()?.photoURL || "Unknown" : "Unknown";
                 }
 
                 // Convert and return yayList and nayList as arrays of strings of uids
@@ -38,6 +40,7 @@ const getAllDocuments = async (req: Request, res: Response) => {
                     ...data,
                     authorUsername: username,
                     authorId: authorId,
+                    authorPFP: authorPFP,
                     yayList,
                     nayList,
                     timePosted: data.timePosted?.toMillis() || null,
@@ -105,7 +108,7 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
             parentGroup: parentGroupRef,
             parentForum: forumRef,
             media: media || null,
-            keywords: [...new Set(["",...req.body.contents.split(" "),...req.body.title.split(" ")])] // Stores words into an array for post searching
+            keywords: [...new Set(["",...req.body.contents.toLowerCase().split(" "),...req.body.title.toLowerCase().split(" ")])] // Stores words into an array for post searching
         };
 
         // Add to Posts collection
@@ -168,12 +171,23 @@ const editDoc = async (req: Request, res: Response) => {
             });
         }
 
+        // Check if changes provided are the same as existing data
+        if (
+            (req.body.title && req.body.title === postData?.title) &&
+            (req.body.contents && req.body.contents === postData?.contents)
+        ) {
+            return res.status(200).send({
+                status: "OK",
+                message: "No changes were made.",
+            });
+        }
+
         // Prepare updates
         const updates: Partial<Post> = {};
         if (req.body.title) updates.title = req.body.title;
         if (req.body.contents) updates.contents = req.body.contents;
         if (req.body.contents || req.body.title) {
-            updates.keywords = [...new Set(["",...req.body.contents.split(" "),...req.body.title.split(" ")])];
+            updates.keywords = [...new Set(["",...req.body.contents.toLowerCase().split(" "),...req.body.title.toLowerCase().split(" ")])];
         }
         updates.timeUpdated = Timestamp.fromDate(new Date());
         updates.edited = true; // Mark post as edited
@@ -422,10 +436,16 @@ const getPostById = async (req: Request, res: Response) => {
         // Dereference author
         let authorUsername = "Unknown";
         let authorId = "Unknown";
+        let authorPFP = "Unknown";
+        let parentForum: string | null = null;
+        let parentGroup: string | null = null;
         if (data?.author?.get) {
             const authorSnap = await data.author.get();
             authorUsername = authorSnap.exists ? authorSnap.data()?.username || "Unknown" : "Unknown";
             authorId = data.author.path.split("/").pop() || "Unknown";
+            authorPFP = authorSnap.exists ? authorSnap.data()?.photoURL || "Unknown" : "Unknown";
+            parentForum = data.parentForum ? (data.parentForum as DocumentReference).id : null;
+            parentGroup = data.parentGroup ? (data.parentGroup as DocumentReference).id : null;
         }
 
         // Convert yayList/nayList references to user IDs
@@ -444,6 +464,9 @@ const getPostById = async (req: Request, res: Response) => {
             ...data,
             authorUsername,
             authorId,
+            authorPFP,
+            parentForum: parentForum,
+            parentGroup: parentGroup,
             yayList,
             nayList,
             listOfReplies,

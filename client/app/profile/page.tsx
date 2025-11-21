@@ -127,7 +127,7 @@ export default function Profile() {
             <div className="profile-card">
                 <h1>Profile</h1>
                 <p>Welcome to your profile page!</p>
-                <Link className="go-back-btn" href = "/" replace>Go back</Link>
+                <Link className="go-back-btn" href = "http://localhost:3000" replace>Go back</Link>
                 <br/>
                 <br/>
                 <Link className="go-back-btn" href = "/profile/notifications">Go to Notifications</Link>
@@ -147,7 +147,6 @@ export default function Profile() {
             </div>
             {/* Additional information */}
             <div className="account-info">
-                <p>Email: {user?.email}</p>
                 <p>Email Verified: {user?.emailVerified ? "Yes" : "No"}</p>
                 {/* Show verify email button when user isn't verified */}
                 {!user?.emailVerified && <span><button onClick={profileFunctions.verifyEmail}><u>&gt; Verify Email</u></button></span>}
