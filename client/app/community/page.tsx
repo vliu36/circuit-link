@@ -37,6 +37,8 @@ export default function CommunityCreatePage() {
         }
     };
 
+    
+
     return (
         <div>
             <h1>Create a Community</h1>
