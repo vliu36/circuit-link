@@ -152,19 +152,17 @@ export async function reportPost(
 } // end function reportPost
 
 export async function searchPosts(commName: string, slug: string, query: string) {
-    const res = await fetch(
-        `${BASE_URL}/forums/search/${commName}/${slug}/${encodeURIComponent(query)}`,
-        {
-            method: "GET",
-            headers: { "Content-Type": "application/json" }
-        }
-    );
+    const res = await fetch(`${BASE_URL}/forums/search/${commName}/${slug}/${query.toLowerCase()}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+    });
 
     if (!res.ok) {
         const text = await res.text();
-        throw new Error(`Search error: ${text}`);
+        throw new Error(`Search error ${res.status}: ${text}`);
     }
 
     const data = await res.json();
-    return data.posts; 
+
+    return { matchingPosts: data.posts };
 }

@@ -199,6 +199,7 @@ export const useReplies = (postId: string, userId?: string) => {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ title, contents, userId }),
+            credentials: "include",
         });
         const data = await res.json();
         return data.message || "Post updated!";

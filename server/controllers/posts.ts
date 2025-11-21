@@ -108,7 +108,7 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
             parentGroup: parentGroupRef,
             parentForum: forumRef,
             media: media || null,
-            keywords: [...new Set(["",...req.body.contents.split(" "),...req.body.title.split(" ")])] // Stores words into an array for post searching
+            keywords: [...new Set(["",...req.body.contents.toLowerCase().split(" "),...req.body.title.toLowerCase().split(" ")])] // Stores words into an array for post searching
         };
 
         // Add to Posts collection
@@ -171,12 +171,23 @@ const editDoc = async (req: Request, res: Response) => {
             });
         }
 
+        // Check if changes provided are the same as existing data
+        if (
+            (req.body.title && req.body.title === postData?.title) &&
+            (req.body.contents && req.body.contents === postData?.contents)
+        ) {
+            return res.status(200).send({
+                status: "OK",
+                message: "No changes were made.",
+            });
+        }
+
         // Prepare updates
         const updates: Partial<Post> = {};
         if (req.body.title) updates.title = req.body.title;
         if (req.body.contents) updates.contents = req.body.contents;
         if (req.body.contents || req.body.title) {
-            updates.keywords = [...new Set(["",...req.body.contents.split(" "),...req.body.title.split(" ")])];
+            updates.keywords = [...new Set(["",...req.body.contents.toLowerCase().split(" "),...req.body.title.toLowerCase().split(" ")])];
         }
         updates.timeUpdated = Timestamp.fromDate(new Date());
         updates.edited = true; // Mark post as edited
