@@ -1,8 +1,8 @@
 "use client"
 
 import Styles from "./navbar.module.css";
-import Link from "next/link"; 
-import Image from "next/image"; 
+import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore"; // <-- ADDED: For fetching user document
@@ -21,16 +21,16 @@ export default function NavBar() {
 
     // ADDED STATE: To hold notification data
     const [notifications, setNotifications] = useState<NotificationData[]>([]);
-    const [requestStatus, setRequestStatus] = useState<{[key: string]: string}>({});
+    const [requestStatus, setRequestStatus] = useState<{ [key: string]: string }>({});
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
-             if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+            if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
                 setIsNotifOpen(false);
             }
         }
-         if (isNotifOpen) {
-             document.addEventListener("mousedown", handleClickOutside);
+        if (isNotifOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
         }
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
@@ -43,21 +43,21 @@ export default function NavBar() {
         });
         return () => unsubscribe();
     }, []);
-    
+
     // ADDED EFFECT: Data fetching logic
     useEffect(() => {
         const fetchNotifs = async () => {
             if (user) {
                 try {
                     // 1. Get the User Document to find the array of notification references
-                    const userDocRef = doc(db, "Users", user.uid); 
+                    const userDocRef = doc(db, "Users", user.uid);
                     const userSnap = await getDoc(userDocRef);
 
                     if (userSnap.exists()) {
                         const userData = userSnap.data();
                         // Assuming the user document has a field named 'notifications' containing DocumentReferences
-                        const notifRefs = userData.notifications || []; 
-                        
+                        const notifRefs = userData.notifications || [];
+
                         if (notifRefs.length > 0) {
                             // 2. Hydrate the references into full notification objects
                             const data = await getNotifications(notifRefs);
@@ -77,168 +77,170 @@ export default function NavBar() {
         function handleClickOutside(event: MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
                 setIsDropdownOpen(false);
-             }
+            }
         }
         if (isDropdownOpen) {
-             document.addEventListener("mousedown", handleClickOutside);
+            document.addEventListener("mousedown", handleClickOutside);
         }
-         return () => {
-             document.removeEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [isDropdownOpen]);
 
     useEffect(() => {
-         function handleProfileClickOutside(event: MouseEvent) {
+        function handleProfileClickOutside(event: MouseEvent) {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-                 setIsDropdownOpen(false);
-             }
+                setIsDropdownOpen(false);
+            }
         }
         if (isDropdownOpen) {
             document.addEventListener("mousedown", handleProfileClickOutside);
-         }
-         return () => {
-             document.removeEventListener("mousedown", handleProfileClickOutside);
-         };
-     }, [isDropdownOpen]);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleProfileClickOutside);
+        };
+    }, [isDropdownOpen]);
 
     // ADDED HANDLER: Logic for accepting/declining requests
     const handleRespondToRequest = async (notifId: string, accept: boolean, userId: string) => {
         // Find the specific notification object to get the DocRef needed for the backend
         const targetNotif = notifications.find(n => n.id === notifId);
-        
+
         if (targetNotif && targetNotif.relatedDocRef) {
             // Update UI immediately (optimistic update)
-            setRequestStatus(prev => ({...prev, [notifId]: accept ? 'accepted' : 'rejected'}));
-            
+            setRequestStatus(prev => ({ ...prev, [notifId]: accept ? 'accepted' : 'rejected' }));
+
             try {
                 // Call the backend function using the DocumentReference
                 await respondToFriendRequest(targetNotif.relatedDocRef, accept, userId);
             } catch (error) {
                 console.error("Failed to respond:", error);
-                setRequestStatus(prev => ({...prev, [notifId]: 'pending'})); // Revert status on failure
+                setRequestStatus(prev => ({ ...prev, [notifId]: 'pending' })); // Revert status on failure
             }
         }
     };
 
-     const toggleNotif = () => {
-         setIsNotifOpen(prev => !prev);
+    const toggleNotif = () => {
+        setIsNotifOpen(prev => !prev);
         setIsDropdownOpen(false); // Close profile
-     };
+    };
 
     const toggleProfile = () => {
-         setIsDropdownOpen(prev => !prev);
-         setIsNotifOpen(false); // Close notifs
-     };
+        setIsDropdownOpen(prev => !prev);
+        setIsNotifOpen(false); // Close notifs
+    };
 
     return (
-        !user ?(
-        <div className = {Styles.navBox}>
-            <div style={{gridArea: 'Home'}}>
-                <Link href="/" replace>
-                    <Image className = {Styles.homeLogo} src={HomeLogo} width={200} height={50} alt="Circuit Link Logo"/>
-                </Link>
-            </div>
-                
-                <Link className = {Styles.logInSignUpButton} href="./signin" replace style={{gridArea: 'register'}}> Log In </Link>
-                <div className = {Styles.orText} style={{gridArea: 'orTh'}}> or </div>
-                <Link className = {Styles.logInSignUpButton} href="./register" replace style={{gridArea: 'signUp'}}> Sign Up </Link>
-            <div className={Styles.line} style={{gridArea: 'line'}}></div>
-        </div>
-         )
-        :(
-            <div className = {Styles.navBox2}>
-                {/*user signed in*/}
-                <div className = {Styles.homeLogo} style={{gridArea: 'Home'}}>
+        !user ? (
+            <div className={Styles.navBox}>
+                <div style={{ gridArea: 'Home' }}>
                     <Link href="/" replace>
-                         <Image src={HomeLogo} alt="Logo" width={200} height={200}></Image>
+                        <Image className={Styles.homeLogo} src={HomeLogo} width={200} height={50} alt="Circuit Link Logo" />
                     </Link>
                 </div>
-                
-                    <div className = {Styles.notifDropdown} ref = {notifRef} style={{gridArea: 'notification'}}>
+
+                <Link className={Styles.logInSignUpButton} href="./signin" replace style={{ gridArea: 'register' }}> Log In </Link>
+                <div className={Styles.orText} style={{ gridArea: 'orTh' }}> or </div>
+                <Link className={Styles.logInSignUpButton} href="./register" replace style={{ gridArea: 'signUp' }}> Sign Up </Link>
+                <div className={Styles.line} style={{ gridArea: 'line' }}></div>
+            </div>
+        )
+            : (
+                <div className={Styles.navBox2}>
+                    {/*user signed in*/}
+                    <div className={Styles.homeLogo} style={{ gridArea: 'Home' }}>
+                        <Link href="/" replace>
+                            <Image src={HomeLogo} alt="Logo" width={200} height={200}></Image>
+                        </Link>
+                    </div>
+
+                    <div className={Styles.rightIcons} ref={notifRef} style={{ gridArea: 'notification' }}>
                         <button onClick={() => setIsNotifOpen(prev => !prev)}>
-                             <Image src = "/notification.svg" alt="Info" className = {Styles.notificationButton} width={5} height={5}></Image>
+                            <Image src="/notification.svg" alt="Info" className={Styles.notificationButton} width={10} height={10}></Image>
                         </button>
-                          {isNotifOpen && (
-                            <div className = {Styles.notifDropdownMenu}>
+                        {isNotifOpen && (
+                            <div className={Styles.notifDropdownMenu}>
                                 {/* RENDER NOTIFICATIONS */}
                                 {notifications.length === 0 ? (
-                                    <p style={{padding: '15px', fontSize: '0.8rem', color: '#555'}}>No notifications</p>
+                                    <p style={{ padding: '15px', fontSize: '0.8rem', color: '#555' }}>No notifications</p>
                                 ) : (
                                     notifications.map((notif) => (
                                         <div key={notif.id} style={{
-                                            padding: '10px', 
-                                            borderBottom: '1px solid #ddd', 
+                                            padding: '10px',
+                                            borderBottom: '1px solid #ddd',
                                             width: '100%',
                                             textAlign: 'left'
                                         }}>
-                                            <p style={{fontSize: '0.85rem', margin: '0 0 5px 0'}}>{notif.message}</p>
+                                            <p style={{ fontSize: '0.85rem', margin: '0 0 5px 0' }}>{notif.message}</p>
 
                                             {/* Render Actions for Friend Requests */}
                                             {notif.type === "friend_request" && notif.relatedDocRef && user && (
-                                                <div style={{marginTop: '5px', display: 'flex', gap: '10px'}}>
+                                                <div style={{ marginTop: '5px', display: 'flex', gap: '10px' }}>
                                                     {/* Check local status or default to pending */}
                                                     {(requestStatus[notif.id] || "pending") === "pending" && (
                                                         <>
-                                                            <button 
+                                                            <button
                                                                 onClick={() => handleRespondToRequest(notif.id, true, user.uid)}
-                                                                style={{fontSize: '0.75rem', color: 'white', backgroundColor: '#4CAF50', border: 'none', borderRadius: '4px', padding: '2px 6px', cursor: 'pointer'}}
+                                                                style={{ fontSize: '0.75rem', color: 'white', backgroundColor: '#4CAF50', border: 'none', borderRadius: '4px', padding: '2px 6px', cursor: 'pointer' }}
                                                             >
                                                                 Accept
                                                             </button>
-                                                            <button 
+                                                            <button
                                                                 onClick={() => handleRespondToRequest(notif.id, false, user.uid)}
-                                                                style={{fontSize: '0.75rem', color: 'white', backgroundColor: '#f44336', border: 'none', borderRadius: '4px', padding: '2px 6px', cursor: 'pointer'}}
+                                                                style={{ fontSize: '0.75rem', color: 'white', backgroundColor: '#f44336', border: 'none', borderRadius: '4px', padding: '2px 6px', cursor: 'pointer' }}
                                                             >
                                                                 Decline
                                                             </button>
                                                         </>
                                                     )}
-                                                    
+
                                                     {requestStatus[notif.id] === "accepted" && (
-                                                        <span style={{fontSize: '0.75rem', color: '#4CAF50', fontStyle: 'italic'}}>Accepted</span>
+                                                        <span style={{ fontSize: '0.75rem', color: '#4CAF50', fontStyle: 'italic' }}>Accepted</span>
                                                     )}
-                                                    
+
                                                     {requestStatus[notif.id] === "rejected" && (
-                                                        <span style={{fontSize: '0.75rem', color: '#f44336', fontStyle: 'italic'}}>Declined</span>
+                                                        <span style={{ fontSize: '0.75rem', color: '#f44336', fontStyle: 'italic' }}>Declined</span>
                                                     )}
                                                 </div>
                                             )}
                                         </div>
                                     ))
                                 )}
-                                <Link 
-                                    href="http://localhost:3000/profile/notifications" 
-                                    style={{fontSize: '0.8rem', color: '#3F6DA1', marginTop: '10px', marginBottom: '5px', textDecoration: 'underline'}}
+                                <Link
+                                    href="http://localhost:3000/profile/notifications"
+                                    style={{ fontSize: '0.8rem', color: '#3F6DA1', marginTop: '10px', marginBottom: '5px', textDecoration: 'underline' }}
                                     replace
                                 >
                                     View All
                                 </Link>
                             </div>
-                             )}
-                    </div>
-                    <div className = {Styles.dropdown} ref = {dropdownRef} style={{gridArea: 'settings'}}>
-                        <button onClick={() => setIsDropdownOpen(prev => !prev)}>
-                            <Image src = {user?.photoURL || "/circleUser.svg"} className = {Styles.settingsIcon} alt="User profile" width = {10} height = {10}></Image>
-                        </button>
-                          {isDropdownOpen && (
-                            <div className = {Styles.dropdownMenu}>
-                                <div className = {Styles.buttonBox}>
-                                    <Link href = "http://localhost:3000/profile" replace>Profile</Link>
-                                </div>
-                                <div className = {Styles.buttonBox}>
-                                    <button style = {{color:'black'}}>Settings</button>
-                                </div>
-                                <div className = {Styles.buttonBox}>
-                                    <button style = {{color:'black'}}onClick={logout}>Log Out</button>
-                                </div>
-                            </div>
-                             )}
-                    </div>
-                <div className={Styles.line} style={{gridArea: 'line'}}>
-                </div>
-                <div className={Styles.line} style={{gridArea: 'line'}}></div>
-             </div>
+                        )}
 
-        )
-     )
+                        <div className={Styles.dropdown} ref={dropdownRef} style={{ gridArea: 'settings' }}>
+                            <button onClick={() => setIsDropdownOpen(prev => !prev)}>
+                                <Image src={user?.photoURL || "/circleUser.svg"} className={Styles.settingsIcon} alt="User profile" width={10} height={10}></Image>
+                            </button>
+                            {isDropdownOpen && (
+                                <div className={Styles.dropdownMenu}>
+                                    <div className={Styles.buttonBox}>
+                                        <Link href="http://localhost:3000/profile" replace>Profile</Link>
+                                    </div>
+                                    <div className={Styles.buttonBox}>
+                                        <button style={{ color: 'black' }}>Settings</button>
+                                    </div>
+                                    <div className={Styles.buttonBox}>
+                                        <button style={{ color: 'black' }} onClick={logout}>Log Out</button>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className={Styles.line} style={{ gridArea: 'line' }}>
+                    </div>
+                    <div className={Styles.line} style={{ gridArea: 'line' }}></div>
+                </div>
+
+            )
+    )
 }

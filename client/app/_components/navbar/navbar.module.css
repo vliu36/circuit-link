@@ -1,12 +1,11 @@
 .navBox {
-    background-color: rgb(237, 237, 237);
     width: 100%;
-    height: 3.19em;
-    display: grid;
-    grid-template-columns: 200px 75vw 40px 80px 40px;
-    grid-template-rows: 100vh;
-    grid-template-areas:
-        "Home blankSpace signUp orTh register"
+    height: 3.5em;
+    background: #ededed;
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    position: relative; /* allows absolute children */
 }
 
 .navBox2 {
@@ -28,13 +27,12 @@
 
 /* ---- RIGHT ICONS FIX ---- */
 .rightIcons {
-    position: absolute;
-    right: 1rem;
-    top: 50%;
-    transform: translateY(-50%);
+    width: 150px;
+    position: fixed;
+    right: -30px;
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 40px;
 }
 
 /* Notification bell */
@@ -58,7 +56,7 @@
 /* Dropdown menus */
 .dropdownMenu,
 .notifDropdownMenu {
-    position: absolute;
+    position: fixed;
     top: 50px;
     right: 0;
     width: 9em;
@@ -108,7 +106,6 @@
     width: 150 px;
     height: 50 px;
     color: rgb(0,0,0);
-    margin-top:20px;
     position: relative;
 }
 
@@ -123,8 +120,8 @@
     align-items: center;
     color: rgb(0, 0, 0);
     z-index: 999;
-    position: relative;
-    right: 120%;
+    position: absolute;
+    right: 40%;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
 }
 
@@ -139,8 +136,8 @@
     align-items: center;
     color: #5A5454;
     z-index: 999;
-    position: relative;
-    right: 120%;
+    position: absolute;
+    right: 20%;
     box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
 }
 

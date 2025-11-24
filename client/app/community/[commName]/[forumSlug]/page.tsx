@@ -22,7 +22,9 @@ import commentIcon from "../../../../public/comment-regular-full.svg"
 import checkedthumbsDown from "../../../../public/thumbs-down-glow-full.svg"
 import checkedthumbsUp from "../../../../public/thumbs-up-glow-full.svg"
 import { fetchTopCommunities, fetchTopUsers, getCommunities } from "@/app/landing.ts";
+import YourCommunities from "../../../_components/yourCommunities/yourCommBar.tsx";
 import { DocumentData } from "firebase/firestore";
+import ServerBar from "../../../_components/serverBar/serverBar.tsx"
 
 export default function ForumPage({
     params,
@@ -489,11 +491,11 @@ export default function ForumPage({
     const handlePostSearch = async (query: string) => {
         try {
             const { matchingPosts } = await searchPosts(commName, forumSlug, query);
-            
+
             const formattedPosts = (matchingPosts || []).map((post: Post) => ({
                 ...post,
                 timePosted: post.timePosted ? new Date(post.timePosted).toLocaleString() : "Unknown",
-                
+
             }));
 
             setPosts(formattedPosts);
@@ -514,157 +516,33 @@ export default function ForumPage({
                 </div>
 
                 <div className={styles.yourCommunitiesBar} style={{ gridArea: "CommunitiesBar" }}>
-                    <h1>Your Communities</h1>
-
-                    <div>
-                        {userCommunities.length === 0 ? (
-                            <p>No joined communities.</p>
-                        ) : (
-                            userCommunities.map((c: DocumentData, i: number) => (
-                                <Link
-                                    key={c.id}
-                                    className={styles.communitiesButtons}
-                                    href={`/community/${c.name}`}
-                                >
-                                    <Image
-                                        src={c.icon ?? "/defaultCommunity.svg"}
-                                        alt={c.name}
-                                        width={30}
-                                        height={30}
-                                        className={styles.addIcon}
-                                    />
-                                    <h1 className={styles.buttonTextforCommunities}>{c.name}</h1>
-                                </Link>
-                            ))
-                        )}
-                    </div>
-
-                    <Link className={styles.communitiesButtons} href={`/community`}>
-                        <Image src="/plus.svg" className={styles.addIcon} alt="Add icon" width={16} height={16} />
-                        <h1 className={styles.buttonTextforCommunities}>Add a Community</h1>
-                    </Link>
+                    <YourCommunities userCommunities={userCommunities} />
                 </div>
 
                 <div className={styles.serverBar} style={{ gridArea: "ServerBar" }}>
-                    <div style={{ display: "flex" }}>
-                        <h1 className={styles.commName}>{commName}</h1>
-                        <div className={styles.createGroupBtn}>
-                            
-                            {(isOwner || isMod) && (
-                                <button
-                                    onClick={toggleCreateGroupPopup}
-                                >
-                                    +
-                                </button>
-                            )}
-                            {createGroupOpen && (
-                                <div className={styles.popupOverlay} onClick={toggleCreateGroupPopup}>
-                                    <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
-                                        <h2 className={styles.popupText}>Create Group</h2>
-
-                                        <input
-                                            type="text"
-                                            className={`${styles.popupText} ${styles.inputField}`}
-                                            placeholder="Group Name"
-                                            value={groupName}
-                                            onChange={(e) => setGroupName(e.target.value)}
-                                        />
-
-                                        {groupMessage && (
-                                            <p className={styles.popupText}>{groupMessage}</p>
-                                        )}
-
-                                        <button
-                                            className={`${styles.saveBtn} ${styles.popupText}`}
-                                            onClick={async () => {
-                                                await handleCreateGroup();
-                                                if (!error) toggleCreateGroupPopup();
-                                            }}
-                                        >
-                                            Create
-                                        </button>
-
-                                        <button
-                                            className={`${styles.closeBtn} ${styles.popupText}`}
-                                            onClick={toggleCreateGroupPopup}
-                                        >
-                                            Close
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                    <div className={styles.horizontalLine}></div>
-                    <div className={styles.serverContainer}>
-                        {/* --- GROUPS AND FORUMS --- */}
-                        <section>
-                            {community.groupsInCommunity.length === 0 && <p>No groups in this community yet.</p>}
-
-                            {/* Displays a group and its forums */}
-                            {community.groupsInCommunity.map((group) => (
-                                <div key={group.id} style={{ marginBottom: "2rem" }}>
-                                    <div className={styles.groupHeader}>
-                                        <div className={styles.groupName}>{group.name}</div>
-                                        {/* Only displays if user is an owner or a mod */}
-                                        {(isOwner || isMod) && (
-                                            <button
-                                                className={styles.plusButton}
-                                                onClick={() => {
-                                                    setGroupName(group.name);
-                                                    setGroupId(group.id);
-                                                    setShowCreateForum(!showCreateForum);
-                                                }}
-                                            >
-                                                +
-                                            </button>
-                                        )}
-                                        {
-                                            (isOwner || isMod) &&
-                                            <>
-                                                <button className={styles.deleteGroup} onClick={() => { setDeleteGroupId(group.id); setDeleteGroupName(group.name); toggleConfirmDeleteGroup(); }}>
-                                                    Delete
-                                                </button>
-                                                <button className={styles.editGroup} onClick={() => { toggleEditGroupPopup(); setEditGroupId(group.id); }}>
-                                                    Edit
-                                                </button>
-
-                                            </>
-                                        }
-                                    </div>
-
-
-                                    {/* Displays the forums in this group */}
-                                    {group.forumsInGroup.length > 0 ? (
-                                        <div>
-                                            {group.forumsInGroup.map((forum) => (
-                                                <div
-                                                    key={forum.id}
-                                                    className={`${styles.channelHeader} ${forum.slug === forumSlug ? styles.activeChannel : ""
-                                                        }`}
-                                                >
-                                                    {/* Link to the forum (displays its posts) */}
-                                                    <div className={styles.channelName}>
-                                                        <Link href={`/community/${commName}/${forum.slug}`}>
-                                                            &gt; {forum.name}
-                                                        </Link>
-                                                    </div>
-                                                    {/* -------- Delete Forum Button -------- */}
-                                                    {/* Only shows if user is owner or mod */}
-                                                    {(isOwner || isMod) &&
-                                                        <button className={styles.deleteChannel} onClick={() => { setDeleteForumName(forum.name); setDeleteForumId(forum.id); toggleConfirmDeleteForum(); }}>
-                                                            Delete Forum
-                                                        </button>
-                                                    }
-                                                </div>
-                                            ))}
-
-                                        </div>
-                                    ) : <p>No forums in this group.</p>}
-                                </div>
-                            ))}
-                        </section>
-                    </div>
+                    <ServerBar
+                        community={community}
+                        commName={commName}
+                        forumSlug={forumSlug}
+                        isOwner={isOwner}
+                        isMod={isMod}
+                        onCreateGroup={handleCreateGroup}
+                        onCreateForum={handleCreateForum}
+                        onDeleteGroup={(id, name) => {
+                            setDeleteGroupId(id);
+                            setDeleteGroupName(name);
+                            toggleConfirmDeleteGroup();
+                        }}
+                        onDeleteForum={(id, name) => {
+                            setDeleteForumId(id);
+                            setDeleteForumName(name);
+                            toggleConfirmDeleteForum();
+                        }}
+                        onOpenEditGroup={(id) => {
+                            setEditGroupId(id);
+                            setEditGroupOpen(true);
+                        }}
+                    />
                 </div>
 
 
@@ -676,9 +554,9 @@ export default function ForumPage({
                     </div>
                     <div className={styles.horizontalLine}></div>
                     <div className={styles.RulesBar}>
-                        Rules
+                        <div className = {styles.RulesTitle}>Rules</div>
                         {/* Display rules here */}
-                        <p>{community?.rules}</p>
+                        <p className={styles.RulesText}>{community?.rules}</p>
                     </div>
                 </div>
 
@@ -786,7 +664,7 @@ export default function ForumPage({
                             </div>
                         </div>
 
-                        <input 
+                        <input
                             className={styles.postSearchBar}
                             placeholder="Search this forum..."
                             onChange={(e) => {
@@ -796,7 +674,7 @@ export default function ForumPage({
                                 }
                             }}
                         />
-                        <button 
+                        <button
                             className={styles.enterSearch}
                             onClick={() => {
                                 handlePostSearch(searchQuery);

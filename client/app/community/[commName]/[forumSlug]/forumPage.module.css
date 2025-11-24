@@ -456,20 +456,7 @@
     box-shadow: 0 5px 10px rgba(154,160,185,.05), 0 15px 40px rgba(166,173,201,.2);
 }
 
-.serverBar{
-    background-color: #EDEDED;
-    display: flex;
-    flex-direction: column;
-    text-indent: 3%;
-    font-family: Inria Sans;
-    font-size: 1.5em;
-    color: #5A5454;
-    overflow-y: auto;
-    overflow-x: hidden;
-    border: 3px #D0E0EB;
-    border-radius: 0.5em;
-    box-shadow: 0 5px 10px rgba(154,160,185,.05), 0 15px 40px rgba(166,173,201,.2);
-}
+
 
 .serverContainer{
     display: flex;
@@ -589,12 +576,12 @@
     font-family: Inria Sans;
     color: #5A5454;
     font-size: 25px;
-    text-indent: 3%;
     overflow-y: auto;
     overflow-x: hidden;
     border: 3px #D0E0EB;
     border-radius: 0.5em;
     box-shadow: 0 5px 10px rgba(154,160,185,.05), 0 15px 40px rgba(166,173,201,.2);
+    margin-right: 5px;
 }
 
 .RulesBar{
@@ -852,6 +839,14 @@
     animation: fadeIn 0.2s ease-in-out;
 }
 
+.RulesText{
+    font-size: 14px;
+    margin-left: 10px;
+}
+
+.RulesTitle{
+    margin-left: 10px;
+}
 
 @keyframes fadeIn {
     from {
@@ -967,6 +962,8 @@
     height: 100%;
     text-align: center;
     padding: 5px 10px;
+    white-space: nowrap;
+    overflow-x: hidden;
 }
 
 .postReportButton:hover{
@@ -1048,22 +1045,7 @@
     color: inherit;          /* optional */
 }
 
-.deleteGroup{
-    margin-right: 3%;
-    margin-left: 3%;
-}
 
-.deleteGroup:hover{
-    color: red;
-}
-
-.editGroup:hover{
-    color: orange;
-}
-
-.plusButton:hover{
-    color:#00ccff;
-}
 
 .commName{
     width:80%;
@@ -1071,6 +1053,8 @@
     overflow: hidden;
     font-size: 20px;
 }
+
+
 
 .createGroupBtn{
     width: 20%;

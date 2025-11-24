@@ -1,0 +1,46 @@
+.topUsersBar {
+    background-color: #EDEDED;
+    display: flex;
+    flex-direction: column;
+    font-family: Jura;
+    font-weight: bold;
+    margin-top: 1em;
+    border: 3px #D9D9D9;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
+    height: 100%;
+    width: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;       
+    color: rgba(90, 84, 84, 1);
+    font-size: 14px;
+}
+
+.topCommunitesScroll {
+    overflow-y: auto;
+}
+
+.topUserItem {
+    display: flex;
+    align-items: center;      
+    gap: 8px;                 
+    padding: 4px 8px;
+    width: 100%;
+}
+
+.topUserIcon {
+    flex-shrink: 0;          
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: white;
+    object-fit: cover;
+}
+
+.topUserName {
+    display: flex;
+    flex-direction: column;
+    white-space: nowrap;     
+    overflow: hidden;         
+    text-overflow: ellipsis;  
+}
