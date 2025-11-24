@@ -35,4 +35,10 @@ router.get("/getBefore/:receiver/:isDirect/:time", messages.getChatBeforeTime);
  */
 router.get("/getBetween/:receiver/:isDirect/:afterTime/:beforeTime", messages.getChatBetweenTime);
 
+/** Deletes a message by its document id
+ *  @route DELETE /api/messages/delete/:id
+ *  @param id - The id of the document to delete
+ */
+router.delete("/delete/:id", messages.deleteMessageById);
+
 export default router;

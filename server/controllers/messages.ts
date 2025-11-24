@@ -4,6 +4,7 @@ import { db } from "../firebase.ts";
 import { Request, Response } from "express";
 import { getCommunityByName } from "./_utils/commUtils";
 import { DocumentReference, Timestamp } from "firebase-admin/firestore";
+import { formatMessageData } from "./_utils/messageUtils.ts";
 
 // Retrieve all documents in the messages collection
 const getAllMessages = async (req: Request, res: Response) => {
@@ -33,6 +34,12 @@ const addMessage = async (req: Request, res: Response) => {
             res.status(400).send({
                 status: "Bad Request",
                 message: "ERROR: Missing required fields"
+            });
+        }
+        if (!(isDirect == 0 || isDirect == 1)) {
+            res.status(400).send({
+                status: "Bad Request",
+                message: "ERROR: isDirect must be 0 (false) or 1 (true)"
             });
         }
 
@@ -79,6 +86,12 @@ const getChatBeforeTime = async (req: Request, res: Response) => {
                 message: "ERROR: Missing required fields"
             });
         }
+        if (!(isDirect == "0" || isDirect == "1")) {
+            res.status(400).send({
+                status: "Bad Request",
+                message: "ERROR: isDirect must be 0 (false) or 1 (true)"
+            });
+        }
 
         // Retrieves the community or user reference depending on whether or not it is a direct message
         const receiverRef = Number(isDirect) == 1 ? db.doc(`/Users/${receiver}`) : await getCommunityByName(receiver);
@@ -91,11 +104,13 @@ const getChatBeforeTime = async (req: Request, res: Response) => {
         let messagesRef: DocumentReference[] = [];
         messageSnapshot.docs.map((doc) => {
             messagesRef.push(doc.ref);
-        })
+        });
+
+        const formattedData = await formatMessageData(messagesRef);
 
         res.status(200).send({
             status: "OK",
-            messages: messagesRef
+            messages: formattedData
         });
     }
     catch (err) {
@@ -117,6 +132,12 @@ const getChatBetweenTime = async (req: Request, res: Response) => {
                 message: "ERROR: Missing required fields"
             });
         }
+        if (!(isDirect == "0" || isDirect == "1")) {
+            res.status(400).send({
+                status: "Bad Request",
+                message: "ERROR: isDirect must be 0 (false) or 1 (true)"
+            });
+        }
 
         // Retrieves the community or user reference depending on whether or not it is a direct message
         const receiverRef = Number(isDirect) == 1 ? db.doc(`/Users/${receiver}`) : await getCommunityByName(receiver);
@@ -132,9 +153,11 @@ const getChatBetweenTime = async (req: Request, res: Response) => {
             messagesRef.push(doc.ref);
         })
 
+        const formattedData = await formatMessageData(messagesRef);
+
         res.status(200).send({
             status: "OK",
-            messages: messagesRef
+            messages: formattedData
         });
     }
     catch (err) {
@@ -145,9 +168,41 @@ const getChatBetweenTime = async (req: Request, res: Response) => {
     }
 }
 
+// Deletes a message by its document id
+const deleteMessageById = async (req: Request, res: Response) => {
+    try {
+        const messageId = req.params.id;
+        if (!messageId) {
+            res.status(400).send({
+                status: "Bad Request",
+                message: "ERROR: Missing required fields"
+            });
+        }
+
+        await db.collection("Messages").doc(messageId).delete();
+
+        res.status(200).send({
+            status: "OK",
+            message: `Successfully deleted: ${messageId}`
+        });
+    }
+    catch (err) {
+        res.status(500).send({
+            status: "Backend Error",
+            message: err
+        });
+    }
+}
+
+// Deletes all messages by a user id inside a specific community or direct message
+const deleteChatByUser = async (req: Request, res: Response) => {
+
+}
+
 export {
     getAllMessages,
     addMessage,
     getChatBeforeTime,
-    getChatBetweenTime
+    getChatBetweenTime,
+    deleteMessageById
 }
