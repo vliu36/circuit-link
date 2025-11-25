@@ -6,6 +6,7 @@ import forumsRouter from "./routes/forums.ts";
 import postsRouter from "./routes/posts.ts";
 import usersRouter from "./routes/users.ts";
 import storageHandler from "./routes/storageHandler.ts";
+import messagesRouter from "./routes/messages.ts";
 
 const app = express();
 app.use(cors({
@@ -21,5 +22,6 @@ app.use("/api/forums", forumsRouter)
 app.use("/api/posts", postsRouter)
 app.use("/api/users", usersRouter)
 app.use("/api/storage", storageHandler)
+app.use("/api/messages", messagesRouter)
 
 export default app;
