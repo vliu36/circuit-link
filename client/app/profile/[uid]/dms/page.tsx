@@ -4,6 +4,7 @@ import { useEffect, useState, use } from "react";
 import { sendMessage, getMessages, getMediaUrl } from "@/app/_utils/messaging.ts";
 import { useAuth } from "@/app/_firebase/context";
 import Image from "next/image";
+import Link from "next/link";
 import { fetchUserById } from "../userProfile";
 
 export default function CommunityChat({
@@ -13,8 +14,9 @@ export default function CommunityChat({
 }) {
     const { uid } = use(params);
     const { user } = useAuth();
-    const [messages, setMessages] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [messages, setMessages] = useState<any[] | null>(null);
+    const [loadingUser, setLoadingUser] = useState(true);
+    const [loadingMessages, setLoadingMessages] = useState(true);
     const [newText, setNewText] = useState("");
     const [mediaFile, setMediaFile] = useState<File | null>(null);
     const [mediaPreview, setMediaPreview] = useState<string | null>(null);
@@ -22,12 +24,13 @@ export default function CommunityChat({
     const [other, setOther] = useState<any | null>(null);
     const [error, setError] = useState<string | null>(null);
 
+    // Load other user info
     useEffect(() => {
         const resolveUidAndFetch = async () => {
             const { uid } = await params; 
             if (!uid) {
                 setError("No UID provided");
-                setLoading(false);
+                setLoadingUser(false);
                 return;
             }
             
@@ -46,27 +49,28 @@ export default function CommunityChat({
                 console.log(err);
                 setOther(null);
             } finally {
-                setLoading(false);
+                setLoadingUser(false);
             }
         };
 
         resolveUidAndFetch();
     }, [params]);
 
-
     // Load initial messages
     useEffect(() => {
-        if (!uid && !user) return;
+        if (!otherId || !user) return;
+        // setLoadingMessages(true);
         async function fetchMessages() {
             const now = new Date();
-            const data = await getMessages(uid, 1, now, user?.uid);
+            const data = await getMessages(otherId!, 1, now, user?.uid);
             setMessages(data.posts || []);
-            setLoading(false);
+            setLoadingMessages(false);
         }
+        
         fetchMessages();
         const interval = setInterval(fetchMessages, 5000);
         return () => clearInterval(interval);
-    }, [uid, user]);
+    }, [otherId, user]);
 
     // Handle sending messages
     async function handleSend() {
@@ -91,7 +95,7 @@ export default function CommunityChat({
         }
 
         // Optimistically add message to UI
-        setMessages((prevMessages) => [...prevMessages, newMsg]);
+        setMessages((prevMessages) => [...(prevMessages || []), newMsg]);
         // Send message to backend
         await sendMessage(user.uid, newText.trim(), mediaUrl, otherId || other?.uid, 1);
 
@@ -119,13 +123,18 @@ export default function CommunityChat({
 
     return (
         <div className="flex flex-col h-screen p-4">
-            <h1 className="text-xl font-bold mb-4">
-                Direct Messages: {other?.user?.username || "Unknown User"}
-            </h1>
+            <div className="flex items-center gap-3 mb-4">
+                <h1 className="text-xl font-bold text-black">
+                    Direct Messages: {other?.user?.username || "Loading..."}
+                </h1>
+                <button onClick={() => window.history.back()} className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600">
+                    Return to Profile
+                </button>
+            </div>
 
             {/* Messages list */}
             <div className="flex-1 overflow-y-auto border rounded p-3 bg-white text-black">
-                {loading ? (
+                {messages === null ? (
                     <p>Loading messages...</p>
                 ) : messages.length === 0 ? (
                     <p>No messages yet.</p>
@@ -135,12 +144,12 @@ export default function CommunityChat({
                             <li key={index} className="p-2 bg-gray-100 rounded">
                                 <Image
                                     src={msg.authorIcon || "/default-profile.png"}
-                                    alt={msg.authorName || "Unknown"}
+                                    alt={"Profile picture of " + (msg.authorName || "Unknown")}
                                     width={40}
                                     height={40}
                                     className="rounded-full"
                                 />
-                                <p className="text-sm font-semibold">{msg.authorName || "Unknown"}</p>
+                                <p className="text-sm font-semibold">{msg.authorName || "Loading..."}</p>
                                 <p>{msg.contents}</p>
                                 <p className="text-xs text-gray-500">
                                     {new Date(msg.timestamp).toLocaleTimeString()}

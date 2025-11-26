@@ -13,7 +13,7 @@ interface Props {
 export default function TopCommunities({ dataLoading, topCommunities }: Props) {
     return (
         <div className={Styles.topCommunitiesBar} style={{ gridArea: "topCommunities" }}>
-            <h1 className = {Styles.titleName}>Top Communities</h1>
+            <p className = {Styles.titleName}>Top Communities</p>
             <div className={Styles.topCommunitesScroll}>
                 {dataLoading && topCommunities.length === 0 ? (
                     <p>Loading...</p>
@@ -33,13 +33,13 @@ export default function TopCommunities({ dataLoading, topCommunities }: Props) {
                                     src={icon}
                                     alt={name}
                                     width={60}
-                                    height={30}
+                                    height={60}
                                     className={Styles.topCommunitiesIcon}
                                 />
                                 <div className={Styles.topCommunitiesName}>
-                                    <h1 className={Styles.communitiesTitle}>{name}</h1>
-                                    <h1>{yay} Yays</h1>
-                                    <h1>{numUsers} Followers</h1>
+                                    <p className={Styles.communitiesTitle}>{name}</p>
+                                    <p>{yay} Yays</p>
+                                    <p>{numUsers} Followers</p>
                                 </div>
                             </Link>
                         );

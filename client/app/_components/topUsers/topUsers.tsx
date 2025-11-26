@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Styles from "./topUsers.module.css";
 import { DocumentData } from "firebase/firestore";
+import Link from "next/link";
 
 interface Props {
     dataLoading: boolean;
@@ -12,7 +13,7 @@ interface Props {
 export default function TopUsers({ dataLoading, topUsers }: Props) {
     return (
         <div className={Styles.topUsersBar}>
-                <h1>Top Users</h1>
+                <p>Top Users</p>
 
                 <div className={Styles.topCommunitesScroll}>
                     {dataLoading && topUsers.length === 0 ? (
@@ -31,8 +32,10 @@ export default function TopUsers({ dataLoading, topUsers }: Props) {
                                     <Image src={photo} alt={username} width={40} height={40} className={Styles.topUserIcon} />
 
                                     <div className={Styles.topUserName}>
-                                        <h1>{username}</h1>
-                                        <h1>{yay} Yay Score</h1>
+                                        <Link href={`/profile/${key}`}>
+                                            <h3>{username}</h3>
+                                            <h3>{yay} Yay Score</h3>
+                                        </Link>
                                     </div>
                                 </div>
                             );

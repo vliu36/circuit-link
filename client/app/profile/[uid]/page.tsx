@@ -90,7 +90,7 @@ export default function OtherProfile({ params }: { params: Promise<{ uid: string
                 <h1>Profile</h1>
                 <p>Welcome to your profile page!</p>
                 {/* // NOTE: This link takes the user back to the landing page, rather than the previous page */}
-                <Link className="go-back-btn" href = "..">Go back</Link> 
+                <Link className="go-back-btn" href = "/profile">Go back</Link> 
                 <br/>
                 <br/>
                 <div className="profile-header">
@@ -112,6 +112,13 @@ export default function OtherProfile({ params }: { params: Promise<{ uid: string
                 <button onClick={() => profileFunctions.sendFriendRequest(user.uid, otherId)}>
                     Add Friend
                 </button>
+            )}
+            {user && other && (
+                <Link href={`/profile/${otherId}/dms`}>
+                    <button>
+                        Chat with {other.user.username}
+                    </button>
+                </Link>
             )}
         </main>
     );

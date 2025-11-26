@@ -127,7 +127,7 @@ export default function Profile() {
             <div className="profile-card">
                 <h1>Profile</h1>
                 <p>Welcome to your profile page!</p>
-                <Link className="go-back-btn" href = "http://localhost:3000" replace>Go back</Link>
+                <Link className="go-back-btn" href = "/" replace>Go back</Link>
                 <br/>
                 <br/>
                 <Link className="go-back-btn" href = "/profile/notifications">Go to Notifications</Link>

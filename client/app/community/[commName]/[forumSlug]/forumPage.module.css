@@ -1064,3 +1064,18 @@
     margin-left: 40%;
 }
 
+.chatLink{
+    margin-left: 1vw;
+    background-color: rgb(15, 68, 167);
+    padding: 0.5vw 1vw;
+    border: none;
+    color: white;
+    border-radius: 1em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    font-size: 0.8vw;
+}
+
+.chatLink:hover{
+    background-color: rgb(10, 45, 110);
+}

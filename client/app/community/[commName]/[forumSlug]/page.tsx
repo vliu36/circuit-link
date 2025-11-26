@@ -824,6 +824,14 @@ export default function ForumPage({
                                 <button className={styles.editForumButton} onClick={() => setEditPopup(true)}>
                                     Edit
                                 </button>
+                                {/* Show link to chat if user is member */}
+                                {isMember && (
+                                    <Link href={`/community/${commName}/chat`} className={styles.chatLink}>
+                                        <button>
+                                            Chat
+                                        </button>
+                                    </Link>
+                                )}
                                 {/* Drop down menu to change sort mode */}
                                 <div className={styles.sortDropdown}>
                                     <div className={styles.sortText}>
