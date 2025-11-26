@@ -81,6 +81,17 @@ export default function ForumPage({
 
     const [createGroupOpen, setCreateGroupOpen] = useState(false);
 
+    const [iconOpen, setIconOpen] = useState(false);
+    const [bannerOpen, setBannerOpen] = useState(false);
+    const [modOptionsOpen, setModOptionsOpen] = useState(false);
+    const [blacklistOpen, setBlacklistOpen] = useState(false);
+
+    const [iconFile, setIconFile] = useState<File | null>(null);
+    const [iconPreview, setIconPreview] = useState<string | null>(null);
+    const [bannerFile, setBannerFile] = useState<File | null>(null);
+    const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+    const [targetUserId, setTargetUserId] = useState<string>("");
+
     // --- Toggle popups ---
     const toggleCreatePostPopup = () => {
         setCreatePostOpen(!createPostOpen);
@@ -99,6 +110,25 @@ export default function ForumPage({
 
     const toggleDeletePostPopup = () => {
         setDeletePostOpen(!deletePostOpen);
+        setError(null);
+    };
+
+    const toggleIconPopup = () => {
+        setIconOpen(!iconOpen);
+        setError(null);
+    };
+    const toggleBannerPopup = () => {
+        setBannerOpen(!bannerOpen);
+        setError(null);
+    };
+
+    const toggleModOptionsPopup = () => {
+        setModOptionsOpen(!modOptionsOpen);
+        setError(null);
+    };
+
+    const toggleBlacklistPopup = () => {
+        setBlacklistOpen(!blacklistOpen);
         setError(null);
     };
 
@@ -303,6 +333,10 @@ export default function ForumPage({
             .finally(() => setLoading(false));
     }, [commName]);
 
+    if (!community) {
+        return <div>Retrieving community data...</div>;
+    }
+
     // Handler to add a new post
     const handleAddPost = async () => {
         if (!user) return alert("Sign in to post!");
@@ -368,6 +402,49 @@ export default function ForumPage({
             fetchPosts();
         } catch (err) {
             console.error(err);
+        }
+    };
+
+    
+    // Handle file selection
+    const handleIconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+        setIconFile(file);
+        if (file) setIconPreview(URL.createObjectURL(file));
+    };
+    
+    const handleBannerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+        setBannerFile(file);
+        if (file) setBannerPreview(URL.createObjectURL(file));
+    };
+    
+    // --- Handle file submission ---
+    // Submission for icon
+    const submitIcon = async () => {
+        if (!iconFile) return;
+        try {
+        await commApi.changeCommunityIcon(iconFile, community.id);
+        toggleIconPopup();
+        setIconFile(null);
+        setIconPreview(null);
+        await refreshCommunity();
+        } catch (err) {
+        console.error("Failed to upload icon:", err);
+        }
+    };
+    
+    // Submission for banner
+    const submitBanner = async () => {
+        if (!bannerFile) return;
+        try {
+        await commApi.changeCommunityBanner(bannerFile, community?.id);
+        toggleBannerPopup();
+        setBannerFile(null);
+        setBannerPreview(null);
+        await refreshCommunity();
+        } catch (err) {
+        console.error("Failed to upload banner:", err);
         }
     };
 
@@ -470,6 +547,56 @@ export default function ForumPage({
         } catch (error) {
             console.error("Error reporting post:", error);
             alert("An error occurred while reporting the post.");
+        }
+    };
+
+    // -------- MODERATION FUNCTIONS -------- //
+    // TODO: The rest of the functions are yet to be imported from the old community page
+    // Handle kick
+    const handleKickUser = async () => {
+        try {
+            const res = await commApi.kickMember(commName, targetUserId);
+            console.log(res.message);
+            setError(res.message || null);
+            // Wait 1 second and close the popup
+            setTimeout(() => {
+            toggleModOptionsPopup();
+            }, 1000);
+            await refreshCommunity();
+        } catch (err) {
+            console.error("Failed to kick user:", err);
+        }
+    };
+
+    // Handle ban
+    const handleBanUser = async () => {
+        try {
+            const res = await commApi.banMember(commName, targetUserId);
+            console.log(res.message);
+            setError(res.message || null);
+            // Wait 1 second and close the popup
+            setTimeout(() => {
+            toggleModOptionsPopup();
+            }, 1000);
+            await refreshCommunity();
+        } catch (err) {
+            console.error("Failed to ban user:", err);
+        }
+    };
+
+    // Handle unban
+    const handleUnbanUser = async (targetUserId: string) => {
+        try {
+            const res = await commApi.unbanMember(commName, targetUserId);
+            console.log(res.message);
+            setError(res.message || null);
+            // Wait 1 second and close the popup
+            setTimeout(() => {
+            toggleBlacklistPopup();
+            }, 1000);
+            await refreshCommunity();
+        } catch (err) {
+            console.error("Failed to unban user:", err);
         }
     };
 
@@ -636,9 +763,61 @@ export default function ForumPage({
                 </div>
                 <div className={styles.centerPage} style={{ gridArea: "Center" }}>
                     <div className={styles.topBox}>
-                        <div className={styles.bannerBox}></div>
+                        <div className={styles.bannerBox}>
+                            {/* --- COMMUNITY BANNER --- -------- Click on banner, if mod/owner, to change the banner */}
+                            {(isOwner || isMod) ? (
+                                <button
+                                className={styles.bannerBox}
+                                onClick={toggleBannerPopup}
+                                style={{ padding: 0, border: 'none', background: 'none', display: 'inline-block' }}
+                                >
+                                <Image
+                                    src={community.banner}
+                                    alt="Community Banner"
+                                    width={800}
+                                    height={200}
+                                    className={styles.bannerBox}
+                                    style={{ display: 'block' }}
+                                />
+                                </button>
+                            ) : (
+                                <Image
+                                src={community.banner}
+                                alt="Community Banner"
+                                width={800}
+                                height={200}
+                                className={styles.bannerBox}
+                                />
+                            )}
+                        </div>
                         <div className={styles.titleBox}>
-                            <div className={styles.serverIcon}></div>
+                            <div className={styles.serverIcon}>
+                                {/* If user is an owner or mod, allow them to change the icon */}
+                                {isOwner || isMod ? (
+                                <button
+                                    className={styles.editIconButton} // ! There is no style for this yet
+                                    onClick={toggleIconPopup}
+                                    style={{ padding: 0, border: 'none', background: 'none' }}
+                                >
+                                    <Image
+                                    src={community.icon}
+                                    alt="Community Icon"
+                                    width={200}
+                                    height={200}
+                                    className={styles.serverIcon}
+                                    />
+                                </button>
+                                ) : (
+                                // Otherwise, just display the icon
+                                <Image
+                                    src={community.icon}
+                                    alt="Community Icon"
+                                    width={100}
+                                    height={100}
+                                    className={styles.serverIcon}
+                                />
+                                )}
+                            </div>
                             <div className={styles.titleText}>
                                 {commName}
                                 {/* Button that toggles edit forum popup */}
@@ -1053,6 +1232,106 @@ export default function ForumPage({
                             <p>{forumInputs[groupId].message}</p>
                         )}
                     </div>
+                </div>
+            )}
+            {/* --- ICON POPUP --- */}
+            {iconOpen && (
+                <div className={styles.popupOverlay} onClick={toggleIconPopup}>
+                <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                    <h2 className={styles.popupText}>Change Community Icon</h2>
+
+                    {/* Preview the uploaded image */}
+                    {iconPreview && (
+                    <div style={{ marginBottom: "1rem" }}>
+                        <Image src={iconPreview} alt="Preview Icon" width={80} height={80} />
+                    </div>
+                    )}
+
+                    {/* File upload input and buttons to change the icon or close the popup */}
+                    <input type="file" accept="image/*" className={`${styles.inputField} ${styles.popupText}`} onChange={handleIconChange} />
+                    <button className={`${styles.saveBtn} ${styles.popupText}`} onClick={submitIcon}>
+                        Save Icon
+                    </button>
+                    <button className={`${styles.closeBtn} ${styles.popupText}`} onClick={toggleIconPopup}>
+                        Close
+                    </button>
+                </div>
+                </div>
+            )}
+
+            {/* --- BANNER POPUP --- */}
+            {bannerOpen && (
+                <div className={styles.popupOverlay} onClick={toggleBannerPopup}>
+                <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                    <h2 className={styles.popupText}>Change Community Banner</h2>
+
+                    {/* Preview the uploaded image */}
+                    {bannerPreview && (
+                    <div style={{ marginBottom: "1rem" }}>
+                        <Image src={bannerPreview} alt="Preview Banner" width={800} height={200} />
+                    </div>
+                    )}
+
+                    {/* File upload input and buttons to change the banner or close the popup */}
+                    <input type="file" accept="image/*" className={`${styles.inputField} ${styles.popupText}`} onChange={handleBannerChange} />
+                    <button className={`${styles.saveBtn} ${styles.popupText}`} onClick={submitBanner}>
+                    Save Banner
+                    </button>
+                    <button className={`${styles.closeBtn} ${styles.popupText}`} onClick={toggleBannerPopup}>
+                    Close
+                    </button>
+                </div>
+                </div>
+            )}
+            {/* --- MOD OPTIONS POPUP --- */}
+            {modOptionsOpen && (
+                <div className={styles.popupOverlay} onClick={toggleModOptionsPopup}>
+                <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                    <h2 className={styles.popupText}>Mod Options</h2>
+                    {/* Add mod options content here */}
+                    <button className={`${styles.popupText} ${styles.closeBtn}`} onClick={handleKickUser}>
+                    Kick User
+                    </button>
+                    <button className={`${styles.popupText} ${styles.closeBtn}`} onClick={handleBanUser}>
+                    Ban User
+                    </button>
+                    {error && <p style={{ color: "yellow" }}>{error}</p>}
+                </div>
+                </div>
+            )}
+            {/* --- BLACKLIST POPUP --- */}
+            {blacklistOpen && (
+                <div className={styles.popupOverlay} onClick={toggleBlacklistPopup}>
+                <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                    <h2 className={styles.popupText}>Blacklist</h2>
+                    {/* Displays each user's name in the blacklist; if empty show a message */}
+                    <ul>
+                    {community.blacklist.length === 0 ? (
+                        <p>The blacklist is empty.</p>
+                    ) : (
+                        community.blacklist.map((bannedUser) => (
+                        <li key={bannedUser.id} className={styles.popupText}>
+                            {/* User's profile picture */}
+                            <Image src={bannedUser.photoURL} alt={bannedUser.username} width={40} height={40} />
+                            {/* Link to their profile */}
+                            <Link href={`/profile/${bannedUser.id}`}>
+                            {bannedUser.username}
+                            </Link>
+                            {/* Button to unban the user */}
+                            <button className={`${styles.popupText} ${styles.saveBtn}`} onClick={() => {
+                            handleUnbanUser(bannedUser.id);
+                            }}>
+                            Unban User
+                            </button>
+                        </li>
+                        ))
+                    )}
+                    </ul>
+                    {error && <p style={{ color: "yellow" }}>{error}</p>}
+                    <button className={`${styles.popupText} ${styles.closeBtn}`} onClick={toggleBlacklistPopup}>
+                    Close
+                    </button>
+                </div>
                 </div>
             )}
         </main>

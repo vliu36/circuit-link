@@ -4,38 +4,76 @@ import { useEffect, useState, use } from "react";
 import { sendMessage, getMessages, getMediaUrl } from "@/app/_utils/messaging.ts";
 import { useAuth } from "@/app/_firebase/context";
 import Image from "next/image";
+import { fetchUserById } from "../userProfile";
 
 export default function CommunityChat({
     params,
 }: {
-    params: Promise<{ commName: string }>;
+    params: Promise<{ uid: string }>;
 }) {
-    const { commName } = use(params);
+    const { uid } = use(params);
     const { user } = useAuth();
     const [messages, setMessages] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [newText, setNewText] = useState("");
     const [mediaFile, setMediaFile] = useState<File | null>(null);
     const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+    const [otherId, setOtherId] = useState<string | null>(null);
+    const [other, setOther] = useState<any | null>(null);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const resolveUidAndFetch = async () => {
+            const { uid } = await params; 
+            if (!uid) {
+                setError("No UID provided");
+                setLoading(false);
+                return;
+            }
+            
+            setOtherId(uid);
+
+            try {
+                const data = await fetchUserById(uid);
+                if (!data) {
+                    setError("User not found");
+                    setOther(null);
+                } else {
+                    setOther(data);
+                }
+            } catch (err) {
+                setError("Error fetching user profile: " + err);
+                console.log(err);
+                setOther(null);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        resolveUidAndFetch();
+    }, [params]);
+
 
     // Load initial messages
     useEffect(() => {
+        if (!uid && !user) return;
         async function fetchMessages() {
             const now = new Date();
-            const data = await getMessages(commName, 0, now);
+            const data = await getMessages(uid, 1, now, user?.uid);
             setMessages(data.posts || []);
             setLoading(false);
         }
         fetchMessages();
         const interval = setInterval(fetchMessages, 5000);
         return () => clearInterval(interval);
-    }, [commName]);
+    }, [uid, user]);
 
     // Handle sending messages
     async function handleSend() {
         if (!newText.trim() && !mediaFile) return;
         if (!user) return;
 
+        // Upload media if present
         let mediaUrl = null;
         if (mediaFile) {
             const uploaded = await getMediaUrl(mediaFile);
@@ -55,14 +93,14 @@ export default function CommunityChat({
         // Optimistically add message to UI
         setMessages((prevMessages) => [...prevMessages, newMsg]);
         // Send message to backend
-        await sendMessage(user.uid, newText.trim(), mediaUrl, commName, 0);
+        await sendMessage(user.uid, newText.trim(), mediaUrl, otherId || other?.uid, 1);
 
         setNewText("");
         setMediaFile(null);
         setMediaPreview(null);
 
         const now = new Date();
-        const data = await getMessages(commName, 0, now);
+        const data = await getMessages(otherId || other?.uid, 1, now, user?.uid);
         setMessages(data.posts || []);
     }
 
@@ -82,7 +120,7 @@ export default function CommunityChat({
     return (
         <div className="flex flex-col h-screen p-4">
             <h1 className="text-xl font-bold mb-4">
-                Community Chat: {commName}
+                Direct Messages: {other?.user?.username || "Unknown User"}
             </h1>
 
             {/* Messages list */}
@@ -125,7 +163,7 @@ export default function CommunityChat({
                     className="flex-1 border rounded p-2"
                     value={newText}
                     onChange={(e) => setNewText(e.target.value)}
-                    placeholder={`Message ${commName}...`}
+                    placeholder={`Message ${other?.user?.username || "Unknown"}...`}
                     style={{ color: "black" }}
                     maxLength={512}
                 />

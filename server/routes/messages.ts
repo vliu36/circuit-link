@@ -23,8 +23,9 @@ router.post("/create", messages.addMessage);
  *  @param receiver - The uid of the message recipient (if isDirect == 1), otherwise the name of the community (if isDirect != 1)
  *  @param isDirect - Is the message a direct message? (0 = false, 1 = true)
  *  @param time - Date timestamp of the time to retrieve messages up to
+ *  @param sender - (optional) The uid of the other user in the direct message (if isDirect == 1)
 */
-router.get("/getBefore/:receiver/:isDirect/:time", messages.getChatBeforeTime);
+router.get("/getBefore/:receiver/:isDirect/:time/:sender", messages.getChatBeforeTime);
 
 /** Retrieves a list of messages between the given timestamps
  *  @route GET /api/messages/getBetween/:receiver/:isDirect/:afterTime/:beforeTime

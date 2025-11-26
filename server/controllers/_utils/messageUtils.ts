@@ -32,9 +32,26 @@ export async function formatMessageData(messagesRefs: DocumentReference[]) {
                 }
             })
         )
+        // Sort messages by timestamp in descending order (newest first)
+        formattedData.sort((a, b) => b.timestamp - a.timestamp);
         return formattedData;
     }
     catch (err) {
         throw new Error(`ERROR: function formatMessageData: ${err}`);
     }
+}
+
+// Helper function to get community by name
+// ** A modified version of getCommunityByName from ./commUtils for messages that only returns the document reference ** //
+export async function getCommunityByName(commName: string) {
+    const nameLower = commName.toLowerCase();
+    const commRef = db.collection("Communities");
+    const snapshot = await commRef.where("nameLower", "==", nameLower).get();
+
+    if (snapshot.empty) {
+        throw new Error(`Community "${commName}" not found`);
+    }
+
+    const doc = snapshot.docs[0];
+    return doc.ref;
 }
