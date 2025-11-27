@@ -31,18 +31,31 @@ const addDoc = async (req: Request, res: Response) => {
     try {
         const { name, description, isPublic }: { name: string; description: string; isPublic: boolean } = req.body;
 
-        // Get userId from sessionCookie
-        const userId = await genUtil.getUserIdFromSessionCookie(req);
+        // ! DEPRECATED: Use ID token from Authorization header instead of session cookie
+        // // Get userId from sessionCookie
+        // const userId = await genUtil.getUserIdFromSessionCookie(req);
+
+        // Get userId from ID token in Authorization header
+        const idToken = req.headers.authorization?.split("Bearer ")[1];
+        if (!idToken) {
+            return res.status(401).send({
+                status: "Unauthorized",
+                message: "No ID token provided in Authorization header",
+            });
+        }
+        const decodedToken = await auth.verifyIdToken(idToken);
+        const userId = decodedToken.uid;
 
         // Clean up community name
         let cleanName = name.trim();                           // remove trailing spaces
         cleanName = cleanName.replace(/[^a-zA-Z0-9-_ ]/g, ""); // Remove special characters except letters, numbers, hyphens, and underscores
         cleanName = cleanName.replace(/\s+/g, "")              // Remove spaces from the name
 
-        // Verify if community already exists
+        // Verify if community already exists via name and lower case name
         const communitiesRef = await db.collection("Communities");
         const snapshot = await communitiesRef.where("name", "==", cleanName).get();
-        if (!snapshot.empty) {
+        const snapshotLower = await communitiesRef.where("nameLower", "==", cleanName.toLowerCase()).get();
+        if (!snapshot.empty || !snapshotLower.empty) {
             console.log("Error: Community already exists.");
             return res.status(400).send({
                 status: "Bad Request",
