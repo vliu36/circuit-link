@@ -6,6 +6,7 @@ import Image from 'next/image';
 import googleIcon from '../../public/googleIcon.png';
 import Link from "next/link";
 import NavBar from "../_components/navbar/navbar.tsx";
+import { useRouter } from "next/navigation";
 
 export default function Registration() {
 
@@ -18,12 +19,18 @@ export default function Registration() {
     const [showPass, setShowPass] = useState(false);
     const [loading, setLoading] = useState(false);
 
+    const router = useRouter();
+
     // handleSubmit function for registration
     async function handleSubmitReg(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setLoading(true);
         try {
-            await register(email.trim(), password.trim(), username);
+            const res = await register(email.trim(), password.trim(), username);
+            if (res.status === "ok") {
+                console.log("Registration successful:", res);
+                router.push("/");
+            }
         } finally {
             setLoading(false);
         } // end try finally
@@ -33,7 +40,11 @@ export default function Registration() {
     async function handleGoogleReg() {
         setLoading(true);
         try {
-            await registerWithGoogle();
+            const res = await registerWithGoogle();
+            if (res.status === "ok") {
+                console.log("Google Registration successful:", res);
+                router.push("/");
+            }
         } finally {
             setLoading(false);
         } // end try finally

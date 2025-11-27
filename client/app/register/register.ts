@@ -1,10 +1,10 @@
 // Script for user registration page
 
 import { GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword } from "firebase/auth";
-import { auth, db } from "../_firebase/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { auth } from "../_firebase/firebase";
+// import { doc, getDoc } from "firebase/firestore";
 import { FirebaseError } from "firebase/app";
-import "./register.module.css";
+
 
 const provider = new GoogleAuthProvider();
 
@@ -44,7 +44,6 @@ export async function register(email: string, password: string, username: string
     }
     
     console.log("User registered and logged in successfully.")
-    window.location.href = "http://localhost:3000/landing"
     return { status: "ok", message:"User registered and logged in successfully", user};
 } // end function register
 
@@ -73,10 +72,9 @@ export async function registerWithGoogle() {
             // alert(data.message || "Failed to sign in user with Google.");
             return { status: "error", message: data.message || "Failed to sign in user with Google" };
         } // end if
-        console.log("Google user signed in successfully:", data);
-        window.location.href = "http://localhost:3000/landing"
-        return { status: "ok", message: "Google login successful", user};
         
+        console.log("Google user signed in successfully:", data);
+        return { status: "ok", message: "Google login successful", user};
     } catch (error) {
         // console.error("Error during Google sign-in:", error.code, error.message);
         // alert("Google sign-in failed: " + error.message);
