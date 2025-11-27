@@ -63,14 +63,33 @@ const addDoc = async (req: Request, res: Response) => {
             parentCommunity: null, // to be updated after community creation
         }
         const generalGroupRef = await groupsRef.add(generalGroupData);
-        
+
+        // Create a default forum "general" within the "general" group
+        const forumsRef = db.collection("Forums");
+        const generalForumData = {
+            name: "general",
+            parentGroup: generalGroupRef,
+            dateCreated: Timestamp.fromDate(new Date()),
+            description: "Add a description to this forum.",
+            slug: "general",
+            postsInForum: [],
+            ownerList: [userRef],
+            parentCommunity: null, // to be updated after community creation
+        }
+        const generalForumRef = await forumsRef.add(generalForumData);
+
+        // Update the group's forumsInGroup to include the general forum
+        await generalGroupRef.update({
+            forumsInGroup: admin.firestore.FieldValue.arrayUnion(generalForumRef),
+        });
+
         // Create the community, including reference to default group
         const data = {
             blacklist: [],                                                              
             dateCreated: Timestamp.fromDate(new Date()),
             description,                                                                
             groupsInCommunity: [generalGroupRef],
-            forumsInCommunity: [],      // This is field is for easier querying
+            forumsInCommunity: [generalForumRef],      // This is field is for easier querying
             userList: [userRef],                                                        
             modList: [userRef],                                                         
             ownerList: [userRef],                                                       
@@ -87,6 +106,10 @@ const addDoc = async (req: Request, res: Response) => {
 
         // Backfill the parentCommunity field in the default group
         await generalGroupRef.update({ parentCommunity: commRef });
+
+        // Backfill the parentCommunity field in the default forum
+        await generalForumRef.update({ parentCommunity: commRef });
+        // --- End community data setup --- //
 
         // Update user's communities field to include reference to new community
         await userRef.update({

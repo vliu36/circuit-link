@@ -2,7 +2,7 @@ import { auth, db, storage, app, functions } from "../_firebase/firebase";
 import { updateProfile, sendEmailVerification } from "firebase/auth";
 import { doc, DocumentReference, getDoc, updateDoc } from "firebase/firestore";
 // import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { getFunctions, httpsCallable } from "firebase/functions";
+// import { getFunctions, httpsCallable } from "firebase/functions";
 import { uploadImage } from "../_utils/mediaUpload";
 
 // Interface for updatedData in function editProfile
@@ -34,32 +34,31 @@ export async function deleteUserAccount() {
     if (!user) return alert("Not signed in");
 
     try {
-    const idToken = await user.getIdToken();
+        const idToken = await user.getIdToken();
 
-    // Call the backend endpoint
-    const res = await fetch(`http://localhost:2400/api/users/delete-account`, {
-        method: "DELETE",
-        headers: {
-            "Authorization": `Bearer ${idToken}`,
-        },
-    });
+        // Call the backend endpoint
+        const res = await fetch(`http://localhost:2400/api/users/delete-account`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": `Bearer ${idToken}`,
+            },
+        });
 
-    if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || "Failed to delete account.");
-    }
+        if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.message || "Failed to delete account.");
+        }
 
-    console.log("Account deleted successfully.");
-    // alert("Account deleted successfully."); 
-    window.location.href = "/";
-    return { status: "ok", message: "Your account has been deleted." };
+        console.log("Account deleted successfully.");
+        // alert("Account deleted successfully."); 
+        window.location.href = "/";
+        return { status: "ok", message: "Your account has been deleted." };
     } catch (error) {
         let msg: string;
         if (error instanceof Error) {
             const firebaseAuthError = error as { code?: string; message: string};
             if (firebaseAuthError.code === "auth/requires-recent-login") {
                 alert("Please log in again to delete your account."); 
-                // window.location.href = "http://localhost:3000/signin";
             } else {
                 alert("Error deleting user: " + firebaseAuthError.message);
             } // end if else
@@ -77,6 +76,7 @@ export async function logout() {
     try {
         await auth.signOut();
         console.log("User signed out.");
+
         // Clear the session cookie
         const res = await fetch("http://localhost:2400/api/users/logout", {
             method: "POST",
@@ -205,14 +205,19 @@ export async function getFriends(friendRefs: DocumentReference[]): Promise<User[
 } // end function getFriends
 
 // Remove friend
-export async function removeFriend(friendId: string, userId: string) {
+export async function removeFriend(friendId: string) {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
+        if (!idToken) {
+            throw new Error("User not authenticated");
+        }
         const removed = await fetch(`http://localhost:2400/api/users/remove-friend`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
             },
-            body: JSON.stringify({ friendId, userId }),
+            body: JSON.stringify({ friendId }),
         });
         if (!removed.ok) {
             throw new Error("Failed to remove friend");

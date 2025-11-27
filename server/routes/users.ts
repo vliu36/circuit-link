@@ -102,7 +102,7 @@ router.post("/respond-friend-request", users.respondToFriendRequest);
 
 /** Remove a friend from the user's friend list
  *  @route POST /api/users/remove-friend
- *  @body userId - UID of the user removing the friend
+ *  @header Authorization - Bearer token containing Firebase ID token
  *  @body friendId - UID of the friend to be removed
  */
 router.post("/remove-friend", users.removeFriend);
