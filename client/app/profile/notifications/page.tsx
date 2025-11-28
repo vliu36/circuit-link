@@ -119,7 +119,6 @@ export default function Notifications() {
 
     return (
         <div>
-            <NavBar/>
             <h1>Notifications Page</h1>
             <p>This is where user notifications will be displayed.</p>
 
@@ -130,19 +129,13 @@ export default function Notifications() {
 
             {/* Show notification List */}
             <div>
-                {/* If there are notifications, display them */}
                 {notifications.length > 0 ? (
                     <ul>
-                        {/* Map through notifications and display them */}
                         {notifications.map((notif) => (
-                            <li key={notif.id}>
+                            <li key={notif.id} style={{ color: '#000' }}>
                                 <br/>
-                                {/* Notification content */}
-                                <span>{notif.message}</span>
-                                {/* Timestamp */}
+                                <span style={{ color: '#000' }}>{notif.message}</span>
                                 <small> {notif.timestamp.toLocaleString()}</small>
-
-                                {/* If notification is unread, show that it is; clicking on it marks it as read */}
                                 {!notif.read && (
                                     <button onClick={() => markAsRead(notif.id)}>
                                         [Unread]
@@ -151,11 +144,8 @@ export default function Notifications() {
                                 <button onClick={() => handleDelete(notif.id)}>
                                     [Delete Notification]
                                 </button>
-
-                                {/* If notification type is a 'friend_request', show it */}
                                 {notif.type === "friend_request" && notif.relatedDocRef && (
                                     <div>
-                                        {/* If status is pending, show accept/decline buttons */}
                                         {requestStatus[notif.id] === "pending" && (
                                             <>
                                                 <button onClick={() => respondToRequest(notif.relatedDocRef!, true, user.uid, notif.id)}>
@@ -166,37 +156,30 @@ export default function Notifications() {
                                                 </button>
                                             </>
                                         )}
-                                        {/* If status is accepted, show accepted message */}
                                         {requestStatus[notif.id] === "accepted" && (
                                             <span><em>Accepted.</em></span>
                                         )}
-                                        {/* If status is rejected, show rejected message */}
                                         {requestStatus[notif.id] === "rejected" && (
                                             <span><em>Rejected.</em></span>
                                         )}
                                     </div>
-                                )} {/* End friend_request handling */}
-
-                                {/* If notification type is a report, show it */}
+                                )}
                                 {notif.type === "report" && notif.relatedDocRef && (
-                                    // Link to view the reported post
                                     <div>
                                         <Link href={redirectUrls[notif.id] || "#"} target="_blank" rel="noopener noreferrer">
                                             [View Reported Post]
                                         </Link>
-                                        {/* Show report status */}
                                         {requestStatus[notif.id] && (
                                             <span><em>Report Status: {requestStatus[notif.id]}</em></span>
                                         )}
                                     </div>
-                                )} {/* End report handling */}
-
+                                )}
                             </li>
-                        ))} {/* End mapping notifications */}
-                    </ul> 
+                        ))}
+                    </ul>
                 ) : (
                     <ul>
-                        <li>No notifications available.</li>
+                        <li style={{ color: '#000' }}>No notifications available.</li>
                     </ul>
                 )}
             </div>

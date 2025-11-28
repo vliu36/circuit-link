@@ -31,18 +31,31 @@ const addDoc = async (req: Request, res: Response) => {
     try {
         const { name, description, isPublic }: { name: string; description: string; isPublic: boolean } = req.body;
 
-        // Get userId from sessionCookie
-        const userId = await genUtil.getUserIdFromSessionCookie(req);
+        // ! DEPRECATED: Use ID token from Authorization header instead of session cookie
+        // // Get userId from sessionCookie
+        // const userId = await genUtil.getUserIdFromSessionCookie(req);
+
+        // Get userId from ID token in Authorization header
+        const idToken = req.headers.authorization?.split("Bearer ")[1];
+        if (!idToken) {
+            return res.status(401).send({
+                status: "Unauthorized",
+                message: "No ID token provided in Authorization header",
+            });
+        }
+        const decodedToken = await auth.verifyIdToken(idToken);
+        const userId = decodedToken.uid;
 
         // Clean up community name
         let cleanName = name.trim();                           // remove trailing spaces
         cleanName = cleanName.replace(/[^a-zA-Z0-9-_ ]/g, ""); // Remove special characters except letters, numbers, hyphens, and underscores
         cleanName = cleanName.replace(/\s+/g, "")              // Remove spaces from the name
 
-        // Verify if community already exists
+        // Verify if community already exists via name and lower case name
         const communitiesRef = await db.collection("Communities");
         const snapshot = await communitiesRef.where("name", "==", cleanName).get();
-        if (!snapshot.empty) {
+        const snapshotLower = await communitiesRef.where("nameLower", "==", cleanName.toLowerCase()).get();
+        if (!snapshot.empty || !snapshotLower.empty) {
             console.log("Error: Community already exists.");
             return res.status(400).send({
                 status: "Bad Request",
@@ -63,14 +76,33 @@ const addDoc = async (req: Request, res: Response) => {
             parentCommunity: null, // to be updated after community creation
         }
         const generalGroupRef = await groupsRef.add(generalGroupData);
-        
+
+        // Create a default forum "general" within the "general" group
+        const forumsRef = db.collection("Forums");
+        const generalForumData = {
+            name: "general",
+            parentGroup: generalGroupRef,
+            dateCreated: Timestamp.fromDate(new Date()),
+            description: "Add a description to this forum.",
+            slug: "general",
+            postsInForum: [],
+            ownerList: [userRef],
+            parentCommunity: null, // to be updated after community creation
+        }
+        const generalForumRef = await forumsRef.add(generalForumData);
+
+        // Update the group's forumsInGroup to include the general forum
+        await generalGroupRef.update({
+            forumsInGroup: admin.firestore.FieldValue.arrayUnion(generalForumRef),
+        });
+
         // Create the community, including reference to default group
         const data = {
             blacklist: [],                                                              
             dateCreated: Timestamp.fromDate(new Date()),
             description,                                                                
             groupsInCommunity: [generalGroupRef],
-            forumsInCommunity: [],      // This is field is for easier querying
+            forumsInCommunity: [generalForumRef],      // This is field is for easier querying
             userList: [userRef],                                                        
             modList: [userRef],                                                         
             ownerList: [userRef],                                                       
@@ -87,6 +119,10 @@ const addDoc = async (req: Request, res: Response) => {
 
         // Backfill the parentCommunity field in the default group
         await generalGroupRef.update({ parentCommunity: commRef });
+
+        // Backfill the parentCommunity field in the default forum
+        await generalForumRef.update({ parentCommunity: commRef });
+        // --- End community data setup --- //
 
         // Update user's communities field to include reference to new community
         await userRef.update({

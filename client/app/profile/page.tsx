@@ -113,7 +113,7 @@ export default function Profile() {
     // Handle removing a friend
     const handleRemoveFriend = async (friendId: string) => {
         try {
-            await profileFunctions.removeFriend(friendId, user.uid);
+            await profileFunctions.removeFriend(friendId);
             // Optimistically remove from local state
             setFriends(prevFriends => prevFriends.filter(f => f.id !== friendId));
         } catch (error) {

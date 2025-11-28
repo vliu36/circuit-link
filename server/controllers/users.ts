@@ -512,14 +512,24 @@ const respondToFriendRequest = async (req: Request, res: Response) => {
 
 // Remove friend
 const removeFriend = async (req: Request, res: Response) => {
-    const { userId, friendId } = req.body;
+
     try {
+        const { friendId } = req.body;
+        const idToken = req.headers.authorization?.split("Bearer ")[1];
+        if (!idToken) {
+            return res.status(401).json({ status: "error", message: "Missing token" });
+        }
+        const decoded = await auth.verifyIdToken(idToken);
+        const userId = decoded.uid;
+
         await db.collection("Users").doc(userId).update({
             friendList: FieldValue.arrayRemove(db.doc(`/Users/${friendId}`))
         });
         await db.collection("Users").doc(friendId).update({
             friendList: FieldValue.arrayRemove(db.doc(`/Users/${userId}`))
         });
+
+        console.log(`Friend removed successfully for user ${userId} and friend ${friendId}.`);
         res.status(200).json({ status: "ok", message: "Friend removed successfully" });
     } catch (error) {
         console.error("Error removing friend:", error);
