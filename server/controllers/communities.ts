@@ -235,6 +235,15 @@ const deleteGroup = async (req: Request, res: Response) => {
 
         const groupData = groupSnap.data();
 
+        // Check if the group is the only group in the community
+        const groupsInCommunity: FirebaseFirestore.DocumentReference[] = commData.groupsInCommunity || [];
+        if (groupsInCommunity.length <= 1) {
+            return res.status(400).json({
+                status: "Bad Request",
+                message: "Cannot delete the only group in the community.",
+            });
+        }
+
         // --- Delete all group children ---
         console.log("Deleting forums, posts, and replies within group...");
         await commUtil.deleteForumsInGroup(groupRef);    // This will delete all forums, posts, and replies within the group

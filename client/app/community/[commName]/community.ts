@@ -146,7 +146,7 @@ export async function deleteForum(forumId: string, commName: string): Promise<{ 
         const data = await res.json();
 
         if (!res.ok) {
-            console.error("Failed to delete forum:", data.message);
+            console.warn("Failed to delete forum:", data.message);
             return {
                 status: "error",
                 message: data.message || "Failed to delete forum.",

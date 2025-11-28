@@ -268,6 +268,10 @@ export default function ForumPage({
                 reroute = true;
             }
             const result = await commApi.deleteForum(forumId, commName);
+            if (!result || result.status === "error") {
+                setError(result?.message || "Failed to delete forum.");
+                return;
+            }
             console.log("Forum deleted successfully:", result);
 
             // Reroute user to community main page after deleting the forum, or refresh community structure
@@ -277,7 +281,8 @@ export default function ForumPage({
                 await refreshCommunity();
             }
         } catch (err) {
-            console.error("Error deleting forum:", err);
+            console.warn("Error deleting forum:", err);
+            setError("Error deleting forum: " + (err instanceof Error ? err.message : ""));
         }
     };
 
@@ -1179,8 +1184,9 @@ export default function ForumPage({
                     <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
                         <h2 className={styles.popupText}>Confirm Delete Forum</h2>
                         <p className={styles.popupText}>Are you sure you want to delete forum &quot;{deleteForumName}&quot;? <br /> This action cannot be undone.</p>
+                        {error && <p className={styles.errorText}>{error}</p>}
                         <button onClick={toggleConfirmDeleteForum} className={styles.cancelButton}>Cancel</button>
-                        <button onClick={() => { handleDeleteForum(deleteForumId); toggleConfirmDeleteForum(); }} className={styles.deleteButtonPopup}>Delete</button>
+                        <button onClick={() => {handleDeleteForum(deleteForumId)}} className={styles.deleteButtonPopup}>Delete</button>
                     </div>
                 </div>
             )}

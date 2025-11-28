@@ -32,8 +32,9 @@ const getAllDocuments = async (req: Request, res: Response) => {
 const addDoc = async (req: Request, res: Response) => {
     try {
         const { name, description, groupId, commName } = req.body;
-        // Verify and get userId from session cookie
+        // Verify and get userId from auth header
         const userId = await getUserIdFromAuthHeader(req);
+        console.log("User ID from auth header:", userId);
 
         // Generate slug from name
         const slug = name
@@ -160,7 +161,7 @@ const deleteForum = async (req: Request, res: Response) => {
         const { forumId } = req.params;
         const { commName } = req.body;
 
-        // Verify and get userId from session cookie
+        // Verify and get userId from auth header
         const userId = await getUserIdFromAuthHeader(req);
         if (!commName || !userId) {
             console.log("No community or user provided.");
@@ -191,6 +192,15 @@ const deleteForum = async (req: Request, res: Response) => {
         console.log(`Confirmed user with ID ${userId} is authorized to delete forum in community "${commName}".`);
 
         const forumData = forumSnap.data();
+
+        // Check if forum is the only forum in the community's forum list
+        const forumsInComm: DocumentReference[] = commData.forumsInCommunity || [];
+        if (forumsInComm.length <= 1) {
+            return res.status(400).json({
+                status: "Bad Request",
+                message: "Cannot delete the only forum in the community.",
+            });
+        }
 
         // --- Delete all posts in the forum's postsInForum ---
         // Get all posts that belong to this forum
