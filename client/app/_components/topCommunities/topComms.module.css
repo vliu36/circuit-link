@@ -2,7 +2,10 @@
     border-radius: 1em;
     margin-right: 2%;
     margin-left: 4%;
+    margin-top: 2%;
     background-color: black;
+    width: 40px;
+    height: 40px;
 }
 
 .topCommunitiesItem{

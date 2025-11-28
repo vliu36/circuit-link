@@ -44,10 +44,7 @@ export async function register(email: string, password: string, username: string
     }
     
     console.log("User registered and logged in successfully.")
-<<<<<<< HEAD
     window.location.href = "http://localhost:3000"
-=======
->>>>>>> 3f16f743d9c3cdb6c2f83bb8ef4487b34917046f
     return { status: "ok", message:"User registered and logged in successfully", user};
 } // end function register
 
