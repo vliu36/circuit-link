@@ -2,7 +2,8 @@ import { DocumentReference, FieldValue, Timestamp } from "firebase-admin/firesto
 import { db } from "../firebase.ts"
 import { Request, Response } from "express"
 import { deletePostRepliesRecursive } from "./_utils/replyUtils.ts";
-import { getUserIdFromSessionCookie, isUserAuthorizedToDeleteDoc } from "./_utils/generalUtils.ts";
+import { /*getUserIdFromSessionCookie,*/ isUserAuthorizedToDeleteDoc, getUserIdFromAuthHeader } from "./_utils/generalUtils.ts";
+
 
 // Retrieves all documents in Replies collection
 const getAllDocuments = async (req: Request, res: Response) => {
@@ -22,7 +23,7 @@ const getAllDocuments = async (req: Request, res: Response) => {
 const createReply = async (req: Request, res: Response) => {
     try {
         const { postId, contents } = req.body;
-        const author = await getUserIdFromSessionCookie(req);
+        const author = await getUserIdFromAuthHeader(req);
         if (!author || !postId || !contents) {
             return res.status(400).json({ status: "error", message: "Missing fields" });
         }
@@ -99,7 +100,7 @@ const voteReply = async (req: Request, res: Response) => {
     try {
         const { id, type } = req.body;
         if (!["yay", "nay"].includes(type)) return res.status(400).json({ status: "error", message: "Invalid vote type" });
-        const userId = await getUserIdFromSessionCookie(req);
+        const userId = await getUserIdFromAuthHeader(req);
 
         const replyRef = db.collection("Replies").doc(id);
 
@@ -198,7 +199,7 @@ const deleteDoc = async (req: Request, res: Response) => {
     try {
         const { replyId } = req.params;
         const { commName } = req.body;
-        const userId = await getUserIdFromSessionCookie(req);
+        const userId = await getUserIdFromAuthHeader(req);
 
         const replyRef = db.collection("Replies").doc(replyId);
         const replySnap = await replyRef.get();
@@ -244,7 +245,7 @@ const editDoc = async (req: Request, res: Response) => {
     try {
         const { replyId } = req.params;
         const { contents } = req.body;
-        const userId = await getUserIdFromSessionCookie(req);
+        const userId = await getUserIdFromAuthHeader(req);
 
         const replyRef = db.collection("Replies").doc(replyId);
         const replySnap = await replyRef.get();

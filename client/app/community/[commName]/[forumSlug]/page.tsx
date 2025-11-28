@@ -343,20 +343,32 @@ export default function ForumPage({
         if (!title || !contents) return alert("Please fill out title and contents");
 
         try {
-
+            let media: string | null = null;
             const res = await getMediaUrl(mediaFile);
-            const mediaUrl = res.media || null;
+            if (res.status == "error") {                    // If error occurred during media upload, throw an error to stop process
+                setError(res.message);
+                throw new Error(res.message);
+            } else if (res.status == "ok") {                // If media upload successful, get the media URL
+                console.log("Media uploaded successfully:", res.media);
+                media = res.media;
+            } else if (res.status == "no_media") {          // If no media file provided, set mediaUrl to null
+                console.log("No media file provided.");
+                media = null;
+            } else {
+                setError("Unexpected response during media upload.");
+                throw new Error("Unexpected response during media upload.");
+            }
 
             const msg = await createPost(
-                // user.uid, // ! DEPRECATED - now derived from session cookie
                 title,
                 contents,
                 commName,
                 forumSlug,
-                mediaUrl,
+                media,
             );
 
             console.log(msg);
+            toggleCreatePostPopup();
             setTitle("");
             setContents("");
             setMediaFile(null);
@@ -368,9 +380,11 @@ export default function ForumPage({
         } catch (err) {
             console.log(err);
             if (err instanceof Error) {
-                alert(`Failed to add post: ${err.message}`);
+                // alert(`Failed to add post: ${err.message}`);
+                setError(`Failed to add post: ${err.message}`);
             } else {
-                alert("Failed to add post due to an unknown error.");
+                // alert("Failed to add post due to an unknown error.");
+                setError("Failed to add post due to an unknown error.");
             }
         }
     };
@@ -738,12 +752,14 @@ export default function ForumPage({
                                     style={{ height: "120px" }}
                                 />
 
+                                {/* Message */}
+                                {error && <p className={styles.errorText}>{error}</p>}
+
                                 {/* Submit Button */}
                                 <button
                                     className={`${styles.saveBtn} ${styles.popupText}`}
                                     onClick={async () => {
                                         await handleAddPost();
-                                        toggleCreatePostPopup();
                                     }}
                                 >
                                     Add Post

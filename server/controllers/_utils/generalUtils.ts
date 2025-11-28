@@ -21,15 +21,26 @@ export function cookieParser(req: Request): Record<string, string> {
     return cookies;
 }
 
-// Function to assist in getting userId from session cookie
-export async function getUserIdFromSessionCookie(req: Request): Promise<string> {
-    const cookies = cookieParser(req);
-    const sessionCookie = cookies.session;
-    if (!sessionCookie) {
-        throw new Error("Unauthorized: Missing session cookie");
+// // Function to assist in getting userId from session cookie
+// export async function getUserIdFromSessionCookie(req: Request): Promise<string> {
+//     const cookies = cookieParser(req);
+//     const sessionCookie = cookies.session;
+//     if (!sessionCookie) {
+//         throw new Error("Unauthorized: Missing session cookie");
+//     }
+//     const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+//     return decodedClaims.uid;
+// }
+
+// Function to get userId from authorization header
+export async function getUserIdFromAuthHeader(req: Request): Promise<string> {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        throw new Error("Unauthorized: Missing or invalid authorization header");
     }
-    const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
-    return decodedClaims.uid;
+    const idToken = authHeader.split("Bearer ")[1];
+    const decodedToken = await auth.verifyIdToken(idToken);
+    return decodedToken.uid;
 }
 
 // Create a new notification for a user

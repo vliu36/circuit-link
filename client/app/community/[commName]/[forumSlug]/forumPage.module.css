@@ -1079,3 +1079,9 @@
 .chatLink:hover{
     background-color: rgb(10, 45, 110);
 }
+
+.errorText {
+    color: orangered;
+    margin-bottom: 1rem;
+    font-family: Inria Sans;
+}

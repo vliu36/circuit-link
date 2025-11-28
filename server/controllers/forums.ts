@@ -4,7 +4,7 @@ import { Timestamp } from "firebase-admin/firestore";
 import admin from "firebase-admin";
 import { DocumentReference } from "firebase-admin/firestore";
 import * as forumUtils from "./_utils/forumUtils.ts";
-import { getUserIdFromSessionCookie, verifyUserIsOwnerOrMod } from "./_utils/generalUtils.ts";
+import { /*getUserIdFromSessionCookie,*/ verifyUserIsOwnerOrMod, getUserIdFromAuthHeader } from "./_utils/generalUtils.ts";
 import { getCommunityByName } from "./_utils/commUtils.ts";
 import { match } from "assert";
 
@@ -33,7 +33,7 @@ const addDoc = async (req: Request, res: Response) => {
     try {
         const { name, description, groupId, commName } = req.body;
         // Verify and get userId from session cookie
-        const userId = await getUserIdFromSessionCookie(req);
+        const userId = await getUserIdFromAuthHeader(req);
 
         // Generate slug from name
         const slug = name
@@ -161,7 +161,7 @@ const deleteForum = async (req: Request, res: Response) => {
         const { commName } = req.body;
 
         // Verify and get userId from session cookie
-        const userId = await getUserIdFromSessionCookie(req);
+        const userId = await getUserIdFromAuthHeader(req);
         if (!commName || !userId) {
             console.log("No community or user provided.");
             return res.status(400).send({
@@ -243,8 +243,8 @@ const editForum = async (req: Request, res: Response) => {
     try {
         const { forumId } = req.params;
         const { name, description }: { name?: string; description?: string } = req.body;
-        // Verify and get userId from session cookie
-        const userId = await getUserIdFromSessionCookie(req);
+        // Verify and get userId from auth header
+        const userId = await getUserIdFromAuthHeader(req);
         if (!userId) {
             console.log("No user provided.");
             return res.status(400).send({

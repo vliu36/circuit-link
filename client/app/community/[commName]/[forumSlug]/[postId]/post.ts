@@ -1,5 +1,6 @@
 "use client";
 
+import { auth } from "@/app/_firebase/firebase";
 import { useState, useEffect } from "react";
 import { useCallback } from "react";
 
@@ -122,11 +123,14 @@ export const useReplies = (postId: string, userId?: string) => {
         });
 
         try {
+            const idToken = await auth.currentUser?.getIdToken();
             await fetch(isReply ? `${BASE_URL}/replies/vote` : `${BASE_URL}/posts/vote`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${idToken}`,
+                },
                 body: JSON.stringify({ id, type }),
-                credentials: "include",
             });
             fetchPost();
         } catch (err) {
@@ -141,11 +145,14 @@ export const useReplies = (postId: string, userId?: string) => {
 
         try {
             // Create the reply
+            const idToken = await auth.currentUser?.getIdToken();
             const res = await fetch(`${BASE_URL}/replies/`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${idToken}`,
+                },
                 body: JSON.stringify({ contents, postId }),
-                credentials: "include",
             });
             const data = await res.json();
             const newReplyId = data.docId;
@@ -171,11 +178,14 @@ export const useReplies = (postId: string, userId?: string) => {
 
     // --- Edit reply ---
     const editReply = async (replyId: string, contents: string) => {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/replies/edit/${replyId}`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
             body: JSON.stringify({ contents }),
-            credentials: "include",
         });
         const data = await res.json();
         return data.message || "Reply updated!";
@@ -183,11 +193,14 @@ export const useReplies = (postId: string, userId?: string) => {
 
     // --- Delete reply ---
     const deleteReplyById = async (replyId: string, commName: string) => {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/replies/delete/${replyId}`, {
             method: "DELETE",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
             body: JSON.stringify({ commName }),
-            credentials: "include",
         });
         const data = await res.json();
         return data.message || "Reply deleted!";
@@ -195,11 +208,14 @@ export const useReplies = (postId: string, userId?: string) => {
 
     // --- Edit post ---
     const editPost = async (postId: string, userId: string | undefined, title: string, contents: string) => {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/posts/edit/${postId}`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
             body: JSON.stringify({ title, contents, userId }),
-            credentials: "include",
         });
         const data = await res.json();
         return data.message || "Post updated!";
@@ -207,11 +223,14 @@ export const useReplies = (postId: string, userId?: string) => {
 
     // --- Delete post ---
     const deletePostById = async (postId: string, commName: string) => {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/posts/delete/${postId}`, {
             method: "DELETE",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
             body: JSON.stringify({ commName }),
-            credentials: "include",
         });
         const data = await res.json();
         return data.message || "Post deleted!";

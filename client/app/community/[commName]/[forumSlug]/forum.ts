@@ -1,3 +1,4 @@
+import { auth } from "@/app/_firebase/firebase";
 import { uploadImage, uploadVideo } from "@/app/_utils/mediaUpload";
 
 const BASE_URL = "http://localhost:2400/api";
@@ -38,44 +39,56 @@ export async function createPost(
     forumSlug: string,
     media: string | null = null
 ) {
+    const idToken = await auth.currentUser?.getIdToken();
     const res = await fetch(`${BASE_URL}/posts/make-post`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${idToken}`,
+        },
         body: JSON.stringify({ title, contents, commName, forumSlug, media }),
-        credentials: "include",
     });
     const data = await res.json();
     return data.message || "Post added!";
 }
 
 export async function editPost(postId: string, title: string, contents: string) {
+    const idToken = await auth.currentUser?.getIdToken();
     const res = await fetch(`${BASE_URL}/posts/edit/${postId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${idToken}`,
+        },
         body: JSON.stringify({ title, contents }),
-        credentials: "include",
     });
     const data = await res.json();
     return data.message || "Post updated!";
 }
 
 export async function deletePostById(postId: string, commName: string) {
+    const idToken = await auth.currentUser?.getIdToken();
     const res = await fetch(`${BASE_URL}/posts/delete/${postId}`, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${idToken}`,
+        },
         body: JSON.stringify({ commName }),
-        credentials: "include",
     });
     const data = await res.json();
     return data.message || "Post deleted!";
 }
 
 export async function votePost(id: string, type: "yay" | "nay") {
+    const idToken = await auth.currentUser?.getIdToken();
     await fetch(`${BASE_URL}/posts/vote`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${idToken}`,
+        },
         body: JSON.stringify({ id, type }),
-        credentials: "include",
     });
 }
 
@@ -86,11 +99,14 @@ export async function editForum(
     description?: string
 ): Promise<{ status: string; message: string, newSlug?: string }> {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/forums/edit/${forumId}`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
             body: JSON.stringify({ name, description }),
-            credentials: "include",
         });
         const data = await res.json();
         if (!res.ok) {
@@ -123,8 +139,8 @@ export async function getMediaUrl(mediaFile: File | null) {
         } // end if else
         return { status: "ok", message: "Media uploaded successfully.", media: mediaUrl };
     } catch (err) {
-        console.error("Media upload failed:", err);
-        return { status: "error", message: "Media upload failed.", media: null };
+        console.warn("Media upload failed:", err);
+        return { status: "error", message: err instanceof Error ? err.message : "Media upload failed.", media: null };
     }
 }
 
@@ -135,11 +151,14 @@ export async function reportPost(
     reason: string
 ) {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/comm/report-post`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
             body: JSON.stringify({ commName, postId, reason }),
-            credentials: "include",
         });
         const data = await res.json();
         if (!res.ok) {

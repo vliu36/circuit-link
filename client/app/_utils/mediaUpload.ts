@@ -42,7 +42,16 @@ export async function uploadImage(file: File) {
         return fileName;
     }
     catch (err) {
-        console.error(err);
+        console.warn(err);
+        if (err instanceof Error) {
+            if (err.message === "File size exceeds 5 MB!") {
+                throw err;
+            } else {
+                throw new Error("Image upload failed.");
+            }
+        } else {
+            throw new Error("Unknown error occurred during image upload.");
+        }
     }
 }
 
@@ -76,7 +85,16 @@ export async function uploadVideo(file: File) {
         return fileName;
     }
     catch (err) {
-        console.error(err);
+        console.warn(err);
+        if (err instanceof Error) {
+            if (err.message === "File size exceeds 30 MB!") {
+                throw err;
+            } else {
+                throw new Error("Video upload failed.");
+            }
+        } else {
+            throw new Error("Unknown error occurred during video upload.");
+        }
     }
 }
 
