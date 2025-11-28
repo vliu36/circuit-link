@@ -20,6 +20,7 @@
     white-space: nowrap;     /* Prevent wrapping */
     overflow: hidden;        /* Prevent stretch */
     text-overflow: ellipsis; /* Prevent scrollbar */
+    font-size: 12px;
 }
 
 .communitiesTitle{

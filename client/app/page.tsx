@@ -57,7 +57,7 @@ export default function Landing() {
             </div>
 
             <div className={Styles.resourcesBar} style={{ gridArea: "resources" }}>
-                <ResourcesBar/>
+                <ResourcesBar />
             </div>
 
             <div className={Styles.topUsersBar} style={{ gridArea: "topUsers" }}>
@@ -82,9 +82,9 @@ export default function Landing() {
                         <SearchBar />
                     </Suspense>
                 </h3>
-                <h4>
+                <div>
                     <SearchResults />
-                </h4>
+                </div>
             </div>
         </div>
     );

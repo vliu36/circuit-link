@@ -44,7 +44,7 @@ export async function register(email: string, password: string, username: string
     }
     
     console.log("User registered and logged in successfully.")
-    window.location.href = "http://localhost:3000/landing"
+    window.location.href = "http://localhost:3000"
     return { status: "ok", message:"User registered and logged in successfully", user};
 } // end function register
 
@@ -74,7 +74,7 @@ export async function registerWithGoogle() {
             return { status: "error", message: data.message || "Failed to sign in user with Google" };
         } // end if
         console.log("Google user signed in successfully:", data);
-        window.location.href = "http://localhost:3000/landing"
+        window.location.href = "http://localhost:3000"
         return { status: "ok", message: "Google login successful", user};
         
     } catch (error) {

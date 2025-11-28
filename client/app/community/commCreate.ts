@@ -24,3 +24,4 @@ export async function createCommunity(
         throw err;
     }
 }
+
