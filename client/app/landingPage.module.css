@@ -34,6 +34,7 @@
     background-color: rgb(255, 255, 255);
     border-radius: 1em;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
+    color: black;
 }
 
 .navBox{
@@ -70,7 +71,6 @@
     text-align: center;
     display: flex;
     flex-direction: column;
-    margin-top: 1em;
     background-color: #FFFFFF;
     border-radius: 1em;
     color: #5A5454;
@@ -79,7 +79,6 @@
 
 .welcomeText{
     width: 100%;
-    height: 6vh;
     font-size: 2.5vw;
     font-family: Jura;
     color: #5A5454;
@@ -87,14 +86,14 @@
 
 .usernameText{
     width: 100%;
-    height: 10vh;
     font-size: 2.5vw;
     font-family: Jura;
     color: #5A5454;
+    margin-bottom: 5vh;
 }
 
 .searchBarAlignment{
-    margin-left:20%;
+    margin-left:15%;
     width: 70%;
     color: #5A5454;
     background-color: #FFFFFF;
@@ -184,6 +183,3 @@
     background-color: #394153;
     margin-left: 10px;
 }
-
-
-
