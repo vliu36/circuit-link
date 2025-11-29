@@ -499,10 +499,29 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                 </div>
 
 
-                <div style={{ gridArea: "ServerBar" }}>
-                    <ServerBar params={{
-                        commName: commName
-                    }}
+                <div className={styles.serverBar} style={{ gridArea: "ServerBar" }}>
+                    <ServerBar
+                        community={community}
+                        commName={commName}
+                        forumSlug={forumSlug}
+                        isOwner={isOwner}
+                        isMod={isMod}
+                        onCreateGroup={handleCreateGroup}
+                        onCreateForum={handleCreateForum}
+                        onDeleteGroup={(id, name) => {
+                            setDeleteGroupId(id);
+                            setDeleteGroupName(name);
+                            toggleConfirmDeleteGroup();
+                        }}
+                        onDeleteForum={(id, name) => {
+                            setDeleteForumId(id);
+                            setDeleteForumName(name);
+                            toggleConfirmDeleteForum();
+                        }}
+                        onOpenEditGroup={(id) => {
+                            setEditGroupId(id);
+                            setEditGroupOpen(true);
+                        }}
                     />
                 </div>
 

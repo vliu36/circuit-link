@@ -280,13 +280,14 @@
     height: 100vh;
     overflow: hidden;
     position:relative;
-    grid-template-columns: 1vw 15.67vw 3vw 60.7vw 3vw 15.67vw 1vw;
+    grid-template-columns: 16.67vw 58.67vw 16.67vw;
     grid-template-rows: 6vh 34vh 54vh;
-    grid-template-areas:
-        "NavBar NavBar NavBar NavBar NavBar NavBar NavBar"
-        "margin1 CommunitiesBar margin3 Center margin4 RightBar margin2"
-        "margin1 ServerBar margin3 Center margin4 RightBar margin2";
+    grid-template-areas: 
+    "NavBar NavBar NavBar"
+    "CommunitiesBar Center RightBar"
+    "ServerBar Center RightBar";
     row-gap: 3%;
+    column-gap: 4%;
 }
 
 .RightBar{

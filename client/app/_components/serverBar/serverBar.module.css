@@ -16,12 +16,10 @@
 }
 
 .commName{
-    width:90%;
-    height:90%;
+    width:80%;
+    height:100%;
     overflow: hidden;
     font-size: 20px;
-    text-indent: 5%;
-    margin-top: 2%;
 }
 
 .plusButton:hover{
@@ -49,12 +47,9 @@
 }
 
 .groupName{
-    width: 75%;
+    width: 40%;
     height: 50%;
     overflow: hidden;
-    margin-left: -4%;
-    overflow: hidden;
-    white-space: nowrap;
 }
 
 .deleteGroup{
@@ -71,23 +66,21 @@
 }
 
 .channelHeader{
-    width: 97.5%;
+    width: 95%;
     height: 3vh;
     display:flex;
     text-indent: 5%;
-
 }
 
 .channelName{
-    width: 83%;
+    width: 65.5%;
     height: 100%;
     font-family: Inria Sans;
     font-size: 1em;
     color: #5A5454;
-    margin-left: 5%;
+    margin-left: 10px;
+    margin-left: 4%;
     overflow: hidden;
-    white-space: nowrap;
-
 }
 
 .popupOverlay {
@@ -158,7 +151,7 @@
     background-color: #FF3B3B;
 }
 
-.activeForum{
-    background-color: #d4deff;
-    border-radius: 1em;
+.activeChannel a {
+    width: 1000px;
+    background-color: #7c7c7c;
 }

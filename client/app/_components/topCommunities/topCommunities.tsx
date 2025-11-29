@@ -38,8 +38,8 @@ export default function TopCommunities({ dataLoading, topCommunities }: Props) {
                                 />
                                 <div className={Styles.topCommunitiesName}>
                                     <p className={Styles.communitiesTitle}>{name}</p>
-                                    <label>{yay} Yays</label>
-                                    <label>{numUsers} Followers</label>
+                                    <p>{yay} Yays</p>
+                                    <p>{numUsers} Followers</p>
                                 </div>
                             </Link>
                         );

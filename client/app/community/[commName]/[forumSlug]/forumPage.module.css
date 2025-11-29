@@ -19,32 +19,23 @@
     flex-direction: column;
 }
 
-.forumBox {
+.forumBox{
     width: 100%;
     height: auto;
-    margin-top: 1%;
-    background-color: rgba(245, 245, 245, 0);
+    margin-top:1%;
+    background-color: rgba(245, 245, 245, 1);
     border-radius: 1em;
-    box-shadow: 0 5px 10px rgba(154, 160, 185, .05), 0 15px 40px rgba(166, 173, 201, .2);
+    box-shadow: 0 5px 10px rgba(154,160,185,.05), 0 15px 40px rgba(166,173,201,.2);
     text-indent: 5%;
 }
 
-.createContainer {
+.createContainer{
     width: 100%;
     height: 50vh;
 
 }
 
-.joinCommunityButton{
-    width: 15%;
-    height: 5vh;
-    border-radius: 1em;
-    margin-top: 0.25%;
-    margin-left: 45%;
-    background-color: rgb(15, 68, 167);
-}
-
-.input {
+.input{
     display: block;
     width: 100%;
     margin-bottom: 10px;
@@ -56,7 +47,7 @@
     color: #5A5454;
 }
 
-.textarea {
+.textarea{
     display: block;
     width: 100%;
     height: 20vh;
@@ -69,8 +60,7 @@
     color: #5A5454;
 }
 
-
-.mediaOut {
+.mediaOut{
     display: block;
     width: 100%;
     height: 10vh;
@@ -97,9 +87,8 @@
     color: #fff;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    box-shadow: 0 5px 10px rgba(154, 160, 185, .05), 0 15px 40px rgba(166, 173, 201, .2);
-    margin-top: 80vh;
-    white-space: nowrap;
+    box-shadow: 0 5px 10px rgba(154,160,185,.05), 0 15px 40px rgba(166,173,201,.2);
+    margin-top:80vh;
 }
 
 .primaryButton:hover {
@@ -113,16 +102,17 @@
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 5px 10px rgba(154, 160, 185, .05), 0 15px 40px rgba(166, 173, 201, .2);
+    box-shadow: 0 5px 10px rgba(154,160,185,.05), 0 15px 40px rgba(166,173,201,.2);
     background-color: #FFFFFF;
     color: #5A5454;
     transition: transform 0.15s ease;
-    width: 100%;
+    width: 90%;
     min-height: 20vh;
+    margin-left: 5%;
 }
 
 .postCard:hover {
-    background-color: #cecece;
+    transform: scale(1.02);
 }
 
 .title {
@@ -134,9 +124,7 @@
     font-size: 16px;
     font-weight: 400;
     min-height: 2vh;
-    width: 90%;
-    margin-left: 5%;
-    text-indent: 0%;
+    width: 100%;
 }
 
 .meta {
@@ -149,25 +137,21 @@
 }
 
 .user {
-    width: 50%;
-    height: 3vh;
-    display: flex;
-    white-space: nowrap;
-    overflow-x: hidden;
-}
-
-.authorText {
     font-size: 14px;
     font-weight: 100;
-    color: #5A5454;
-
+    color: #ccc;
+    width: 50%;
+    height: 3vh;
+    text-wrap: unset;
+    display: flex;
 }
 
-.userProfile {
-    width: 20px;
+.userProfile{
+    width:20px;
     height: 20px;
     border-radius: 50%;
     background-color: black;
+    margin-top: -0.5%;
     margin-right: 2%;
 }
 
@@ -175,25 +159,22 @@
     width: 50%;
     height: 3vh;
     font-size: 14px;
-    margin-right: 5px;
     color: #5A5454;
     text-align: right;
     text-wrap: unset;
 }
 
-
-.likesCommentsShare {
+.likesCommentsShare{
     margin-top: 2%;
     display: flex;
-    width: 90%;
-    height: 30px;
-    margin-left: 5%;
+    width: 100%;
+    height: 3.5vh;
 }
 
-.commentsBox {
+.commentsBox{
     display: flex;
-    width: 80px;
-    height: 30px;
+    width: 8%;
+    height: 3.5vh;
     background-color: rgba(217, 217, 217, 1);
     text-indent: 1vw;
     border-radius: 1vw;
@@ -201,24 +182,22 @@
     margin-right: 1%;
 }
 
-.commentIcon {
+.commentIcon{
     margin-left: 10%;
-    margin-top: 5%;
+    margin-top:5%;
     width: 30%;
-    height: 30px;
 }
 
-.ratioScore {
-    width: 70%;
-    font-size: 20px;
+.ratioScore{
+   width: 70%; 
 }
 
 .actions {
     display: grid;
     grid-template-columns: 23.33% 53.33% 23.34%;
     grid-row: 100%;
-    width: 120px;
-    height: 30px;
+    width:  15%;
+    height: 3.5vh;
     background-color: rgba(217, 217, 217, 1);
     grid-template-areas: "Yays score Nays";
     border-radius: 1em;
@@ -235,6 +214,10 @@
 }
 
 
+
+.editButton:hover {
+    background-color: #ec971f;
+}
 
 .saveButton {
     background-color: #4caf50;
@@ -274,6 +257,22 @@
     background-color: #c9302c;
 }
 
+/* Delete button for posts */
+.deleteButton {
+    background-color: #d9534f;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-left: 1rem;
+}
+
+.deleteButton:hover {
+    background-color: #c9302c;
+}
+
 .voteButton {
     background-color: rgba(217, 217, 217, 1);
     color: white;
@@ -282,10 +281,10 @@
     cursor: pointer;
     transition: background-color 0.2s ease;
     width: 100%;
-    height: 30px;
+    height: 3.5vh;
 }
 
-.imageAlignmentInButton {
+.imageAlignmentInButton{
     margin-left: 5%;
 }
 
@@ -293,23 +292,23 @@
     background-color: #5a6268;
 }
 
-.yayScore {
+.yayScore{
     color: black;
     text-align: center;
     margin-right: 10%;
-    font-size: 20px;
+    margin-top: -5%;
 }
 
 .header {
     font-size: 35px;
     text-align: center;
-    color: rgb(255, 255, 255);
+    color: rgb(255,255,255);
 }
 
-.postHeading {
+.postHeading{
     display: flex;
-    height: 2vh;
-    width: 100%;
+    height:2vh;
+    width:100%;
 }
 
 .background {
@@ -317,15 +316,13 @@
     display: grid;
     width: 100%;
     height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-    overflow-y: hidden;
+    overflow-x:hidden;
     grid-template-columns: 1vw 15.67vw 3vw 60.7vw 3vw 15.67vw 1vw;
     grid-template-rows: 6vh 34vh 54vh;
-    grid-template-areas:
-        "NavBar NavBar NavBar NavBar NavBar NavBar NavBar"
-        "margin1 CommunitiesBar margin3 Center margin4 RightBar margin2"
-        "margin1 ServerBar margin3 Center margin4 RightBar margin2";
+    grid-template-areas: 
+    "NavBar NavBar NavBar NavBar NavBar NavBar NavBar"
+    "margin1 CommunitiesBar margin3 Center margin4 RightBar margin2"
+    "margin1 ServerBar margin3 Center margin4 RightBar margin2";
     row-gap: 3%;
 }
 
@@ -333,7 +330,7 @@
     color: #5A5454;
 }
 
-.joinButton {
+.joinButton{
     background-color: rgb(168, 156, 156);
     margin-top: 5px;
     height: 40px;
@@ -341,58 +338,58 @@
     border-radius: 1em;
 }
 
-.homeLogo {
+.homeLogo{
     height: 50px;
     width: 200px;
 }
 
-.line {
-    background-color: rgb(255, 255, 255);
-    color: rgb(255, 255, 255);
-    height: 1px;
-    width: 495px;
-    margin: 100px;
-    position: relative;
-    right: 470px;
+.line{
+    background-color:rgb(255,255,255);
+    color:rgb(255,255,255);
+    height:1px;
+    width:495px;
+    margin:100px;
+    position:relative;
+    right:470px;
 }
 
-.channelList {
-    background-color: rgb(255, 255, 255);
+.channelList{
+    background-color: rgb(255,255,255);
 }
 
-.communityImage {
-    background-color: rgb(0, 0, 0);
-    height: 400px;
-    width: 1800px;
-    border-radius: 1rem;
-    position: relative;
+.communityImage{
+    background-color: rgb(0,0,0);
+    height:400px;
+    width:1800px;
+    border-radius:1rem;
+    position:relative;
 
 }
 
-.bigBox {
+.bigBox{
     background-color: rgb(57, 65, 83);
     color: #5A5454;
     position: relative;
     width: 700px;
     height: 85vh;
     left: -485px;
-    top: 15vh;
+    top:15vh;
     display: flex;
     justify-content: center;
 }
 
-.banner {
-    background-color: rgb(255, 255, 255);
+.banner{
+    background-color: rgb(255,255,255);
     position: relative;
-    right: 1185px;
-    top: 5vh;
+    right:1185px;
+    top:5vh;
     height: 10vh;
     width: 700px;
-    text-align: center;
-    font-size: 24px;
+    text-align:center;
+    font-size:24px;
 }
 
-.navBox {
+.navBox{
     background-color: rgb(11, 11, 44);
     width: 100vw;
     height: 51px;
@@ -400,26 +397,26 @@
     justify-content: space-between;
 }
 
-.pfpSection {
-    background-color: rgb(28, 38, 66);
-    position: relative;
-    margin: 1px;
-    width: 80px;
-    height: 30px;
-    left: 1150px;
-    margin-left: 30px;
+.pfpSection{
+    background-color: rgb(28,38,66);
+    position:relative;
+    margin:1px;
+    width:80px;
+    height:30px;
+    left:1150px;
+    margin-left:30px;
 }
 
-.notificationButton {
+.notificationButton{
     height: 30px;
     width: 30px;
     border-radius: 1em;
-    background-color: rgb(57, 65, 83);
+    background-color: rgb(57,65,83);
     margin: 0px;
 }
 
 .dropdownMenu {
-    background-color: rgb(91, 102, 128);
+    background-color: rgb(91,102,128);
     width: 150px;
     height: 150px;
     right: 0px;
@@ -433,19 +430,19 @@
     color: white;
 }
 
-.dropdown:focus-within .dropdownMenu {
+.dropdown:focus-within .dropdownMenu{
     opacity: 1;
     pointer-events: auto;
 }
 
-.settingsIcon {
+.settingsIcon{
     height: 30px;
     width: 30px;
     border-radius: 1em;
-    background-color: rgb(184, 184, 184);
+    background-color: rgb(184,184,184);
 }
 
-.yourCommunitiesBar {
+.yourCommunitiesBar{
     background-color: #EDEDED;
     display: flex;
     flex-direction: column;
@@ -456,12 +453,12 @@
     overflow-x: hidden;
     border: 3px #D0E0EB;
     border-radius: 0.5em;
-    box-shadow: 0 5px 10px rgba(154, 160, 185, .05), 0 15px 40px rgba(166, 173, 201, .2);
+    box-shadow: 0 5px 10px rgba(154,160,185,.05), 0 15px 40px rgba(166,173,201,.2);
 }
 
 
 
-.serverContainer {
+.serverContainer{
     display: flex;
     flex-direction: column;
     font-family: Inria Sans;
@@ -469,7 +466,7 @@
     color: #5A5454;
 }
 
-.channelText {
+.channelText{
     font-family: Inria Sans;
     font-size: 15px;
     color: #5A5454;
@@ -477,14 +474,14 @@
 }
 
 
-.horizontalLine {
+.horizontalLine{
     background-color: #000000;
     width: 95%;
     height: 1px;
     margin-left: 8px;
 }
 
-.horizontalLine1 {
+.horizontalLine1{
     background-color: #AAAAAA;
     width: 95%;
     height: 1px;
@@ -494,7 +491,7 @@
 }
 
 
-.communitiesButtons {
+.communitiesButtons{
     width: 90%;
     margin-left: 10px;
     height: 50px;
@@ -504,7 +501,7 @@
     background-color: #F0F0F0;
 }
 
-.addIcon {
+.addIcon{
     background-color: rgb(168, 156, 156);
     margin-top: 5px;
     height: 40px;
@@ -512,7 +509,7 @@
     border-radius: 1em;
 }
 
-.buttonTextforCommunities {
+.buttonTextforCommunities{
     text-align: left;
     margin-top: 15px;
     margin-left: 10px;
@@ -522,11 +519,11 @@
     font-size: 0.8rem;
 }
 
-.communitiesButtons:hover {
+.communitiesButtons:hover{
     background-color: #D9D9D9;
 }
 
-.channelInfoBox {
+.channelInfoBox{
     background-color: #EDEDED;
     display: flex;
     flex-direction: column;
@@ -535,44 +532,44 @@
     text-indent: 3%;
     overflow-y: auto;
     overflow-x: hidden;
-    width: 100%;
-    height: 20vh;
+    width:100%;
+    height:20vh;
 }
 
-.channelInfoh1 {
+.channelInfoh1{
     margin-top: 10px;
     color: #5A5454;
     font-size: 25px;
 }
 
-.usersText {
+.usersText{
     background-color: rgb(255, 255, 255);
     font-size: 25px;
     width: 100%;
     height: 20vh;
 }
 
-.channelInfoh2 {
+.channelInfoh2{
     margin-top: 10px;
     font-size: 15px;
     text-indent: 0%;
     margin-left: 3%;
 }
 
-.UserContainer {
+.UserContainer{
     margin-left: 3%;
     display: flex;
     color: gray;
     font-size: 17px;
-
+    
 }
 
-.userTextAlign {
+.userTextAlign{
     margin-left: 3%;
     margin-top: 4%;
 }
 
-.RightBar {
+.RightBar{
     background-color: #EDEDED;
     display: flex;
     flex-direction: column;
@@ -583,11 +580,11 @@
     overflow-x: hidden;
     border: 3px #D0E0EB;
     border-radius: 0.5em;
-    box-shadow: 0 5px 10px rgba(154, 160, 185, .05), 0 15px 40px rgba(166, 173, 201, .2);
+    box-shadow: 0 5px 10px rgba(154,160,185,.05), 0 15px 40px rgba(166,173,201,.2);
     margin-right: 5px;
 }
 
-.RulesBar {
+.RulesBar{
     width: 100%;
     height: 45vh;
     overflow-y: auto;
@@ -596,7 +593,7 @@
     flex-direction: column;
 }
 
-.usersBar {
+.usersBar{
     background-color: rgb(11, 11, 44);
     display: flex;
     flex-direction: column;
@@ -608,7 +605,7 @@
     overflow-x: hidden;
 }
 
-.navBox {
+.navBox{
     background-color: rgb(11, 11, 44);
     width: 100%;
     height: 51px;
@@ -616,29 +613,32 @@
     justify-content: space-between;
 }
 
-.communnitiesPage {
+.communnitiesPage{
     width: 60%;
     height: calc(100vh - 51px);
     overflow-y: auto;
     overflow-x: hidden;
     position: absolute;
-    left: 20vw;
+    left:20vw;
     top: 2.5vw;
     display: flex;
     flex-direction: column;
     color: #5A5454;
-    font-size: 20px;
+    font-size: 20px;  
 }
 
-.createBox {
-    position: sticky;
-    top: 1rem;        /* Keep it visible */
-    left: 80%;      /* Keep near the right edge */
+.createBox{
     width: 15vw;
+    color: #5A5454;
+    border-radius: 1em;
+    flex-direction: column;
+    position:sticky;
+    left: 70%;
+
     z-index: 99999;
 }
 
-.centerPage {
+.centerPage{
     overflow-y: auto;
     overflow-x: hidden;
     display: flex;
@@ -650,39 +650,43 @@
     border-radius: 1em;
 }
 
-.descText {
+.descText{
     margin-left: 10%;
     margin-top: 1vh;
 }
 
-.bannerBox {
+.bannerBox{
     width: 100%;
     min-height: 20vh;
     max-height: 20vh;
     background-color: #3a3a3a;
 }
 
-.titleBox {
+.titleBox{
     width: 100%;
     height: 14vh;
     display: flex;
 }
 
-.titleText {
+.titleText{
     margin-left: 3vh;
-    font-size: 40px;
+    font-size: 2vw;
 }
 
-.serverIcon {
-    width: 150px;
-    height: 150px;
+.serverIcon{
+    /* min-width: 13%; */
+    min-width: 16vh;
+    min-height: 16vh;
+    max-height: 16vh;
+    /* background-color: rgb(0, 0, 0); */
     border-radius: 50%;
+    /* margin-top: -3.5vw; */
     margin-top: -1.5vw;
-    margin-left: 1vw;
-    margin-right: 1.5vw;
+    /* margin-left: 4vw; */
+    margin-left: 2vw;
 }
 
-.blackLine {
+.blackLine{
     width: 100%;
     min-height: 2px;
     max-height: 2px;
@@ -690,26 +694,26 @@
     background-color: black;
 }
 
-.groupHeader {
+.groupHeader{
     display: flex;
     text-indent: 10%;
 }
 
-.groupName {
+.groupName{
     width: 40%;
     height: 50%;
     overflow: hidden;
 }
 
 
-.channelHeader {
+.channelHeader{
     width: 95%;
     height: 3vh;
-    display: flex;
+    display:flex;
     text-indent: 5%;
 }
 
-.channelName {
+.channelName{
     width: 65.5%;
     height: 100%;
     font-family: Inria Sans;
@@ -725,7 +729,7 @@
     border-radius: 1em;
 }
 
-.deleteChannel {
+.deleteChannel{
     width: 30%;
     height: 100%;
     font-family: Inria Sans;
@@ -740,21 +744,21 @@
     border-radius: 1em;
 }
 
-.createForumContainer {
+.createForumContainer{
     width: 50%;
     height: 50vh;
     display: flex;
     flex-direction: column;
     background-color: #ffffff;
     position: absolute;
-    box-shadow: 0 5px 10px rgba(154, 160, 185, .05), 0 15px 40px rgba(166, 173, 201, .2);
-    left: 25%;
+    box-shadow: 0 5px 10px rgba(154,160,185,.05), 0 15px 40px rgba(166,173,201,.2);
+    left:25%;
     bottom: 25%;
     border: 2px solid black;
     border-radius: 1em;
 }
 
-.forumCreationInfomation {
+.forumCreationInfomation{
     margin-left: 10%;
     background-color: #F0F0F0;
     border-radius: 1em;
@@ -763,7 +767,7 @@
     padding-right: 1em;
 }
 
-.forumDescCreationInfomation {
+.forumDescCreationInfomation{
     margin-top: 3vh;
     margin-left: 10%;
     background-color: #F0F0F0;
@@ -775,7 +779,7 @@
     padding-right: 1em;
 }
 
-.createForumButton {
+.createForumButton{
     background-color: #0072BB;
     font-size: 14px;
     color: white;
@@ -792,26 +796,26 @@
     background-color: #004570;
 }
 
-.joinCommunityButton {
-    width: 130px;
-    height: 40px;
+.joinCommunityButton{
+    width: 15%;
+    height: 5vh;
     border-radius: 1em;
+    margin-top: 0.25%;
+    margin-left: 45%;
     background-color: rgb(15, 68, 167);
-    color: white;
-    font-size: 14px;
-    margin-top: 1%;
 }
 
-.editForumButton {
+.editForumButton{
     margin-left: 2vw;
+    padding: 0.5vw 1vw;
     border: none;
     color: #5A5454;
     cursor: pointer;
     transition: background-color 0.2s ease;
     font-size: 1vw;
-    height: 20px;
-    width: 20px;
+    height: 4vh;
     border-radius: 1em;
+    background-color: rgb(168, 156, 156);
     font-size: 0.8vw;
 }
 
@@ -833,17 +837,17 @@
     padding: 2rem;
     border-radius: 1em;
     width: 400px;
-    box-shadow: 0 5px 10px rgba(154, 160, 185, .05), 0 15px 40px rgba(166, 173, 201, .2);
+    box-shadow: 0 5px 10px rgba(154,160,185,.05), 0 15px 40px rgba(166,173,201,.2);
     text-align: center;
     animation: fadeIn 0.2s ease-in-out;
 }
 
-.RulesText {
+.RulesText{
     font-size: 14px;
     margin-left: 10px;
 }
 
-.RulesTitle {
+.RulesTitle{
     margin-left: 10px;
 }
 
@@ -852,7 +856,6 @@
         opacity: 0;
         transform: scale(0.9);
     }
-
     to {
         opacity: 1;
         transform: scale(1);
@@ -870,7 +873,7 @@
     padding: 0.5rem;
     margin-top: 0.5rem;
     margin-bottom: 1rem;
-    border: floralwhite 1px solid;
+    border:floralwhite 1px solid;
     border-radius: 0.5em;
     font-family: Inria Sans;
 }
@@ -910,43 +913,32 @@
     border-radius: 0.5em;
 }
 
-.mediaInPost {
-    overflow: hidden;
-    margin-left: 25%;
-    margin-right: 25%;
-    max-width: 500px;
-    max-height: 500px;
-    background-color: grey;
-}
-
-.mediaBackground{
-    width: 90%;
-    margin-left: 5%;
-    height: 100%;
-    background-color: rgba(237, 237, 237, 1);
+.mediaInPost{
+    width: 200%;
+    overflow:hidden;
 }
 
 @font-face {
-    font-family: Jura;
-    src: url('../../../../public/fonts/Jura-Light.ttf');
+  font-family: Jura;
+  src: url('../../../../public/fonts/Jura-Light.ttf');
 }
 
 @font-face {
-    font-family: Inria Sans;
-    src: url('../../../../public/fonts/InriaSans-Light.ttf');
+  font-family: Inria Sans;
+  src: url('../../../../public/fonts/InriaSans-Light.ttf');
 }
 
-.topBox {
+.topBox{
     display: flex;
     flex-direction: column;
     background-color: #F5F5F5;
     margin-bottom: 1vw;
     border-radius: 1em;
-    box-shadow: 0 5px 10px rgba(154, 160, 185, .05), 0 15px 40px rgba(166, 173, 201, .2);
-
+    box-shadow: 0 5px 10px rgba(154,160,185,.05), 0 15px 40px rgba(166,173,201,.2);
+    
 }
 
-.sortText {
+.sortText{
     font-size: 12px;
 }
 
@@ -957,39 +949,89 @@
 }
 
 
-.postReportButton {
-    width: 33.33%;
+.postReportButton{
+    background-color: orangered;
+    font-size: 14px;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 1em;
+    cursor: pointer;
+    margin-left: 5%;
+    margin-right: 5%;
+    transition: background-color 0.2s ease;
+    font-family: Inria Sans;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    padding: 5px 10px;
+    white-space: nowrap;
+    overflow-x: hidden;
+}
+
+.postReportButton:hover{
+    background-color: rgb(187, 50, 0);
+    width: 100%;
+    height: 3.5vh;
+    border-radius: 1em;
 }
 
 .editButton {
-    width: 33.33%;
+    background-color: #f0ad4e;
+    font-size: 14px;
+    color: #fff;
+    padding: 5px 15px;
+    border: none;
+    border-radius: 1em;
+    cursor: pointer;
+    margin-left: 17%;
+    margin-right: 17%;
+    transition: background-color 0.2s ease;
+    font-family: Inria Sans;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    vertical-align: top;
+    margin-bottom: 5%;
 }
 
 .deleteButton {
-    width: 33.33%;
+    background-color: #d9534f;
+    font-size: 14px;
+    color: white;
+    border: none;
+    border-radius: 1em;
+    width: 100%;
+    height: 100%;
+    margin-right: 25%;
+    margin-left: 25%;
+    cursor: pointer;
+    font-family: Inria Sans;
+    vertical-align: top;
+    margin-bottom: 5%;
 }
 
-.postSearchBar {
+.postSearchBar{
     background-color: #D9D9D9;
     width: 60%;
     height: 4vh;
     border-radius: 1em;
     position: relative;
     bottom: 5%;
-    left: 20%;
+    left:20%;
     color: #5A5454;
     text-indent: 5%;
     font-size: 14px;
 }
 
-.enterSearch {
+.enterSearch{
     width: 10%;
     height: 4vh;
     border-radius: 1em;
     background-color: #F0F0F0;
     text-align: center;
     position: relative;
-    left: 75%;
+    left:75%;
     bottom: 14.5%;
     font-size: 14px;
 }
@@ -1002,32 +1044,30 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    text-decoration: none;
-    /* optional */
-    color: inherit;
-    /* optional */
+    text-decoration: none;   /* optional */
+    color: inherit;          /* optional */
 }
 
 
 
-.commName {
-    width: 80%;
-    height: 100%;
+.commName{
+    width:80%;
+    height:100%;
     overflow: hidden;
     font-size: 20px;
 }
 
 
 
-.createGroupBtn {
+.createGroupBtn{
     width: 20%;
     margin-left: 40%;
 }
 
-.chatLink {
+.chatLink{
     margin-left: 1vw;
-    width: 20px;
-    height: 20px;
+    background-color: rgb(15, 68, 167);
+    padding: 0.5vw 1vw;
     border: none;
     color: white;
     border-radius: 1em;
@@ -1036,75 +1076,8 @@
     font-size: 0.8vw;
 }
 
-@media screen and (max-width: 1300px) {
-    .serverIcon {
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        margin-top: -1.5vw;
-        margin-left: 1vw;
-        margin-right: 1.5vw;
-    }
-
-
-}
-
-@media screen and (max-width: 1000px) {
-    .background {
-        grid-template-columns: 1vw 15.67vw 3vw 60.7vw 3vw 15.67vw 1vw;
-        grid-template-rows: 6vh 34vh 54vh;
-        grid-template-areas:
-            "NavBar NavBar NavBar NavBar NavBar NavBar NavBar"
-            "margin1 CommunitiesBar margin3 Center Center Center Center"
-            "margin1 ServerBar margin3 Center Center Center Center";
-        row-gap: 3%;
-    }
-
-    .createBox {
-        position: fixed;   /* Sticky breaks when grid collapses */
-        bottom: 2rem;      /* Put button bottom-right */
-        right: 2rem;
-        left: auto;
-        width: auto;       /* Prevent squishing */
-        z-index: 999999;
-    }
-}
-
-@media screen and (max-width: 700px) {
-    .postSearchBar {
-        background-color: #D9D9D9;
-        width: 60%;
-        height: 4vh;
-        border-radius: 1em;
-        position: relative;
-        bottom: 5%;
-        left: 30%;
-        color: #5A5454;
-        text-indent: 5%;
-        font-size: 14px;
-    }
-
-    .enterSearch {
-        width: 10%;
-        height: 4vh;
-        border-radius: 1em;
-        background-color: #F0F0F0;
-        text-align: center;
-        position: relative;
-        left: 80%;
-        bottom: 14.5%;
-        font-size: 14px;
-    }
-
-
-}
-
-.utilButtons {
-    display: flex;
-    width: 10%;
-    height: 75%;
-    justify-content: space-between;
-    margin-left: 70%;
+.chatLink:hover{
+    background-color: rgb(10, 45, 110);
 }
 
 .errorText {

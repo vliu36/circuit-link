@@ -2,10 +2,7 @@
     border-radius: 1em;
     margin-right: 2%;
     margin-left: 4%;
-    margin-top: 2%;
     background-color: black;
-    width: 40px;
-    height: 40px;
 }
 
 .topCommunitiesItem{
@@ -23,7 +20,6 @@
     white-space: nowrap;     /* Prevent wrapping */
     overflow: hidden;        /* Prevent stretch */
     text-overflow: ellipsis; /* Prevent scrollbar */
-    font-size: 12px;
 }
 
 .communitiesTitle{
