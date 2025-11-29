@@ -590,3 +590,22 @@ export async function unbanMember(commName: string, userId: string): Promise<{ s
         };
     }
 }
+
+// Get forum document reference by its slug within a community
+export async function getForumDocBySlug(commName: string, forumSlug: string, sortMode?: string) {
+    try {
+        const res = await fetch(`${BASE_URL}/forums/getDoc/${commName}/${forumSlug}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`Error ${res.status}: ${text}`);
+        }
+        const data = await res.json();
+        return data.forum;
+    } catch (err) {
+        console.error("Error fetching forum by slug:", err);
+        return null;
+    }
+}

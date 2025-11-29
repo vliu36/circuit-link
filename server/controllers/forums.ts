@@ -101,7 +101,7 @@ const addDoc = async (req: Request, res: Response) => {
 }; // end addDoc
 
 // Retrieves a specific forum and all its posts by its slug within a specified community
-const getForumBySlug = async (req: Request, res: Response) => {
+const getForumAndPostsBySlug = async (req: Request, res: Response) => {
     try {
         const { commName, forumSlug } = req.params;
         const { sortMode } = req.body; 
@@ -155,6 +155,50 @@ const getForumBySlug = async (req: Request, res: Response) => {
     }
 };
 
+// Get forum by slug within a community; returns forum reference and data
+const getForumDocBySlug = async (req: Request, res: Response) => {
+    try {
+        const { commName, forumSlug } = req.params;
+        // Get community by name
+        const { data: commData } = await getCommunityByName(commName);
+        // Find forum in that community 
+        const forumRef = await forumUtils.findForumRefInCommunity(commData, forumSlug);
+        if (!forumRef) {
+            return res.status(404).json({
+                status: "Not Found",
+                message: `Forum with slug "${forumSlug}" not found in community "${commName}".`,
+            });
+        }
+        // Retrieve forum data 
+        const forumSnap = await forumRef.get();
+        const forumData = forumSnap.data();
+        if (!forumData) {
+            return res.status(404).json({
+                status: "Not Found",
+                message: "Forum data could not be retrieved.",
+            });
+        }
+
+        // Return forum's parentGroup as id string
+        const parentGroupId = forumData.parentGroup ? (forumData.parentGroup as DocumentReference).id : null;
+        forumData.parentGroup = parentGroupId;
+
+        res.status(200).json({
+            status: "OK",
+            forum: {
+                id: forumSnap.id,
+                ...forumData,
+            },
+        });
+    } catch (err) {
+        console.error("Error fetching forum:", err);
+        res.status(500).json({
+            status: "Backend error",
+            message: err instanceof Error ? err.message : err,
+        });
+    }
+};
+
 // Deletes a forum, all its posts, and all replies listed in repliesInForum
 const deleteForum = async (req: Request, res: Response) => {
     try {
@@ -196,6 +240,7 @@ const deleteForum = async (req: Request, res: Response) => {
         // Check if forum is the only forum in the community's forum list
         const forumsInComm: DocumentReference[] = commData.forumsInCommunity || [];
         if (forumsInComm.length <= 1) {
+            console.log("Cannot delete the only forum in the community.");
             return res.status(400).json({
                 status: "Bad Request",
                 message: "Cannot delete the only forum in the community.",
@@ -373,7 +418,8 @@ const searchForum = async (req: Request, res: Response) => {
 export {
     getAllDocuments,
     addDoc,
-    getForumBySlug,
+    getForumAndPostsBySlug,
+    getForumDocBySlug,
     deleteForum,
     editForum,
     searchForum

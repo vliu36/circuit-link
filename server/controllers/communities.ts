@@ -238,6 +238,7 @@ const deleteGroup = async (req: Request, res: Response) => {
         // Check if the group is the only group in the community
         const groupsInCommunity: FirebaseFirestore.DocumentReference[] = commData.groupsInCommunity || [];
         if (groupsInCommunity.length <= 1) {
+            console.log("Cannot delete the only group in the community.");
             return res.status(400).json({
                 status: "Bad Request",
                 message: "Cannot delete the only group in the community.",

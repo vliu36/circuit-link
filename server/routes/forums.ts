@@ -16,13 +16,20 @@ router.get("/all", forums.getAllDocuments)
  */
 router.post("/create", forums.addDoc);
 
-/** Retrieve a forum by its slug within a specified community
- *  @route GET /api/forums/get/:commName/:forumSlug
+/** Retrieve a forum and its posts by its slug within a specified community
+ *  @route POST /api/forums/get/:commName/:forumSlug
  *  @param commName - The name of the community the forum belongs to
  *  @param forumSlug - The slug of the forum to retrieve
  *  @body sortMode - (optional) The sorting mode for posts: "newest", "oldest", "mostYays", "alphabetical"
  */
-router.post("/get/:commName/:forumSlug", forums.getForumBySlug);
+router.post("/get/:commName/:forumSlug", forums.getForumAndPostsBySlug);
+
+/** Retrieve a forum's document reference and data by its slug within a specified community 
+ *  @route GET /api/forums/getDoc/:commName/:forumSlug
+ *  @param commName - The name of the community the forum belongs to
+ *  @param forumSlug - The slug of the forum to retrieve
+ */
+router.get("/getDoc/:commName/:forumSlug", forums.getForumDocBySlug);
 
 /** Delete a forum by its ID
  *  @route DELETE /api/forums/delete/:forumId
