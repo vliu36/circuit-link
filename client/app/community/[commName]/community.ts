@@ -30,7 +30,7 @@ export async function fetchStructure(communityName: string): Promise<Community |
 
         return data.community as Community;
     } catch (err) {
-        console.error(err);
+        console.log(err);
         return null;
     } // end try catch
 } // end fetchStructure
@@ -64,7 +64,7 @@ export async function createGroup( commName: string, name: string): Promise<{ st
         console.log("Group created successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error creating group:", err);
+        console.log("Error creating group:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error.",
@@ -87,7 +87,7 @@ export async function deleteGroup(groupId: string, commName: string): Promise<{ 
         const data = await res.json();
 
         if (!res.ok) {
-            console.error("Failed to delete group:", data.message);
+            console.log("Failed to delete group:", data.message);
             return {
                 status: "error",
                 message: data.message || "Failed to delete group.",
@@ -97,7 +97,7 @@ export async function deleteGroup(groupId: string, commName: string): Promise<{ 
         console.log("Group deleted successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error deleting group:", err);
+        console.log("Error deleting group:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error.",
@@ -126,8 +126,9 @@ export async function createForum({ name, description, groupId, commName, }: Cre
 
         return data.newSlug; // return the newly created forum's ID
     } catch (err) {
-        console.error("Error creating forum:", err);
-        throw err;
+        console.log("Error creating forum:", err);
+        // throw err;
+        return "";
     } // end try catch
 } // end createForum
 
@@ -155,7 +156,7 @@ export async function deleteForum(forumId: string, commName: string): Promise<{ 
         console.log("Forum deleted successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error deleting forum:", err);
+        console.log("Error deleting forum:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error.",
@@ -183,8 +184,9 @@ export async function deleteCommunity(commName: string) {
         window.location.href = "/landing";
         return;
     } catch (err) {
-        console.error("Error deleting community: ", err);
-        throw err;
+        console.log("Error deleting community: ", err);
+        // throw err;
+        return;
     } // end try catch
 } // end deleteCommunity
 
@@ -206,7 +208,7 @@ export async function joinCommunity(commName: string): Promise<{ status: string;
         console.log("Joined community successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error joining community:", err);
+        console.log("Error joining community:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error",
@@ -239,7 +241,7 @@ export async function leaveCommunity(commName: string): Promise<{ status: string
         console.log("Left community successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error leaving community:", err);
+        console.log("Error leaving community:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error",
@@ -266,7 +268,7 @@ export async function promoteToMod(commName: string, userId: string): Promise<{ 
         console.log("User promoted to mod successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error promoting to mod:", err);
+        console.log("Error promoting to mod:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error",
@@ -293,7 +295,7 @@ export async function demoteMod(commName: string, userId: string): Promise<{ sta
         console.log("User demoted from mod successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error demoting mod:", err);
+        console.log("Error demoting mod:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error",
@@ -320,7 +322,7 @@ export async function promoteToOwner(commName: string, userId: string): Promise<
         console.log("User promoted to owner successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error promoting to owner:", err);
+        console.log("Error promoting to owner:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error",
@@ -347,7 +349,7 @@ export async function demoteOwner(commName: string, userId: string): Promise<{ s
         console.log("User demoted from owner successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error demoting owner:", err);
+        console.log("Error demoting owner:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error",
@@ -447,8 +449,12 @@ export async function changeCommunityIcon(file: File, commId: string) {
         return publicUrl;
 
     } catch (error) {
-        console.error("Error uploading profile picture:", error);
-        throw error;
+        console.log("Error uploading profile picture:", error);
+        // throw error;
+        return {
+            status: "error",
+            message: error instanceof Error ? error.message : "Unknown error",
+        }
     }
 }
 
@@ -470,8 +476,12 @@ export async function changeCommunityBanner(file: File, commId: string) {
         return publicUrl;
 
     } catch (error) {
-        console.error("Error uploading profile picture:", error);
-        throw error;
+        console.log("Error uploading profile picture:", error);
+        // throw error;
+        return {
+            status: "error",
+            message: error instanceof Error ? error.message : "Unknown error",
+        };
     }
 }
 
@@ -598,7 +608,7 @@ export async function ensureDefaultGroup(commName: string) {
         const commSnap = await getDoc(commRef);
 
         if (!commSnap.exists()) {
-            console.error("Community not found:", commName);
+            console.log("Community not found:", commName);
             return null;
         }
 
@@ -628,7 +638,7 @@ export async function ensureDefaultGroup(commName: string) {
         console.log("Default general group created.");
         return newGroup;
     } catch (err) {
-        console.error("Error ensuring default group:", err);
+        console.log("Error ensuring default group:", err);
         return null;
     }
 }

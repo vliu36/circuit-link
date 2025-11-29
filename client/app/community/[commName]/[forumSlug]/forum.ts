@@ -5,30 +5,35 @@ const BASE_URL = "http://localhost:2400/api";
 
 // Fetch posts belonging to a specific forum
 export async function fetchPostsByForum(commName: string, forumSlug: string, sortMode: string) {
-    const res = await fetch(`${BASE_URL}/forums/get/${commName}/${forumSlug}`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sortMode }),
-    });
+    try {
+        const res = await fetch(`${BASE_URL}/forums/get/${commName}/${forumSlug}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ sortMode }),
+        });
 
-    // Defensive: handle non-JSON or errors
-    if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Backend error ${res.status}: ${text}`);
+        // Defensive: handle non-JSON or errors
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`Backend error ${res.status}: ${text}`);
+        }
+
+        const data = await res.json();
+
+        // Ensure structure matches your backend
+        if (data.status !== "OK") {
+            throw new Error(data.message || "Unexpected backend format");
+        }
+
+        // Return the inner forum and posts
+        return {
+            forum: data.forum,
+            posts: data.posts,
+        };
+    } catch (error) {
+        console.error("Error fetching posts by forum:", error);
+        return { forum: null, posts: [] };
     }
-
-    const data = await res.json();
-
-    // Ensure structure matches your backend
-    if (data.status !== "OK") {
-        throw new Error(data.message || "Unexpected backend format");
-    }
-
-    // Return the inner forum and posts
-    return {
-        forum: data.forum,
-        posts: data.posts,
-    };
 }
 
 export async function createPost(
@@ -171,17 +176,22 @@ export async function reportPost(
 } // end function reportPost
 
 export async function searchPosts(commName: string, slug: string, query: string) {
-    const res = await fetch(`${BASE_URL}/forums/search/${commName}/${slug}/${query.toLowerCase()}`, {
-        method: "GET",
-        headers: { "Content-Type": "application/json" },
-    });
+    try {
+        const res = await fetch(`${BASE_URL}/forums/search/${commName}/${slug}/${query.toLowerCase()}`, {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
 
-    if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Search error ${res.status}: ${text}`);
+        if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`Search error ${res.status}: ${text}`);
+        }
+
+        const data = await res.json();
+
+        return { matchingPosts: data.posts };
+    } catch (error) {
+        console.error("Error searching posts:", error);
+        return { matchingPosts: [] };
     }
-
-    const data = await res.json();
-
-    return { matchingPosts: data.posts };
 }

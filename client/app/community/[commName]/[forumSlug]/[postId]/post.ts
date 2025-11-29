@@ -63,7 +63,7 @@ export const useReplies = (postId: string, userId?: string) => {
                 listOfReplies: formatReplies(p.listOfReplies || []),
             });
         } catch (err) {
-            console.error("Failed to fetch post:", err);
+            console.log("Failed to fetch post:", err);
         } finally {
             setLoading(false);
         }
@@ -134,7 +134,7 @@ export const useReplies = (postId: string, userId?: string) => {
             });
             fetchPost();
         } catch (err) {
-            console.error("Vote failed:", err);
+            console.log("Vote failed:", err);
             fetchPost();
         }
     };
@@ -172,7 +172,7 @@ export const useReplies = (postId: string, userId?: string) => {
             // Refresh post data
             fetchPost();
         } catch (err) {
-            console.error("Failed to add reply:", err);
+            console.log("Failed to add reply:", err);
         }
     };
 
