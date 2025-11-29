@@ -48,9 +48,16 @@ export default function ServerBar({
   const [editOpen, setEditOpen] = useState(false);
   const [editGroupOpen, setEditGroupOpen] = useState(false);
   const [editGroupName, setEditGroupName] = useState("");
+  const [confirmDeleteForum, setConfirmDeleteForum] = useState(false);
+  const [confirmDeleteGroup, setConfirmDeleteGroup] = useState(false);
 
   // Which group are we editing / creating forums in?
   const [activeGroupId, setActiveGroupId] = useState("");
+  const [activeGroupName, setActiveGroupName] = useState("");
+
+  // Which forum are we editing?
+  const [activeForumId, setActiveForumId] = useState("");
+  const [activeForumName, setActiveForumName] = useState("");
 
   const router = useRouter();
 
@@ -136,6 +143,16 @@ export default function ServerBar({
     setError(null);
   };
 
+  const toggleConfirmDeleteGroup = () => {
+    setConfirmDeleteGroup(!confirmDeleteGroup);
+    setError(null);
+  };
+
+  const toggleConfirmDeleteForum = () => {
+    setConfirmDeleteForum(!confirmDeleteForum);
+    setError(null);
+  };
+
   const refreshCommunity = async () => {
     try {
       const updated = await commApi.fetchStructure(commName);
@@ -156,8 +173,11 @@ export default function ServerBar({
 
   // DELETE GROUP POPUP
   const onDeleteGroup = (groupId: string, groupName: string) => {
-    if (!confirm(`Delete group "${groupName}"?`)) return;
-    handleDeleteGroup(groupId);
+    // if (!confirm(`Delete group "${groupName}"?`)) return;
+    setActiveGroupName(groupName);
+    setActiveGroupId(groupId);
+    toggleConfirmDeleteGroup();
+    // handleDeleteGroup(groupId);
   };
 
   const handleDeleteGroup = async (groupId: string) => {
@@ -165,23 +185,26 @@ export default function ServerBar({
       try {
           // Check if user is currently viewing a forum within the group being deleted
           let reroute = false;
-          console.log("Forum's parent group ID:", forum?.parentGroup);
-          console.log("Group ID to be deleted:", groupId);
           if (forum && forum.parentGroup === groupId) {
               reroute = true;
           }
 
           const result = await commApi.deleteGroup(groupId, commName);
-          console.log("Group deleted successfully:", result);
+          if (!result || result.status === "error") {
+              setError(result?.message || "Failed to delete group.");
+              return;
+          }
+          console.log("Group deleted successfully");
           // Reroute user to community main page after deleting the group, or refresh community structure
           if (reroute) {
               router.push(`/community/${commName}`);
           } else {
               await refreshCommunity();
+              toggleConfirmDeleteGroup();
           }
       } catch (err) {
           console.error("Error deleting group:", err);
-      }
+      } 
   };
 
 
@@ -242,8 +265,9 @@ export default function ServerBar({
 
   // DELETE FORUM
   const onDeleteForum = (forumId: string, forumName: string) => {
-    if (!confirm(`Delete forum "${forumName}"?`)) return;
-    handleDeleteForum(forumId);
+    setActiveForumName(forumName);
+    setActiveForumId(forumId);
+    toggleConfirmDeleteForum();
   };
 
   // --- DELETE FORUM ---
@@ -252,7 +276,9 @@ export default function ServerBar({
       try {
           // Check if user is currently viewing the forum being deleted
           let reroute = false;
-          if (forum?.slug === activeForumSlug) {
+          console.log("Current forum id:", forum?.id);
+          console.log("Target forum id:", forumId);
+          if (forum?.id === forumId) {
               reroute = true;
           }
           const result = await commApi.deleteForum(forumId, commName);
@@ -260,13 +286,14 @@ export default function ServerBar({
               setError(result?.message || "Failed to delete forum.");
               return;
           }
-          console.log("Forum deleted successfully:", result);
+          console.log("Forum deleted successfully");
 
           // Reroute user to community main page after deleting the forum, or refresh community structure
           if (reroute) {
               router.push(`/community/${commName}`);
           } else {
               await refreshCommunity();
+              toggleConfirmDeleteForum();
           }
       } catch (err) {
           console.warn("Error deleting forum:", err);
@@ -436,14 +463,14 @@ export default function ServerBar({
           </div>
         </div>
       )}
-      {/* {confirmDeleteForum && (
+      {confirmDeleteForum && (
           <div className={styles.popupOverlay} onClick={toggleConfirmDeleteForum}>
               <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
                   <h2 className={styles.popupText}>Confirm Delete Forum</h2>
-                  <p className={styles.popupText}>Are you sure you want to delete forum &quot;{deleteForumName}&quot;? <br /> This action cannot be undone.</p>
+                  <p className={styles.popupText}>Are you sure you want to delete forum &quot;{activeForumName}&quot;? <br /> This action cannot be undone.</p>
                   {error && <p className={styles.errorText}>{error}</p>}
                   <button onClick={toggleConfirmDeleteForum} className={styles.cancelButton}>Cancel</button>
-                  <button onClick={() => {handleDeleteForum(deleteForumId)}} className={styles.deleteButtonPopup}>Delete</button>
+                  <button onClick={() => {handleDeleteForum(activeForumId)}} className={styles.deleteButtonPopup}>Delete</button>
               </div>
           </div>
       )}
@@ -451,12 +478,13 @@ export default function ServerBar({
           <div className={styles.popupOverlay} onClick={toggleConfirmDeleteGroup}>
               <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
                   <h2 className={styles.popupText}>Confirm Delete Group</h2>
-                  <p className={styles.popupText}>Are you sure you want to delete group &quot;{deleteGroupName}&quot;? <br /> This will delete all of its forums and cannot be undone.</p>
+                  <p className={styles.popupText}>Are you sure you want to delete group &quot;{activeGroupName}&quot;? <br /> This will delete all of its forums and cannot be undone.</p>
+                  {error && <p className={styles.errorText}>{error}</p>}
                   <button onClick={toggleConfirmDeleteGroup} className={styles.cancelButton}>Cancel</button>
-                  <button onClick={() => { handleDeleteGroup(deleteGroupId); toggleConfirmDeleteGroup(); }} className={styles.deleteButtonPopup}>Delete</button>
+                  <button onClick={() => {handleDeleteGroup(activeGroupId)}} className={styles.deleteButtonPopup}>Delete</button>
               </div>
           </div>
-      )} */}
+      )}
     </div>
   );
 }

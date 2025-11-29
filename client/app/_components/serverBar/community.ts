@@ -87,7 +87,7 @@ export async function deleteGroup(groupId: string, commName: string): Promise<{ 
         const data = await res.json();
 
         if (!res.ok) {
-            console.error("Failed to delete group:", data.message);
+            console.log("Failed to delete group:", data.message);
             return {
                 status: "error",
                 message: data.message || "Failed to delete group.",
