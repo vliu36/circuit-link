@@ -4,6 +4,8 @@ import { useEffect, useState, use } from "react";
 import { sendMessage, getMessages, getMediaUrl } from "@/app/_utils/messaging.ts";
 import { useAuth } from "@/app/_firebase/context";
 import Image from "next/image";
+import { Community } from "@/app/_types/types";
+import { fetchStructure } from "../community";
 
 export default function CommunityChat({
     params,
@@ -17,6 +19,7 @@ export default function CommunityChat({
     const [newText, setNewText] = useState("");
     const [mediaFile, setMediaFile] = useState<File | null>(null);
     const [mediaPreview, setMediaPreview] = useState<string | null>(null);
+    const [community, setCommunity] = useState<Community | null | undefined>(undefined);
 
     // Load initial messages
     useEffect(() => {
@@ -31,6 +34,30 @@ export default function CommunityChat({
         return () => clearInterval(interval);
     }, [commName]);
 
+    // Load community structure
+    useEffect(() => {
+        async function loadCommunity() {
+            const updated = await fetchStructure(commName);
+            setCommunity(updated);
+        }
+        loadCommunity();
+    }, [commName]);
+
+    // Refresh the current community structure and update state
+    const refreshCommunity = async () => {
+        try {
+            const updated = await fetchStructure(commName);
+            if (updated) {
+                setCommunity(updated);
+            } else {
+                // TODO: This causes an error when changing the community name; refreshing returns no data because the old name is used
+                console.log("Failed to refresh community: no data returned");
+            }
+        } catch (err) {
+            console.log("Error refreshing community:", err);
+        }
+    };
+
     // Handle sending messages
     async function handleSend() {
         if (!newText.trim() && !mediaFile) return;
@@ -42,6 +69,8 @@ export default function CommunityChat({
             mediaUrl = uploaded?.media || null;
         }
 
+        // const time = Date.now();
+
         // Create message object for optimistic UI update
         const newMsg = {
             authorId: user.uid,
@@ -49,7 +78,7 @@ export default function CommunityChat({
             authorIcon: user.photoURL || "/default-profile.png",
             contents: newText.trim(),
             media: mediaUrl,
-            timeStamp: Date.now(),
+            timeStamp: new Date().toISOString(),
         }
 
         // Optimistically add message to UI
@@ -77,6 +106,37 @@ export default function CommunityChat({
         } else {
             setMediaPreview(null);
         }
+    }
+
+    if (!community) {
+        return (
+            <div className="flex flex-col h-screen p-4">
+                <h1 className="text-xl font-bold text-black">
+                    Loading community...
+                </h1>
+            </div>
+        );
+    }
+    if (community === null) {
+        return (
+            <div className="flex flex-col h-screen p-4">
+                <h1 className="text-xl font-bold text-black">
+                    Community {commName} not found.
+                </h1>
+            </div>
+        );
+    }
+
+    const isMember = community?.userList.some(m => m.id === user?.uid);
+
+    if (!isMember) {
+        return (
+            <div className="flex flex-col h-screen p-4">
+                <h1 className="text-xl font-bold text-black">
+                    You must be a member of {commName} to access the chat.
+                </h1>
+            </div>
+        );
     }
 
     return (

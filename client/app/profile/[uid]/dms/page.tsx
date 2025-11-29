@@ -91,7 +91,7 @@ export default function CommunityChat({
             authorIcon: user.photoURL || "/default-profile.png",
             contents: newText.trim(),
             media: mediaUrl,
-            timeStamp: Date.now(),
+            timeStamp: new Date().toISOString(),
         }
 
         // Optimistically add message to UI

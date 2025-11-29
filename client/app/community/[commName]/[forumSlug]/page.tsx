@@ -268,10 +268,10 @@ export default function ForumPage({
                 setCommunity(updated);
             } else {
                 // TODO: This causes an error when changing the community name; refreshing returns no data because the old name is used
-                console.error("Failed to refresh community: no data returned");
+                console.log("Failed to refresh community: no data returned");
             }
         } catch (err) {
-            console.error("Error refreshing community:", err);
+            console.log("Error refreshing community:", err);
         }
     };
 

@@ -62,6 +62,15 @@ const addDoc = async (req: Request, res: Response) => {
             });
         }
 
+        // Check if the slug is named "chat" which is reserved
+        if (slug === "chat") {
+            console.log("Bad Request: Attempted to create forum with reserved name 'chat'");
+            return res.status(400).send({
+                status: "Bad Request",
+                message: 'Forum name cannot be "chat" as it is a reserved word.',
+            });
+        }
+
         // Create forum
         const data = {
             dateCreated: Timestamp.fromDate(new Date()),
