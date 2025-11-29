@@ -139,10 +139,12 @@ export default function NavBar() {
                     </Link>
                 </div>
 
-                <Link className={Styles.logInSignUpButton} href="./signin" replace style={{ gridArea: 'register' }}> Log In </Link>
-                <div className={Styles.orText} style={{ gridArea: 'orTh' }}> or </div>
-                <Link className={Styles.logInSignUpButton} href="./register" replace style={{ gridArea: 'signUp' }}> Sign Up </Link>
-                <div className={Styles.line} style={{ gridArea: 'line' }}></div>
+                <div className={Styles.loginAndSignUp}>
+                    <Link className={Styles.logInSignUpButton} href="./signin"> Log In </Link>
+                    <div className={Styles.orText}> or </div>
+                    <Link className={Styles.logInSignUpButton} href="./register"> Sign Up </Link>
+                </div>
+                
             </div>
         )
             : (
