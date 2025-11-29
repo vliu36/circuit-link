@@ -3,7 +3,6 @@
   display: flex;
   flex-direction: column;
   width: 100%;               /* avoid weird 250% */
-  max-width: 800px;          /* optional: constrain overall search block */
   color: #000;
   z-index: 2;
 
@@ -94,11 +93,11 @@
 .searchbar::after{
     content: '';
     position: absolute;
-    height: 4.5vh;
-    width: 100.7%;
+    height: 44px;
+    width: 101%;
     background-image: linear-gradient(to right,rgba(0, 89, 255, 1), rgba(152, 197, 248, 1));
     z-index: -1;
     top:-8%;
-    left: -0.3%;
+    left: -0.4%;
     border-radius: 1.5rem;
 }

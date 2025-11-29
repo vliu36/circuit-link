@@ -14,6 +14,8 @@ import ResourcesBar from "./_components/resources/resources.tsx";
 import TopUsers from "./_components/topUsers/topUsers.tsx";
 import TopCommunities from "./_components/topCommunities/topCommunities.tsx";
 import * as profileFunctions from "./profile/profile.ts";
+import trashBin from "../public/trash-solid-full.svg"
+import Link from "next/link";
 
 export default function Landing() {
     // ─────────────────────────────────────────────
@@ -163,74 +165,87 @@ export default function Landing() {
 
     // LOGGED-IN VIEW
     return (
-        <div className={Styles.background}>
-
-            <div className={Styles.yourCommunitiesBar} style={{ gridArea: "communities" }}>
-                <YourCommunities userCommunities={userCommunities} />
-            </div>
-
-            <div className={Styles.resourcesBar} style={{ gridArea: "resources" }}>
-                <ResourcesBar />
-            </div>
-
-            <div className={Styles.topUsersBar} style={{ gridArea: "topUsers" }}>
-                <TopUsers dataLoading={dataLoading} topUsers={topUsers} />
-            </div>
-
-            <div className={Styles.topCommunitiesBar} style={{ gridArea: "topCommunities" }}>
-                <TopCommunities dataLoading={dataLoading} topCommunities={topCommunities} />
-            </div>
-
+        <main>
             <div className={Styles.navBox} style={{ gridArea: "navBar" }}>
                 <NavBar />
             </div>
 
-            <div className={Styles.friendsBox} style={{ gridArea: "friendReq" }}>
-                <h2 className={Styles.sectionTitle}>Your Friends</h2>
+            <div className={Styles.background}>
 
-                {friends.length === 0 ? (
-                    <p className={Styles.noFriendsText}>You have no friends yet.</p>
-                ) : (
-                    <ul className={Styles.friendList}>
-                        {friends.map((f) => (
-                            <li key={f.id} className={Styles.friendItem}>
-                                <Image
-                                    src={f.photoURL || "/defaultPFP.png"}
-                                    alt={`${f.username}'s profile`}
-                                    width={45}
-                                    height={45}
-                                    className={Styles.friendAvatar}
-                                />
+                <div className={Styles.yourCommunitiesBar} style={{ gridArea: "communities" }}>
+                    <YourCommunities userCommunities={userCommunities} />
+                </div>
 
-                                <div className={Styles.friendInfo}>
-                                    <p className={Styles.friendName}>{f.username}</p>
-                                    <p className={Styles.friendBio}>{f.profileDesc ?? ""}</p>
+                <div className={Styles.resourcesBar} style={{ gridArea: "resources" }}>
+                    <ResourcesBar />
+                </div>
+
+                <div className={Styles.topUsersBar} style={{ gridArea: "topUsers" }}>
+                    <TopUsers dataLoading={dataLoading} topUsers={topUsers} />
+                </div>
+
+                <div className={Styles.topCommunitiesBar} style={{ gridArea: "topCommunities" }}>
+                    <TopCommunities dataLoading={dataLoading} topCommunities={topCommunities} />
+                </div>
+
+
+
+                <div className={Styles.friendsBox} style={{ gridArea: "friendReq" }}>
+                    <h2 className={Styles.sectionTitle}>Your Friends</h2>
+
+                    {friends.length === 0 ? (
+                        <p className={Styles.noFriendsText}>You have no friends yet.</p>
+                    ) : (
+                        <ul className={Styles.friendList}>
+                            {friends.map((f) => (
+                                <div key={f.id} className={Styles.fullFriendItem}>
+                                    <Link href={`profile/${f.id}/dms`} className={Styles.friendItem} >
+                                        <Image
+                                            src={f.photoURL || "/defaultPFP.png"}
+                                            alt={`${f.username}'s profile`}
+                                            width={40}
+                                            height={40}
+                                            className={Styles.friendsIcon}
+                                        />
+
+                                        <p className={Styles.friendName}>{f.username}</p>
+                                        <p className={Styles.friendBio}>{f.profileDesc ?? ""}</p>
+                                    </Link>
+
+
+                                    <button
+                                        className={Styles.removeFriendButton}
+                                        onClick={() => handleRemoveFriend(f.id)}
+                                    >
+                                        <Image
+                                            src={trashBin}
+                                            alt="Trash"
+                                            width={20}
+                                            height={20}
+                                        />
+                                    </button>
                                 </div>
 
-                                <button
-                                    className={Styles.removeFriendButton}
-                                    onClick={() => handleRemoveFriend(f.id)}
-                                >
-                                    Remove
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                )}
+                            ))}
+                        </ul>
+
+                    )}
+                </div>
+
+                <div className={Styles.searchBarArea} style={{ gridArea: "search" }}>
+                    <div className={Styles.welcomeText}>Welcome to Circuit-Link,</div>
+                    <div className={Styles.usernameText}>{user.displayName}</div>
+
+                    <h3 className={Styles.searchBarAlignment}>
+                        <Suspense fallback={<div>Loading search bar...</div>}>
+                            <SearchBar />
+                        </Suspense>
+                    </h3>
+
+                    <SearchResults />
+                </div>
             </div>
+        </main>
 
-            <div className={Styles.searchBarArea} style={{ gridArea: "search" }}>
-                <div className={Styles.welcomeText}>Welcome to Circuit-Link,</div>
-                <div className={Styles.usernameText}>{user.displayName}</div>
-
-                <h3 className={Styles.searchBarAlignment}>
-                    <Suspense fallback={<div>Loading search bar...</div>}>
-                        <SearchBar />
-                    </Suspense>
-                </h3>
-
-                <SearchResults />
-            </div>
-        </div>
     );
 }
