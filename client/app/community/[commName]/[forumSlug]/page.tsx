@@ -655,7 +655,7 @@ export default function ForumPage({
     return (
         <main>
             <div className={styles.background}>
-                <div className={styles.navBox} style={{ gridArea: "NavBar" }}>
+                <div style={{ gridArea: "NavBar" }}>
                     <NavBar />
                 </div>
 
@@ -799,8 +799,8 @@ export default function ForumPage({
                                         <Image
                                             src={community.icon}
                                             alt="Community Icon"
-                                            width={100}
-                                            height={100}
+                                            width={150}
+                                            height={150}
                                             className={styles.serverIcon}
                                         />
                                     </button>
@@ -809,8 +809,8 @@ export default function ForumPage({
                                     <Image
                                         src={community.icon}
                                         alt="Community Icon"
-                                        width={100}
-                                        height={100}
+                                        width={150}
+                                        height={150}
                                         className={styles.serverIcon}
                                     />
                                 )}
@@ -1052,8 +1052,8 @@ export default function ForumPage({
                                                         >
                                                             <Image
                                                                 src={reportIcon}
-                                                                height={20}
-                                                                width={20}
+                                                                height={30}
+                                                                width={30}
                                                                 alt="edit"
                                                             />
                                                         </button>
@@ -1073,8 +1073,8 @@ export default function ForumPage({
                                                             >
                                                                 <Image
                                                                     src={editButton}
-                                                                    height={20}
-                                                                    width={20}
+                                                                    height={30}
+                                                                    width={30}
                                                                     alt="edit"
                                                                 />
                                                             </button>
@@ -1092,8 +1092,8 @@ export default function ForumPage({
                                                             >
                                                                 <Image
                                                                     src={trashBin}
-                                                                    height={20}
-                                                                    width={20}
+                                                                    height={30}
+                                                                    width={30}
                                                                     alt="edit"
                                                                 />
                                                             </button>

@@ -35,7 +35,7 @@
 
 }
 
-.joinCommunityButton{
+.joinCommunityButton {
     width: 15%;
     height: 5vh;
     border-radius: 1em;
@@ -204,23 +204,24 @@
 .commentIcon {
     margin-left: 10%;
     margin-top: 5%;
-    width: 30%;
-    height: 30px;
+    width: 40px;
+    height: 40px;
 }
 
 .ratioScore {
-    width: 70%;
-    font-size: 20px;
+    width: 100px;
+    margin-top: 5px;
+    font-size: 14px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .actions {
-    display: grid;
-    grid-template-columns: 23.33% 53.33% 23.34%;
-    grid-row: 100%;
-    width: 120px;
+    display: flex;
+    width: 150px;
     height: 30px;
     background-color: rgba(217, 217, 217, 1);
-    grid-template-areas: "Yays score Nays";
     border-radius: 1em;
 }
 
@@ -281,7 +282,7 @@
     border-radius: 1vw 0 0 1vw;
     cursor: pointer;
     transition: background-color 0.2s ease;
-    width: 100%;
+    width: 30px;
     height: 30px;
 }
 
@@ -296,8 +297,10 @@
 .yayScore {
     color: black;
     text-align: center;
-    margin-right: 10%;
     font-size: 20px;
+    width: 90px;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
 .header {
@@ -321,7 +324,7 @@
     position: relative;
     overflow-y: hidden;
     grid-template-columns: 1vw 15.67vw 3vw 60.7vw 3vw 15.67vw 1vw;
-    grid-template-rows: 6vh 34vh 54vh;
+    grid-template-rows: 5vh 34vh 54vh;
     grid-template-areas:
         "NavBar NavBar NavBar NavBar NavBar NavBar NavBar"
         "margin1 CommunitiesBar margin3 Center margin4 RightBar margin2"
@@ -632,8 +635,10 @@
 
 .createBox {
     position: sticky;
-    top: 1rem;        /* Keep it visible */
-    left: 80%;      /* Keep near the right edge */
+    top: 1rem;
+    /* Keep it visible */
+    left: 80%;
+    /* Keep near the right edge */
     width: 15vw;
     z-index: 99999;
 }
@@ -671,13 +676,14 @@
 .titleText {
     margin-left: 3vh;
     font-size: 40px;
+    white-space: nowrap;
 }
 
 .serverIcon {
-    width: 150px;
-    height: 150px;
+    width: 130px;
+    height: 130px;
     border-radius: 50%;
-    margin-top: -1.5vw;
+    margin-top: -2vw;
     margin-left: 1vw;
     margin-right: 1.5vw;
 }
@@ -800,6 +806,8 @@
     color: white;
     font-size: 14px;
     margin-top: 1%;
+    position: absolute;
+    left: 30%;
 }
 
 .editForumButton {
@@ -919,7 +927,7 @@
     background-color: grey;
 }
 
-.mediaBackground{
+.mediaBackground {
     width: 90%;
     margin-left: 5%;
     height: 100%;
@@ -943,7 +951,7 @@
     margin-bottom: 1vw;
     border-radius: 1em;
     box-shadow: 0 5px 10px rgba(154, 160, 185, .05), 0 15px 40px rgba(166, 173, 201, .2);
-
+    position: relative;
 }
 
 .sortText {
@@ -958,15 +966,24 @@
 
 
 .postReportButton {
-    width: 33.33%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+
 }
 
 .editButton {
-    width: 33.33%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+
 }
 
 .deleteButton {
-    width: 33.33%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+
 }
 
 .postSearchBar {
@@ -1036,73 +1053,82 @@
     font-size: 0.8vw;
 }
 
-@media screen and (max-width: 1300px) {
+.utilButtons {
+    display: flex;
+    height: 20px;
+    justify-content: space-between;
+    margin-left: auto;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+    /* distance from bottom edge */
+}
+
+/* Mobile View */
+@media only screen and (max-width: 768px) {
+    .background {
+        background-color: #D0E0EB;
+        display: grid;
+        width: 100%;
+        height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+        overflow-y: hidden;
+        grid-template-columns: 1vw 24vw 2vw 22vw 2vw 24vw 24vw 1vw;
+        grid-template-rows: 3.5vh 15vh 80vh;
+        grid-template-areas:
+            "NavBar NavBar NavBar NavBar NavBar NavBar NavBar NavBar"
+            "blank1 CommunitiesBar CommunitiesBar CommunitiesBar blank2 ServerBar ServerBar blank3"
+            "blank1 RightBar RightBar Center Center Center Center blank3";
+    }
+
     .serverIcon {
         width: 100px;
         height: 100px;
         border-radius: 50%;
-        margin-top: -1.5vw;
+        margin-top: -4vw;
         margin-left: 1vw;
         margin-right: 1.5vw;
     }
 
-
-}
-
-@media screen and (max-width: 1000px) {
-    .background {
-        grid-template-columns: 1vw 15.67vw 3vw 60.7vw 3vw 15.67vw 1vw;
-        grid-template-rows: 6vh 34vh 54vh;
-        grid-template-areas:
-            "NavBar NavBar NavBar NavBar NavBar NavBar NavBar"
-            "margin1 CommunitiesBar margin3 Center Center Center Center"
-            "margin1 ServerBar margin3 Center Center Center Center";
-        row-gap: 3%;
+    .joinCommunityButton {
+        width: 50px;
+        height: 40px;
+        border-radius: 1em;
+        margin-top: 5%;
+        margin-left: 50%;
+        background-color: rgb(15, 68, 167);
+        font-size: 10px;
     }
 
     .createBox {
-        position: fixed;   /* Sticky breaks when grid collapses */
-        bottom: 2rem;      /* Put button bottom-right */
-        right: 2rem;
-        left: auto;
-        width: auto;       /* Prevent squishing */
-        z-index: 999999;
-    }
-}
-
-@media screen and (max-width: 700px) {
-    .postSearchBar {
-        background-color: #D9D9D9;
-        width: 60%;
-        height: 4vh;
-        border-radius: 1em;
-        position: relative;
-        bottom: 5%;
-        left: 30%;
-        color: #5A5454;
-        text-indent: 5%;
-        font-size: 14px;
+        position: fixed;
+        top: 7rem;
+        /* Keep it visible */
+        left: 1%;
+        /* Keep near the right edge */
+        width: 15vw;
+        z-index: 99999;
     }
 
-    .enterSearch {
-        width: 10%;
-        height: 4vh;
-        border-radius: 1em;
-        background-color: #F0F0F0;
+    .primaryButton {
+        padding: 5px 10px;
+        border: 1px solid #0072BB;
+        border-radius: 1.1em;
+        background-color: #0072BB;
+        color: #fff;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        box-shadow: 0 5px 10px rgba(154, 160, 185, .05), 0 15px 40px rgba(166, 173, 201, .2);
+        margin-top: 80vh;
+        white-space: nowrap;
+    }
+
+    .yayScore {
+        color: black;
         text-align: center;
-        position: relative;
-        left: 80%;
-        bottom: 14.5%;
-        font-size: 14px;
+        font-size: 20px;
+        width: 60%;
+        white-space: nowrap;
+        overflow: hidden;
     }
-
-
-}
-
-.utilButtons {
-    display: flex;
-    width: 10%;
-    height: 75%;
-    justify-content: space-between;
-    margin-left: 70%;
 }
