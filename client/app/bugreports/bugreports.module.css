@@ -1,5 +1,10 @@
+@font-face {
+    font-family: Inria Sans;
+    src: url('/public/fonts/InriaSans-Light.ttf');
+}
+
 .background {
-    background-color: rgba(57, 65, 83, 1);
+    background-color: #D0E0EB;
     display: flex;
     width: 100%;
     height: 100vh;
@@ -11,13 +16,16 @@
     position: sticky;
     width: 70%;
     height: 80vh;
-    background-color:rgba(109, 115, 130, 1);
+    background-color: #FFFFFF;
+    color: #5A5454;
     margin-top: 80px;
     flex-direction: column;
     border-radius: 1em;
+    box-shadow: 0 5px 10px rgba(154, 160, 185, 0.5), 0 15px 40px rgba(166, 173, 201, 0.2);
 }
 
 .responseBox{
+    background-color: #FFFFFF;
     display:flex;
     flex-direction: column;
     width: 90%;
@@ -27,6 +35,7 @@
 }
 
 .responseBox2{
+    background-color: #FFFFFF;
     display:flex;
     flex-direction: column;
     width: 90%;
@@ -36,22 +45,24 @@
 }
 
 .heading1{
-    font-family: 'Courier New', Courier, monospace;
-    color: white;
+    font-family: Inria Sans;
+    background-color: #FFFFFF;
+    color: #5A5454;
     font-size: 20px;
     margin-left: 25px;
 }
 
 .heading2{
-    font-family: 'Courier New', Courier, monospace;
-    color: white;
+    font-family: Inria Sans;
+    background-color: #FFFFFF;
+    color: #5A5454;
     font-size: 12px;
     margin-left: 25px;
 }
 
 .returnButton {
     position: absolute;
-    background-color: #3F6DA1;
+    background-color: #F0F0F0;
     height: 30px;
     width: 80px;
     border-radius: 1em;
@@ -60,14 +71,14 @@
 }
 
 .returnButton:hover {
-  background-color: blue;
+  background-color: #D9D9D9;
 }
 
 .returnButtonText {
-    margin-top: 0px;
-    margin-left: 10px;
-    font-family: Courier;
-    color: white;
+    margin-top: 4px;
+    margin-left: 3px;
+    font-family: Inria Sans;
+    color: #5A5454;
     position: relative;
     font-size: 0.8rem;
     text-align: center;
@@ -75,7 +86,8 @@
 
 .dropdownBar{
     display:flex;
-    background-color: rgba(217, 217, 217, 1);
+    background-color: #EDEDED;
+    color: #5A5454;
     width: 90%;
     height: 25px;
     position: absolute;
@@ -86,7 +98,8 @@
 
 .responseBar{
     display:flex;
-    background-color: rgba(217, 217, 217, 1);
+    background-color: #EDEDED;
+    color: #5A5454;
     width: 90%;
     height: 300px;
     position: absolute;
@@ -102,7 +115,8 @@
 
 .submitButton {
     position: absolute;
-    background-color: #3F6DA1;
+    background-color: #D9D9D9;
+    color: #5A5454;
     height: 30px;
     width: 120px;
     border-radius: 1em;
@@ -111,14 +125,14 @@
 }
 
 .submitButton:hover {
-  background-color: blue;
+  background-color: darkgray;
 }
 
 .submitButtonText {
-    margin-top: 0px;
-    margin-left: 10px;
-    font-family: Courier;
-    color: white;
+    margin-top: 5px;
+    margin-left: 8px;
+    font-family: Inria Sans;
+    color: #5A5454;
     position: relative;
     font-size: 0.8rem;
     text-align: center;
