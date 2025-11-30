@@ -161,6 +161,7 @@
     border-radius: 50%;
     background-color: black;
     margin-right: 2%;
+    flex-shrink: 0;
 }
 
 .time {

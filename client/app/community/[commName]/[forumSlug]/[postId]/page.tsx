@@ -358,9 +358,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                         {/* Otherwise, show the post/reply */}
                         {/* Show the author's username and display total yay score */}
                         <div className={styles.meta}>
-                            <div className={styles.userIcon}>
-                                <Image src={item.authorPFP} alt={"Profile picture"} width={64} height={64} />
-                            </div>
+                                <Image src={item.authorPFP} alt={"Profile picture"} width={20} height={20} className={styles.userIcon}/>
                             <div className={styles.userTextAlignPosts}>
                                 <Link href={`/profile/${item.authorId}`}>
                                     {item.authorUsername}

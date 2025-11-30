@@ -81,10 +81,11 @@
 }
 
 .userIcon {
-    background-color: rgb(168, 156, 156);
-    height: 20px;
     width: 20px;
-    border-radius: 1em;
+    height: 20px;
+    border-radius: 50%;
+    background-color: black;
+    margin-right: 2%;
     flex-shrink: 0;
 }
 
