@@ -153,6 +153,22 @@ export default function ForumPage({
         setError(null);
     };
 
+    // EFFECT: Handle bfcache (back/forward cache) issues
+    // useEffect(() => {
+    // const handlePageShow = (event: PageTransitionEvent) => {
+    //     if (event.persisted) {
+    //     // Page was restored from bfcache
+    //     window.dispatchEvent(new Event("resize")); // trigger layout recalculation
+    //     }
+    // };
+
+    // window.addEventListener("pageshow", handlePageShow);
+
+    // return () => {
+    //     window.removeEventListener("pageshow", handlePageShow);
+    // };
+    // }, []);
+
     useEffect(() => {
         if (loading) return;
 
@@ -706,6 +722,34 @@ export default function ForumPage({
         }
     };
 
+    // --- PROMOTE USER TO MOD ---
+    const handlePromoteToMod = async (userId: string) => {
+        const res = await commApi.promoteToMod(commName, userId);
+        console.log(res.message);
+        await refreshCommunity();
+    };
+
+    // --- DEMOTE MOD TO USER ---
+    const handleDemoteMod = async (userId: string) => {
+        const res = await commApi.demoteMod(commName, userId);
+        console.log(res.message);
+        await refreshCommunity();
+    };
+
+    // --- PROMOTE USER TO OWNER ---
+    const handlePromoteToOwner = async (userId: string) => {
+        const res = await commApi.promoteToOwner(commName, userId);
+        console.log(res.message);
+        await refreshCommunity();
+    };
+
+    // --- DEMOTE OWNER ---
+    const handleDemoteOwner = async (userId: string) => {
+        const res = await commApi.demoteOwner(commName, userId);
+        console.log(res.message);
+        await refreshCommunity();
+    };
+
     const isMember = community?.userList.some(m => m.id === user?.uid);
     const isMod = community?.modList.some(m => m.id === user?.uid);
     const isOwner = community?.ownerList.some(o => o.id === user?.uid);
@@ -748,7 +792,7 @@ export default function ForumPage({
     }
 
     return (
-        <main>
+        <main className={styles.main}>
             <div className={styles.background}>
                 <div className={styles.navBox} style={{ gridArea: "NavBar" }}>
                     <NavBar />
@@ -764,8 +808,6 @@ export default function ForumPage({
                     }} />
                 </div>
 
-
-
                 <div className={styles.RightBar} style={{ gridArea: "RightBar" }}>
                     <div className={styles.channelInfoBox}>
                         <div className={styles.channelInfoh1}>{forumSlug}</div>
@@ -776,6 +818,52 @@ export default function ForumPage({
                         <div className={styles.RulesTitle}>Rules</div>
                         {/* Display rules here */}
                         <p className={styles.RulesText}>{community?.rules}</p>
+                    </div>
+                    <div className={styles.horizontalLine}></div>
+                    {/* Display owner and modlist. Only display owner once if already a mod */}
+                    <div className={styles.ModeratorsBox}>
+                        <div className={styles.RulesTitle}>Owners</div>
+                        <div className={styles.ModeratorsList}>
+                            {community?.ownerList.map((owner) => (
+                                <div key={owner.id} className={styles.ModeratorItem}>
+                                    <Link href={`/profile/${owner.id}`} className={styles.ModeratorLink}>
+                                        <div className={styles.ModeratorContent}>
+                                            <Image
+                                                src={owner.photoURL || "/default-profile.png"}
+                                                alt="Owner Profile Picture"
+                                                width={30}
+                                                height={30}
+                                                className={styles.ModeratorAvatar}
+                                            />
+                                            <span className={styles.ModeratorName}>{owner.username || "Unknown User"}</span>
+                                            {/* <span className={styles.ModeratorRole}>(Owner)</span> */}
+                                        </div>
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+                        <div className={styles.RulesTitle}>Moderators</div>
+                        <div className={styles.ModeratorsList}>
+                            {community?.modList.map((mod) => (
+                                !community?.ownerList.some(owner => owner.id === mod.id) && (
+                                    <div key={mod.id} className={styles.ModeratorItem}>
+                                        <Link href={`/profile/${mod.id}`} className={styles.ModeratorLink}>
+                                            <div className={styles.ModeratorContent}>
+                                                <Image
+                                                    src={mod.photoURL || "/default-profile.png"}
+                                                    alt="Moderator Profile Picture"
+                                                    width={30}
+                                                    height={30}
+                                                    className={styles.ModeratorAvatar}
+                                                />
+                                                <span className={styles.ModeratorName}>{mod.username || "Unknown User"}</span>
+                                                {/* <span className={styles.ModeratorRole}>(Moderator)</span> */}
+                                            </div>
+                                        </Link>
+                                    </div>
+                                )
+                            ))}
+                        </div>
                     </div>
                 </div>
 

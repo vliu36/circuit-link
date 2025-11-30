@@ -65,7 +65,22 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
 
     const [groupId, setGroupId] = useState("");
 
+    // EFFECT: Handle bfcache (back/forward cache) issues
+    // useEffect(() => {
+    // const handlePageShow = (event: PageTransitionEvent) => {
+    //     if (event.persisted) {
+    //     // Page was restored from bfcache
+    //     window.dispatchEvent(new Event("resize")); // trigger layout recalculation
+    //     }
+    // };
 
+    // window.addEventListener("pageshow", handlePageShow);
+
+    // return () => {
+    //     window.removeEventListener("pageshow", handlePageShow);
+    // };
+    // }, []);
+    
     const toggleCreateGroupPopup = () => {
         setCreateGroupOpen(!createGroupOpen);
         setError(null);
@@ -309,6 +324,10 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
         const isReply = "timeReply" in item;
         const isAuthor = item.authorId === user?.uid;
 
+        // Check if the post's author is a mod or owner
+        const authorIsMod = community.modList.some(m => m.id === item.authorId);
+        const authorIsOwner = community.ownerList.some(o => o.id === item.authorId); 
+
         return (
             <div
                 key={item.id}
@@ -361,7 +380,11 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                                 <Image src={item.authorPFP} alt={"Profile picture"} width={20} height={20} className={styles.userIcon}/>
                             <div className={styles.userTextAlignPosts}>
                                 <Link href={`/profile/${item.authorId}`}>
-                                    {item.authorUsername}
+                                    {item.authorUsername} {authorIsOwner
+                                                                ? " [OWNER]"
+                                                                : authorIsMod
+                                                                    ? " [MOD]"
+                                                                    : ""}
                                 </Link>
                             </div>
                         </div>
@@ -511,7 +534,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
     if (authLoading || !post) return <div>Loading post...</div>;
 
     return (
-        <main>
+        <main className={styles.main}>
             <div className={styles.background}>
                 <div className={styles.yourCommunitiesBar} style={{ gridArea: "CommunitiesBar" }}>
                     <YourCommunities userCommunities={userCommunities} />
@@ -533,11 +556,57 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                     </div>
                     <div className={styles.horizontalLine}></div>
                     <div className={styles.RulesBar}>
-                        <div className={styles.horizontalLine}></div>
-                        <div className={styles.horizontalLine}></div>
+                        {/* <div className={styles.horizontalLine}></div> */}
+                        {/* <div className={styles.horizontalLine}></div> */}
                         <h1>Rules</h1>
                         {/* Display rules here */}
                         <p>{community?.rules}</p>
+                    </div>
+                    <div className={styles.horizontalLine}></div>
+                    {/* Display owner and modlist. Only display owner once if already a mod */}
+                    <div className={styles.ModeratorsBox}>
+                        <div className={styles.RulesTitle}>Owners</div>
+                        <div className={styles.ModeratorsList}>
+                            {community?.ownerList.map((owner) => (
+                                <div key={owner.id} className={styles.ModeratorItem}>
+                                    <Link href={`/profile/${owner.id}`} className={styles.ModeratorLink}>
+                                        <div className={styles.ModeratorContent}>
+                                            <Image
+                                                src={owner.photoURL || "/default-profile.png"}
+                                                alt="Owner Profile Picture"
+                                                width={30}
+                                                height={30}
+                                                className={styles.ModeratorAvatar}
+                                            />
+                                            <span className={styles.ModeratorName}>{owner.username || "Unknown User"}</span>
+                                            {/* <span className={styles.ModeratorRole}>(Owner)</span> */}
+                                        </div>
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+                        <div className={styles.RulesTitle}>Moderators</div>
+                        <div className={styles.ModeratorsList}>
+                            {community?.modList.map((mod) => (
+                                !community?.ownerList.some(owner => owner.id === mod.id) && (
+                                    <div key={mod.id} className={styles.ModeratorItem}>
+                                        <Link href={`/profile/${mod.id}`} className={styles.ModeratorLink}>
+                                            <div className={styles.ModeratorContent}>
+                                                <Image
+                                                    src={mod.photoURL || "/default-profile.png"}
+                                                    alt="Moderator Profile Picture"
+                                                    width={30}
+                                                    height={30}
+                                                    className={styles.ModeratorAvatar}
+                                                />
+                                                <span className={styles.ModeratorName}>{mod.username || "Unknown User"}</span>
+                                                {/* <span className={styles.ModeratorRole}>(Moderator)</span> */}
+                                            </div>
+                                        </Link>
+                                    </div>
+                                )
+                            ))}
+                        </div>
                     </div>
                 </div>
 

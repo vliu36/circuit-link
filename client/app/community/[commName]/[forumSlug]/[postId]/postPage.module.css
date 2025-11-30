@@ -1,3 +1,7 @@
+.main {
+    padding: 0;
+}
+
 .container {
     padding: 40px;
     max-width: 800px;
@@ -295,12 +299,12 @@
     font-family: Inria Sans;
     color: #5A5454;
     font-size: 25px;
-    text-indent: 3%;
     overflow-y: auto;
     overflow-x: hidden;
     border: 3px #D0E0EB;
     border-radius: 0.5em;
-    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
+    box-shadow: 0 5px 10px rgba(154, 160, 185, .05), 0 15px 40px rgba(166, 173, 201, .2);
+    margin-right: 5px;
 }
 
 .notificationButton {
@@ -398,7 +402,7 @@
 .horizontalLine {
     background-color: #000000;
     width: 95%;
-    height: 0.25px;
+    height: 1px;
     margin-left: 8px;
 }
 
@@ -475,14 +479,63 @@
 
 .RulesBar {
     width: 100%;
-    height: 45vh;
+    /* height: 45vh; */
+    height: 30vh;
     overflow-y: auto;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
+    margin-bottom: 1vh;
 }
 
+.ModeratorsBox {
+    width: 100%;
+    /* height: 45vh; */
+    height: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1vh;
+}
 
+.ModeratorsList {
+    margin-left: 3%;
+    color: gray;
+    font-size: 17px;
+}
+
+.ModeratorAvatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: black;
+    margin-right: 2%;
+    flex-shrink: 0;
+    object-fit: cover;
+}
+
+.ModeratorName {
+    font-size: 20px;
+    color: #5A5454;
+}
+
+.ModeratorContent {
+    display: flex;
+    align-items: center;
+}
+
+.ModeratorLink {
+    text-decoration: none;
+    color: inherit;
+}
+
+.ModeratorItem {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* space between avatar, name, role */
+    margin-bottom: 10px; /* optional spacing between rows */
+}
 
 .usersBar {
     background-color: #EDEDED;

@@ -15,14 +15,18 @@ export async function fetchPostsByForum(commName: string, forumSlug: string, sor
         // Defensive: handle non-JSON or errors
         if (!res.ok) {
             const text = await res.text();
-            throw new Error(`Backend error ${res.status}: ${text}`);
+            // throw new Error(`Backend error ${res.status}: ${text}`);
+            console.error(`Backend error ${res.status}: ${text}`);
+            return { forum: null, posts: [] };
         }
 
         const data = await res.json();
 
         // Ensure structure matches your backend
         if (data.status !== "OK") {
-            throw new Error(data.message || "Unexpected backend format");
+            // throw new Error(data.message || "Unexpected backend format");
+            console.error(data.message || "Unexpected backend format");
+            return { forum: null, posts: [] };
         }
 
         // Return the inner forum and posts
@@ -184,7 +188,8 @@ export async function searchPosts(commName: string, slug: string, query: string)
 
         if (!res.ok) {
             const text = await res.text();
-            throw new Error(`Search error ${res.status}: ${text}`);
+            console.error(`Search error ${res.status}: ${text}`);
+            return { matchingPosts: [] };
         }
 
         const data = await res.json();
