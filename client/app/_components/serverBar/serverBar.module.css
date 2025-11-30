@@ -24,6 +24,11 @@
     margin-top: 2%;
 }
 
+.plusButton{
+    margin-left: 5%;
+    cursor: pointer;
+}
+
 .plusButton:hover{
     color:#00ccff;
 }
@@ -60,10 +65,16 @@
 .deleteGroup{
     margin-right: 3%;
     margin-left: 3%;
+    cursor: pointer;
 }
 
 .deleteGroup:hover{
     color: red;
+}
+
+.editGroup{
+    margin-right: 3%;
+    cursor: pointer;
 }
 
 .editGroup:hover{
@@ -87,7 +98,12 @@
     margin-left: 5%;
     overflow: hidden;
     white-space: nowrap;
+}
 
+.deleteChannel{
+    margin-right: 3%;
+    margin-left: 3%;
+    cursor: pointer;
 }
 
 .popupOverlay {
@@ -152,6 +168,16 @@
 
 .saveBtn:hover {
     background-color: #45a049;
+}
+
+.closeBtn {
+    background-color: #FF5C5C;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
 }
 
 .closeBtn:hover {

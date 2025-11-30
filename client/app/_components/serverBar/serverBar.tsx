@@ -153,6 +153,11 @@ export default function ServerBar({
     setError(null);
   };
 
+  const toggleEditGroupPopup = () => {
+    setEditGroupOpen(!editGroupOpen);
+    setError(null);
+  };
+
   const refreshCommunity = async () => {
     try {
       const updated = await commApi.fetchStructure(commName);
@@ -212,14 +217,22 @@ export default function ServerBar({
   const onOpenEditGroup = (groupId: string) => {
     setActiveGroupId(groupId);
     setGroupName(groupName); // NEW
-    setEditGroupOpen(true);
+    toggleEditGroupPopup();
   };
 
-  // EDIT GROUP
-  const handleEditGroup = async (newName: string) => {
-    await commApi.editGroup(commName, activeGroupId, newName);
-    setEditGroupOpen(false);
-    await refreshCommunity();
+  // --- EDIT GROUP ---
+  const handleEditGroup = async (groupId: string, newName: string) => {
+    try {
+      const res = await commApi.editGroup(commName, groupId, newName);
+      console.log(res.message);
+      setError(res.message || null);
+      await refreshCommunity();
+      if (res.status === "ok") {
+        toggleEditGroupPopup();
+      }
+    } catch (err) {
+      console.error("Error editing group:", err);
+    }
   };
 
   // CREATE FORUM POPUP INIT
@@ -484,6 +497,45 @@ export default function ServerBar({
                   <button onClick={() => {handleDeleteGroup(activeGroupId)}} className={styles.deleteButtonPopup}>Delete</button>
               </div>
           </div>
+      )}
+            {/* --- EDIT GROUP POPUP --- */}
+      {editGroupOpen && (
+        <div className={styles.popupOverlay} onClick={toggleEditGroupPopup}>
+          <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+            <h2 className={styles.popupText}>Edit Group</h2>
+
+            {/* Form for editing the group */}
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const newName = formData.get("newName") as string;
+              const groupId = activeGroupId;
+
+              await handleEditGroup(groupId, newName);
+            }}>
+              <label className={styles.popupText}>
+                New Name: <br />
+                <input
+                  type="text"
+                  name="newName"
+                  className={`${styles.popupText} ${styles.inputField}`}
+                  style={{ border: "2px solid darkgrey" }}
+                  maxLength={24}
+                  pattern="^[a-zA-Z0-9_-]+$"
+                  title="24 characters max. Name can only contain letters, numbers, underscores, and hyphens."
+                  required
+                />
+              </label>
+              <br /><br />
+              {error && <p className={styles.errorText}>{error}</p>}
+              <br />
+              <button type="submit" className={`${styles.popupText} ${styles.saveBtn}`}>Save Changes</button>
+            </form>
+            <button className={` ${styles.closeBtn} ${styles.popupText}`} onClick={toggleEditGroupPopup}>
+              Close
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
