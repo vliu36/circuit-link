@@ -3,18 +3,16 @@
 import React, { useState, useEffect } from "react";
 import * as profileFunctions from "./profile";
 import { useAuth } from "../_firebase/context";
-import "./profile-styles.css";
+import Styles from './profile.module.css';
 import Image from 'next/image';
 import Link from 'next/link';
-
 
 export default function Profile() {
     const { user, userData, loading } = useAuth();    
 
-    const [file, setFile] = useState<File | null>(null);   // For profile picture upload
-    const [preview, setPreview] = useState<string | null>(null); // For image preview
+    const [file, setFile] = useState<File | null>(null);
+    const [preview, setPreview] = useState<string | null>(null);
     
-    // Profile edit states
     const [newUsername, setNewUsername] = useState("");
     const [newBio, setNewBio] = useState("");   
     const [textSize, setTextSize] = useState(userData?.textSize ?? 12);     
@@ -24,17 +22,12 @@ export default function Profile() {
     const [restrictedMode, setRestrictedMode] = useState(userData?.restrictedMode ?? false);
     const [error, setError] = useState("");
 
-    // Friends list
     const [friends, setFriends] = useState<profileFunctions.User[]>([]); 
-    
-    // Popup state
     const [isOpen, setIsOpen] = useState(false);
 
-    // File size limit
     const MAX_KB = 200;
     const MAX_BYTES = MAX_KB * 1024;
 
-    // Live username validation
     useEffect(() => {
         if (!newUsername) {
             setError("");
@@ -42,60 +35,47 @@ export default function Profile() {
         }
         const localError = profileFunctions.basicUsernameCheck(newUsername);
         setError(localError);
+    }, [newUsername]);
 
-    }, [newUsername]); // end useEffect
-
-    // Load friends list
     useEffect(() => {
         const loadFriends = async () => {
-        if (!userData?.friendList) return;
-        const data = await profileFunctions.getFriends(userData.friendList);
-        setFriends(data);
+            if (!userData?.friendList) return;
+            const data = await profileFunctions.getFriends(userData.friendList);
+            setFriends(data);
         };
         loadFriends();
     }, [userData]);
 
-    // Show loading message while auth state is being determined
     if (loading) {
         return <p>Loading user info...</p>;
     }
 
-    // If no user is logged in, show message
     if (!user || !userData) {
         return ( <p>You must be logged in to view this page.</p> );
     }
 
-    // Handle form submission for editing profile
     const handleEditProfile = async (e: React.FormEvent) => {
         e.preventDefault();
         await profileFunctions.editProfile(newUsername, newBio, textSize, font, darkMode, privateMode, restrictedMode);
-        window.location.reload(); // Reload the page to show updated info
+        window.location.reload();
     };
 
-    // Popup Confirmation 
     const togglePopup = () => {
         setIsOpen(!isOpen);
     }
 
-    // Handle image file change
     const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0] || null;
         setFile(selectedFile);
-        if (selectedFile) {
-            setPreview(URL.createObjectURL(selectedFile));
-        } else {
-            setPreview(null);
-        } // end if else
-    } // end handleFileChange
+        setPreview(selectedFile ? URL.createObjectURL(selectedFile) : null);
+    }
 
-    // Handle image file submission
     const submitImage = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!file) {
             alert("Please select a file to upload.");
             return;
         }
-        // Check file size 
         if (file.size > MAX_BYTES) {
             alert(`File size exceeds the maximum allowed limit: ${MAX_KB}.`);
             return;
@@ -107,14 +87,12 @@ export default function Profile() {
             window.location.reload();
         } catch (error) {
             console.error("Error uploading profile picture:", error);
-        } // end try catch
-    } // end submitImage
+        }
+    }
 
-    // Handle removing a friend
     const handleRemoveFriend = async (friendId: string) => {
         try {
             await profileFunctions.removeFriend(friendId);
-            // Optimistically remove from local state
             setFriends(prevFriends => prevFriends.filter(f => f.id !== friendId));
         } catch (error) {
             console.error("Error removing friend:", error);
@@ -122,114 +100,159 @@ export default function Profile() {
     };
 
     return (
-        <main>
+        <main className={Styles.main}>
             {/* Profile */}
-            <div className="profile-card">
-                <h1>Profile</h1>
-                <p>Welcome to your profile page!</p>
-                <Link className="go-back-btn" href = "/" replace>Go back</Link>
+            <div className={Styles.profileCard}>
+                <h1 className={Styles.title}>Profile</h1>
+                <p className={Styles.subtitle}>Welcome to your profile page!</p>
+                
+                <Link className={Styles.goBackBtn} href="/">Go back</Link>
                 <br/>
                 <br/>
-                <Link className="go-back-btn" href = "/profile/notifications">Go to Notifications</Link>
+                <Link className={Styles.goBackBtn} href="/profile/notifications">Go to Notifications</Link>
                 <br/>
                 <br/>
                 {/* Display profile info */}
-                <div className="profile-header">
+                <div className={Styles.profileHeader}>
                     <Image
-                    src={user.photoURL || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
-                    alt="Profile Picture"
-                    width={64}
-                    height={64}
-                    className="w-16 h-16 rounded-full object-cover border" />
-                    <span className="username">{userData?.username}</span>
+                        src={userData.photoURL || user.photoURL || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
+                        alt="Profile Picture"
+                        width={64}
+                        height={64}
+                        className={Styles.profileHeaderImage}
+                    />
+                    <span className={Styles.profileHeaderUsername}>{userData?.username}</span>
                 </div>
-                <p>{userData?.profileDesc}</p>
+                <p className={Styles.bioText}>{userData?.profileDesc}</p>
             </div>
+
             {/* Additional information */}
-            <div className="account-info">
+            <div className={Styles.accountInfo}>
                 <p>Email Verified: {user?.emailVerified ? "Yes" : "No"}</p>
-                {/* Show verify email button when user isn't verified */}
-                {!user?.emailVerified && <span><button onClick={profileFunctions.verifyEmail}><u>&gt; Verify Email</u></button></span>}
+                {!user?.emailVerified && (
+                    <span>
+                        <button className={Styles.verifyBtn} onClick={profileFunctions.verifyEmail}>
+                            Verify Email
+                        </button>
+                    </span>
+                )}
                 <p>Account Created: {user?.metadata.creationTime}</p>
                 <p>Last Sign-in: {user?.metadata.lastSignInTime}</p>
             </div>
 
             {/* Friend list */}
-            <div className="account-info">
-                <h2>Friends</h2>
+            <div className={Styles.accountInfo}>
+                <h2 className={Styles.sectionTitle}>Friends</h2>
                 <br/>
                 {friends.length > 0 ? (
-                    <ul>
+                    <ul className={Styles.friendList}>
                         {friends.map((friend) => (
-                            <li key={friend.id}>
-                                <Link href={`/profile/${friend.id}`}>
+                            <li key={friend.id} className={Styles.friendItem}>
+                                <Link className={Styles.friendLink} href={`/profile/${friend.id}`}>
                                     <Image 
                                         src={friend.photoURL || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
                                         width={32} 
                                         height={32} 
                                         alt="Profile Picture" 
-                                        className="w-16 h-16 rounded-full object-cover border" 
+                                        className={Styles.friendAvatar}
                                     />
                                     {friend.username}
                                 </Link>
-                                <button onClick={() => handleRemoveFriend(friend.id)}>Remove</button>
+                                <button className={Styles.removeFriendBtn} onClick={() => handleRemoveFriend(friend.id)}>X</button>
                             </li>
                         ))}
                     </ul>
                 ) : (
-                    <p>No friends to display.</p>
+                    <p className={Styles.emptyState}>No friends to display.</p>
                 )}
             </div>
 
             {/* Change profile picture */}
-            <div>
+            <div className={Styles.accountInfo}>
                 <br/>
-                <form onSubmit={submitImage} className="flex items-left gap-4">
-                    <label className="cursor-pointer border p-2 rounded-1g">
+                <form onSubmit={submitImage} className={Styles.uploadForm}>
+                    <label className={Styles.uploadLabel}>
                         Change Profile Picture
+                        <br/>
                         <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleImageChange}/>
+                            type="file"
+                            accept="image/*"
+                            className={Styles.fileInput}
+                            onChange={handleImageChange}
+                        />
                     </label>
-                    {preview && (<Image src={preview} alt="Preview" width={16} height={16} className="w-16 h-16 rounded-full object-cover border"></Image>)}
+                    {preview && (
+                        <Image
+                            src={preview}
+                            alt="Preview"
+                            width={128}
+                            height={128}
+                            className={Styles.previewAvatar}
+                        />
+                    )}
                     <button
                         type="submit"
-                        disabled={!file}>Upload
+                        className={Styles.uploadBtn}
+                        disabled={!file}
+                    >
+                        Upload
                     </button>
-                    <p>File size limit: {MAX_KB} KB</p>
+                    <p className={Styles.helperText}>File size limit: {MAX_KB} KB</p>
                 </form>
             </div>
             
             <br/>
             {/* Edit profile */}
-            <div>
-                <form onSubmit={handleEditProfile}>
+            <div className={Styles.accountInfo}>
+                <form onSubmit={handleEditProfile} className={Styles.editForm}>
                     {/* Change username */}
-                    <label>New Username (max 20 characters): </label>
+                    <label className={Styles.label}>New Username (max 20 characters): </label>
                     <input 
-                    type="text" 
-                    id="username" 
-                    name="username" 
-                    minLength={1} 
-                    maxLength={20} 
-                    pattern="^[a-zA-Z0-9_]+$" 
-                    onChange={(e) => setNewUsername(e.target.value)}/>
-                    {error && <span className="errorMessage"> {error}</span>} {/* Display username error */}
+                        type="text" 
+                        id="username" 
+                        name="username" 
+                        minLength={1} 
+                        maxLength={20} 
+                        pattern="^[a-zA-Z0-9_]+$" 
+                        className={Styles.inputText}
+                        onChange={(e) => setNewUsername(e.target.value)}
+                    />
+                    {error && <span className={Styles.errorMessage}>{error}</span>}
                     <br/>
                     {/* Change profile description */}
-                    <label>New Bio (max 200 characters): </label>
-                    <textarea className="bio" name="profileDesc" minLength={0} maxLength={200} rows={8} cols={32} onChange={(e) => {setNewBio(e.target.value)}}/>
+                    <label className={Styles.label}>New Bio (max 200 characters): </label>
+                    <textarea
+                        className={Styles.textarea}
+                        name="profileDesc"
+                        minLength={0}
+                        maxLength={200}
+                        rows={8}
+                        cols={32}
+                        onChange={(e) => {setNewBio(e.target.value)}}
+                    />
                     <br/>
                     {/* Change Text Size */}
-                    <label>Text Size: </label>
-                    <input type="number" name="textSize" defaultValue={userData?.textSize} min={8} max={72} onChange={(e) => {setTextSize(Number(e.target.value))}}/>
-                    <em> -  effect to be implemented </em>
+                    <label className={Styles.label}>Text Size: </label>
+                    <input
+                        type="number"
+                        name="textSize"
+                        defaultValue={userData?.textSize}
+                        min={8}
+                        max={72}
+                        className={Styles.inputNumber}
+                        onChange={(e) => {setTextSize(Number(e.target.value))}}
+                    />
+                    <em className={Styles.note}> -  effect to be implemented </em>
                     <br/>
                     {/* Change Font */}
-                    <label>Font: </label>
-                    <select id="font" name="font" defaultValue={userData?.font} onChange={(e) => {setFont(e.target.value)}}>
+                    <label className={Styles.label}>Font: </label>
+                    <select
+                        id="font"
+                        name="font"
+                        defaultValue={userData?.font}
+                        className={Styles.select}
+                        onChange={(e) => {setFont(e.target.value)}}
+                    >
                         <option value="Arial">Arial</option>
                         <option value="Verdana">Verdana</option>
                         <option value="Helvetica">Helvetica</option>
@@ -238,40 +261,59 @@ export default function Profile() {
                         <option value="Georgia">Georgia</option>
                         <option value="Comic Sans">Comic Sans</option>
                     </select>
-                    <em> -  effect to be implemented </em>
+                    <em className={Styles.note}> -  effect to be implemented </em>
                     <br/>
                     {/* Dark Mode */}
-                    <label>Dark Mode: </label>
-                    <input type="checkbox" name="darkMode" defaultChecked={userData?.darkMode} onChange={(e) => {setDarkMode(e.target.checked)}}/>
-                    <em> -  effect to be implemented </em>
+                    <label className={Styles.labelInline}>Dark Mode: </label>
+                    <input
+                        type="checkbox"
+                        name="darkMode"
+                        defaultChecked={userData?.darkMode}
+                        className={Styles.checkbox}
+                        onChange={(e) => {setDarkMode(e.target.checked)}}
+                    />
+                    <em className={Styles.note}> -  effect to be implemented </em>
                     <br/>
                     {/* Private Mode */}
-                    <label>Private Mode: </label>
-                    <input type="checkbox" name="privateMode" defaultChecked={userData?.privateMode} onChange={(e) => {setPrivateMode(e.target.checked)}} />
-                    <em> -  effect to be implemented </em>
+                    <label className={Styles.labelInline}>Private Mode: </label>
+                    <input
+                        type="checkbox"
+                        name="privateMode"
+                        defaultChecked={userData?.privateMode}
+                        className={Styles.checkbox}
+                        onChange={(e) => {setPrivateMode(e.target.checked)}}
+                    />
+                    <em className={Styles.note}> -  effect to be implemented </em>
                     <br/>
                     {/* Restricted Mode */}
-                    <label>Restricted Mode: </label>
-                    <input type="checkbox" name="restrictedMode" defaultChecked={userData?.restrictedMode} onChange={(e) => {setRestrictedMode(e.target.checked)}} />
-                    <em> -  effect to be implemented </em>
+                    <label className={Styles.labelInline}>Restricted Mode: </label>
+                    <input
+                        type="checkbox"
+                        name="restrictedMode"
+                        defaultChecked={userData?.restrictedMode}
+                        className={Styles.checkbox}
+                        onChange={(e) => {setRestrictedMode(e.target.checked)}}
+                    />
+                    <em className={Styles.note}> -  effect to be implemented </em>
                     <br/>
-                    <button type="submit"><u>&gt; Save Changes</u></button>
+                    <button type="submit" className={Styles.submitBtn}>Save Changes</button>
                 </form>
             </div>
 
             <br/>
-            <div className="bottom-actions">
+            <div className={Styles.bottomActions}>
                 {/* Delete profile button */}
-                <button className="delete-btn" onClick={togglePopup}>Delete Profile</button>
+                <button className={Styles.deleteBtn} onClick={togglePopup}>Delete Profile</button>
                 {isOpen && (
-                    <div className="confirm-overlay" onClick={togglePopup}>
+                    <div className={Styles.confirmOverlay} onClick={togglePopup}>
                         <div 
-                        className="confirm-modal"
-                        onClick={(e) => e.stopPropagation()}>
-                            <h2 className="popup-text">Are you sure?</h2>
-                            <div className="confirm-actions">
-                                <button className="btn-cancel" onClick={togglePopup}>Close</button>
-                                <button className="btn-confirm" onClick={() => {profileFunctions.deleteUserAccount()}}>Delete</button>
+                            className={Styles.confirmModal}
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <h2 className={Styles.popupText}>Are you sure?</h2>
+                            <div className={Styles.confirmActions}>
+                                <button className={Styles.btnCancel} onClick={togglePopup}>Close</button>
+                                <button className={Styles.btnConfirm} onClick={() => {profileFunctions.deleteUserAccount()}}>Delete</button>
                             </div>
                         </div>
                     </div>
@@ -279,7 +321,7 @@ export default function Profile() {
                 <br/>
                 <br/>
                 {/* Log out */}
-                <script className="logout-btn" onClick={() => { profileFunctions.logout(); }}>Log Out</script>
+                <button className={Styles.logoutBtn} onClick={() => { profileFunctions.logout(); }}>Log Out</button>
             </div>
         </main>
     );

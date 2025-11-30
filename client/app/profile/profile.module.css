@@ -1,0 +1,414 @@
+/* Overall page layout */
+.main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    background: #D0E0EB;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 2rem;
+}
+
+/* Profile section box */
+.profileCard {
+    background: #F5F5F5;
+    color: #5A5454;
+    padding: 2rem;
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+    margin-bottom: 1.5rem;
+    border: 3px #D9D9D9;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* Account information box */
+.accountInfo {
+    background: #F5F5F5;
+    color: #5A5454;
+    padding: 2rem;
+    border: 3px #D9D9D9;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
+    max-width: 500px;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+/* Section headings */
+.sectionTitle {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Info text */
+.infoText {
+    margin: 0.3rem 0;
+}
+
+/* Form sections (edit + upload) */
+.form {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    background: #F5F5F5;
+    color: #5A5454;
+    padding: 1.5rem;
+    border: 3px #D9D9D9;
+    border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
+    width: 100%;
+    max-width: 500px;
+    margin-bottom: 1.5rem;
+}
+
+/* Inputs and labels */
+.label {
+    font-weight: 600;
+}
+
+.inputText,
+.inputNumber,
+.textarea,
+.select {
+    width: 100%;
+    padding: 0.4rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.checkbox {
+    margin-left: 0.5rem;
+}
+
+/* Buttons */
+.button {
+    background: none;
+    border: none;
+    color: #5A5454;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s ease;
+    margin-left: 2.5em;
+}
+
+.button:hover {
+    color: #699DD8;
+    text-decoration: underline;
+    color: #5A5454;
+}
+
+/* Go back button */
+.goBackBtn {
+    background: #D0E0EB;
+    color: #5A5454;
+    border: none;
+    padding: 0.3rem 1rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.2s ease;
+}
+
+.goBackBtn:hover {
+    background-color: #D9D9D9;
+}
+
+/* Primary action buttons (Save/Delete) */
+.submitBtn,
+.uploadBtn {
+    background: #D0E0EB;
+    color: #5A5454;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.submitBtn:hover,
+.uploadBtn:hover {
+    background: #D9D9D9;
+}
+
+/* Delete button */
+.deleteBtn {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.deleteBtn:hover {
+    background: #b02a37;
+    color: white;
+}
+
+/* Logout button */
+.logoutBtn {
+    background: #3F6DA1;
+    color: white;
+    border: none;
+    padding: 0.6rem 1rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.logoutBtn:hover {
+    background: #699DD8;
+    color: white;
+}
+
+/* Verify email button */
+.verifyBtn {
+    background: #FFD700;
+    color: #5A5454;
+    border: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.2s ease;
+}
+
+.verifyBtn:hover {
+    background-color: #FFC107;
+}
+
+/* Align buttons at bottom */
+.bottomActions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+/* Error messages */
+.errorMessage {
+    color: red;
+    font-size: 0.9rem;
+}
+
+/* Header row: picture + username */
+.profileHeader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+/* Profile picture */
+.profileHeaderImage {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ddd;
+}
+
+/* Username beside image */
+.profileHeaderUsername {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Delete button confirmation */
+/* overlay */
+.confirmOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+}
+
+/* modal card */
+.confirmModal {
+    max-width: 420px;
+    background: var(--card-bg, #fff);
+    color: var(--text, #111827);
+    border-radius: 12px;
+    padding: 1.25rem 1.25rem;
+    box-shadow: 0 10px 30px rgba(2,6,23,0.35);
+    transform-origin: center;
+    animation: fadeScaleIn 220ms ease-out;
+}
+
+/* fade + slight scale */
+@keyframes fadeScaleIn {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* modal title and text */
+.confirmModalTitle {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.125rem;
+}
+
+/* buttons row */
+.confirmActions {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+/* neutral cancel */
+.btnCancel {
+    background: none;
+    border: 1px solid #cbd5e1;
+    color: #0f172a;
+    padding: 0.45rem 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* destructive confirm */
+.btnConfirm {
+    background: #dc3545; /* red */
+    color: white;
+    border: none;
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* hover states */
+.btnCancel:hover { background: rgba(0,0,0,0.03); }
+.btnConfirm:hover { filter: brightness(0.95); }
+
+/* Style for file upload input */
+.fileInput {
+    margin-top: 0.5rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 14px;
+    padding: 0.5rem 1rem;
+    border: 1px solid #b0b0b0;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: #f5f5f5;
+    color: #333;
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.fileInput:hover {
+    background-color: #e0e0e0;
+    border-color: #999;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+}
+
+.fileInput:active {
+    background-color: #dcdcdc;
+    border-color: #888;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.previewAvatar {
+    margin-top: 1rem;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ccc;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Friend list container */
+.friendList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+/* Individual friend item */
+.friendItem {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f5f5f5;
+    padding: 0.6rem 1rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.friendItem:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Friend link (avatar + username) */
+.friendLink {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
+
+.friendLink:hover {
+  color: #0f6dd0; /* subtle highlight on hover */
+    text-decoration: underline;
+}
+
+/* Friend avatar image */
+.friendAvatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ddd;
+    transition: transform 0.2s ease;
+}
+
+.friendAvatar:hover {
+    transform: scale(1.1);
+}
+
+/* Remove friend button */
+.removeFriendBtn {
+    background: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 0.3rem 0.8rem;
+    border-radius: 8px;
+    margin-left: 1rem;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: background 0.2s ease;
+}
+
+.removeFriendBtn:hover {
+    background: #b02a37;
+}
+
+/* Empty state when no friends */
+.emptyState {
+    color: #777;
+    font-style: italic;
+    text-align: center;
+}

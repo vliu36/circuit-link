@@ -52,3 +52,13 @@ export interface Community {
     banner: string;
     rules: string;
 }
+
+// Used in @app/profile/[uid]/dms/page.tsx and @app/community/[commName]/chat/page.tsx
+export interface Message {
+    authorId: string;
+    authorName: string;
+    authorIcon: string;
+    contents: string;
+    media: string | null;
+    timestamp: string;
+}

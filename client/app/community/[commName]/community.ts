@@ -1,6 +1,6 @@
 const BASE_URL = "http://localhost:2400/api"; // adjust as needed
 import { uploadImage } from "@/app/_utils/mediaUpload.ts";
-import { Community } from "../../_types/types.ts";
+import { Community, Group } from "../../_types/types.ts";
 import { updateProfile } from "firebase/auth/web-extension";
 import { doc, updateDoc, getDoc} from "firebase/firestore";
 import { auth, db } from "@/app/_firebase/firebase.ts";
@@ -617,7 +617,7 @@ export async function ensureDefaultGroup(commName: string) {
 
         // If "general" already exists → return it
         const existing = groups.find(
-            (g: any) => g.name.toLowerCase() === "general"
+            (g: Group) => g.name.toLowerCase() === "general"
         );
         if (existing) return existing;
 

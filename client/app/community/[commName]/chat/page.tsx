@@ -4,7 +4,7 @@ import { useEffect, useState, use } from "react";
 import { sendMessage, getMessages, getMediaUrl } from "@/app/_utils/messaging.ts";
 import { useAuth } from "@/app/_firebase/context";
 import Image from "next/image";
-import { Community } from "@/app/_types/types";
+import { Community, Message } from "@/app/_types/types";
 import { fetchStructure } from "../community";
 
 export default function CommunityChat({
@@ -14,7 +14,7 @@ export default function CommunityChat({
 }) {
     const { commName } = use(params);
     const { user } = useAuth();
-    const [messages, setMessages] = useState<any[]>([]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(true);
     const [newText, setNewText] = useState("");
     const [mediaFile, setMediaFile] = useState<File | null>(null);
@@ -78,7 +78,7 @@ export default function CommunityChat({
             authorIcon: user.photoURL || "/default-profile.png",
             contents: newText.trim(),
             media: mediaUrl,
-            timeStamp: new Date().toISOString(),
+            timestamp: new Date().toISOString(),
         }
 
         // Optimistically add message to UI
@@ -170,7 +170,7 @@ export default function CommunityChat({
                     <p className="text-sm font-semibold">{msg.authorName || "Unknown"}</p>
                     <p>{msg.contents}</p>
                     <p className="text-xs text-gray-500">
-                        {new Date(msg.timestamp).toLocaleTimeString()}
+                        {new Date(msg.timestamp).toLocaleString()}
                     </p>
                     {msg.media && (
                         <div className="mt-2">
