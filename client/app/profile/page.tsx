@@ -9,24 +9,24 @@ import Link from 'next/link';
 
 
 export default function Profile() {
-    const { user, userData, loading } = useAuth();    
+    const { user, userData, loading } = useAuth();
 
     const [file, setFile] = useState<File | null>(null);   // For profile picture upload
     const [preview, setPreview] = useState<string | null>(null); // For image preview
-    
+
     // Profile edit states
     const [newUsername, setNewUsername] = useState("");
-    const [newBio, setNewBio] = useState("");   
-    const [textSize, setTextSize] = useState(userData?.textSize ?? 12);     
+    const [newBio, setNewBio] = useState("");
+    const [textSize, setTextSize] = useState(userData?.textSize ?? 12);
     const [font, setFont] = useState(userData?.font ?? "Arial");
-    const [darkMode, setDarkMode] = useState(userData?.darkMode ?? true); 
+    const [darkMode, setDarkMode] = useState(userData?.darkMode ?? true);
     const [privateMode, setPrivateMode] = useState(userData?.privateMode ?? false);
     const [restrictedMode, setRestrictedMode] = useState(userData?.restrictedMode ?? false);
     const [error, setError] = useState("");
 
     // Friends list
-    const [friends, setFriends] = useState<profileFunctions.User[]>([]); 
-    
+    const [friends, setFriends] = useState<profileFunctions.User[]>([]);
+
     // Popup state
     const [isOpen, setIsOpen] = useState(false);
 
@@ -48,9 +48,9 @@ export default function Profile() {
     // Load friends list
     useEffect(() => {
         const loadFriends = async () => {
-        if (!userData?.friendList) return;
-        const data = await profileFunctions.getFriends(userData.friendList);
-        setFriends(data);
+            if (!userData?.friendList) return;
+            const data = await profileFunctions.getFriends(userData.friendList);
+            setFriends(data);
         };
         loadFriends();
     }, [userData]);
@@ -62,7 +62,7 @@ export default function Profile() {
 
     // If no user is logged in, show message
     if (!user || !userData) {
-        return ( <p>You must be logged in to view this page.</p> );
+        return (<p>You must be logged in to view this page.</p>);
     }
 
     // Handle form submission for editing profile
@@ -127,20 +127,27 @@ export default function Profile() {
             <div className="profile-card">
                 <h1>Profile</h1>
                 <p>Welcome to your profile page!</p>
-                <Link className="go-back-btn" href = "/" replace>Go back</Link>
-                <br/>
-                <br/>
-                <Link className="go-back-btn" href = "/profile/notifications">Go to Notifications</Link>
-                <br/>
-                <br/>
+                <button
+                    className="go-back-btn"
+                    onClick={() => {
+                        window.location.href = "/"; // goes to landing page + counts as full refresh
+                    }}
+                >
+                    Go back
+                </button>
+                <br />
+                <br />
+                <Link className="go-back-btn" href="/profile/notifications">Go to Notifications</Link>
+                <br />
+                <br />
                 {/* Display profile info */}
                 <div className="profile-header">
                     <Image
-                    src={user.photoURL || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
-                    alt="Profile Picture"
-                    width={64}
-                    height={64}
-                    className="w-16 h-16 rounded-full object-cover border" />
+                        src={user.photoURL || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"}
+                        alt="Profile Picture"
+                        width={64}
+                        height={64}
+                        className="w-16 h-16 rounded-full object-cover border" />
                     <span className="username">{userData?.username}</span>
                 </div>
                 <p>{userData?.profileDesc}</p>
@@ -157,18 +164,18 @@ export default function Profile() {
             {/* Friend list */}
             <div className="account-info">
                 <h2>Friends</h2>
-                <br/>
+                <br />
                 {friends.length > 0 ? (
                     <ul>
                         {friends.map((friend) => (
                             <li key={friend.id}>
                                 <Link href={`/profile/${friend.id}`}>
-                                    <Image 
-                                        src={friend.photoURL || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"} 
-                                        width={32} 
-                                        height={32} 
-                                        alt="Profile Picture" 
-                                        className="w-16 h-16 rounded-full object-cover border" 
+                                    <Image
+                                        src={friend.photoURL || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"}
+                                        width={32}
+                                        height={32}
+                                        alt="Profile Picture"
+                                        className="w-16 h-16 rounded-full object-cover border"
                                     />
                                     {friend.username}
                                 </Link>
@@ -183,15 +190,15 @@ export default function Profile() {
 
             {/* Change profile picture */}
             <div>
-                <br/>
+                <br />
                 <form onSubmit={submitImage} className="flex items-left gap-4">
                     <label className="cursor-pointer border p-2 rounded-1g">
                         Change Profile Picture
                         <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleImageChange}/>
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={handleImageChange} />
                     </label>
                     {preview && (<Image src={preview} alt="Preview" width={16} height={16} className="w-16 h-16 rounded-full object-cover border"></Image>)}
                     <button
@@ -201,35 +208,35 @@ export default function Profile() {
                     <p>File size limit: {MAX_KB} KB</p>
                 </form>
             </div>
-            
-            <br/>
+
+            <br />
             {/* Edit profile */}
             <div>
                 <form onSubmit={handleEditProfile}>
                     {/* Change username */}
                     <label>New Username (max 20 characters): </label>
-                    <input 
-                    type="text" 
-                    id="username" 
-                    name="username" 
-                    minLength={1} 
-                    maxLength={20} 
-                    pattern="^[a-zA-Z0-9_]+$" 
-                    onChange={(e) => setNewUsername(e.target.value)}/>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        minLength={1}
+                        maxLength={20}
+                        pattern="^[a-zA-Z0-9_]+$"
+                        onChange={(e) => setNewUsername(e.target.value)} />
                     {error && <span className="errorMessage"> {error}</span>} {/* Display username error */}
-                    <br/>
+                    <br />
                     {/* Change profile description */}
                     <label>New Bio (max 200 characters): </label>
-                    <textarea className="bio" name="profileDesc" minLength={0} maxLength={200} rows={8} cols={32} onChange={(e) => {setNewBio(e.target.value)}}/>
-                    <br/>
+                    <textarea className="bio" name="profileDesc" minLength={0} maxLength={200} rows={8} cols={32} onChange={(e) => { setNewBio(e.target.value) }} />
+                    <br />
                     {/* Change Text Size */}
                     <label>Text Size: </label>
-                    <input type="number" name="textSize" defaultValue={userData?.textSize} min={8} max={72} onChange={(e) => {setTextSize(Number(e.target.value))}}/>
+                    <input type="number" name="textSize" defaultValue={userData?.textSize} min={8} max={72} onChange={(e) => { setTextSize(Number(e.target.value)) }} />
                     <em> -  effect to be implemented </em>
-                    <br/>
+                    <br />
                     {/* Change Font */}
                     <label>Font: </label>
-                    <select id="font" name="font" defaultValue={userData?.font} onChange={(e) => {setFont(e.target.value)}}>
+                    <select id="font" name="font" defaultValue={userData?.font} onChange={(e) => { setFont(e.target.value) }}>
                         <option value="Arial">Arial</option>
                         <option value="Verdana">Verdana</option>
                         <option value="Helvetica">Helvetica</option>
@@ -239,45 +246,45 @@ export default function Profile() {
                         <option value="Comic Sans">Comic Sans</option>
                     </select>
                     <em> -  effect to be implemented </em>
-                    <br/>
+                    <br />
                     {/* Dark Mode */}
                     <label>Dark Mode: </label>
-                    <input type="checkbox" name="darkMode" defaultChecked={userData?.darkMode} onChange={(e) => {setDarkMode(e.target.checked)}}/>
+                    <input type="checkbox" name="darkMode" defaultChecked={userData?.darkMode} onChange={(e) => { setDarkMode(e.target.checked) }} />
                     <em> -  effect to be implemented </em>
-                    <br/>
+                    <br />
                     {/* Private Mode */}
                     <label>Private Mode: </label>
-                    <input type="checkbox" name="privateMode" defaultChecked={userData?.privateMode} onChange={(e) => {setPrivateMode(e.target.checked)}} />
+                    <input type="checkbox" name="privateMode" defaultChecked={userData?.privateMode} onChange={(e) => { setPrivateMode(e.target.checked) }} />
                     <em> -  effect to be implemented </em>
-                    <br/>
+                    <br />
                     {/* Restricted Mode */}
                     <label>Restricted Mode: </label>
-                    <input type="checkbox" name="restrictedMode" defaultChecked={userData?.restrictedMode} onChange={(e) => {setRestrictedMode(e.target.checked)}} />
+                    <input type="checkbox" name="restrictedMode" defaultChecked={userData?.restrictedMode} onChange={(e) => { setRestrictedMode(e.target.checked) }} />
                     <em> -  effect to be implemented </em>
-                    <br/>
+                    <br />
                     <button type="submit"><u>&gt; Save Changes</u></button>
                 </form>
             </div>
 
-            <br/>
+            <br />
             <div className="bottom-actions">
                 {/* Delete profile button */}
                 <button className="delete-btn" onClick={togglePopup}>Delete Profile</button>
                 {isOpen && (
                     <div className="confirm-overlay" onClick={togglePopup}>
-                        <div 
-                        className="confirm-modal"
-                        onClick={(e) => e.stopPropagation()}>
+                        <div
+                            className="confirm-modal"
+                            onClick={(e) => e.stopPropagation()}>
                             <h2 className="popup-text">Are you sure?</h2>
                             <div className="confirm-actions">
                                 <button className="btn-cancel" onClick={togglePopup}>Close</button>
-                                <button className="btn-confirm" onClick={() => {profileFunctions.deleteUserAccount()}}>Delete</button>
+                                <button className="btn-confirm" onClick={() => { profileFunctions.deleteUserAccount() }}>Delete</button>
                             </div>
                         </div>
                     </div>
                 )}
-                <br/>
-                <br/>
+                <br />
+                <br />
                 {/* Log out */}
                 <script className="logout-btn" onClick={() => { profileFunctions.logout(); }}>Log Out</script>
             </div>
