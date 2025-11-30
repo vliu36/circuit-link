@@ -674,7 +674,7 @@ export default function ForumPage({
     return (
         <main>
             <div className={styles.background}>
-                <div style={{ gridArea: "NavBar" }}>
+                <div className={styles.navBox} style={{ gridArea: "NavBar" }}>
                     <NavBar />
                 </div>
 
@@ -820,8 +820,8 @@ export default function ForumPage({
                                         <Image
                                             src={community.icon}
                                             alt="Community Icon"
-                                            width={150}
-                                            height={150}
+                                            width={100}
+                                            height={100}
                                             className={styles.serverIcon}
                                         />
                                     </button>
@@ -830,8 +830,8 @@ export default function ForumPage({
                                     <Image
                                         src={community.icon}
                                         alt="Community Icon"
-                                        width={150}
-                                        height={150}
+                                        width={100}
+                                        height={100}
                                         className={styles.serverIcon}
                                     />
                                 )}
@@ -839,7 +839,6 @@ export default function ForumPage({
                             <div className={styles.titleText}>
                                 {commName}
                                 {/* Button that toggles edit forum popup */}
-                                {isOwner || isMod ? (
                                 <button className={styles.editForumButton} onClick={() => setEditPopup(true)}>
                                     <Image
                                         src={editButton}
@@ -848,9 +847,6 @@ export default function ForumPage({
                                         alt="edit"
                                     />
                                 </button>
-                                ) : (
-                                    <div></div>
-                                )}
                                 {/* Show link to chat if user is member */}
                                 {isMember && (
                                     <button className={styles.chatLink}>
@@ -1083,8 +1079,8 @@ export default function ForumPage({
                                                         >
                                                             <Image
                                                                 src={reportIcon}
-                                                                height={30}
-                                                                width={30}
+                                                                height={20}
+                                                                width={20}
                                                                 alt="edit"
                                                             />
                                                         </button>
@@ -1104,8 +1100,8 @@ export default function ForumPage({
                                                             >
                                                                 <Image
                                                                     src={editButton}
-                                                                    height={30}
-                                                                    width={30}
+                                                                    height={20}
+                                                                    width={20}
                                                                     alt="edit"
                                                                 />
                                                             </button>
@@ -1123,8 +1119,8 @@ export default function ForumPage({
                                                             >
                                                                 <Image
                                                                     src={trashBin}
-                                                                    height={30}
-                                                                    width={30}
+                                                                    height={20}
+                                                                    width={20}
                                                                     alt="edit"
                                                                 />
                                                             </button>

@@ -12,7 +12,7 @@
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
     background-color: #FFFFFF;
     color: #5A5454;
     position: relative;
@@ -23,7 +23,7 @@
     transform: scale(1.02);
 }
 
-.darkline {
+.darkline{
     width: 90%;
     height: 2px;
     background-color: black;
@@ -34,9 +34,11 @@
     display: flex;
     flex-direction: column;
     border-radius: 10px;
+    background-color: #ffffff;
     color: #5A5454;
     transition: transform 0.15s ease;
-    width: 100%;
+    width: 90%;
+    margin-left: 5%;
 }
 
 .replyCard p,
@@ -65,28 +67,26 @@
     margin-top: 0.2em;
     margin-left: 2vw;
     display: flex;
-    width: 400px;
+    width: 10%;
     height: 2.5vh;
-    white-space: nowrap;
 }
 
-.postBox {
+.postBox{
     height: auto;
     width: 100%;
     font-family: Inria Sans;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
     border-radius: 1em;
-    background-color: #ffffff;
 }
 
-.userIcon {
+.userIcon{
     background-color: rgb(168, 156, 156);
     height: 20px;
     width: 20px;
     border-radius: 1em;
 }
 
-.userTextAlignPosts {
+.userTextAlignPosts{
     font-size: 12px;
     margin-left: 0.5vw;
 }
@@ -100,56 +100,61 @@
 
 .actions {
     display: flex;
+    margin-top: 10px;
     width: 150px;
-    height: 30px;
-    background-color: rgba(217, 217, 217, 1);
+    height: 40px;
+    background-color: #F0F0F0;
+    justify-content: space-between;
     border-radius: 1em;
-    margin-left: 3%;
+    margin-bottom: 5%;
+    margin-left: 2vw;
 }
 
 .voteButton {
-    background-color: rgba(217, 217, 217, 1);
     color: white;
+    padding: 5px 10px;
     border: none;
-    border-radius: 1vw 0 0 1vw;
     cursor: pointer;
+    width: 33%;
     transition: background-color 0.2s ease;
-    width: 30px;
-    height: 30px;
+    text-align: center;
+    border-radius: 1vw 0 0 1vw;
+    display: flex;
+    align-items: center;
 }
 
-.voteButton:hover {
-    background-color: #5a6268;
-}
-
-.dislikeButton:hover {
-    background-color: #5a6268;
-}
-
-.votingIcon {
+.votingIcon{
     width: 400%;
     text-align: center;
 }
 
-.dislikeButton {
+.dislikeButton{
     border-radius: 0 1vw 1vw 0;
 }
 
-.yayscore {
-    color: black;
+.yayscore{
+    width: 50%;
+    height: 3.9vh;
+    margin-top: 3%;
     text-align: center;
     font-size: 20px;
-    width: 90px;
-    white-space: nowrap;
-    overflow: hidden;
 }
 
 .voteButton:hover {
     background-color: #D9D9D9;
 }
 
+.yayActive {
+    color: #4caf50;
+    background-color: green;
+}
 
-.replyBorder {
+.nayActive {
+    color: #d9534f;
+    background-color: red;
+}
+
+.replyBorder{
     width: 100%;
     height: 5vh;
 }
@@ -173,23 +178,23 @@
 }
 
 .submitButton {
-    font-size: 14px;
+    font-size: 0.75vw;
     color: #5A5454;
     background-color: #F0F0F0;
     padding: 5px 10px;
     border: none;
     border-radius: 40px;
     cursor: pointer;
-    margin-left: 90%;
-    width: 70px;
-    height: 40px;
+    margin-left: 92.5%;
+    width: 8%;
+    height: 8vh;
     transition: background-color 0.2s ease;
     border: 1px solid white;
     text-align: center;
     font-family: Inria Sans;
 }
 
-.submitButton:hover {
+.submitButton:hover{
     background-color: #D9D9D9;
 }
 
@@ -198,12 +203,28 @@
 }
 
 .editButton {
-    width: 30px;
-    height: 30px;
+    background-color: #f0ad4e;
+    font-size: 14px;
+    color: #fff;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 6px;
     cursor: pointer;
+    margin-left: 5%;
+    margin-right: 5%;
+    transition: background-color 0.2s ease;
+    font-family: Inria Sans;
+    width: 10%;
+    height: 70%;
+    margin-top: 2%;
+    text-align: center;
 }
 
-.replyBox {
+.editButton:hover {
+    background-color: #ec971f;
+}
+
+.replyBox{
     margin-top: 2.5%;
     display: flex;
     flex-direction: column;
@@ -215,67 +236,41 @@
 
 .replyInput {
     display: block;
-    width: 90%;
-    height: 50px;
+    width: 100%;
+    height: 35vh;
     margin-bottom: 10px;
     padding: 10px;
     border-radius: 8px;
     border: 1px solid #ccc;
     font-size: 14px;
-    margin-left: 5%;
-}
-
-.descInput {
-    display: block;
-    width: 90%;
-    height: 200px;
-    margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    margin-left: 5%;
 }
 
 .deleteButton {
-    width: 30px;
-    height: 30px;
+    background-color: #d9534f;
+    font-size: 14px;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    width: 10%;
+    height: 70%;
+    margin-right: 5%;
+    margin-top: 2%;
     cursor: pointer;
-}
-
-.editingButtons{
-    display: flex;
-    justify-content: space-evenly;
-}
-
-.saveButton{
-    height: 30px;
-    width: 80px;
-    background-color: rgb(190, 190, 255);
-    font-size: 20px;
-    border-radius: 1em;
-    color: white;
     font-family: Inria Sans;
 }
 
-.dontSaveButton{
-    height: 30px;
-    width: 80px;
-    background-color: rgb(255, 175, 175);
-    font-size: 20px;
-    border-radius: 1em;
-    color: white;
-    font-family: Inria Sans;
+.deleteButton:hover {
+    background-color: #c9302c;
 }
 
 @font-face {
-    font-family: Jura;
-    src: url('../../../../../public/fonts/Jura-Light.ttf');
+  font-family: Jura;
+  src: url('../../../../../public/fonts/Jura-Light.ttf');
 }
 
 @font-face {
-    font-family: Inria Sans;
-    src: url('../../../../../public/fonts/InriaSans-Light.ttf');
+  font-family: Inria Sans;
+  src: url('../../../../../public/fonts/InriaSans-Light.ttf');
 }
 
 .background {
@@ -284,7 +279,7 @@
     width: 100%;
     height: 100vh;
     overflow: hidden;
-    position: relative;
+    position:relative;
     grid-template-columns: 1vw 15.67vw 3vw 60.7vw 3vw 15.67vw 1vw;
     grid-template-rows: 6vh 34vh 54vh;
     grid-template-areas:
@@ -294,7 +289,7 @@
     row-gap: 3%;
 }
 
-.RightBar {
+.RightBar{
     background-color: #EDEDED;
     display: flex;
     flex-direction: column;
@@ -309,7 +304,7 @@
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
-.notificationButton {
+.notificationButton{
     height: 30px;
     width: 30px;
     border-radius: 1em;
@@ -317,7 +312,7 @@
     margin-left: 10px;
 }
 
-.settingsIcon {
+.settingsIcon{
     height: 40px;
     width: 40px;
     border-radius: 50%;
@@ -339,16 +334,16 @@
     color: white;
 }
 
-.dropdownMenu:hover {
+.dropdownMenu:hover{
     background-color: #828FAF;
 }
 
-.dropdown:focus-within .dropdownMenu {
+.dropdown:focus-within .dropdownMenu{
     opacity: 1;
     pointer-events: auto;
 }
 
-.yourCommunitiesBar {
+.yourCommunitiesBar{
     background-color: #EDEDED;
     display: flex;
     flex-direction: column;
@@ -365,7 +360,7 @@
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
-.serverBar {
+.serverBar{
     background-color: #EDEDED;
     display: flex;
     flex-direction: column;
@@ -381,10 +376,10 @@
     border: 3px;
     border-radius: 0.5em;
     box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
-    z-index: 999;
+        z-index: 999;
 }
 
-.serverContainer {
+.serverContainer{
     background-color: #EDEDED;
     display: flex;
     flex-direction: column;
@@ -393,7 +388,7 @@
     color: #5A5454;
 }
 
-.channelText {
+.channelText{
     font-family: Inria Sans;
     font-size: 15px;
     color: #5A5454;
@@ -401,7 +396,7 @@
 }
 
 
-.horizontalLine {
+.horizontalLine{
     background-color: #000000;
     width: 95%;
     height: 0.25px;
@@ -409,7 +404,7 @@
 }
 
 
-.communitiesButtons {
+.communitiesButtons{
     width: 90%;
     margin-left: 10px;
     height: 50px;
@@ -418,7 +413,7 @@
     border-radius: 1em;
 }
 
-.addIcon {
+.addIcon{
     /* background-color: rgb(168, 156, 156); */
     margin-top: 5px;
     height: 40px;
@@ -426,7 +421,7 @@
     border-radius: 1em;
 }
 
-.buttonTextforCommunities {
+.buttonTextforCommunities{
     text-align: left;
     margin-top: 15px;
     margin-left: 10px;
@@ -436,11 +431,11 @@
     font-size: 0.8rem;
 }
 
-.communitiesButtons:hover {
+.communitiesButtons:hover{
     background-color: #D9D9D9;
 }
 
-.channelInfoBox {
+.channelInfoBox{
     background-color: #EDEDED;
     display: flex;
     flex-direction: column;
@@ -449,37 +444,37 @@
     text-indent: 3%;
     overflow-y: auto;
     overflow-x: hidden;
-    width: 100%;
-    height: 20vh;
+    width:100%;
+    height:20vh;
 }
 
-.channelInfoh1 {
+.channelInfoh1{
     margin-top: 10px;
     color: #5A5454;
     font-size: 25px;
 }
 
-.channelInfoh2 {
+.channelInfoh2{
     margin-top: 10px;
     font-size: 15px;
     text-indent: 0%;
     margin-left: 3%;
 }
 
-.UserContainer {
+.UserContainer{
     margin-left: 3%;
     display: flex;
     color: #5A5454;
     font-size: 17px;
-
+    
 }
 
-.userTextAlign {
+.userTextAlign{
     margin-left: 3%;
     margin-top: 4%;
 }
 
-.RulesBar {
+.RulesBar{
     width: 100%;
     height: 45vh;
     overflow-y: auto;
@@ -490,7 +485,7 @@
 
 
 
-.usersBar {
+.usersBar{
     background-color: #EDEDED;
     display: flex;
     flex-direction: column;
@@ -502,7 +497,7 @@
     overflow-x: hidden;
 }
 
-.navBox {
+.navBox{
     background-color: rgb(11, 11, 44);
     width: 100%;
     height: 51px;
@@ -510,22 +505,22 @@
     justify-content: space-between;
 }
 
-.communnitiesPage {
+.communnitiesPage{
     overflow-y: auto;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
     color: gray;
-    font-size: 20px;
+    font-size: 20px;  
 }
 
-.buttonFormat {
+.buttonFormat{
     display: flex;
     height: 6vh;
     width: 100%;
 }
 
-.postsPage {
+.postsPage{
     overflow-y: auto;
     overflow-x: hidden;
     display: flex;
@@ -534,41 +529,48 @@
     font-size: 2vw;
     margin-top: 0.3em;
     margin-bottom: 0.6em;
+    background-color: #ffffff;
     border: 3px #D0E0EB;
     border-radius: 0.5em;
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.35);
 }
 
-.backDisplay {
-    width: 40px;
+.backDisplay{
+    width: 5%;
     border-radius: 1em;
-    height: 20px;
+    height: 1.25vw;
     text-align: center;
     margin-left: 0.2em;
     margin-top: 0.2em;
     background-color: #F0F0F0;
     border: 1px solid white;
     color: #5A5454;
-    font-size: 14px;
-    margin-bottom: 15px;
+    font-size: 0.75vw;
 }
 
-.backDisplay:hover {
+.backDisplay:hover{
     background-color: #D9D9D9;
 }
 
-.mediaContainer {
-    margin-left: 2vw;
-}
-
-.groupName {
-    width: 60%;
-}
-
-.groupHeader {
+.utilityButtons{
+    width: 100%;
+    height: 100%;
     display: flex;
 }
 
-.createForumContainer {
+.mediaContainer{
+    margin-left: 2vw;
+}
+
+.groupName{
+    width: 60%;
+}
+
+.groupHeader{
+    display: flex;
+}
+
+.createForumContainer{
     width: 50%;
     height: 50vh;
     display: flex;
@@ -576,13 +578,13 @@
     background-color: #ffffff;
     position: absolute;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-    left: 25%;
+    left:25%;
     bottom: 25%;
     border: 2px solid black;
     border-radius: 1em;
 }
 
-.forumCreationInfomation {
+.forumCreationInfomation{
     margin-left: 10%;
     background-color: #F0F0F0;
     border-radius: 1em;
@@ -591,7 +593,7 @@
     padding-right: 1em;
 }
 
-.forumDescCreationInfomation {
+.forumDescCreationInfomation{
     margin-top: 3vh;
     margin-left: 10%;
     background-color: #F0F0F0;
@@ -603,7 +605,7 @@
     padding-right: 1em;
 }
 
-.createForumButton {
+.createForumButton{
     width: 25%;
     margin-left: 35%;
     margin-top: 1vh;
@@ -641,7 +643,6 @@
         opacity: 0;
         transform: scale(0.9);
     }
-
     to {
         opacity: 1;
         transform: scale(1);
@@ -659,7 +660,7 @@
     padding: 0.5rem;
     margin-top: 0.5rem;
     margin-bottom: 1rem;
-    border: floralwhite 1px solid;
+    border:floralwhite 1px solid;
     border-radius: 0.5em;
     font-family: Inria Sans;
 }
@@ -700,36 +701,36 @@
     background-color: #7c7c7c;
 }
 
-.deleteGroup {
+.deleteGroup{
     margin-right: 3%;
     margin-left: 3%;
 }
 
-.deleteGroup:hover {
+.deleteGroup:hover{
     color: red;
 }
 
-.editGroup:hover {
+.editGroup:hover{
     color: orange;
 }
 
-.plusButton:hover {
-    color: #00ccff;
+.plusButton:hover{
+    color:#00ccff;
 }
 
-.commName {
-    width: 80%;
-    height: 100%;
+.commName{
+    width:80%;
+    height:100%;
     overflow: hidden;
     font-size: 20px;
 }
 
-.createGroupBtn {
+.createGroupBtn{
     width: 20%;
     margin-left: 40%;
 }
 
-.createForumButton {
+.createForumButton{
     background-color: #0072BB;
     font-size: 14px;
     color: white;
@@ -745,88 +746,4 @@
 
 .createForumButton:hover {
     background-color: #004570;
-}
-
-.mediaPreview {
-    max-width: 100%;
-    min-height: 20vh;
-    margin-top: 1rem;
-    border-radius: 0.5em;
-}
-
-.mediaInPost {
-    overflow: hidden;
-    margin-left: 25%;
-    margin-right: 25%;
-    max-width: 500px;
-    max-height: 500px;
-}
-
-.mediaBackground {
-    width: 90%;
-    margin-left: 5%;
-    max-width: 100%;
-    max-height: 500px;
-    background-color: rgba(237, 237, 237, 1);
-}
-
-.postMedia {
-    margin-left: 25%;
-    margin-right: 25%;
-    max-width: 500px;
-    max-height: 500px;
-}
-
-.utilButtons {
-    display: flex;
-    height: 20px;
-    justify-content: space-between;
-    margin-left: auto;
-    margin-right: 1rem;
-    margin-bottom: 1rem;
-    /* distance from bottom edge */
-}
-
-.editingCard{
-    background-color: white;
-    width: 100%;
-    height: 350px;
-    font-size: 20px;
-    text-indent: 5%;
-}
-
-/* Mobile View */
-@media only screen and (max-width: 768px) {
-    .background {
-        background-color: #D0E0EB;
-        display: grid;
-        width: 100%;
-        height: 100vh;
-        overflow-x: hidden;
-        position: relative;
-        overflow-y: hidden;
-        grid-template-columns: 1vw 24vw 2vw 22vw 2vw 24vw 24vw 1vw;
-        grid-template-rows: 3.5vh 15vh 80vh;
-        grid-template-areas:
-            "NavBar NavBar NavBar NavBar NavBar NavBar NavBar NavBar"
-            "blank1 CommunitiesBar CommunitiesBar CommunitiesBar blank2 ServerBar ServerBar blank3"
-            "blank1 RightBar blank Center Center Center Center blank3";
-    }
-
-    .submitButton {
-        font-size: 14px;
-        color: #5A5454;
-        background-color: #F0F0F0;
-        padding: 5px 10px;
-        border: none;
-        border-radius: 40px;
-        cursor: pointer;
-        margin-left: 85%;
-        width: 70px;
-        height: 40px;
-        transition: background-color 0.2s ease;
-        border: 1px solid white;
-        text-align: center;
-        font-family: Inria Sans;
-    }
 }
