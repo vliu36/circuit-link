@@ -1,0 +1,103 @@
+.backButton{
+    background: #c5d5ff;
+    width: 80px;
+    height: 30px;
+    color: black;
+    text-align: center;
+    border-radius: 1em;
+    border: 1px solid white;
+}
+.pageContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 1.5rem;
+    background: #f5f5f5;
+}
+
+/* Top title area */
+.titleCard {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    margin-bottom: 1.5rem;
+    color: black;
+    box-shadow: 0 5px 10px rgba(154, 160, 185, 0.5), 0 15px 40px rgba(166, 173, 201, 0.2);
+
+}
+
+.titleCard h1 {
+    font-size: 1.7rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Notification list area */
+.notificationList {
+    flex: 1;
+    overflow-y: auto;
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 5px 10px rgba(154, 160, 185, 0.5), 0 15px 40px rgba(166, 173, 201, 0.2);
+    color: black;
+}
+
+/* Each notification */
+.notificationItem {
+    background: #f0f0f0;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    color: black;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+/* Timestamp */
+.timeStamp {
+    font-size: 0.75rem;
+    color: #666;
+    margin-left: 6px;
+}
+
+/* Action buttons */
+.btn {
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    margin-right: 8px;
+    margin-top: 6px;
+    display: inline-block;
+}
+
+.btnUnread {
+    background: #ffd966;
+    color: black;
+}
+
+.btnDelete {
+    background: #ff6b6b;
+    color: white;
+}
+
+.btnAccept {
+    background: #4CAF50;
+    color: white;
+}
+
+.btnDecline {
+    background: #d9534f;
+    color: white;
+}
+
+.btnView {
+    background: #4287f5;
+    color: white;
+}
+
+.statusMsg {
+    font-style: italic;
+    margin-left: 6px;
+}

@@ -1,17 +1,22 @@
-// This page displays the user's notifications
-"use client"
+"use client";
 import { useAuth } from "../../_firebase/context";
 import { DocumentReference, getDoc } from "firebase/firestore";
 import { useState, useEffect } from "react";
-import { getNotifications, NotificationData, markNotificationAsRead, respondToFriendRequest, deleteNotification, getPostRedirectUrl } from "./notifications";
+import {
+    getNotifications,
+    NotificationData,
+    markNotificationAsRead,
+    respondToFriendRequest,
+    deleteNotification,
+    getPostRedirectUrl
+} from "./notifications";
 import Link from "next/link";
+import Styles from "./notifications.module.css";
 
 export default function Notifications() {
     const { user, userData, loading } = useAuth();
-    
     const [notifications, setNotifications] = useState<NotificationData[]>([]);
     const [requestStatus, setRequestStatus] = useState<Record<string, string>>({});
-
     const [redirectUrls, setRedirectUrls] = useState<Record<string, string>>({});
 
     useEffect(() => {
@@ -26,24 +31,19 @@ export default function Notifications() {
             );
             setRedirectUrls(urls);
         };
-
         fetchUrls();
     }, [notifications]);
 
-    // Fetch notifications and their friend request statuses if applicable
     useEffect(() => {
         if (!userData?.notifications) return;
 
         const fetchAll = async () => {
             try {
-                // Fetch notification docs
                 const notifDocs = await getNotifications(userData.notifications);
-
-                // For friend request notifications, fetch their status
                 const statuses: Record<string, string> = {};
+
                 await Promise.all(
                     notifDocs.map(async (notif) => {
-                        // Fetches the status of the notification's related document, which is a FriendRequest
                         if (notif.type === "friend_request" && notif.relatedDocRef) {
                             const docsSnap = await getDoc(notif.relatedDocRef);
                             if (docsSnap.exists()) {
@@ -53,137 +53,131 @@ export default function Notifications() {
                     })
                 );
 
-                // Update states
                 setNotifications(notifDocs);
                 setRequestStatus(statuses);
             } catch (err) {
                 console.error("Error fetching notifications:", err);
             }
         };
-
         fetchAll();
     }, [userData?.notifications]);
 
-    // Handle marking notification as read
     async function markAsRead(notifId: string) {
-        try {
-            await markNotificationAsRead(notifId);
-            // Update local state
-            setNotifications((prevNotifs) =>
-                prevNotifs.map((notif) =>
-                    notif.id === notifId ? { ...notif, read: true } : notif
-                )
-            );
-        } catch (error) {
-            console.error("Error marking notification as read:", error);
-        } // end try catch
-    } // end function markAsRead
+        await markNotificationAsRead(notifId);
+        setNotifications((prev) =>
+            prev.map((n) => (n.id === notifId ? { ...n, read: true } : n))
+        );
+    }
 
-    // Handle responding to friend requests
     async function respondToRequest(requestRef: DocumentReference, accept: boolean, userId: string, notifId: string) {
-        try {
-            await respondToFriendRequest(requestRef, accept, userId);
-            // Mark the notification as read
-            markAsRead(notifId);
+        await respondToFriendRequest(requestRef, accept, userId);
+        markAsRead(notifId);
 
-            // Update local state 
-            setRequestStatus((prevStatus) => ({
-                ...prevStatus,
-                [notifId]: accept ? "accepted" : "declined",
-            }));
-        } catch (error) {
-            console.error("Error responding to friend request:", error);
-        } // end try catch
-    } // end function respondToRequest
+        setRequestStatus((prev) => ({
+            ...prev,
+            [notifId]: accept ? "accepted" : "rejected",
+        }));
+    }
 
-    // Handle deleteing a notification
     async function handleDelete(notifId: string) {
-        try {
-            await deleteNotification(notifId, user!.uid);
-            // Update local state
-            setNotifications((prevNotifs) =>
-                prevNotifs.filter((notif) => notif.id !== notifId)
-            );
-        } catch (error) {
-            console.error("Error deleting notification:", error);
-        } // end try catch
-    } // end function handleDelete
+        await deleteNotification(notifId, user!.uid);
+        setNotifications((prev) => prev.filter((n) => n.id !== notifId));
+    }
 
-    // Loading states
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-    if (!user || !userData) {
-        return <div>You must be logged in to view notifications.</div>;
-    }
+    if (loading) return <div>Loading...</div>;
+    if (!user || !userData) return <div>You must be logged in to view notifications.</div>;
 
     return (
-        <div>
-            <h1>Notifications Page</h1>
-            <p>This is where user notifications will be displayed.</p>
-
-            <div>
-                <p>Logged in as: {userData?.username}</p>
+        <div className={Styles.pageContainer}>
+            <Link className = {Styles.backButton} href="/">Go Back</Link>
+            {/* Title Card */}
+            <div className={Styles.titleCard}>
+                <h1>Notifications</h1>
+                <p>Logged in as: {userData.username}</p>
             </div>
-            <br/>
 
-            {/* Show notification List */}
-            <div>
+            {/* Notifications List */}
+            <div className={Styles.notificationList}>
                 {notifications.length > 0 ? (
                     <ul>
                         {notifications.map((notif) => (
-                            <li key={notif.id} style={{ color: '#000' }}>
-                                <br/>
-                                <span style={{ color: '#000' }}>{notif.message}</span>
-                                <small> {notif.timestamp.toLocaleString()}</small>
+                            <li key={notif.id} className={Styles.notificationItem}>
+                                
+                                <span>{notif.message}</span>
+                                <span className={Styles.timeStamp}>
+                                    {notif.timestamp.toLocaleString()}
+                                </span>
+
                                 {!notif.read && (
-                                    <button onClick={() => markAsRead(notif.id)}>
-                                        [Unread]
+                                    <button
+                                        className={`${Styles.btn} ${Styles.btnUnread}`}
+                                        onClick={() => markAsRead(notif.id)}
+                                    >
+                                        Mark as Read
                                     </button>
                                 )}
-                                <button onClick={() => handleDelete(notif.id)}>
-                                    [Delete Notification]
+
+                                <button
+                                    className={`${Styles.btn} ${Styles.btnDelete}`}
+                                    onClick={() => handleDelete(notif.id)}
+                                >
+                                    Delete
                                 </button>
+
+                                {/* Friend Request Controls */}
                                 {notif.type === "friend_request" && notif.relatedDocRef && (
                                     <div>
                                         {requestStatus[notif.id] === "pending" && (
                                             <>
-                                                <button onClick={() => respondToRequest(notif.relatedDocRef!, true, user.uid, notif.id)}>
-                                                    [Accept Friend Request]
+                                                <button
+                                                    className={`${Styles.btn} ${Styles.btnAccept}`}
+                                                    onClick={() =>
+                                                        respondToRequest(notif.relatedDocRef!, true, user.uid, notif.id)
+                                                    }
+                                                >
+                                                    Accept
                                                 </button>
-                                                <button onClick={() => respondToRequest(notif.relatedDocRef!, false, user.uid, notif.id)}>
-                                                    [Decline Friend Request]
+                                                <button
+                                                    className={`${Styles.btn} ${Styles.btnDecline}`}
+                                                    onClick={() =>
+                                                        respondToRequest(notif.relatedDocRef!, false, user.uid, notif.id)
+                                                    }
+                                                >
+                                                    Decline
                                                 </button>
                                             </>
                                         )}
+
                                         {requestStatus[notif.id] === "accepted" && (
-                                            <span><em>Accepted.</em></span>
+                                            <span className={Styles.statusMsg}>Accepted.</span>
                                         )}
+
                                         {requestStatus[notif.id] === "rejected" && (
-                                            <span><em>Rejected.</em></span>
+                                            <span className={Styles.statusMsg}>Rejected.</span>
                                         )}
                                     </div>
                                 )}
+
+                                {/* View Report Link */}
                                 {notif.type === "report" && notif.relatedDocRef && (
                                     <div>
-                                        <Link href={redirectUrls[notif.id] || "#"} target="_blank" rel="noopener noreferrer">
-                                            [View Reported Post]
+                                        <Link
+                                            href={redirectUrls[notif.id] || "#"}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className={`${Styles.btn} ${Styles.btnView}`}
+                                        >
+                                            View Reported Post
                                         </Link>
-                                        {requestStatus[notif.id] && (
-                                            <span><em>Report Status: {requestStatus[notif.id]}</em></span>
-                                        )}
                                     </div>
                                 )}
                             </li>
                         ))}
                     </ul>
                 ) : (
-                    <ul>
-                        <li style={{ color: '#000' }}>No notifications available.</li>
-                    </ul>
+                    <p>No notifications available.</p>
                 )}
             </div>
-
         </div>
     );
 }
