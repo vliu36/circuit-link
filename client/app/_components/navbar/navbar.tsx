@@ -162,9 +162,9 @@ export default function NavBar() {
                 </div>
 
                 <div className={Styles.loginAndSignUp}>
-                    <Link className={Styles.logInSignUpButton} href="./signin"> Log In </Link>
+                    <Link className={Styles.logInSignUpButton} href="/signin"> Log In </Link>
                     <div className={Styles.orText}> or </div>
-                    <Link className={Styles.logInSignUpButton} href="./register"> Sign Up </Link>
+                    <Link className={Styles.logInSignUpButton} href="/register"> Sign Up </Link>
                 </div>
 
             </div>

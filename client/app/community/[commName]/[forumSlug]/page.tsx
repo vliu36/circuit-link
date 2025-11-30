@@ -96,6 +96,8 @@ export default function ForumPage({
     const [bannerPreview, setBannerPreview] = useState<string | null>(null);
     const [targetUserId, setTargetUserId] = useState<string>("");
 
+    const [alertOpen, setAlertOpen] = useState(false);
+
     // --- Toggle popups ---
     const toggleCreatePostPopup = () => {
         setCreatePostOpen(!createPostOpen);
@@ -120,10 +122,14 @@ export default function ForumPage({
     const toggleIconPopup = () => {
         setIconOpen(!iconOpen);
         setError(null);
+        setIconFile(null);
+        setIconPreview(null);
     };
     const toggleBannerPopup = () => {
         setBannerOpen(!bannerOpen);
         setError(null);
+        setBannerFile(null);
+        setBannerPreview(null);
     };
 
     const toggleModOptionsPopup = () => {
@@ -134,6 +140,10 @@ export default function ForumPage({
     const toggleBlacklistPopup = () => {
         setBlacklistOpen(!blacklistOpen);
         setError(null);
+    };
+
+    const toggleAlertPopup = () => {
+        setAlertOpen(!alertOpen);
     };
 
     useEffect(() => {
@@ -158,19 +168,26 @@ export default function ForumPage({
         loadData();
     }, [userData, loading]);
 
-      // --- JOIN THE COMMUNITY ---
-      const handleJoin = async () => {
+    // --- JOIN THE COMMUNITY ---
+    const handleJoin = async () => {
         const res = await commApi.joinCommunity(commName);
         console.log(res.message);
         await refreshCommunity();
-      };
+    };
 
-        // --- LEAVE THE COMMUNITY ---
-        const handleLeave = async () => {
-          const res = await commApi.leaveCommunity(commName);
-          console.log(res.message);
-          await refreshCommunity();
-        };
+    // --- LEAVE THE COMMUNITY ---
+    const handleLeave = async () => {
+        const res = await commApi.leaveCommunity(commName);
+        if (res.status === "error") {
+            setError(res.message);
+            console.log(res.message);
+            toggleAlertPopup();
+            return;
+        }
+        console.log(res.message);
+
+        await refreshCommunity();
+    };
 
     // --- CREATE GROUP ---
     const handleCreateGroup = async () => {
@@ -361,8 +378,14 @@ export default function ForumPage({
 
     // Handler to add a new post
     const handleAddPost = async () => {
-        if (!user) return alert("Sign in to post!");
-        if (!title || !contents) return alert("Please fill out title and contents");
+        if (!user) {
+            setError("Sign in to post!");
+            return;
+        }
+        if (!title || !contents) {
+            setError("Please fill out title and contents");
+            return;
+        }
 
         try {
             let media: string | null = null;
@@ -402,10 +425,8 @@ export default function ForumPage({
         } catch (err) {
             console.log(err);
             if (err instanceof Error) {
-                // alert(`Failed to add post: ${err.message}`);
                 setError(`Failed to add post: ${err.message}`);
             } else {
-                // alert("Failed to add post due to an unknown error.");
                 setError("Failed to add post due to an unknown error.");
             }
         }
@@ -430,11 +451,9 @@ export default function ForumPage({
 
     // Handler to delete a post
     const handleDeletePost = async (postId: string) => {
-        // if (!confirm("Are you sure you want to delete this post?")) return;
         try {
             // const msg = await deletePostById(postId, commName);
             await deletePostById(postId, commName);
-            // alert(msg);
             fetchPosts();
         } catch (err) {
             console.error(err);
@@ -460,13 +479,17 @@ export default function ForumPage({
     const submitIcon = async () => {
         if (!iconFile) return;
         try {
-            await commApi.changeCommunityIcon(iconFile, community.id);
+            const res = await commApi.changeCommunityIcon(iconFile, community.id);
+            if (res.status === "error") {
+                throw new Error(res.message);
+            }
             toggleIconPopup();
             setIconFile(null);
             setIconPreview(null);
             await refreshCommunity();
         } catch (err) {
-            console.error("Failed to upload icon:", err);
+            console.warn("Failed to upload icon:", err);
+            setError("Failed to upload icon: " + (err instanceof Error ? err.message : ""));
         }
     };
 
@@ -474,20 +497,27 @@ export default function ForumPage({
     const submitBanner = async () => {
         if (!bannerFile) return;
         try {
-            await commApi.changeCommunityBanner(bannerFile, community?.id);
+            const res = await commApi.changeCommunityBanner(bannerFile, community?.id);
+            if (res.status === "error") {
+                throw new Error(res.message);
+            }
             toggleBannerPopup();
             setBannerFile(null);
             setBannerPreview(null);
             await refreshCommunity();
         } catch (err) {
-            console.error("Failed to upload banner:", err);
+            console.warn("Failed to upload banner:", err);
+            setError("Failed to upload banner: " + (err instanceof Error ? err.message : ""));
         }
     };
 
     // Handler to vote on a post
-    // !!! UPDATED !!! ---------------- This now uses optimistic UI updates for a snappier experience
     const handleVote = async (postId: string, type: "yay" | "nay") => {
-        if (!user) return alert("Sign in to vote!");
+        if (!user) {
+            setError("Sign in to vote on posts!");
+            toggleAlertPopup();
+            return;
+        }
 
         setPosts((prevPosts) =>
             prevPosts.map((p) => {
@@ -570,8 +600,15 @@ export default function ForumPage({
 
     // Handle report post
     const handleReportPost = async () => {
-        if (!user) return alert("Sign in to report posts!");
-        if (!reportReason) return alert("Please provide a reason for the report.");
+        if (!user) {
+            setMessage("Sign in to report posts!");
+            return;
+        }
+        if (!reportReason) {
+            setMessage("Please provide a reason for the report.");
+            return;
+        }
+        
         try {
             const res = await reportPost(commName, postId, reportReason);
             console.log(res.message);
@@ -582,7 +619,7 @@ export default function ForumPage({
             }, 3000);
         } catch (error) {
             console.error("Error reporting post:", error);
-            alert("An error occurred while reporting the post.");
+            setMessage("An error occurred while reporting the post.");
         }
     };
 
@@ -922,6 +959,10 @@ export default function ForumPage({
                                 // Check if the post is currently being edited
                                 const isEditing = editingPostId === post.id;
 
+                                // Check if the post's author is a mod or owner
+                                const authorIsMod = community.modList.some(m => m.id === post.authorId);
+                                const authorIsOwner = community.ownerList.some(o => o.id === post.authorId); 
+
                                 return (
                                     <div key={post.id} className={styles.postCard}>
                                         {/* ---- Post metadata ---- */}
@@ -930,7 +971,7 @@ export default function ForumPage({
                                             <Link className={styles.user} href={`/profile/${post.authorId}`}>
                                                 <Image src={post.authorPFP} alt={`${post.authorUsername}'s profile picture`} width={20} height={20} className={styles.userProfile} />
                                                 <div className={styles.authorText}>
-                                                    {post.authorUsername}
+                                                    {post.authorUsername} {authorIsMod && "[MOD]"} {authorIsOwner && "[ADMIN]"}
                                                 </div>
 
                                             </Link>
@@ -1199,7 +1240,7 @@ export default function ForumPage({
                                     />
                                 </label>
 
-                                {message && <p>{message}</p>}
+                                {message && <p className={styles.errorText}>{message}</p>}
                                 <button type="submit" className={`${styles.popupText} ${styles.saveBtn}`}>
                                     Submit Report
                                 </button>
@@ -1305,12 +1346,13 @@ export default function ForumPage({
                         {/* Preview the uploaded image */}
                         {iconPreview && (
                             <div style={{ marginBottom: "1rem" }}>
-                                <Image src={iconPreview} alt="Preview Icon" width={80} height={80} />
+                                <Image src={iconPreview} alt="Preview Icon" width={80} height={80} className="w-20 h-20 rounded-full object-cover border" />
                             </div>
                         )}
 
                         {/* File upload input and buttons to change the icon or close the popup */}
                         <input type="file" accept="image/*" className={`${styles.inputField} ${styles.popupText}`} onChange={handleIconChange} />
+                        {error && <p className={styles.errorText}>{error}</p>}
                         <button className={`${styles.saveBtn} ${styles.popupText}`} onClick={submitIcon}>
                             Save Icon
                         </button>
@@ -1336,6 +1378,7 @@ export default function ForumPage({
 
                         {/* File upload input and buttons to change the banner or close the popup */}
                         <input type="file" accept="image/*" className={`${styles.inputField} ${styles.popupText}`} onChange={handleBannerChange} />
+                        {error && <p className={styles.errorText}>{error}</p>}
                         <button className={`${styles.saveBtn} ${styles.popupText}`} onClick={submitBanner}>
                             Save Banner
                         </button>
@@ -1391,6 +1434,18 @@ export default function ForumPage({
                         </ul>
                         {error && <p style={{ color: "yellow" }}>{error}</p>}
                         <button className={`${styles.popupText} ${styles.closeBtn}`} onClick={toggleBlacklistPopup}>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
+            {/* --- ALERT POPUP --- */}
+            {alertOpen && (
+                <div className={styles.popupOverlay} onClick={() => { toggleAlertPopup(); setError(null); }}>
+                    <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                        <h2 className={styles.popupText}>Alert</h2>
+                        {error && <p className={styles.errorText}>{error}</p>}
+                        <button className={`${styles.popupText} ${styles.closeBtn}`} onClick={() => { toggleAlertPopup(); setError(null); }}>
                             Close
                         </button>
                     </div>

@@ -210,7 +210,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
 
     // Handler for editing posts/replies
     const handleEdit = async (id: string, isReply: boolean) => {
-        if (!editContent.trim()) return alert("Content cannot be empty.");
+        if (!editContent.trim()) return; //alert("Content cannot be empty.");
         try {
             if (isReply) {
                 await editReply(id, editContent);
