@@ -128,6 +128,9 @@
 .title {
     font-size: 20px;
     font-weight: 600;
+    width: 90%;
+    text-indent: 0%;
+    margin-left: 5%;
 }
 
 .contents {
@@ -160,7 +163,9 @@
     font-size: 14px;
     font-weight: 100;
     color: #5A5454;
-
+    overflow: hidden;
+    white-space: nowrap;
+    width: 70%;
 }
 
 .userProfile {
@@ -174,11 +179,11 @@
 .time {
     width: 50%;
     height: 3vh;
-    font-size: 14px;
+    font-size: 13px;
     margin-right: 5px;
     color: #5A5454;
     text-align: right;
-    text-wrap: unset;
+    white-space: nowrap;
 }
 
 
@@ -821,7 +826,12 @@
     width: 20px;
     border-radius: 1em;
     font-size: 0.8vw;
+    position: absolute;
+    left: 7.5%;
+    top: 90%;
 }
+
+
 
 .popupOverlay {
     position: fixed;
@@ -1051,6 +1061,9 @@
     cursor: pointer;
     font-family: Inria Sans;
     font-size: 0.8vw;
+    position: absolute;
+    left: 5%;
+    top: 90%;
 }
 
 .utilButtons {
@@ -1094,7 +1107,7 @@
         width: 50px;
         height: 40px;
         border-radius: 1em;
-        margin-top: 5%;
+        margin-top: -10%;
         margin-left: 50%;
         background-color: rgb(15, 68, 167);
         font-size: 10px;
@@ -1130,5 +1143,17 @@
         width: 60%;
         white-space: nowrap;
         overflow: hidden;
+    }
+
+    .editForumButton {
+        position: absolute;
+        left: 15%;
+        top: 90%;
+    }
+
+    .chatLink {
+        position: absolute;
+        left: 7.5%;
+        top: 90%;
     }
 }

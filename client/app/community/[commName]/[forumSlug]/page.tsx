@@ -818,6 +818,7 @@ export default function ForumPage({
                             <div className={styles.titleText}>
                                 {commName}
                                 {/* Button that toggles edit forum popup */}
+                                {isOwner || isMod ? (
                                 <button className={styles.editForumButton} onClick={() => setEditPopup(true)}>
                                     <Image
                                         src={editButton}
@@ -826,6 +827,9 @@ export default function ForumPage({
                                         alt="edit"
                                     />
                                 </button>
+                                ) : (
+                                    <div></div>
+                                )}
                                 {/* Show link to chat if user is member */}
                                 {isMember && (
                                     <button className={styles.chatLink}>
