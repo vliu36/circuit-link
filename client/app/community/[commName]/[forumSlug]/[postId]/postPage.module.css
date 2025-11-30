@@ -51,6 +51,8 @@
     font-size: 25px;
     font-weight: 600;
     margin-left: 2vw;
+    white-space: normal;   /* allow wrapping */
+    word-break: break-word; /* break long words if needed */
 }
 
 .contents {
@@ -58,6 +60,7 @@
     font-weight: 400;
     margin-left: 2vw;
     color: #5A5454
+    
 }
 
 .meta {
@@ -237,12 +240,12 @@
     margin-left: 5%;
 }
 
-.editingButtons{
+.editingButtons {
     display: flex;
     justify-content: space-evenly;
 }
 
-.saveButton{
+.saveButton {
     height: 30px;
     width: 80px;
     background-color: rgb(190, 190, 255);
@@ -252,7 +255,7 @@
     font-family: Inria Sans;
 }
 
-.dontSaveButton{
+.dontSaveButton {
     height: 30px;
     width: 80px;
     background-color: rgb(255, 175, 175);
@@ -526,8 +529,6 @@
     flex-direction: column;
     color: #5A5454;
     font-size: 2vw;
-    margin-top: 0.3em;
-    margin-bottom: 0.6em;
     border: 3px #D0E0EB;
     border-radius: 0.5em;
 }
@@ -753,16 +754,19 @@
 .mediaInPost {
     overflow: hidden;
     max-width: 500px;
-    margin: 0 auto;        /* Centers horizontally */
+    margin: 0 auto;
+    /* Centers horizontally */
     flex-shrink: 0;
 }
 
 .mediaBackground {
-    width: 90%;           /* Or whatever size you want */
+    width: 90%;
+    /* Or whatever size you want */
     max-height: 500px;
     background-color: rgba(237, 237, 237, 1);
     flex-shrink: 0;
-    display: flex;         /* Ensure the child centers */
+    display: flex;
+    /* Ensure the child centers */
     justify-content: center;
     align-items: center;
     margin-left: 5%;
@@ -778,7 +782,7 @@
     /* distance from bottom edge */
 }
 
-.editingCard{
+.editingCard {
     background-color: white;
     width: 100%;
     height: 350px;
@@ -793,11 +797,15 @@
         display: grid;
         width: 100%;
         height: 100vh;
-        overflow-x: hidden;
         position: relative;
-        overflow-y: hidden;
+
+        overflow-x: hidden;
+        overflow-y: auto;
+        /* <-- FIX */
+
         grid-template-columns: 1vw 24vw 2vw 22vw 2vw 24vw 24vw 1vw;
-        grid-template-rows: 3.5vh 15vh 80vh;
+        grid-template-rows: 5vh 15vh auto;
+        /* <-- allow Center to extend */
         grid-template-areas:
             "NavBar NavBar NavBar NavBar NavBar NavBar NavBar NavBar"
             "blank1 CommunitiesBar CommunitiesBar CommunitiesBar blank2 ServerBar ServerBar blank3"
@@ -823,7 +831,7 @@
 
     .mediaInPost {
         overflow: hidden;
-        max-width: 300px;
+        max-width: 290px;
         margin: 0 auto;
         /* Centers horizontally */
         flex-shrink: 0;
