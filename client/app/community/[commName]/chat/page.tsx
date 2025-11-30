@@ -6,6 +6,7 @@ import { useAuth } from "@/app/_firebase/context";
 import Image from "next/image";
 import { Community, Message } from "@/app/_types/types";
 import { fetchStructure } from "../community";
+import Styles from "./chat.module.css";
 
 export default function CommunityChat({
     params,
@@ -50,7 +51,6 @@ export default function CommunityChat({
             if (updated) {
                 setCommunity(updated);
             } else {
-                // TODO: This causes an error when changing the community name; refreshing returns no data because the old name is used
                 console.log("Failed to refresh community: no data returned");
             }
         } catch (err) {
@@ -69,9 +69,6 @@ export default function CommunityChat({
             mediaUrl = uploaded?.media || null;
         }
 
-        // const time = Date.now();
-
-        // Create message object for optimistic UI update
         const newMsg = {
             authorId: user.uid,
             authorName: user.displayName || "Unknown",
@@ -79,11 +76,10 @@ export default function CommunityChat({
             contents: newText.trim(),
             media: mediaUrl,
             timestamp: new Date().toISOString(),
-        }
+        };
 
-        // Optimistically add message to UI
-        setMessages((prevMessages) => [...prevMessages, newMsg]);
-        // Send message to backend
+        setMessages((prev) => [...prev, newMsg]);
+
         await sendMessage(user.uid, newText.trim(), mediaUrl, commName, 0);
 
         setNewText("");
@@ -110,17 +106,15 @@ export default function CommunityChat({
 
     if (!community) {
         return (
-            <div className="flex flex-col h-screen p-4">
-                <h1 className="text-xl font-bold text-black">
-                    Loading community...
-                </h1>
+            <div className={Styles.chatPage}>
+                <h1 className={Styles.chatTitle}>Loading community...</h1>
             </div>
         );
     }
     if (community === null) {
         return (
-            <div className="flex flex-col h-screen p-4">
-                <h1 className="text-xl font-bold text-black">
+            <div className={Styles.chatPage}>
+                <h1 className={Styles.chatTitle}>
                     Community {commName} not found.
                 </h1>
             </div>
@@ -131,8 +125,8 @@ export default function CommunityChat({
 
     if (!isMember) {
         return (
-            <div className="flex flex-col h-screen p-4">
-                <h1 className="text-xl font-bold text-black">
+            <div className={Styles.chatPage}>
+                <h1 className={Styles.chatTitle}>
                     You must be a member of {commName} to access the chat.
                 </h1>
             </div>
@@ -140,80 +134,100 @@ export default function CommunityChat({
     }
 
     return (
-        <div className="flex flex-col h-screen p-4">
-            <div className="flex items-center gap-3 mb-4">
-                <h1 className="text-xl font-bold text-black">
+        <div className={Styles.chatPage}>
+            {/* Header */}
+            <div className={Styles.chatHeader}>
+                <h1 className={Styles.chatTitle}>
                     Community Chat: {commName}
                 </h1>
-                <button onClick={() => window.history.back()} className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600">
+
+                <button
+                    onClick={() => window.history.back()}
+                    className={Styles.returnButton}
+                >
                     Return to Forums
                 </button>
             </div>
 
-            {/* Messages list */}
-            <div className="flex-1 overflow-y-auto border rounded p-3 bg-white text-black">
-            {loading ? (
-                <p>Loading messages...</p>
-            ) : messages.length === 0 ? (
-                <p>No messages yet.</p>
-            ) : (
-                <ul className="space-y-3">
-                {messages.map((msg, index) => (
-                    <li key={index} className="p-2 bg-gray-100 rounded">
-                    <Image
-                        src={msg.authorIcon || "/default-profile.png"}
-                        alt={msg.authorName || "Unknown"}
-                        width={40}
-                        height={40}
-                        className="rounded-full"
-                    />
-                    <p className="text-sm font-semibold">{msg.authorName || "Unknown"}</p>
-                    <p>{msg.contents}</p>
-                    <p className="text-xs text-gray-500">
-                        {new Date(msg.timestamp).toLocaleString()}
-                    </p>
-                    {msg.media && (
-                        <div className="mt-2">
-                        <Image src={msg.media} alt="Media content" width={200} height={200} />
-                        </div>
-                    )}
-                    </li>
-                ))}
-                </ul>
-            )}
+            {/* Messages */}
+            <div className={Styles.messagesBox}>
+                {loading ? (
+                    <p>Loading messages...</p>
+                ) : messages.length === 0 ? (
+                    <p>No messages yet.</p>
+                ) : (
+                    <ul className="space-y-3">
+                        {messages.map((msg, index) => (
+                            <li key={index} className={Styles.messageItem}>
+                                <Image
+                                    src={msg.authorIcon || "/default-profile.png"}
+                                    alt={msg.authorName || "Unknown"}
+                                    width={40}
+                                    height={40}
+                                    className={Styles.messageAvatar}
+                                />
+                                <p className={Styles.messageAuthor}>
+                                    {msg.authorName || "Unknown"}
+                                </p>
+                                <p>{msg.contents}</p>
+                                <p className={Styles.messageTimestamp}>
+                                    {new Date(msg.timestamp).toLocaleString()}
+                                </p>
+
+                                {msg.media && (
+                                    <div>
+                                        <Image
+                                            src={msg.media}
+                                            alt="Media content"
+                                            width={200}
+                                            height={200}
+                                        />
+                                    </div>
+                                )}
+                            </li>
+                        ))}
+                    </ul>
+                )}
             </div>
 
-            {/* Input bar */}
-            <div className="flex mt-4 gap-2 items-center">
-            <input
-                type="text"
-                className="flex-1 border rounded p-2"
-                value={newText}
-                onChange={(e) => setNewText(e.target.value)}
-                placeholder={`Message ${commName}...`}
-                style={{ color: "black" }}
-                maxLength={512}
-            />
-            <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                className="border rounded p-2 bg-sky-300 text-gray-600 hover:bg-sky-400 cursor-pointer"
-            />
-            <button
-                onClick={handleSend}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-                Send
-            </button>
+            {/* Input Row */}
+            <div className={Styles.chatInputRow}>
+                <input
+                    type="text"
+                    className={Styles.chatTextInput}
+                    value={newText}
+                    onChange={(e) => setNewText(e.target.value)}
+                    placeholder={`Message ${commName}...`}
+                    maxLength={512}
+                />
+
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className={Styles.chatFileInput}
+                />
+
+                <button
+                    onClick={handleSend}
+                    className={Styles.sendButton}
+                >
+                    Send
+                </button>
             </div>
 
-            {/* Preview */}
+            {/* Media Preview */}
             {mediaPreview && (
-            <div className="mt-2">
-                <p className="text-sm text-gray-500">Preview:</p>
-                <Image src={mediaPreview} alt="Preview" width={200} height={200} className="rounded" />
-            </div>
+                <div className={Styles.mediaPreviewBox}>
+                    <p className={Styles.mediaPreviewLabel}>Preview:</p>
+                    <Image
+                        src={mediaPreview}
+                        alt="Preview"
+                        width={200}
+                        height={200}
+                        className={Styles.mediaPreviewImage}
+                    />
+                </div>
             )}
         </div>
     );

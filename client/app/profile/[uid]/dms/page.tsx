@@ -7,12 +7,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { fetchUserById, OtherUserData } from "../userProfile";
 import { Message } from "@/app/_types/types";
+import Styles from "./dms.module.css";
 
-export default function CommunityChat({
-    params,
-}: {
-    params: Promise<{ uid: string }>;
-}) {
+export default function CommunityChat({ params }: { params: Promise<{ uid: string }> }) {
     const { uid } = use(params);
     const { user } = useAuth();
     const [messages, setMessages] = useState<Message[] | null>(null);
@@ -25,26 +22,20 @@ export default function CommunityChat({
     const [other, setOther] = useState<OtherUserData | null>(null);
     const [error, setError] = useState<string | null>(null);
 
-    // Load other user info
     useEffect(() => {
         const resolveUidAndFetch = async () => {
-            const { uid } = await params; 
+            const { uid } = await params;
             if (!uid) {
                 setError("No UID provided");
                 setLoadingUser(false);
                 return;
             }
-            
             setOtherId(uid);
 
             try {
                 const data = await fetchUserById(uid);
-                if (!data) {
-                    setError("User not found");
-                    setOther(null);
-                } else {
-                    setOther(data);
-                }
+                if (!data) setError("User not found");
+                setOther(data);
             } catch (err) {
                 setError("Error fetching user profile: " + err);
                 console.log(err);
@@ -53,41 +44,34 @@ export default function CommunityChat({
                 setLoadingUser(false);
             }
         };
-
         resolveUidAndFetch();
     }, [params]);
 
-    // Load initial messages
     useEffect(() => {
         if (!otherId || !user) return;
-        // setLoadingMessages(true);
+
         async function fetchMessages() {
             const now = new Date();
             const data = await getMessages(otherId!, 1, now, user?.uid);
             setMessages(data.posts || []);
             setLoadingMessages(false);
         }
-        
+
         fetchMessages();
         const interval = setInterval(fetchMessages, 5000);
         return () => clearInterval(interval);
     }, [otherId, user]);
 
-    // Handle sending messages
     async function handleSend() {
         if (!newText.trim() && !mediaFile) return;
-        if (!user) return;
-        if (!otherId) return;
-        if (!other) return;
+        if (!user || !otherId) return;
 
-        // Upload media if present
         let mediaUrl = null;
         if (mediaFile) {
             const uploaded = await getMediaUrl(mediaFile);
             mediaUrl = uploaded?.media || null;
         }
 
-        // Create message object for optimistic UI update
         const newMsg = {
             authorId: user.uid,
             authorName: user.displayName || "Unknown",
@@ -95,20 +79,15 @@ export default function CommunityChat({
             contents: newText.trim(),
             media: mediaUrl,
             timestamp: new Date().toISOString(),
-        }
+        };
 
-        // Optimistically add message to UI
-        setMessages((prevMessages) => [...(prevMessages || []), newMsg]);
-        // Send message to backend
-        await sendMessage(user.uid, newText.trim(), mediaUrl, otherId || other.user.uid, 1);
+        setMessages((prev) => [...(prev || []), newMsg]);
+
+        await sendMessage(user.uid, newText.trim(), mediaUrl, otherId, 1);
 
         setNewText("");
         setMediaFile(null);
         setMediaPreview(null);
-
-        const now = new Date();
-        const data = await getMessages(otherId || other.user.uid, 1, now, user?.uid);
-        setMessages(data.posts || []);
     }
 
     function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -119,47 +98,45 @@ export default function CommunityChat({
             const reader = new FileReader();
             reader.onloadend = () => setMediaPreview(reader.result as string);
             reader.readAsDataURL(file);
-        } else {
-            setMediaPreview(null);
-        }
+        } else setMediaPreview(null);
     }
 
     return (
-        <div className="flex flex-col h-screen p-4">
-            <div className="flex items-center gap-3 mb-4">
-                <h1 className="text-xl font-bold text-black">
+        <div className={Styles.dmPage}>
+            <div className={Styles.dmHeader}>
+                <h1 className={Styles.dmTitle}>
                     Direct Messages: {other?.user?.username || "Loading..."}
                 </h1>
-                <button onClick={() => window.history.back()} className="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600">
+                <button onClick={() => window.history.back()} className={Styles.returnButton}>
                     Return to Profile
                 </button>
             </div>
 
-            {/* Messages list */}
-            <div className="flex-1 overflow-y-auto border rounded p-3 bg-white text-black">
+            <div className={Styles.messagesBox}>
                 {messages === null ? (
                     <p>Loading messages...</p>
                 ) : messages.length === 0 ? (
                     <p>No messages yet.</p>
                 ) : (
-                    <ul className="space-y-3">
+                    <ul>
                         {messages.map((msg, index) => (
-                            <li key={index} className="p-2 bg-gray-100 rounded">
+                            <li key={index} className={Styles.messageItem}>
                                 <Image
                                     src={msg.authorIcon || "/default-profile.png"}
-                                    alt={"Profile picture of " + (msg.authorName || "Unknown")}
+                                    alt="Profile picture"
                                     width={40}
                                     height={40}
-                                    className="rounded-full"
+                                    className={Styles.messageAvatar}
                                 />
-                                <p className="text-sm font-semibold">{msg.authorName || "Loading..."}</p>
+                                <p className={Styles.messageAuthor}>{msg.authorName}</p>
                                 <p>{msg.contents}</p>
-                                <p className="text-xs text-gray-500">
+                                <p className={Styles.messageTimestamp}>
                                     {new Date(msg.timestamp).toLocaleString()}
                                 </p>
+
                                 {msg.media && (
-                                    <div className="mt-2">
-                                        <Image src={msg.media} alt="Media content" width={200} height={200} />
+                                    <div>
+                                        <Image src={msg.media} alt="Media" width={200} height={200} />
                                     </div>
                                 )}
                             </li>
@@ -168,36 +145,38 @@ export default function CommunityChat({
                 )}
             </div>
 
-            {/* Input bar */}
-            <div className="flex mt-4 gap-2 items-center">
+            <div className={Styles.inputRow}>
                 <input
                     type="text"
-                    className="flex-1 border rounded p-2"
+                    className={Styles.textInput}
                     value={newText}
                     onChange={(e) => setNewText(e.target.value)}
-                    placeholder={`Message ${other?.user?.username || "Unknown"}...`}
-                    style={{ color: "black" }}
+                    placeholder={`Message ${other?.user?.username || "User"}...`}
                     maxLength={512}
                 />
+
                 <input
                     type="file"
                     accept="image/*"
                     onChange={handleFileChange}
-                    className="border rounded p-2 bg-sky-300 text-gray-600 hover:bg-sky-400 cursor-pointer"
+                    className={Styles.fileInput}
                 />
-                <button
-                    onClick={handleSend}
-                    className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                >
+
+                <button onClick={handleSend} className={Styles.sendButton}>
                     Send
                 </button>
             </div>
 
-            {/* Preview */}
             {mediaPreview && (
-                <div className="mt-2">
-                    <p className="text-sm text-gray-500">Preview:</p>
-                    <Image src={mediaPreview} alt="Preview" width={200} height={200} className="rounded" />
+                <div className={Styles.previewBox}>
+                    <p className={Styles.previewLabel}>Preview:</p>
+                    <Image
+                        src={mediaPreview}
+                        alt="Preview"
+                        width={200}
+                        height={200}
+                        className={Styles.previewImage}
+                    />
                 </div>
             )}
         </div>

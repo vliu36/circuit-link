@@ -1,0 +1,172 @@
+.dmPage {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 1rem;
+}
+
+/* Header */
+.dmHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 1rem;
+}
+
+.dmTitle {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: black;
+}
+
+.returnButton {
+    padding: 6px 12px;
+    background-color: #22c55e;
+    color: white;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+.returnButton:hover {
+    background-color: #16a34a;
+}
+
+/* Messages container */
+.messagesBox {
+    flex: 1;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 12px;
+    background-color: white;
+    color: black;
+}
+
+/* Each message bubble */
+.messageItem {
+    background-color: #f3f3f3;
+    padding: 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+
+    /* Wrapping */
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+}
+
+/* Avatar */
+.messageAvatar {
+    border-radius: 9999px;
+}
+
+/* Name */
+.messageAuthor {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+/* Timestamp */
+.messageTimestamp {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 2px;
+}
+
+/* Input Row */
+.inputRow {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    align-items: center;
+}
+
+.textInput {
+    flex: 1;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px;
+    color: black;
+}
+
+.fileInput {
+    border: 1px solid #ccc;
+    background-color: #7dd3fc;
+    padding: 8px;
+    color: #4b5563;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: 0.15s;
+}
+
+.fileInput:hover {
+    background-color: #38bdf8;
+}
+
+.sendButton {
+    padding: 8px 14px;
+    background-color: #2563eb;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.15s;
+}
+
+.sendButton:hover {
+    background-color: #1d4ed8;
+}
+
+/* Preview */
+.previewBox {
+    margin-top: 12px;
+}
+
+.previewLabel {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.previewImage {
+    border-radius: 8px;
+    margin-top: 6px;
+}
+
+@media only screen and (max-width: 768px) {
+    .inputRow {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        align-items: center;
+    }
+
+    .textInput {
+        flex: 1;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 0.5rem;
+        width: 100%;
+        color: black;
+    }
+
+    .fileInput {
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        padding: 0.4rem;
+        background: #7dd3fc;
+        color: #4b5563;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .sendButton {
+        padding: 0.5rem 1rem;
+        background: #2563eb;
+        color: white;
+        border-radius: 6px;
+        cursor: pointer;
+        width: 100%;
+    }
+}
