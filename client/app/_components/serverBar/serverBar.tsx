@@ -265,6 +265,31 @@ export default function ServerBar({
       return;
     }
 
+    // Verify name length
+    if (name.length < 1 || name.length > 24) {
+      setForumInputs((prev) => ({
+        ...prev,
+        [groupId]: {
+          ...prev[groupId],
+          message: "Name must be between 1 and 24 characters",
+        },
+      }));
+      return;
+    }
+    // Verify name characters
+    const nameRegex = /^[a-zA-Z0-9_-]+$/;
+    if (!nameRegex.test(name)) {
+      setForumInputs((prev) => ({
+        ...prev,
+        [groupId]: {
+          ...prev[groupId],
+          message: "Name can only contain letters, numbers, underscores, and hyphens",
+        },
+      }));
+      return;
+    }
+    
+
     const slug = await commApi.createForum({
       name,
       description,
@@ -433,6 +458,8 @@ export default function ServerBar({
 
             <input
               type="text"
+              maxLength={24}
+              minLength={1}
               className={styles.inputField}
               placeholder="Forum Name"
               value={forumInputs[activeGroupId]?.name || ""}
@@ -449,6 +476,7 @@ export default function ServerBar({
 
             <input
               type="text"
+              maxLength={200}
               className={styles.inputField}
               placeholder="Forum Description"
               value={forumInputs[activeGroupId]?.description || ""}
@@ -462,7 +490,11 @@ export default function ServerBar({
                 }))
               }
             />
-
+            {forumInputs[activeGroupId]?.message && (
+              <p className={styles.errorText}>
+                {forumInputs[activeGroupId]?.message}
+              </p>
+            )}
             <button
               className={styles.saveBtn}
               onClick={() => onCreateForum(activeGroupId)}
