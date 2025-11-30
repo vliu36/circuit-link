@@ -34,7 +34,6 @@
     width: 32px;
     height: 32px;
     border-radius: 0.5em;
-    background: white;
     cursor: pointer;
 }
 
@@ -77,10 +76,11 @@
 
 /* Notification dropdown */
 .notifDropdownMenu {
-    width: 9em;
-    min-height: 9em;
+    width: 10em;
+    height: 15em;
     align-items: center;
     color: black;
+    overflow-y: auto;
 }
 
 /* Buttons inside dropdowns */
@@ -122,4 +122,14 @@
     width: 30px;
     text-align: center;
     color: rgb(51, 51, 51);
+}
+
+.redDot{
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: red;
+    position: absolute;
+    left: 25%;
+    bottom: 60%;
 }
