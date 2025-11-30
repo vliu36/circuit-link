@@ -4,7 +4,7 @@ import { Timestamp } from "firebase-admin/firestore";
 import admin from "firebase-admin";
 import { DocumentReference } from "firebase-admin/firestore";
 import * as forumUtils from "./_utils/forumUtils.ts";
-import { getUserIdFromSessionCookie, verifyUserIsOwnerOrMod } from "./_utils/generalUtils.ts";
+import { /*getUserIdFromSessionCookie,*/ verifyUserIsOwnerOrMod, getUserIdFromAuthHeader } from "./_utils/generalUtils.ts";
 import { getCommunityByName } from "./_utils/commUtils.ts";
 import { match } from "assert";
 
@@ -32,8 +32,9 @@ const getAllDocuments = async (req: Request, res: Response) => {
 const addDoc = async (req: Request, res: Response) => {
     try {
         const { name, description, groupId, commName } = req.body;
-        // Verify and get userId from session cookie
-        const userId = await getUserIdFromSessionCookie(req);
+        // Verify and get userId from auth header
+        const userId = await getUserIdFromAuthHeader(req);
+        console.log("User ID from auth header:", userId);
 
         // Generate slug from name
         const slug = name
@@ -58,6 +59,15 @@ const addDoc = async (req: Request, res: Response) => {
             return res.status(400).send({
                 status: "Bad Request",
                 message: "Forum already exists!",
+            });
+        }
+
+        // Check if the slug is named "chat" which is reserved
+        if (slug === "chat") {
+            console.log("Bad Request: Attempted to create forum with reserved name 'chat'");
+            return res.status(400).send({
+                status: "Bad Request",
+                message: 'Forum name cannot be "chat" as it is a reserved word.',
             });
         }
 
@@ -100,7 +110,7 @@ const addDoc = async (req: Request, res: Response) => {
 }; // end addDoc
 
 // Retrieves a specific forum and all its posts by its slug within a specified community
-const getForumBySlug = async (req: Request, res: Response) => {
+const getForumAndPostsBySlug = async (req: Request, res: Response) => {
     try {
         const { commName, forumSlug } = req.params;
         const { sortMode } = req.body; 
@@ -154,14 +164,58 @@ const getForumBySlug = async (req: Request, res: Response) => {
     }
 };
 
+// Get forum by slug within a community; returns forum reference and data
+const getForumDocBySlug = async (req: Request, res: Response) => {
+    try {
+        const { commName, forumSlug } = req.params;
+        // Get community by name
+        const { data: commData } = await getCommunityByName(commName);
+        // Find forum in that community 
+        const forumRef = await forumUtils.findForumRefInCommunity(commData, forumSlug);
+        if (!forumRef) {
+            return res.status(404).json({
+                status: "Not Found",
+                message: `Forum with slug "${forumSlug}" not found in community "${commName}".`,
+            });
+        }
+        // Retrieve forum data 
+        const forumSnap = await forumRef.get();
+        const forumData = forumSnap.data();
+        if (!forumData) {
+            return res.status(404).json({
+                status: "Not Found",
+                message: "Forum data could not be retrieved.",
+            });
+        }
+
+        // Return forum's parentGroup as id string
+        const parentGroupId = forumData.parentGroup ? (forumData.parentGroup as DocumentReference).id : null;
+        forumData.parentGroup = parentGroupId;
+
+        res.status(200).json({
+            status: "OK",
+            forum: {
+                id: forumSnap.id,
+                ...forumData,
+            },
+        });
+    } catch (err) {
+        console.error("Error fetching forum:", err);
+        res.status(500).json({
+            status: "Backend error",
+            message: err instanceof Error ? err.message : err,
+        });
+    }
+};
+
 // Deletes a forum, all its posts, and all replies listed in repliesInForum
 const deleteForum = async (req: Request, res: Response) => {
     try {
         const { forumId } = req.params;
         const { commName } = req.body;
 
-        // Verify and get userId from session cookie
-        const userId = await getUserIdFromSessionCookie(req);
+        // Verify and get userId from auth header
+        const userId = await getUserIdFromAuthHeader(req);
         if (!commName || !userId) {
             console.log("No community or user provided.");
             return res.status(400).send({
@@ -191,6 +245,16 @@ const deleteForum = async (req: Request, res: Response) => {
         console.log(`Confirmed user with ID ${userId} is authorized to delete forum in community "${commName}".`);
 
         const forumData = forumSnap.data();
+
+        // Check if forum is the only forum in the community's forum list
+        const forumsInComm: DocumentReference[] = commData.forumsInCommunity || [];
+        if (forumsInComm.length <= 1) {
+            console.log("Cannot delete the only forum in the community.");
+            return res.status(400).json({
+                status: "Bad Request",
+                message: "Cannot delete the only forum in the community.",
+            });
+        }
 
         // --- Delete all posts in the forum's postsInForum ---
         // Get all posts that belong to this forum
@@ -243,8 +307,8 @@ const editForum = async (req: Request, res: Response) => {
     try {
         const { forumId } = req.params;
         const { name, description }: { name?: string; description?: string } = req.body;
-        // Verify and get userId from session cookie
-        const userId = await getUserIdFromSessionCookie(req);
+        // Verify and get userId from auth header
+        const userId = await getUserIdFromAuthHeader(req);
         if (!userId) {
             console.log("No user provided.");
             return res.status(400).send({
@@ -363,7 +427,8 @@ const searchForum = async (req: Request, res: Response) => {
 export {
     getAllDocuments,
     addDoc,
-    getForumBySlug,
+    getForumAndPostsBySlug,
+    getForumDocBySlug,
     deleteForum,
     editForum,
     searchForum

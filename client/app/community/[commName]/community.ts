@@ -1,6 +1,6 @@
 const BASE_URL = "http://localhost:2400/api"; // adjust as needed
 import { uploadImage } from "@/app/_utils/mediaUpload.ts";
-import { Community } from "../../_types/types.ts";
+import { Community, Group } from "../../_types/types.ts";
 import { updateProfile } from "firebase/auth/web-extension";
 import { doc, updateDoc, getDoc} from "firebase/firestore";
 import { auth, db } from "@/app/_firebase/firebase.ts";
@@ -30,7 +30,7 @@ export async function fetchStructure(communityName: string): Promise<Community |
 
         return data.community as Community;
     } catch (err) {
-        console.error(err);
+        console.log(err);
         return null;
     } // end try catch
 } // end fetchStructure
@@ -38,16 +38,17 @@ export async function fetchStructure(communityName: string): Promise<Community |
 // Create a group in the current community
 export async function createGroup( commName: string, name: string): Promise<{ status: string; message: string }> {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/comm/create-group`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
             },
             body: JSON.stringify({
                 commName,
                 name,
             }),
-            credentials: "include",
         });
 
         const data = await res.json();
@@ -63,7 +64,7 @@ export async function createGroup( commName: string, name: string): Promise<{ st
         console.log("Group created successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error creating group:", err);
+        console.log("Error creating group:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error.",
@@ -74,16 +75,19 @@ export async function createGroup( commName: string, name: string): Promise<{ st
 // Delete a group by its ID
 export async function deleteGroup(groupId: string, commName: string): Promise<{ status: string; message: string }> {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/comm/delete-group/${groupId}`, {
             method: "DELETE",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
             body: JSON.stringify({ commName }),
-            credentials: "include"
         });
         const data = await res.json();
 
         if (!res.ok) {
-            console.error("Failed to delete group:", data.message);
+            console.log("Failed to delete group:", data.message);
             return {
                 status: "error",
                 message: data.message || "Failed to delete group.",
@@ -93,7 +97,7 @@ export async function deleteGroup(groupId: string, commName: string): Promise<{ 
         console.log("Group deleted successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error deleting group:", err);
+        console.log("Error deleting group:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error.",
@@ -104,13 +108,14 @@ export async function deleteGroup(groupId: string, commName: string): Promise<{ 
 // Create a forum in a specified group within a community
 export async function createForum({ name, description, groupId, commName, }: CreateForumParams): Promise<string> {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/forums/create`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
             },
             body: JSON.stringify({ name, description, groupId, commName }),
-            credentials: "include",
         }); 
     
         const data = await res.json();
@@ -121,26 +126,28 @@ export async function createForum({ name, description, groupId, commName, }: Cre
 
         return data.newSlug; // return the newly created forum's ID
     } catch (err) {
-        console.error("Error creating forum:", err);
-        throw err;
+        console.log("Error creating forum:", err);
+        // throw err;
+        return "";
     } // end try catch
 } // end createForum
 
 // Delete a forum by its ID
 export async function deleteForum(forumId: string, commName: string): Promise<{ status: string; message: string }> {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/forums/delete/${forumId}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
             },
             body: JSON.stringify({ commName }),
-            credentials: "include",
         });
         const data = await res.json();
 
         if (!res.ok) {
-            console.error("Failed to delete forum:", data.message);
+            console.warn("Failed to delete forum:", data.message);
             return {
                 status: "error",
                 message: data.message || "Failed to delete forum.",
@@ -149,7 +156,7 @@ export async function deleteForum(forumId: string, commName: string): Promise<{ 
         console.log("Forum deleted successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error deleting forum:", err);
+        console.log("Error deleting forum:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error.",
@@ -160,12 +167,13 @@ export async function deleteForum(forumId: string, commName: string): Promise<{ 
 // Delete the community
 export async function deleteCommunity(commName: string) {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/comm/delete/${commName}`, {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
             },
-            credentials: "include", // include the cookie
         });
         const data = await res.json();
         if (!res.ok) {
@@ -176,18 +184,22 @@ export async function deleteCommunity(commName: string) {
         window.location.href = "/landing";
         return;
     } catch (err) {
-        console.error("Error deleting community: ", err);
-        throw err;
+        console.log("Error deleting community: ", err);
+        // throw err;
+        return;
     } // end try catch
 } // end deleteCommunity
 
 // Join the community
 export async function joinCommunity(commName: string): Promise<{ status: string; message: string }> {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/comm/join/${commName}`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
         });
 
         const data = await res.json();
@@ -196,7 +208,7 @@ export async function joinCommunity(commName: string): Promise<{ status: string;
         console.log("Joined community successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error joining community:", err);
+        console.log("Error joining community:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error",
@@ -207,10 +219,13 @@ export async function joinCommunity(commName: string): Promise<{ status: string;
 // Leave the community
 export async function leaveCommunity(commName: string): Promise<{ status: string; message: string }> {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/comm/leave/${commName}`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
         });
 
         const data = await res.json();
@@ -226,7 +241,7 @@ export async function leaveCommunity(commName: string): Promise<{ status: string
         console.log("Left community successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error leaving community:", err);
+        console.log("Error leaving community:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error",
@@ -237,10 +252,13 @@ export async function leaveCommunity(commName: string): Promise<{ status: string
 // Promote a user to moderator
 export async function promoteToMod(commName: string, userId: string): Promise<{ status: string; message: string }> {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/comm/promote-mod/${commName}`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
             body: JSON.stringify({ userId }),
         });
 
@@ -250,7 +268,7 @@ export async function promoteToMod(commName: string, userId: string): Promise<{ 
         console.log("User promoted to mod successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error promoting to mod:", err);
+        console.log("Error promoting to mod:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error",
@@ -261,10 +279,13 @@ export async function promoteToMod(commName: string, userId: string): Promise<{ 
 // Demote a user from moderator
 export async function demoteMod(commName: string, userId: string): Promise<{ status: string; message: string }> {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/comm/demote-mod/${commName}`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
             body: JSON.stringify({ userId }),
         });
 
@@ -274,7 +295,7 @@ export async function demoteMod(commName: string, userId: string): Promise<{ sta
         console.log("User demoted from mod successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error demoting mod:", err);
+        console.log("Error demoting mod:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error",
@@ -285,10 +306,13 @@ export async function demoteMod(commName: string, userId: string): Promise<{ sta
 // Promote a user to owner
 export async function promoteToOwner(commName: string, userId: string): Promise<{ status: string; message: string }> {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/comm/promote-owner/${commName}`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
             body: JSON.stringify({ userId }),
         });
 
@@ -298,7 +322,7 @@ export async function promoteToOwner(commName: string, userId: string): Promise<
         console.log("User promoted to owner successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error promoting to owner:", err);
+        console.log("Error promoting to owner:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error",
@@ -309,10 +333,13 @@ export async function promoteToOwner(commName: string, userId: string): Promise<
 // Demote a user from owner
 export async function demoteOwner(commName: string, userId: string): Promise<{ status: string; message: string }> {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/comm/demote-owner/${commName}`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
             body: JSON.stringify({ userId }),
         });
 
@@ -322,7 +349,7 @@ export async function demoteOwner(commName: string, userId: string): Promise<{ s
         console.log("User demoted from owner successfully:", data);
         return data;
     } catch (err) {
-        console.error("Error demoting owner:", err);
+        console.log("Error demoting owner:", err);
         return {
             status: "error",
             message: err instanceof Error ? err.message : "Unknown error",
@@ -339,10 +366,13 @@ export async function editCommunity(
     rules?: string               // new rules for the community (optional)
 ): Promise<{ status: string; message: string }> {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/comm/edit/${commName}`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
             body: JSON.stringify({ newName, description, isPublic, rules }),
         });
         const data = await res.json();
@@ -372,10 +402,13 @@ export async function editGroup(
     newName: string
 ): Promise<{ status: string; message: string }> {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/comm/edit-group/${groupId}`, {
             method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
             body: JSON.stringify({ commName, newName }),
         });
         const data = await res.json();
@@ -416,8 +449,12 @@ export async function changeCommunityIcon(file: File, commId: string) {
         return publicUrl;
 
     } catch (error) {
-        console.error("Error uploading profile picture:", error);
-        throw error;
+        console.log("Error uploading profile picture:", error);
+        // throw error;
+        return {
+            status: "error",
+            message: error instanceof Error ? error.message : "Unknown error",
+        }
     }
 }
 
@@ -439,18 +476,25 @@ export async function changeCommunityBanner(file: File, commId: string) {
         return publicUrl;
 
     } catch (error) {
-        console.error("Error uploading profile picture:", error);
-        throw error;
+        console.log("Error uploading profile picture:", error);
+        // throw error;
+        return {
+            status: "error",
+            message: error instanceof Error ? error.message : "Unknown error",
+        };
     }
 }
 
 // Fetch community blacklisted users
 export async function fetchBlacklistedUsers(commName: string): Promise<string[] | null> {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/comm/blacklist/${commName}`, {
             method: "GET",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
         });
         const data = await res.json();
         if (!res.ok) {
@@ -467,10 +511,13 @@ export async function fetchBlacklistedUsers(commName: string): Promise<string[] 
 // Kick a member from the community
 export async function kickMember(commName: string, userId: string): Promise<{ status: string; message: string }> {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/comm/kick-user`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
             body: JSON.stringify({ userId, commName }),
         });
         const data = await res.json();
@@ -495,10 +542,13 @@ export async function kickMember(commName: string, userId: string): Promise<{ st
 // Ban a member from the community
 export async function banMember(commName: string, userId: string): Promise<{ status: string; message: string }> {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/comm/ban-user`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
             body: JSON.stringify({ userId, commName }),
         });
         const data = await res.json();
@@ -523,10 +573,13 @@ export async function banMember(commName: string, userId: string): Promise<{ sta
 // Unban a member from the community
 export async function unbanMember(commName: string, userId: string): Promise<{ status: string; message: string }> {
     try {
+        const idToken = await auth.currentUser?.getIdToken();
         const res = await fetch(`${BASE_URL}/comm/unban-user`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include",
+            headers: { 
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${idToken}`,
+            },
             body: JSON.stringify({ userId, commName }),
         });
         const data = await res.json();
@@ -555,7 +608,7 @@ export async function ensureDefaultGroup(commName: string) {
         const commSnap = await getDoc(commRef);
 
         if (!commSnap.exists()) {
-            console.error("Community not found:", commName);
+            console.log("Community not found:", commName);
             return null;
         }
 
@@ -564,7 +617,7 @@ export async function ensureDefaultGroup(commName: string) {
 
         // If "general" already exists → return it
         const existing = groups.find(
-            (g: any) => g.name.toLowerCase() === "general"
+            (g: Group) => g.name.toLowerCase() === "general"
         );
         if (existing) return existing;
 
@@ -585,7 +638,7 @@ export async function ensureDefaultGroup(commName: string) {
         console.log("Default general group created.");
         return newGroup;
     } catch (err) {
-        console.error("Error ensuring default group:", err);
+        console.log("Error ensuring default group:", err);
         return null;
     }
 }

@@ -2,7 +2,7 @@ import { db } from "../firebase.ts"
 import { Request, Response } from "express"
 import { FieldValue, DocumentReference, Timestamp } from "firebase-admin/firestore";
 import { fetchRepliesRecursively, Post, deleteNestedRepliesRecursive, getPostForumAndGroup } from "./_utils/postUtils.ts";
-import { getUserIdFromSessionCookie } from "./_utils/generalUtils.ts";
+import { /*getUserIdFromSessionCookie*/ getUserIdFromAuthHeader } from "./_utils/generalUtils.ts";
 import { getCommunityByName } from "./_utils/commUtils.ts";
 import { isUserAuthorizedToDeleteDoc } from "./_utils/generalUtils.ts";
 
@@ -70,7 +70,7 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
             media       // Optional media URL
         } = req.body;
 
-        const authorId = await getUserIdFromSessionCookie(req);
+        const authorId = await getUserIdFromAuthHeader(req);
 
         const authorRef = db.doc(`/Users/${authorId}`);
         const postsRef = db.collection("Posts");
@@ -148,7 +148,7 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
 const editDoc = async (req: Request, res: Response) => {
     try {
         const postId = req.params.id;
-        const userId = await getUserIdFromSessionCookie(req);
+        const userId = await getUserIdFromAuthHeader(req);
         
         const postRef = db.collection("Posts").doc(postId);
         const postDoc = await postRef.get();
@@ -212,7 +212,7 @@ const editDoc = async (req: Request, res: Response) => {
 const deleteDoc = async (req: Request, res: Response) => {
     try {
         const postId = req.params.id;   // id of the post being deleted
-        const userId = await getUserIdFromSessionCookie(req);
+        const userId = await getUserIdFromAuthHeader(req);
         const commName = req.body.commName; // the community this post belongs to
 
         const postRef = db.collection("Posts").doc(postId);
@@ -288,7 +288,7 @@ const votePost = async (req: Request, res: Response) => {
                 message: "Invalid vote type" 
             });
         }
-        const userId = await getUserIdFromSessionCookie(req);
+        const userId = await getUserIdFromAuthHeader(req);
 
         const postRef = db.collection("Posts").doc(id);
 

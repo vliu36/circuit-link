@@ -268,10 +268,10 @@ export default function ForumPage({
                 setCommunity(updated);
             } else {
                 // TODO: This causes an error when changing the community name; refreshing returns no data because the old name is used
-                console.error("Failed to refresh community: no data returned");
+                console.log("Failed to refresh community: no data returned");
             }
         } catch (err) {
-            console.error("Error refreshing community:", err);
+            console.log("Error refreshing community:", err);
         }
     };
 
@@ -285,6 +285,10 @@ export default function ForumPage({
                 reroute = true;
             }
             const result = await commApi.deleteForum(forumId, commName);
+            if (!result || result.status === "error") {
+                setError(result?.message || "Failed to delete forum.");
+                return;
+            }
             console.log("Forum deleted successfully:", result);
 
             // Reroute user to community main page after deleting the forum, or refresh community structure
@@ -294,7 +298,8 @@ export default function ForumPage({
                 await refreshCommunity();
             }
         } catch (err) {
-            console.error("Error deleting forum:", err);
+            console.warn("Error deleting forum:", err);
+            setError("Error deleting forum: " + (err instanceof Error ? err.message : ""));
         }
     };
 
@@ -360,20 +365,32 @@ export default function ForumPage({
         if (!title || !contents) return alert("Please fill out title and contents");
 
         try {
-
+            let media: string | null = null;
             const res = await getMediaUrl(mediaFile);
-            const mediaUrl = res.media || null;
+            if (res.status == "error") {                    // If error occurred during media upload, throw an error to stop process
+                setError(res.message);
+                throw new Error(res.message);
+            } else if (res.status == "ok") {                // If media upload successful, get the media URL
+                console.log("Media uploaded successfully:", res.media);
+                media = res.media;
+            } else if (res.status == "no_media") {          // If no media file provided, set mediaUrl to null
+                console.log("No media file provided.");
+                media = null;
+            } else {
+                setError("Unexpected response during media upload.");
+                throw new Error("Unexpected response during media upload.");
+            }
 
             const msg = await createPost(
-                // user.uid, // ! DEPRECATED - now derived from session cookie
                 title,
                 contents,
                 commName,
                 forumSlug,
-                mediaUrl,
+                media,
             );
 
             console.log(msg);
+            toggleCreatePostPopup();
             setTitle("");
             setContents("");
             setMediaFile(null);
@@ -385,9 +402,11 @@ export default function ForumPage({
         } catch (err) {
             console.log(err);
             if (err instanceof Error) {
-                alert(`Failed to add post: ${err.message}`);
+                // alert(`Failed to add post: ${err.message}`);
+                setError(`Failed to add post: ${err.message}`);
             } else {
-                alert("Failed to add post due to an unknown error.");
+                // alert("Failed to add post due to an unknown error.");
+                setError("Failed to add post due to an unknown error.");
             }
         }
     };
@@ -655,7 +674,7 @@ export default function ForumPage({
     return (
         <main>
             <div className={styles.background}>
-                <div style={{ gridArea: "NavBar" }}>
+                <div className={styles.navBox} style={{ gridArea: "NavBar" }}>
                     <NavBar />
                 </div>
 
@@ -735,12 +754,14 @@ export default function ForumPage({
                                     style={{ height: "120px" }}
                                 />
 
+                                {/* Message */}
+                                {error && <p className={styles.errorText}>{error}</p>}
+
                                 {/* Submit Button */}
                                 <button
                                     className={`${styles.saveBtn} ${styles.popupText}`}
                                     onClick={async () => {
                                         await handleAddPost();
-                                        toggleCreatePostPopup();
                                     }}
                                 >
                                     Add Post
@@ -799,8 +820,8 @@ export default function ForumPage({
                                         <Image
                                             src={community.icon}
                                             alt="Community Icon"
-                                            width={150}
-                                            height={150}
+                                            width={100}
+                                            height={100}
                                             className={styles.serverIcon}
                                         />
                                     </button>
@@ -809,8 +830,8 @@ export default function ForumPage({
                                     <Image
                                         src={community.icon}
                                         alt="Community Icon"
-                                        width={150}
-                                        height={150}
+                                        width={100}
+                                        height={100}
                                         className={styles.serverIcon}
                                     />
                                 )}
@@ -818,7 +839,6 @@ export default function ForumPage({
                             <div className={styles.titleText}>
                                 {commName}
                                 {/* Button that toggles edit forum popup */}
-                                {isOwner || isMod ? (
                                 <button className={styles.editForumButton} onClick={() => setEditPopup(true)}>
                                     <Image
                                         src={editButton}
@@ -827,9 +847,6 @@ export default function ForumPage({
                                         alt="edit"
                                     />
                                 </button>
-                                ) : (
-                                    <div></div>
-                                )}
                                 {/* Show link to chat if user is member */}
                                 {isMember && (
                                     <button className={styles.chatLink}>
@@ -1030,21 +1047,27 @@ export default function ForumPage({
 
 
                                                     </div>
-
-                                                    <div className={styles.commentsBox}>
-                                                        <div className={styles.commentIcon} style={{ gridArea: "icon" }}>
-                                                            <Image
-                                                                src={commentIcon}
-                                                                width={50}
-                                                                height={50}
-                                                                alt="commentIcon"
-                                                            />
+                                                    
+                                                    <Link href={`/community/${commName}/${forumSlug}/${post.id}`} className={styles.commentsBox}>
+                                                        <div className={styles.commentsBox}>
+                                                            <div className={styles.commentIcon} style={{ gridArea: "icon" }}>
+                                                                {/* <Link href={`/community/${commName}/${forumSlug}/${post.id}`}> */}
+                                                                    <Image
+                                                                        src={commentIcon}
+                                                                        width={50}
+                                                                        height={50}
+                                                                        alt="commentIcon"
+                                                                        style={{ cursor: "pointer" }}
+                                                                    />
+                                                                {/* </Link> */}
+                                                            </div>
+                                                            <div className={styles.ratioScore} style={{ gridArea: "ratio" }}>
+                                                                {/* <Link href={`/community/${commName}/${forumSlug}/${post.id}`}> */}
+                                                                    {post.replyCount}
+                                                                {/* </Link> */}
+                                                            </div>
                                                         </div>
-                                                        <div className={styles.ratioScore} style={{ gridArea: "ratio" }}>
-                                                            {post.replyCount}
-                                                        </div>
-
-                                                    </div>
+                                                    </Link>
                                                     {/* Report button */}
                                                     <div className={styles.utilButtons}>
                                                         <button
@@ -1056,8 +1079,8 @@ export default function ForumPage({
                                                         >
                                                             <Image
                                                                 src={reportIcon}
-                                                                height={30}
-                                                                width={30}
+                                                                height={20}
+                                                                width={20}
                                                                 alt="edit"
                                                             />
                                                         </button>
@@ -1077,8 +1100,8 @@ export default function ForumPage({
                                                             >
                                                                 <Image
                                                                     src={editButton}
-                                                                    height={30}
-                                                                    width={30}
+                                                                    height={20}
+                                                                    width={20}
                                                                     alt="edit"
                                                                 />
                                                             </button>
@@ -1096,8 +1119,8 @@ export default function ForumPage({
                                                             >
                                                                 <Image
                                                                     src={trashBin}
-                                                                    height={30}
-                                                                    width={30}
+                                                                    height={20}
+                                                                    width={20}
                                                                     alt="edit"
                                                                 />
                                                             </button>
@@ -1193,8 +1216,9 @@ export default function ForumPage({
                     <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
                         <h2 className={styles.popupText}>Confirm Delete Forum</h2>
                         <p className={styles.popupText}>Are you sure you want to delete forum &quot;{deleteForumName}&quot;? <br /> This action cannot be undone.</p>
+                        {error && <p className={styles.errorText}>{error}</p>}
                         <button onClick={toggleConfirmDeleteForum} className={styles.cancelButton}>Cancel</button>
-                        <button onClick={() => { handleDeleteForum(deleteForumId); toggleConfirmDeleteForum(); }} className={styles.deleteButtonPopup}>Delete</button>
+                        <button onClick={() => {handleDeleteForum(deleteForumId)}} className={styles.deleteButtonPopup}>Delete</button>
                     </div>
                 </div>
             )}

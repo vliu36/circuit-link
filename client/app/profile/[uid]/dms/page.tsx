@@ -5,7 +5,8 @@ import { sendMessage, getMessages, getMediaUrl } from "@/app/_utils/messaging.ts
 import { useAuth } from "@/app/_firebase/context";
 import Image from "next/image";
 import Link from "next/link";
-import { fetchUserById } from "../userProfile";
+import { fetchUserById, OtherUserData } from "../userProfile";
+import { Message } from "@/app/_types/types";
 
 export default function CommunityChat({
     params,
@@ -14,14 +15,14 @@ export default function CommunityChat({
 }) {
     const { uid } = use(params);
     const { user } = useAuth();
-    const [messages, setMessages] = useState<any[] | null>(null);
+    const [messages, setMessages] = useState<Message[] | null>(null);
     const [loadingUser, setLoadingUser] = useState(true);
     const [loadingMessages, setLoadingMessages] = useState(true);
     const [newText, setNewText] = useState("");
     const [mediaFile, setMediaFile] = useState<File | null>(null);
     const [mediaPreview, setMediaPreview] = useState<string | null>(null);
     const [otherId, setOtherId] = useState<string | null>(null);
-    const [other, setOther] = useState<any | null>(null);
+    const [other, setOther] = useState<OtherUserData | null>(null);
     const [error, setError] = useState<string | null>(null);
 
     // Load other user info
@@ -76,6 +77,8 @@ export default function CommunityChat({
     async function handleSend() {
         if (!newText.trim() && !mediaFile) return;
         if (!user) return;
+        if (!otherId) return;
+        if (!other) return;
 
         // Upload media if present
         let mediaUrl = null;
@@ -91,20 +94,20 @@ export default function CommunityChat({
             authorIcon: user.photoURL || "/default-profile.png",
             contents: newText.trim(),
             media: mediaUrl,
-            timeStamp: Date.now(),
+            timestamp: new Date().toISOString(),
         }
 
         // Optimistically add message to UI
         setMessages((prevMessages) => [...(prevMessages || []), newMsg]);
         // Send message to backend
-        await sendMessage(user.uid, newText.trim(), mediaUrl, otherId || other?.uid, 1);
+        await sendMessage(user.uid, newText.trim(), mediaUrl, otherId || other.user.uid, 1);
 
         setNewText("");
         setMediaFile(null);
         setMediaPreview(null);
 
         const now = new Date();
-        const data = await getMessages(otherId || other?.uid, 1, now, user?.uid);
+        const data = await getMessages(otherId || other.user.uid, 1, now, user?.uid);
         setMessages(data.posts || []);
     }
 
@@ -152,7 +155,7 @@ export default function CommunityChat({
                                 <p className="text-sm font-semibold">{msg.authorName || "Loading..."}</p>
                                 <p>{msg.contents}</p>
                                 <p className="text-xs text-gray-500">
-                                    {new Date(msg.timestamp).toLocaleTimeString()}
+                                    {new Date(msg.timestamp).toLocaleString()}
                                 </p>
                                 {msg.media && (
                                     <div className="mt-2">

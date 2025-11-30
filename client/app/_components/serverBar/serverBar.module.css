@@ -162,3 +162,39 @@
     background-color: #d4deff;
     border-radius: 1em;
 }
+
+.cancelButton {
+    background-color: #888;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-right: 1rem;
+}
+
+.cancelButton:hover {
+    background-color: #666;
+}
+
+.deleteButtonPopup {
+    background-color: #d9534f;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-left: 1rem;
+}
+
+.deleteButtonPopup:hover {
+    background-color: #c9302c;
+}
+
+.errorText {
+    color: orangered;
+    margin-bottom: 1rem;
+    font-family: Inria Sans;
+}

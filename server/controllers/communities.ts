@@ -33,7 +33,7 @@ const addDoc = async (req: Request, res: Response) => {
 
         // ! DEPRECATED: Use ID token from Authorization header instead of session cookie
         // // Get userId from sessionCookie
-        // const userId = await genUtil.getUserIdFromSessionCookie(req);
+        // const userId = await genUtil.getUserIdFromAuthHeader(req);
 
         // Get userId from ID token in Authorization header
         const idToken = req.headers.authorization?.split("Bearer ")[1];
@@ -149,8 +149,8 @@ const createGroup = async (req: Request, res: Response) => {
     try {
         const { commName, name } = req.body;
 
-        // Verify and get userId from session cookie
-        const userId = await genUtil.getUserIdFromSessionCookie(req);
+        // Verify and get userId from auth header
+        const userId = await genUtil.getUserIdFromAuthHeader(req);
 
         const commsRef = db.collection("Communities");
         const commSnap = await commsRef.where("nameLower", "==", commName.toLowerCase()).get();
@@ -204,8 +204,8 @@ const deleteGroup = async (req: Request, res: Response) => {
         const { groupId } = req.params;
         const { commName } = req.body;
 
-        // Verify and get userId from session cookie
-        const userId = await genUtil.getUserIdFromSessionCookie(req);
+        // Verify and get userId from auth header
+        const userId = await genUtil.getUserIdFromAuthHeader(req);
 
         if (!commName || !userId) {
             console.log("No community or user provided.");
@@ -234,6 +234,16 @@ const deleteGroup = async (req: Request, res: Response) => {
         console.log(`Confirmed user with ID ${userId} is authorized to delete community "${commName}".`);
 
         const groupData = groupSnap.data();
+
+        // Check if the group is the only group in the community
+        const groupsInCommunity: FirebaseFirestore.DocumentReference[] = commData.groupsInCommunity || [];
+        if (groupsInCommunity.length <= 1) {
+            console.log("Cannot delete the only group in the community.");
+            return res.status(400).json({
+                status: "Bad Request",
+                message: "Cannot delete the only group in the community.",
+            });
+        }
 
         // --- Delete all group children ---
         console.log("Deleting forums, posts, and replies within group...");
@@ -273,8 +283,8 @@ const joinCommunity = async (req: Request, res: Response) => {
     try {
         const { name } = req.params;
 
-        // Verify and get userId from session cookie
-        const userId = await genUtil.getUserIdFromSessionCookie(req);
+        // Verify and get userId from auth header
+        const userId = await genUtil.getUserIdFromAuthHeader(req);
         if (!name || !userId) {
             console.log("Missing community name or user ID in request.");
             return res.status(400).send({
@@ -325,8 +335,8 @@ const leaveCommunity = async (req: Request, res: Response) => {
     try {
         const { name } = req.params;
 
-        // Verify and get userId from session cookie
-        const userId = await genUtil.getUserIdFromSessionCookie(req);
+        // Verify and get userId from auth header
+        const userId = await genUtil.getUserIdFromAuthHeader(req);
         if (!name || !userId) {
             console.log("Missing community name or user ID in request.");
             return res.status(400).send({
@@ -376,8 +386,8 @@ const deleteDoc = async (req: Request, res: Response) => {
         // const { userId } = req.body;
         const { name } = req.params;
 
-        // Verify and get userId from session cookie
-        const userId = await genUtil.getUserIdFromSessionCookie(req);
+        // Verify and get userId from auth header
+        const userId = await genUtil.getUserIdFromAuthHeader(req);
         if (!name || !userId) {
             console.log("No community or user provided.");
             return res.status(400).send({
@@ -447,8 +457,8 @@ const promoteToMod = async (req: Request, res: Response) => {
         const { name } = req.params;
         const { userId: targetId } = req.body; // This is the uid of the user being promoted.
 
-        // Verify and get userId from session cookie
-        const ownerId = await genUtil.getUserIdFromSessionCookie(req);
+        // Verify and get userId from auth header
+        const ownerId = await genUtil.getUserIdFromAuthHeader(req);
         if (!name || !targetId) {
             return res.status(400).send({ message: "Missing community name or target user ID" });
         }
@@ -491,8 +501,8 @@ const demoteMod = async (req: Request, res: Response) => {
         const { name } = req.params;
         const { userId: targetId } = req.body; // UID of the user being demoted
 
-        // Verify and get owner UID from session cookie
-        const ownerId = await genUtil.getUserIdFromSessionCookie(req);
+        // Verify and get owner UID from auth header
+        const ownerId = await genUtil.getUserIdFromAuthHeader(req);
 
         if (!name || !targetId) {
             return res.status(400).send({ message: "Missing community name or target user ID" });
@@ -535,8 +545,8 @@ const promoteToOwner = async (req: Request, res: Response) => {
         const { name } = req.params;
         const { userId: targetId } = req.body; // UID of the user being promoted
 
-        // Verify session cookie
-        const ownerId = await genUtil.getUserIdFromSessionCookie(req);
+        // Verify auth header
+        const ownerId = await genUtil.getUserIdFromAuthHeader(req);
 
         if (!name || !targetId) {
             return res.status(400).send({ message: "Missing community name or target user ID" });
@@ -579,8 +589,8 @@ const demoteOwner = async (req: Request, res: Response) => {
         const { name } = req.params;
         const { userId: targetId } = req.body; // UID of the owner being demoted
 
-        // Verify session cookie
-        const ownerId = await genUtil.getUserIdFromSessionCookie(req);
+        // Verify auth header
+        const ownerId = await genUtil.getUserIdFromAuthHeader(req);
         if (!name || !targetId) {
             return res.status(400).send({ message: "Missing community name or target user ID" });
         }
@@ -680,8 +690,8 @@ const kickUser = async (req: Request, res: Response) => {
     try {
         const { userId: targetId, commName } = req.body; // UID of the user being kicked
         console.log("Received kick request for user ID:", targetId, "from community:", commName);
-        // Verify and get userId from session cookie
-        const requesterId = await genUtil.getUserIdFromSessionCookie(req); // UID of the user making the request; must be owner or mod
+        // Verify and get userId from auth header
+        const requesterId = await genUtil.getUserIdFromAuthHeader(req); // UID of the user making the request; must be owner or mod
         if (!commName || !targetId) {
             return res.status(400).send({ message: "Missing community name or target user ID" });
         }
@@ -706,7 +716,7 @@ const banUser = async (req: Request, res: Response) => {
         
         const { userId: targetId, commName } = req.body; // UID of the user being banned
         // Verify and get userId from session cookie
-        const requesterId = await genUtil.getUserIdFromSessionCookie(req); // UID of the user making the request; must be owner or mod
+        const requesterId = await genUtil.getUserIdFromAuthHeader(req); // UID of the user making the request; must be owner or mod
         console.log("Received ban request for user ID:", targetId, "from community:", commName);
         
         // Kick the user first
@@ -736,8 +746,8 @@ const banUser = async (req: Request, res: Response) => {
 const unbanUser = async (req: Request, res: Response) => {
     try {
         const { userId: targetId, commName } = req.body; // UID of the user being unbanned
-        // Verify and get userId from session cookie
-        const requesterId = await genUtil.getUserIdFromSessionCookie(req); // UID of the user making the request; must be owner or mod
+        // Verify and get userId from auth header
+        const requesterId = await genUtil.getUserIdFromAuthHeader(req); // UID of the user making the request; must be owner or mod
         if (!commName || !targetId) {
             return res.status(400).send({ message: "Missing community name or target user ID" });
         }
@@ -795,8 +805,8 @@ const getBlacklist = async (req: Request, res: Response) => {
 const reportPost = async (req: Request, res: Response) => {
     try {
         const { commName, postId, reason } = req.body;
-        // Verify and get userId from session cookie
-        const reporterId = await genUtil.getUserIdFromSessionCookie(req);
+        // Verify and get userId from auth header
+        const reporterId = await genUtil.getUserIdFromAuthHeader(req);
         if (!commName || !postId || !reason) {
             return res.status(400).send({ message: "Missing community name, post ID, or reason" });
         }
@@ -852,8 +862,8 @@ const editComm = async (req: Request, res: Response) => {
         cleanName = cleanName.replace(/[^a-zA-Z0-9-_ ]/g, ""); // Remove special characters except letters, numbers, hyphens, and underscores
         cleanName = cleanName.replace(/\s+/g, "")              // Remove spaces from the name
 
-        // Verify and get userId from session cookie
-        const userId = await genUtil.getUserIdFromSessionCookie(req);
+        // Verify and get userId from auth header
+        const userId = await genUtil.getUserIdFromAuthHeader(req);
         
         if (!name || !userId) {
             console.log("No community or user provided.");
@@ -933,8 +943,8 @@ const editGroup = async (req: Request, res: Response) => {
         const { groupId } = req.params;
         const { commName, newName } = req.body;
 
-        // Verify and get userId from session cookie
-        const userId = await genUtil.getUserIdFromSessionCookie(req);
+        // Verify and get userId from auth header
+        const userId = await genUtil.getUserIdFromAuthHeader(req);
         // Verify ownership or mod privileges
         const { data: commData } = await commUtil.getCommunityByName(commName);
         await genUtil.verifyUserIsOwnerOrMod(commData, userId);
