@@ -485,7 +485,7 @@ const promoteToMod = async (req: Request, res: Response) => {
             modList: FieldValue.arrayUnion(targetRef)
         });
         console.log(`User ${targetId} promoted to moderator in community ${name} by owner ${ownerId}.`);
-        return res.status(200).send({ message: `User ${targetId} successfully promoted to moderator` });
+        return res.status(200).send({ message: "User successfully promoted to moderator" });
     } catch (err) {
         console.error("Error promoting user to mod:", err);
         return res.status(500).send({
@@ -529,7 +529,7 @@ const demoteMod = async (req: Request, res: Response) => {
             modList: FieldValue.arrayRemove(targetRef)
         });
         console.log(`User ${targetId} demoted from moderator in community ${name} by owner ${ownerId}.`);
-        return res.status(200).send({ message: `User ${targetId} successfully demoted from moderator` });
+        return res.status(200).send({ message: "User successfully demoted from moderator" });
     } catch (err) {
         console.error("Error demoting user from mod:", err);
         return res.status(500).send({
@@ -573,7 +573,7 @@ const promoteToOwner = async (req: Request, res: Response) => {
             modList: FieldValue.arrayUnion(targetRef),
         });
         console.log(`User ${targetId} promoted to owner in community ${name} by owner ${ownerId}.`);
-        return res.status(200).send({ message: `User ${targetId} promoted to owner successfully` });
+        return res.status(200).send({ message: "User successfully promoted to owner" });
     } catch (err) {
         console.error("Error promoting user to owner:", err);
         return res.status(500).send({
@@ -621,7 +621,7 @@ const demoteOwner = async (req: Request, res: Response) => {
             ownerList: FieldValue.arrayRemove(targetRef),
         });
         console.log(`User ${targetId} demoted from owner in community ${name} by owner ${ownerId}.`);
-        return res.status(200).send({ message: `User ${targetId} demoted from owner successfully` });
+        return res.status(200).send({ message: "User successfully demoted from owner" });
     } catch (err) {
         console.error("Error demoting owner:", err);
         return res.status(500).send({
@@ -732,7 +732,7 @@ const banUser = async (req: Request, res: Response) => {
             blacklist: FieldValue.arrayUnion(targetRef)
         });
         console.log(`User ${targetId} banned from community ${commName}.`);
-        return res.status(200).send({ message: `User banned successfully` });
+        return res.status(200).send({ message: "User banned successfully" });
     } catch (err) {
         console.error("Error banning user:", err);
         return res.status(500).send({
@@ -762,7 +762,7 @@ const unbanUser = async (req: Request, res: Response) => {
             blacklist: FieldValue.arrayRemove(targetRef)
         });
         console.log(`User ${targetId} unbanned from community ${commName}.`);
-        return res.status(200).send({ message: `User ${targetId} successfully unbanned from community` });
+        return res.status(200).send({ message: "User successfully unbanned from community" });
     } catch (err) {
         console.error("Error unbanning user:", err);
         return res.status(500).send({

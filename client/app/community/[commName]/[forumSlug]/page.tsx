@@ -30,6 +30,8 @@ import chatutton from "../../../../public/message-solid-full.svg"
 import trashBin from "../../../../public/trash-solid-full.svg"
 import reportIcon from "../../../../public/flag-solid-full.svg"
 import cogwheel from "../../../../public/gear.svg"
+import shield from "../../../../public/shield.svg"
+import listIcon from "../../../../public/file.svg"
 
 export default function ForumPage({
     params,
@@ -94,11 +96,15 @@ export default function ForumPage({
     const [iconPreview, setIconPreview] = useState<string | null>(null);                    // Icon preview URL
     const [bannerFile, setBannerFile] = useState<File | null>(null);                        // Banner file for community
     const [bannerPreview, setBannerPreview] = useState<string | null>(null);                // Banner preview URL
-    const [targetUserId, setTargetUserId] = useState<string>("");
+    const [targetUserId, setTargetUserId] = useState<string>("");                           // Target user ID for mod actions
+    const [targetUsername, setTargetUsername] = useState<string>("");                       // Target username for mod actions
 
     const [alertOpen, setAlertOpen] = useState(false);                                      // Alert popup state
 
     const [editCommPopup, setEditCommPopup] = useState(false);                              // Edit community popup state
+
+    const [modPopup, setModPopup] = useState(false);                                        // Moderator options popup state
+    
 
     // --- Toggle popups ---
     const toggleCreatePostPopup = () => {
@@ -150,6 +156,11 @@ export default function ForumPage({
 
     const toggleEditCommPopup = () => {
         setEditCommPopup(!editCommPopup);
+        setError(null);
+    };
+
+    const toggleModPopup = () => {
+        setModPopup(!modPopup);
         setError(null);
     };
 
@@ -673,7 +684,6 @@ export default function ForumPage({
     };
 
     // -------- MODERATION FUNCTIONS -------- //
-    // TODO: The rest of the functions are yet to be imported from the old community page
     // Handle kick
     const handleKickUser = async () => {
         try {
@@ -682,8 +692,8 @@ export default function ForumPage({
             setError(res.message || null);
             // Wait 1 second and close the popup
             setTimeout(() => {
-                toggleModOptionsPopup();
-            }, 1000);
+                toggleModPopup();
+            }, 500);
             await refreshCommunity();
         } catch (err) {
             console.error("Failed to kick user:", err);
@@ -698,11 +708,12 @@ export default function ForumPage({
             setError(res.message || null);
             // Wait 1 second and close the popup
             setTimeout(() => {
-                toggleModOptionsPopup();
-            }, 1000);
+                toggleModPopup();
+            }, 500);
             await refreshCommunity();
         } catch (err) {
             console.error("Failed to ban user:", err);
+            setError("Failed to ban user.");
         }
     };
 
@@ -715,7 +726,7 @@ export default function ForumPage({
             // Wait 1 second and close the popup
             setTimeout(() => {
                 toggleBlacklistPopup();
-            }, 1000);
+            }, 500);
             await refreshCommunity();
         } catch (err) {
             console.error("Failed to unban user:", err);
@@ -723,31 +734,75 @@ export default function ForumPage({
     };
 
     // --- PROMOTE USER TO MOD ---
-    const handlePromoteToMod = async (userId: string) => {
-        const res = await commApi.promoteToMod(commName, userId);
-        console.log(res.message);
-        await refreshCommunity();
+    const handlePromoteToMod = async () => {
+        try {
+            const userId = targetUserId;
+            const res = await commApi.promoteToMod(commName, userId);
+            setError(res.message || null);
+            console.log(res.message);
+            await refreshCommunity();
+            // Close mod popup after a brief delay
+            setTimeout(() => {
+                toggleModPopup();
+            }, 500);
+        } catch (err) {
+            console.error("Failed to promote user to mod:", err);
+            setError("Failed to promote user to mod.");
+        }
     };
 
     // --- DEMOTE MOD TO USER ---
-    const handleDemoteMod = async (userId: string) => {
-        const res = await commApi.demoteMod(commName, userId);
-        console.log(res.message);
-        await refreshCommunity();
+    const handleDemoteMod = async () => {
+        try {
+            const userId = targetUserId;
+            const res = await commApi.demoteMod(commName, userId);
+            setError(res.message || null);
+            console.log(res.message);
+            await refreshCommunity();
+            // Close mod popup after a brief delay
+            setTimeout(() => {
+                toggleModPopup();
+            }, 500);
+        } catch (err) {
+            console.error("Failed to demote mod to user:", err);
+            setError("Failed to demote mod to user.");
+        }
     };
 
     // --- PROMOTE USER TO OWNER ---
-    const handlePromoteToOwner = async (userId: string) => {
-        const res = await commApi.promoteToOwner(commName, userId);
-        console.log(res.message);
-        await refreshCommunity();
+    const handlePromoteToOwner = async () => {
+        try {
+            const userId = targetUserId;
+            const res = await commApi.promoteToOwner(commName, userId);
+            setError(res.message || null);
+            console.log(res.message);
+            await refreshCommunity();
+            // Close mod popup after a brief delay
+            setTimeout(() => {
+                toggleModPopup();
+            }, 500);
+        } catch (err) {
+            console.error("Failed to promote user to owner:", err);
+            setError("Failed to promote user to owner.");
+        }
     };
 
     // --- DEMOTE OWNER ---
-    const handleDemoteOwner = async (userId: string) => {
-        const res = await commApi.demoteOwner(commName, userId);
-        console.log(res.message);
-        await refreshCommunity();
+    const handleDemoteOwner = async () => {
+        try {
+            const userId = targetUserId;
+            const res = await commApi.demoteOwner(commName, userId);
+            setError(res.message || null);
+            console.log(res.message);
+            await refreshCommunity();
+            // Close mod popup after a brief delay
+            setTimeout(() => {
+                toggleModPopup();
+            }, 500);
+        } catch (err) {
+            console.error("Failed to demote owner:", err);
+            setError("Failed to demote owner.");
+        }
     };
 
     const isMember = community?.userList.some(m => m.id === user?.uid);
@@ -1029,15 +1084,26 @@ export default function ForumPage({
                                             />
                                         </Link>
                                     </button>
-
                                 )}
+                                {/* If user is owner, display community settings button */}
                                 {isOwner && (
                                     <button className={styles.editCommunityButton} onClick={toggleEditCommPopup}>
                                         <Image
                                             src={cogwheel}
                                             height={40}
                                             width={40}
-                                            alt="mod options"
+                                            alt="community settings"
+                                        />
+                                    </button>
+                                )}
+                                {/* If user is mod/owner, display button to show blacklist */}
+                                {(isMod || isOwner) && (
+                                    <button className={styles.blacklistButton} onClick={toggleBlacklistPopup}>
+                                        <Image
+                                            src={listIcon}
+                                            height={40}
+                                            width={40}
+                                            alt="blacklist"
                                         />
                                     </button>
                                 )}
@@ -1102,9 +1168,10 @@ export default function ForumPage({
                                 // Check if the post is currently being edited
                                 const isEditing = editingPostId === post.id;
 
-                                // Check if the post's author is a mod or owner
+                                // Check if the post's author is a mod or owner, and a member of the community
                                 const authorIsMod = community.modList.some(m => m.id === post.authorId);
                                 const authorIsOwner = community.ownerList.some(o => o.id === post.authorId); 
+                                const authorIsMember = community.userList.some(member => member.id === post.authorId);
 
                                 return (
                                     <div key={post.id} className={styles.postCard}>
@@ -1118,11 +1185,11 @@ export default function ForumPage({
                                                                             ? " [OWNER]"
                                                                             : authorIsMod
                                                                                 ? " [MOD]"
-                                                                                : ""}
+                                                                                : authorIsMember
+                                                                                    ? " [MEMBER]"
+                                                                                    : ""}
                                                 </div>
-
                                             </Link>
-
                                             {/* Time post was created, and if it was edited */}
                                             <p className={styles.time}>
                                                 {post.timePosted} {post.edited && "(edited)"}
@@ -1149,7 +1216,7 @@ export default function ForumPage({
                                                 {/* Save button */}
                                                 <button
                                                     onClick={() => handleSaveEdit(post.id)}
-                                                    className={`${styles.button} ${styles.saveButton}`}
+                                                    className={`${styles.saveBtn}`}
                                                 >
                                                     Save
                                                 </button>
@@ -1157,7 +1224,7 @@ export default function ForumPage({
                                                 {/* Cancel button */}
                                                 <button
                                                     onClick={cancelEditing}
-                                                    className={`${styles.button} ${styles.cancelButton}`}
+                                                    className={`${styles.cancelButton}`}
                                                 >
                                                     Cancel
                                                 </button>
@@ -1270,10 +1337,31 @@ export default function ForumPage({
                                                                 alt="edit"
                                                             />
                                                         </button>
-
+                                                        
+                                                        {/* Moderator tools button; display if owner or mod */}
+                                                        {/* Do not show if: */}
+                                                        {/* User is a mod, but post user is an owner/mod */}
+                                                        {/* Post user is not a member */}
+                                                        {/* Post user is the user */}
+                                                        {( (isMod && (!authorIsMod && !authorIsOwner)) || isOwner ) && authorIsMember && !isAuthor ? (
+                                                            <button
+                                                                className={styles.postModToolsButton}
+                                                                onClick={() => {
+                                                                    toggleModPopup();
+                                                                    setTargetUserId(post.authorId);
+                                                                    setTargetUsername(post.authorUsername);
+                                                                }}
+                                                            >
+                                                                <Image
+                                                                    src={shield}
+                                                                    height={20}
+                                                                    width={20}
+                                                                    alt="moderator tools"
+                                                                />
+                                                            </button>
+                                                        ) : ""}
 
                                                         {/* Edit and delete buttons */}
-
                                                         {/* Edit button */}
                                                         {isAuthor && (
                                                             <button
@@ -1558,20 +1646,20 @@ export default function ForumPage({
                     <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
                         <h2 className={styles.popupText}>Blacklist</h2>
                         {/* Displays each user's name in the blacklist; if empty show a message */}
-                        <ul>
+                        <ul className={styles.blacklistList}>
                             {community.blacklist.length === 0 ? (
-                                <p>The blacklist is empty.</p>
+                                <p className={styles.blacklistEmpty}>The blacklist is empty.</p>
                             ) : (
                                 community.blacklist.map((bannedUser) => (
-                                    <li key={bannedUser.id} className={styles.popupText}>
+                                    <li key={bannedUser.id} className={styles.blacklistItem}>
                                         {/* User's profile picture */}
                                         <Image src={bannedUser.photoURL} alt={bannedUser.username} width={40} height={40} />
                                         {/* Link to their profile */}
-                                        <Link href={`/profile/${bannedUser.id}`}>
+                                        <Link href={`/profile/${bannedUser.id}`} className={styles.blacklistName}>
                                             {bannedUser.username}
                                         </Link>
                                         {/* Button to unban the user */}
-                                        <button className={`${styles.popupText} ${styles.saveBtn}`} onClick={() => {
+                                        <button className={`${styles.unbanButton}`} onClick={() => {
                                             handleUnbanUser(bannedUser.id);
                                         }}>
                                             Unban User
@@ -1580,7 +1668,7 @@ export default function ForumPage({
                                 ))
                             )}
                         </ul>
-                        {error && <p style={{ color: "yellow" }}>{error}</p>}
+                        {error && <p className={styles.errorText}>{error}</p>}
                         <button className={`${styles.popupText} ${styles.closeBtn}`} onClick={toggleBlacklistPopup}>
                             Close
                         </button>
@@ -1663,6 +1751,58 @@ export default function ForumPage({
                         <h2 className={styles.popupText}>Alert</h2>
                         {error && <p className={styles.errorText}>{error}</p>}
                         <button className={`${styles.popupText} ${styles.closeBtn}`} onClick={() => { toggleAlertPopup(); setError(null); }}>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
+            {/* --- MODERATOR TOOLS POPUP --- */}
+            {modPopup && (
+                <div className={styles.popupOverlay} onClick={() => { toggleModPopup(); setError(null); }}>
+                    <div className={styles.popupBoxModerator} onClick={(e) => e.stopPropagation()}>
+                        <h2 className={styles.popupText}>Moderator Tools</h2>
+                        <p className={styles.popupText}>Target User: {targetUsername}</p>
+                        {/* Button to kick user */}
+                        <button className={`${styles.popupText} ${styles.kickUserButton}`} onClick={handleKickUser}>
+                            Kick User
+                        </button>
+                        {/* Button to ban user */}
+                        <button className={`${styles.popupText} ${styles.banUserButton}`} onClick={handleBanUser}>
+                            Ban User
+                        </button>
+                        {/* Buttons if owner only: */}
+                        {/* Button to promote and demote to/from moderator */}
+                        {isOwner && !community.ownerList.some(o => o.id === targetUserId) && (
+                            <>
+                                {!community.modList.some(m => m.id === targetUserId) ? (
+                                    <button className={`${styles.popupText} ${styles.promoteModButton}`} onClick={handlePromoteToMod}>
+                                        Promote to Moderator
+                                    </button>
+                                ) : (
+                                    <button className={`${styles.popupText} ${styles.demoteModButton}`} onClick={handleDemoteMod}>
+                                        Demote from Moderator
+                                    </button>
+                                )}
+                            </>
+                        )}
+                        {/* Button to promote/demote to/from owner */}
+                        {isOwner && (
+                            <>
+                                {!community.ownerList.some(o => o.id === targetUserId) ? (
+                                    <button className={`${styles.popupText} ${styles.promoteOwnerButton}`} onClick={handlePromoteToOwner}>
+                                        Promote to Owner
+                                    </button>
+                                ) : (
+                                    targetUserId !== user?.uid ? (
+                                        <button className={`${styles.popupText} ${styles.demoteOwnerButton}`} onClick={handleDemoteOwner}>
+                                            Demote from Owner
+                                        </button>
+                                    ) : null
+                                )}
+                            </>
+                        )}
+                        {error && <p className={styles.errorText}>{error}</p>}
+                        <button className={`${styles.popupText} ${styles.closeBtn}`} onClick={() => { toggleModPopup(); setError(null); }}>
                             Close
                         </button>
                     </div>

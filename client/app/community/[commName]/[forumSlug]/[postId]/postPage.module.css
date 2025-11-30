@@ -678,11 +678,45 @@
     padding: 2rem;
     border-radius: 1em;
     width: 400px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 5px 10px rgba(154, 160, 185, .05), 0 15px 40px rgba(166, 173, 201, .2);
     text-align: center;
     animation: fadeIn 0.2s ease-in-out;
 }
 
+.popupBoxModerator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
+    background-color: white;
+    padding: 2rem;
+    border-radius: 1em;
+    width: 400px;
+    box-shadow: 0 5px 10px rgba(154, 160, 185, .05), 0 15px 40px rgba(166, 173, 201, .2);
+    text-align: center;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+.popupText {
+    color: #5A5454;
+    margin-bottom: 1.5rem;
+    font-family: Inria Sans;
+}
+
+.closeBtn {
+    background-color: #FF5C5C;
+    border: none;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    transition: background-color 0.2s ease;
+}
+
+.closeBtn:hover {
+    background-color: #FF3B3B;
+}
 
 @keyframes fadeIn {
     from {
@@ -694,6 +728,12 @@
         opacity: 1;
         transform: scale(1);
     }
+}
+
+.errorText {
+    color: orangered;
+    margin-bottom: 1rem;
+    font-family: Inria Sans;
 }
 
 .popupText {
@@ -894,4 +934,95 @@
         align-items: center;
         margin-left: 5%;
     }
+}
+
+.kickUserButton {
+    background-color: #ffffff;
+    border: 1px solid rgb(255, 0, 0);
+    color: rgb(255, 0, 0);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.kickUserButton:hover {
+    background-color: #ffcccc;
+}
+
+.banUserButton {
+    background-color: #CC0000;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.banUserButton:hover {
+    background-color: #990000;
+}
+
+.promoteModButton {
+    background-color: #0072BB;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.promoteModButton:hover {
+    background-color: #004570;
+}
+
+.demoteModButton {
+    background-color: #DD5555;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.demoteModButton:hover {
+    background-color: #aa4444;
+}
+
+.promoteOwnerButton {
+    background-color: #4CAF50;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.promoteOwnerButton:hover {
+    background-color: #357a38;
+}
+
+.demoteOwnerButton {
+    background-color: #DD5555;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.demoteOwnerButton:hover {
+    background-color: #aa4444;
 }

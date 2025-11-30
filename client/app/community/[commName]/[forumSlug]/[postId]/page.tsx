@@ -21,6 +21,7 @@ import ServerBar from "../../../../_components/serverBar/serverBar.tsx";
 import YourCommunities from "../../../../_components/yourCommunities/yourCommBar.tsx";
 import trashBin from "../../../../../public/trash-solid-full.svg"
 import editButton from "../../../../../public/pencil-solid-full.svg"
+import shield from "../../../../../public/shield.svg"
 
 
 export default function PostDetail({ params }: { params: Promise<{ commName: string; forumSlug: string; postId: string }> }) {
@@ -64,6 +65,9 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
     const [isReplyDelete, setIsReplyDelete] = useState(false);
 
     const [groupId, setGroupId] = useState("");
+    const [modPopup, setModPopup] = useState(false);
+    const [targetUserId, setTargetUserId] = useState("");
+    const [targetUsername, setTargetUsername] = useState("");
 
     // EFFECT: Handle bfcache (back/forward cache) issues
     // useEffect(() => {
@@ -259,6 +263,10 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
         setMessage(null);
     };
 
+    const toggleModPopup = () => {
+        setModPopup(!modPopup);
+        setError(null);
+    };
 
 
     // Handler for deleting posts/replies
@@ -299,6 +307,128 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
         }
     };
 
+    // -------- MODERATION FUNCTIONS -------- //
+    // Handle kick
+    const handleKickUser = async () => {
+        try {
+            const res = await commApi.kickMember(commName, targetUserId);
+            console.log(res.message);
+            setError(res.message || null);
+            // Wait 1 second and close the popup
+            setTimeout(() => {
+                toggleModPopup();
+            }, 500);
+            await refreshCommunity();
+        } catch (err) {
+            console.error("Failed to kick user:", err);
+        }
+    };
+
+    // Handle ban
+    const handleBanUser = async () => {
+        try {
+            const res = await commApi.banMember(commName, targetUserId);
+            console.log(res.message);
+            setError(res.message || null);
+            // Wait 1 second and close the popup
+            setTimeout(() => {
+                toggleModPopup();
+            }, 500);
+            await refreshCommunity();
+        } catch (err) {
+            console.error("Failed to ban user:", err);
+            setError("Failed to ban user.");
+        }
+    };
+
+    // // Handle unban
+    // const handleUnbanUser = async (targetUserId: string) => {
+    //     try {
+    //         const res = await commApi.unbanMember(commName, targetUserId);
+    //         console.log(res.message);
+    //         setError(res.message || null);
+    //         // Wait 1 second and close the popup
+    //         setTimeout(() => {
+    //             toggleBlacklistPopup();
+    //         }, 500);
+    //         await refreshCommunity();
+    //     } catch (err) {
+    //         console.error("Failed to unban user:", err);
+    //     }
+    // };
+
+    // --- PROMOTE USER TO MOD ---
+    const handlePromoteToMod = async () => {
+        try {
+            const userId = targetUserId;
+            const res = await commApi.promoteToMod(commName, userId);
+            setError(res.message || null);
+            console.log(res.message);
+            await refreshCommunity();
+            // Close mod popup after a brief delay
+            setTimeout(() => {
+                toggleModPopup();
+            }, 500);
+        } catch (err) {
+            console.error("Failed to promote user to mod:", err);
+            setError("Failed to promote user to mod.");
+        }
+    };
+
+    // --- DEMOTE MOD TO USER ---
+    const handleDemoteMod = async () => {
+        try {
+            const userId = targetUserId;
+            const res = await commApi.demoteMod(commName, userId);
+            setError(res.message || null);
+            console.log(res.message);
+            await refreshCommunity();
+            // Close mod popup after a brief delay
+            setTimeout(() => {
+                toggleModPopup();
+            }, 500);
+        } catch (err) {
+            console.error("Failed to demote mod to user:", err);
+            setError("Failed to demote mod to user.");
+        }
+    };
+
+    // --- PROMOTE USER TO OWNER ---
+    const handlePromoteToOwner = async () => {
+        try {
+            const userId = targetUserId;
+            const res = await commApi.promoteToOwner(commName, userId);
+            setError(res.message || null);
+            console.log(res.message);
+            await refreshCommunity();
+            // Close mod popup after a brief delay
+            setTimeout(() => {
+                toggleModPopup();
+            }, 500);
+        } catch (err) {
+            console.error("Failed to promote user to owner:", err);
+            setError("Failed to promote user to owner.");
+        }
+    };
+
+    // --- DEMOTE OWNER ---
+    const handleDemoteOwner = async () => {
+        try {
+            const userId = targetUserId;
+            const res = await commApi.demoteOwner(commName, userId);
+            setError(res.message || null);
+            console.log(res.message);
+            await refreshCommunity();
+            // Close mod popup after a brief delay
+            setTimeout(() => {
+                toggleModPopup();
+            }, 500);
+        } catch (err) {
+            console.error("Failed to demote owner:", err);
+            setError("Failed to demote owner.");
+        }
+    };
+
     const isMember = community.userList.some(m => m.id === user?.uid);
     const isMod = community.modList.some(m => m.id === user?.uid);
     const isOwner = community.ownerList.some(o => o.id === user?.uid);
@@ -327,6 +457,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
         // Check if the post's author is a mod or owner
         const authorIsMod = community.modList.some(m => m.id === item.authorId);
         const authorIsOwner = community.ownerList.some(o => o.id === item.authorId); 
+        const authorIsMember = community.userList.some(u => u.id === item.authorId);
 
         return (
             <div
@@ -384,7 +515,9 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                                                                 ? " [OWNER]"
                                                                 : authorIsMod
                                                                     ? " [MOD]"
-                                                                    : ""}
+                                                                    : authorIsMember
+                                                                        ? " [MEMBER]"
+                                                                        : ""}
                                 </Link>
                             </div>
                         </div>
@@ -422,6 +555,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                             <div className={styles.actions}>
                                 {/* Yay button; if the current user is in the yay list, show as active (green) */}
                                 <button
+
                                     className={`${styles.voteButton} ${user?.uid && item.yayList.includes(user.uid) ? styles.yayActive : ""}`}
                                     onClick={() => handleVote(item.id, "yay", isReply)}
                                 >
@@ -452,9 +586,27 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                             </div>
 
                             {/* Edit and Delete buttons for posts and replies, only shown if the current user is the author */}
-                            {(isOwner || isMod || isAuthor) && (
-                                <div className={styles.utilButtons}>
-                                    {/* Edit button */}
+                            <div className={styles.utilButtons}>
+                                {/* Moderator tools button, only show if mod/owner, and current author isn't the user | If mod, don't show if author is an owner */}
+                                {( (isMod && !authorIsOwner && item.authorId !== user?.uid) || (isOwner && item.authorId !== user?.uid) ) &&
+                                    <button
+                                        className={styles.modToolsButton}
+                                        onClick={() => {
+                                            setTargetUserId(item.authorId);
+                                            setTargetUsername(item.authorUsername);
+                                            toggleModPopup();
+                                        }}
+                                    >
+                                        <Image
+                                            src={shield}
+                                            height={30}
+                                            width={30}
+                                            alt="moderator tools"
+                                        />
+                                    </button>
+                                }
+                                {/* Edit button, only shown to the author */}
+                                {isAuthor &&
                                     <button
                                         className={styles.editButton}
                                         onClick={() => { setEditingId(item.id); setEditContent(item.contents); if (!isReply) setEditTitle(item.title); }}
@@ -466,7 +618,9 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                                             alt="edit"
                                         />
                                     </button>
-                                    {/* Delete button */}
+                                }
+                                {/* Delete button, only shown for authors, mods, and owners */}
+                                {(isAuthor || isMod || isOwner) && (
                                     <button
                                         className={styles.deleteButton}
                                         onClick={() => {
@@ -482,8 +636,8 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                                             alt="edit"
                                         />
                                     </button>
-                                </div>
-                            )}
+                                )}
+                            </div>
 
                         </div>
                         <div>
@@ -708,6 +862,58 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                         {forumInputs[groupId]?.message && (
                             <p>{forumInputs[groupId].message}</p>
                         )}
+                    </div>
+                </div>
+            )}
+            {/* --- MODERATOR TOOLS POPUP --- */}
+            {modPopup && (
+                <div className={styles.popupOverlay} onClick={() => { toggleModPopup(); setError(null); }}>
+                    <div className={styles.popupBoxModerator} onClick={(e) => e.stopPropagation()}>
+                        <h2 className={styles.popupText}>Moderator Tools</h2>
+                        <p className={styles.popupText}>Target User: {targetUsername}</p>
+                        {/* Button to kick user */}
+                        <button className={`${styles.popupText} ${styles.kickUserButton}`} onClick={handleKickUser}>
+                            Kick User
+                        </button>
+                        {/* Button to ban user */}
+                        <button className={`${styles.popupText} ${styles.banUserButton}`} onClick={handleBanUser}>
+                            Ban User
+                        </button>
+                        {/* Buttons if owner only: */}
+                        {/* Button to promote and demote to/from moderator */}
+                        {isOwner && !community.ownerList.some(o => o.id === targetUserId) && (
+                            <>
+                                {!community.modList.some(m => m.id === targetUserId) ? (
+                                    <button className={`${styles.popupText} ${styles.promoteModButton}`} onClick={handlePromoteToMod}>
+                                        Promote to Moderator
+                                    </button>
+                                ) : (
+                                    <button className={`${styles.popupText} ${styles.demoteModButton}`} onClick={handleDemoteMod}>
+                                        Demote from Moderator
+                                    </button>
+                                )}
+                            </>
+                        )}
+                        {/* Button to promote/demote to/from owner */}
+                        {isOwner && (
+                            <>
+                                {!community.ownerList.some(o => o.id === targetUserId) ? (
+                                    <button className={`${styles.popupText} ${styles.promoteOwnerButton}`} onClick={handlePromoteToOwner}>
+                                        Promote to Owner
+                                    </button>
+                                ) : (
+                                    targetUserId !== user?.uid ? (
+                                        <button className={`${styles.popupText} ${styles.demoteOwnerButton}`} onClick={handleDemoteOwner}>
+                                            Demote from Owner
+                                        </button>
+                                    ) : null
+                                )}
+                            </>
+                        )}
+                        {error && <p className={styles.errorText}>{error}</p>}
+                        <button className={`${styles.closeBtn}`} onClick={() => { toggleModPopup(); setError(null); }}>
+                            Close
+                        </button>
                     </div>
                 </div>
             )}
