@@ -12,6 +12,7 @@ import { logout } from '@/app/landing.ts';
 import HomeLogo from '../../../public/CircuitLinkHomeLogo.svg'
 import { getNotifications, NotificationData, respondToFriendRequest, fetchFriendRequestStatus } from "../../profile/notifications/notifications.ts";
 import notifalert from "../../../public/notifalerter.png"
+import { useAuth } from "@/app/_firebase/context.tsx";
 
 export default function NavBar() {
     const [user, setUser] = useState<User | null>(null);
@@ -19,6 +20,8 @@ export default function NavBar() {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const notifRef = useRef<HTMLDivElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
+
+    const { userData } = useAuth();
 
     // ADDED STATE: To hold notification data
     const [notifications, setNotifications] = useState<NotificationData[]>([]);
@@ -251,7 +254,7 @@ export default function NavBar() {
 
                         <div className={Styles.dropdown} ref={dropdownRef} style={{ gridArea: 'settings' }}>
                             <button onClick={() => setIsDropdownOpen(prev => !prev)}>
-                                <Image src={user?.photoURL || "/circleUser.svg"} className={Styles.settingsIcon} alt="User profile" width={10} height={10}></Image>
+                                <Image src={userData?.photoURL || user?.photoURL || "/circleUser.svg"} className={Styles.settingsIcon} alt="User profile" width={10} height={10}></Image>
                             </button>
                             {isDropdownOpen && (
                                 <div className={Styles.dropdownMenu}>
