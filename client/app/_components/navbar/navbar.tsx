@@ -8,7 +8,7 @@ import { User } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore"; // <-- ADDED: For fetching user document
 import { db } from "@/app/_firebase/firebase"; // <-- ADDED: Reference to Firestore DB
 import { authStateCallback } from "@/app/_firebase/auth-observer.ts";
-import { logout } from '../../OldDefault/landing.ts';
+import { logout } from '@/app/landing.ts';
 import HomeLogo from '../../../public/CircuitLinkHomeLogo.svg'
 import { getNotifications, NotificationData, respondToFriendRequest } from "../../profile/notifications/notifications.ts";
 

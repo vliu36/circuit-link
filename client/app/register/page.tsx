@@ -4,7 +4,6 @@ import { register, registerWithGoogle } from "./register";
 import Styles from './register.module.css';
 import Image from 'next/image';
 import googleIcon from '../../public/googleIcon.png';
-import Link from "next/link";
 import NavBar from "../_components/navbar/navbar.tsx";
 import { useRouter } from "next/navigation";
 
