@@ -53,6 +53,22 @@ export default function Landing() {
     const MAX_KB = 200;
     const MAX_BYTES = MAX_KB * 1024;
 
+    // EFFECT: Handle bfcache (back/forward cache) issues
+    // useEffect(() => {
+    // const handlePageShow = (event: PageTransitionEvent) => {
+    //     if (event.persisted) {
+    //     // Page was restored from bfcache
+    //     window.dispatchEvent(new Event("resize")); // trigger layout recalculation
+    //     }
+    // };
+
+    // window.addEventListener("pageshow", handlePageShow);
+
+    // return () => {
+    //     window.removeEventListener("pageshow", handlePageShow);
+    // };
+    // }, []);
+
     // ─────────────────────────────────────────────
     // EFFECT: Update profile settings when userData loads
     // ─────────────────────────────────────────────
@@ -162,10 +178,11 @@ export default function Landing() {
             </div>
         );
     }
+    
 
     // LOGGED-IN VIEW
     return (
-        <main>
+        <main className={Styles.landingMain}>
             <div className={Styles.navBox} style={{ gridArea: "navBar" }}>
                 <NavBar />
             </div>

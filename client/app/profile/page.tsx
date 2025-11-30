@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import * as profileFunctions from "./profile";
 import { useAuth } from "../_firebase/context";
 import "./profile-styles.css";
+import styles from "./profile.module.css"
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -22,17 +23,21 @@ export default function Profile() {
     const [darkMode, setDarkMode] = useState(userData?.darkMode ?? true);
     const [privateMode, setPrivateMode] = useState(userData?.privateMode ?? false);
     const [restrictedMode, setRestrictedMode] = useState(userData?.restrictedMode ?? false);
-    const [error, setError] = useState("");
+    const [error, setError] = useState(""); // For username validation error messages
+    const [message, setMessage] = useState(""); 
+    const [status, setStatus] = useState("");
 
     // Friends list
     const [friends, setFriends] = useState<profileFunctions.User[]>([]);
 
     // Popup state
     const [isOpen, setIsOpen] = useState(false);
+    const [alertPopup, setAlertPopup] = useState(false);
 
     // File size limit
-    const MAX_KB = 200;
-    const MAX_BYTES = MAX_KB * 1024;
+    // const MAX_KB = 200;
+    const MAX_MB = 5;
+    const MAX_BYTES = MAX_MB * 1024 * 1024;
 
     // Live username validation
     useEffect(() => {
@@ -55,6 +60,10 @@ export default function Profile() {
         loadFriends();
     }, [userData]);
 
+    const toggleAlertPopup = () => {
+        setAlertPopup(!alertPopup);
+    }
+
     // Show loading message while auth state is being determined
     if (loading) {
         return <p>Loading user info...</p>;
@@ -68,8 +77,20 @@ export default function Profile() {
     // Handle form submission for editing profile
     const handleEditProfile = async (e: React.FormEvent) => {
         e.preventDefault();
-        await profileFunctions.editProfile(newUsername, newBio, textSize, font, darkMode, privateMode, restrictedMode);
-        window.location.reload(); // Reload the page to show updated info
+        const res = await profileFunctions.editProfile(newUsername, newBio, textSize, font, darkMode, privateMode, restrictedMode);
+        if (res.status === "ok") {
+            setMessage(res.message);
+            setStatus("Success");
+            toggleAlertPopup();
+            // Reload after a short delay to show updated info
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            setMessage(res.message);
+            setStatus("Error");
+            toggleAlertPopup();
+        }
     };
 
     // Popup Confirmation 
@@ -96,18 +117,24 @@ export default function Profile() {
         }
         // Check file size 
         if (file.size > MAX_BYTES) {
-            // alert(`File size exceeds the maximum allowed limit: ${MAX_KB}.`);
-            setError(`File size exceeds the maximum allowed limit: ${MAX_KB} KB.`);
+            setMessage(`File size exceeds the maximum allowed limit: ${MAX_MB} MB.`);
+            setStatus("Error");
             console.log("File size exceeds the maximum allowed limit.");
+            toggleAlertPopup();
             return;
         }
         try {
             const url = await profileFunctions.uploadProfilePicture(file);
-            alert("Profile picture uploaded successfully.");
+            setMessage("Profile picture uploaded successfully.");
+            setStatus("Success");
+            toggleAlertPopup();
             console.log("File URL: ", url);
             window.location.reload();
         } catch (error) {
-            console.error("Error uploading profile picture:", error);
+            console.warn("Error uploading profile picture:", error);
+            setMessage("Error uploading profile picture.");
+            setStatus("Error");
+            toggleAlertPopup();
         } // end try catch
     } // end submitImage
 
@@ -118,177 +145,302 @@ export default function Profile() {
             // Optimistically remove from local state
             setFriends(prevFriends => prevFriends.filter(f => f.id !== friendId));
         } catch (error) {
-            console.error("Error removing friend:", error);
+            console.warn("Error removing friend:", error);
+            setMessage("Error removing friend.");
+            setStatus("Error");
+            toggleAlertPopup();
+        }
+    };
+
+    // Handle delete account
+    const handleDeleteAccount = async () => {
+        try {
+            const result = await profileFunctions.deleteUserAccount();
+            if (result.status === "ok") {
+                setMessage(result.message);
+                setStatus("Success");
+                toggleAlertPopup();
+                // Redirect to home after a short delay to allow user to read message
+                setTimeout(() => {
+                    window.location.href = "/";
+                }, 2000);
+            }
+        } catch (error) {
+            console.warn("Error deleting account:", error);
+            setMessage("An error occurred while deleting your account.");
+            setStatus("Error");
+            toggleAlertPopup();
+        }
+    };
+
+    // Handle verify email
+    const handleVerifyEmail = async () => {
+        try {
+            const result = await profileFunctions.verifyEmail();
+            setMessage(result.message);
+            setStatus(result.status === "ok" ? "Success" : "Error");
+            toggleAlertPopup();
+        } catch (error) {
+            console.warn("Error verifying email:", error);
+            setMessage("An error occurred while sending verification email.");
+            setStatus("Error");
+            toggleAlertPopup();
         }
     };
 
     return (
-        <main>
+        <main className={styles.main}>
+
             {/* Profile */}
-            <div className="profile-card">
+            <div className={styles.profileCard}>
                 <h1>Profile</h1>
                 <p>Welcome to your profile page!</p>
+
                 <button
-                    className="go-back-btn"
-                    onClick={() => {
-                        window.location.href = "/"; // goes to landing page + counts as full refresh
-                    }}
+                    className={styles.goBackBtn}
+                    onClick={() => { window.location.href = "/"; }}
                 >
                     Go back
                 </button>
-                <br />
-                <br />
-                <Link className="go-back-btn" href="/profile/notifications">Go to Notifications</Link>
-                <br />
-                <br />
-                {/* Display profile info */}
-                <div className="profile-header">
+
+                <br /><br />
+
+                <Link className={styles.goBackBtn} href="/profile/notifications">
+                    Go to Notifications
+                </Link>
+
+                <br /><br />
+
+                {/* Profile header */}
+                <div className={styles.profileHeader}>
                     <Image
                         src={user.photoURL || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"}
                         alt="Profile Picture"
                         width={64}
                         height={64}
-                        className="w-16 h-16 rounded-full object-cover border" />
-                    <span className="username">{userData?.username}</span>
+                        className={styles.profileHeaderImage}
+                    />
+                    <span className={styles.profileHeaderUsername}>
+                        {userData?.username}
+                    </span>
                 </div>
+
                 <p>{userData?.profileDesc}</p>
             </div>
-            {/* Additional information */}
-            <div className="account-info">
-                <p>Email Verified: {user?.emailVerified ? "Yes" : "No"}</p>
-                {/* Show verify email button when user isn't verified */}
-                {!user?.emailVerified && <span><button onClick={profileFunctions.verifyEmail}><u>&gt; Verify Email</u></button></span>}
-                <p>Account Created: {user?.metadata.creationTime}</p>
-                <p>Last Sign-in: {user?.metadata.lastSignInTime}</p>
+
+            {/* Account info */}
+            <div className={styles.accountInfo}>
+                <p className={styles.infoText}>Email Verified: {user?.emailVerified ? "Yes" : "No"}</p>
+
+                {!user?.emailVerified && (
+                    <button className={styles.verifyBtn} onClick={handleVerifyEmail}>
+                        Verify Email
+                    </button>
+                )}
+
+                <p className={styles.infoText}>Account Created: {user?.metadata.creationTime}</p>
+                <p className={styles.infoText}>Last Sign-in: {user?.metadata.lastSignInTime}</p>
             </div>
 
             {/* Friend list */}
-            <div className="account-info">
-                <h2>Friends</h2>
-                <br />
+            <div className={styles.accountInfo}>
+                <h2 className={styles.sectionTitle}>Friends</h2>
+
                 {friends.length > 0 ? (
-                    <ul>
+                    <ul className={styles.friendList}>
                         {friends.map((friend) => (
-                            <li key={friend.id}>
-                                <Link href={`/profile/${friend.id}`}>
+                            <li key={friend.id} className={styles.friendItem}>
+                                <Link href={`/profile/${friend.id}`} className={styles.friendLink}>
                                     <Image
                                         src={friend.photoURL || "https://upload.wikimedia.org/wikipedia/commons/a/ac/Default_pfp.jpg"}
                                         width={32}
                                         height={32}
                                         alt="Profile Picture"
-                                        className="w-16 h-16 rounded-full object-cover border"
+                                        className={styles.friendAvatar}
                                     />
                                     {friend.username}
                                 </Link>
-                                <button onClick={() => handleRemoveFriend(friend.id)}>Remove</button>
+
+                                <button
+                                    className={styles.removeFriendBtn}
+                                    onClick={() => handleRemoveFriend(friend.id)}
+                                >
+                                    Remove
+                                </button>
                             </li>
                         ))}
                     </ul>
                 ) : (
-                    <p>No friends to display.</p>
+                    <p className={styles.emptyState}>No friends to display.</p>
                 )}
             </div>
 
             {/* Change profile picture */}
-            <div>
-                <br />
-                <form onSubmit={submitImage} className="flex items-left gap-4">
-                    <label className="cursor-pointer border p-2 rounded-1g">
-                        Change Profile Picture
-                        <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={handleImageChange} />
-                    </label>
-                    {preview && (<Image src={preview} alt="Preview" width={16} height={16} className="w-16 h-16 rounded-full object-cover border"></Image>)}
-                    <button
-                        type="submit"
-                        disabled={!file}>Upload
-                    </button>
-                    <p>File size limit: {MAX_KB} KB</p>
-                </form>
-            </div>
-
-            <br />
-            {/* Edit profile */}
-            <div>
-                <form onSubmit={handleEditProfile}>
-                    {/* Change username */}
-                    <label>New Username (max 20 characters): </label>
+            <form onSubmit={submitImage} className={styles.form}>
+                <label className={styles.fileInput}>
+                    Change Profile Picture
                     <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        minLength={1}
-                        maxLength={20}
-                        pattern="^[a-zA-Z0-9_]+$"
-                        onChange={(e) => setNewUsername(e.target.value)} />
-                    {error && <span className="errorMessage"> {error}</span>} {/* Display username error */}
-                    <br />
-                    {/* Change profile description */}
-                    <label>New Bio (max 200 characters): </label>
-                    <textarea className="bio" name="profileDesc" minLength={0} maxLength={200} rows={8} cols={32} onChange={(e) => { setNewBio(e.target.value) }} />
-                    <br />
-                    {/* Change Text Size */}
-                    <label>Text Size: </label>
-                    <input type="number" name="textSize" defaultValue={userData?.textSize} min={8} max={72} onChange={(e) => { setTextSize(Number(e.target.value)) }} />
-                    <em> -  effect to be implemented </em>
-                    <br />
-                    {/* Change Font */}
-                    <label>Font: </label>
-                    <select id="font" name="font" defaultValue={userData?.font} onChange={(e) => { setFont(e.target.value) }}>
-                        <option value="Arial">Arial</option>
-                        <option value="Verdana">Verdana</option>
-                        <option value="Helvetica">Helvetica</option>
-                        <option value="Times New Roman">Times New Roman</option>
-                        <option value="Courier New">Courier New</option>
-                        <option value="Georgia">Georgia</option>
-                        <option value="Comic Sans">Comic Sans</option>
-                    </select>
-                    <em> -  effect to be implemented </em>
-                    <br />
-                    {/* Dark Mode */}
-                    <label>Dark Mode: </label>
-                    <input type="checkbox" name="darkMode" defaultChecked={userData?.darkMode} onChange={(e) => { setDarkMode(e.target.checked) }} />
-                    <em> -  effect to be implemented </em>
-                    <br />
-                    {/* Private Mode */}
-                    <label>Private Mode: </label>
-                    <input type="checkbox" name="privateMode" defaultChecked={userData?.privateMode} onChange={(e) => { setPrivateMode(e.target.checked) }} />
-                    <em> -  effect to be implemented </em>
-                    <br />
-                    {/* Restricted Mode */}
-                    <label>Restricted Mode: </label>
-                    <input type="checkbox" name="restrictedMode" defaultChecked={userData?.restrictedMode} onChange={(e) => { setRestrictedMode(e.target.checked) }} />
-                    <em> -  effect to be implemented </em>
-                    <br />
-                    <button type="submit"><u>&gt; Save Changes</u></button>
-                </form>
-            </div>
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageChange}
+                    />
+                </label>
 
-            <br />
-            <div className="bottom-actions">
-                {/* Delete profile button */}
-                <button className="delete-btn" onClick={togglePopup}>Delete Profile</button>
+                {preview && (
+                    <Image
+                        src={preview}
+                        alt="Preview"
+                        width={100}
+                        height={100}
+                        className={styles.previewAvatar}
+                    />
+                )}
+
+                <button type="submit" className={styles.uploadBtn} disabled={!file}>
+                    Upload
+                </button>
+
+                <p>File size limit: {MAX_MB} MB</p>
+            </form>
+
+            {/* Edit profile */}
+            <form onSubmit={handleEditProfile} className={styles.form}>
+
+                <label className={styles.label}>New Username (max 20 characters):</label>
+                <input
+                    type="text"
+                    name="username"
+                    minLength={1}
+                    maxLength={20}
+                    pattern="^[a-zA-Z0-9_]+$"
+                    className={styles.inputText}
+                    onChange={(e) => setNewUsername(e.target.value)}
+                />
+                {error && <span className={styles.errorMessage}>{error}</span>}
+
+                <label className={styles.label}>New Bio (max 200 characters):</label>
+                <textarea
+                    name="profileDesc"
+                    minLength={0}
+                    maxLength={200}
+                    rows={8}
+                    className={styles.textarea}
+                    onChange={(e) => setNewBio(e.target.value)}
+                />
+
+                <label className={styles.label}>Text Size:</label>
+                
+                {/* // ! -------- Commented out because not in use -------- // */}
+                {/* <input
+                    type="number"
+                    name="textSize"
+                    defaultValue={userData?.textSize}
+                    min={8}
+                    max={72}
+                    className={styles.inputNumber}
+                    onChange={(e) => setTextSize(Number(e.target.value))}
+                />
+                <em> - effect to be implemented</em>
+
+                <label className={styles.label}>Font:</label>
+                <select
+                    name="font"
+                    defaultValue={userData?.font}
+                    className={styles.select}
+                    onChange={(e) => setFont(e.target.value)}
+                >
+                    <option value="Arial">Arial</option>
+                    <option value="Verdana">Verdana</option>
+                    <option value="Helvetica">Helvetica</option>
+                    <option value="Times New Roman">Times New Roman</option>
+                    <option value="Courier New">Courier New</option>
+                    <option value="Georgia">Georgia</option>
+                    <option value="Comic Sans">Comic Sans</option>
+                </select>
+                <em> - effect to be implemented</em>
+
+                <label className={styles.label}>
+                    Dark Mode:
+                    <input
+                        type="checkbox"
+                        className={styles.checkbox}
+                        defaultChecked={userData?.darkMode}
+                        onChange={(e) => setDarkMode(e.target.checked)}
+                    />
+                </label>
+                <em> - effect to be implemented</em>
+
+                <label className={styles.label}>
+                    Private Mode:
+                    <input
+                        type="checkbox"
+                        className={styles.checkbox}
+                        defaultChecked={userData?.privateMode}
+                        onChange={(e) => setPrivateMode(e.target.checked)}
+                    />
+                </label>
+                <em> - effect to be implemented</em>
+
+                <label className={styles.label}>
+                    Restricted Mode:
+                    <input
+                        type="checkbox"
+                        className={styles.checkbox}
+                        defaultChecked={userData?.restrictedMode}
+                        onChange={(e) => setRestrictedMode(e.target.checked)}
+                    />
+                </label>
+                <em> - effect to be implemented</em> */}
+
+                <button type="submit" className={styles.submitBtn}>
+                    Save Changes
+                </button>
+            </form>
+
+            {/* Delete + Logout */}
+            <div className={styles.bottomActions}>
+                <button className={styles.deleteBtn} onClick={togglePopup}>
+                    Delete Profile
+                </button>
+
                 {isOpen && (
-                    <div className="confirm-overlay" onClick={togglePopup}>
-                        <div
-                            className="confirm-modal"
-                            onClick={(e) => e.stopPropagation()}>
-                            <h2 className="popup-text">Are you sure?</h2>
-                            <div className="confirm-actions">
-                                <button className="btn-cancel" onClick={togglePopup}>Close</button>
-                                <button className="btn-confirm" onClick={() => { profileFunctions.deleteUserAccount() }}>Delete</button>
+                    <div className={styles.confirmOverlay} onClick={togglePopup}>
+                        <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+                            <h2 className={styles.confirmModalTitle}>Are you sure?</h2>
+
+                            <div className={styles.confirmActions}>
+                                <button className={styles.btnCancel} onClick={togglePopup}>
+                                    Close
+                                </button>
+                                <button className={styles.btnConfirm} onClick={handleDeleteAccount}>
+                                    Delete
+                                </button>
                             </div>
                         </div>
                     </div>
                 )}
-                <br />
-                <br />
-                {/* Log out */}
-                <script className="logout-btn" onClick={() => { profileFunctions.logout(); }}>Log Out</script>
+
+                <button className={styles.logoutBtn} onClick={profileFunctions.logout}>
+                    Log Out
+                </button>
             </div>
+
+            {alertPopup && (
+                <div className={styles.confirmOverlay} onClick={toggleAlertPopup}>
+                    <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+                        <h2 className={styles.confirmModalTitle}>{status || "Alert"}</h2>
+                        {message && <p>{message}</p>}
+
+                        <div className={styles.confirmActions}>
+                            <button className={styles.btnConfirm} onClick={toggleAlertPopup}>
+                                OK
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
         </main>
     );
 }

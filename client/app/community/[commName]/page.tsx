@@ -25,32 +25,32 @@ export default function CommunityPage({
   const [error, setError] = useState<string | null>(null);
   const [userCommunities, setUserCommunities] = useState<DocumentData[]>([]);
 
-  const [groupName, setGroupName] = useState("");
-  const [groupMessage, setGroupMessage] = useState("");
-  const [forumInputs, setForumInputs] = useState<{ [groupId: string]: { name: string; description: string; message: string } }>({});
-  const [targetUserId, setTargetUserId] = useState<string>("");
+  // const [groupName, setGroupName] = useState("");
+  // const [groupMessage, setGroupMessage] = useState("");
+  // const [forumInputs, setForumInputs] = useState<{ [groupId: string]: { name: string; description: string; message: string } }>({});
+  // const [targetUserId, setTargetUserId] = useState<string>("");
 
   const [editOpen, setEditOpen] = useState(false);
   const [iconOpen, setIconOpen] = useState(false);
   const [bannerOpen, setBannerOpen] = useState(false);
   const [editGroupOpen, setEditGroupOpen] = useState(false);
-  const [showCreateForum, setShowCreateForum] = useState<{ [key: string]: boolean }>({});
+  // const [showCreateForum, setShowCreateForum] = useState<{ [key: string]: boolean }>({});
   const [modOptionsOpen, setModOptionsOpen] = useState(false);
   const [blacklistOpen, setBlacklistOpen] = useState(false);
   const [confirmDeleteForum, setConfirmDeleteForum] = useState(false);
   const [confirmDeleteGroup, setConfirmDeleteGroup] = useState(false);
 
-  const [iconFile, setIconFile] = useState<File | null>(null);
-  const [iconPreview, setIconPreview] = useState<string | null>(null);
-  const [bannerFile, setBannerFile] = useState<File | null>(null);
-  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+  // const [iconFile, setIconFile] = useState<File | null>(null);
+  // const [iconPreview, setIconPreview] = useState<string | null>(null);
+  // const [bannerFile, setBannerFile] = useState<File | null>(null);
+  // const [bannerPreview, setBannerPreview] = useState<string | null>(null);
 
-  const [deleteForumId, setDeleteForumId] = useState<string>("");
-  const [deleteForumName, setDeleteForumName] = useState<string>("");
-  const [deleteGroupId, setDeleteGroupId] = useState<string>("");
-  const [deleteGroupName, setDeleteGroupName] = useState<string>("");
+  // const [deleteForumId, setDeleteForumId] = useState<string>("");
+  // const [deleteForumName, setDeleteForumName] = useState<string>("");
+  // const [deleteGroupId, setDeleteGroupId] = useState<string>("");
+  // const [deleteGroupName, setDeleteGroupName] = useState<string>("");
 
-  const [editGroupId, setEditGroupId] = useState<string>("");
+  // const [editGroupId, setEditGroupId] = useState<string>("");
 
   const [createGroupOpen, setCreateGroupOpen] = useState(false);
 

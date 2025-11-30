@@ -63,6 +63,7 @@
     width: 100%;
     max-width: 500px;
     margin-bottom: 1.5rem;
+    align-items: center;
 }
 
 /* Inputs and labels */
@@ -92,7 +93,8 @@
     font-weight: 600;
     cursor: pointer;
     transition: 0.2s ease;
-    margin-left: 2.5em;
+    /* margin-left: 2.5em; */
+    margin: auto;
 }
 
 .button:hover {
@@ -112,13 +114,15 @@
     cursor: pointer;
     font-size: 12px;
     transition: background-color 0.2s ease;
+    margin: auto;
 }
 
 .goBackBtn:hover {
-    background-color: #D9D9D9;
+    background-color: #a3c1d6;
 }
 
 /* Primary action buttons (Save/Delete) */
+.verifyBtn,
 .submitBtn,
 .uploadBtn {
     background: #D0E0EB;
@@ -129,11 +133,13 @@
     margin-top: 0.5rem;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    margin: auto;
 }
 
+.verifyBtn:hover,
 .submitBtn:hover,
 .uploadBtn:hover {
-    background: #D9D9D9;
+    background: #a3c1d6;
 }
 
 /* Delete button */
@@ -146,6 +152,7 @@
     margin-top: 0.5rem;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    margin: auto;
 }
 
 .deleteBtn:hover {
@@ -163,6 +170,7 @@
     margin-top: 0.5rem;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    margin: auto;
 }
 
 .logoutBtn:hover {
@@ -171,7 +179,7 @@
 }
 
 /* Verify email button */
-.verifyBtn {
+/* .verifyBtn {
     background: #FFD700;
     color: #5A5454;
     border: none;
@@ -181,11 +189,12 @@
     cursor: pointer;
     font-weight: 600;
     transition: background-color 0.2s ease;
+    margin: auto;
 }
 
 .verifyBtn:hover {
     background-color: #FFC107;
-}
+} */
 
 /* Align buttons at bottom */
 .bottomActions {

@@ -31,7 +31,10 @@ export interface User {
 // Delete account (revised)
 export async function deleteUserAccount() {
     const user = auth.currentUser;
-    if (!user) return alert("Not signed in");
+    if (!user) return {
+        status: "error",
+        message: "No user is currently signed in.",
+    };
 
     try {
         const idToken = await user.getIdToken();
@@ -50,24 +53,23 @@ export async function deleteUserAccount() {
         }
 
         console.log("Account deleted successfully.");
-        // alert("Account deleted successfully."); 
-        window.location.href = "/";
-        return { status: "ok", message: "Your account has been deleted." };
+        // window.location.href = "/";
+        return { status: "ok", message: "Account deleted successfully." };
     } catch (error) {
         let msg: string;
         if (error instanceof Error) {
             const firebaseAuthError = error as { code?: string; message: string};
             if (firebaseAuthError.code === "auth/requires-recent-login") {
-                alert("Please log in again to delete your account."); 
+                console.log(`${firebaseAuthError.message}`);
+                return { status: "error", message: "Please log in again to delete your account." };
             } else {
-                alert("Error deleting user: " + firebaseAuthError.message);
+                console.log(`Error deleting user: ${firebaseAuthError.message}`);
+                return { status: "error", message: firebaseAuthError.message };
             } // end if else
-            msg = firebaseAuthError.message;
         } else {
-            msg = "An unknown error occurred while deleting your account.";
-            alert("An unknown error occurred while deleting your account.");
+            console.log("An unknown error occurred while deleting your account.");
         } // end if else
-        return { status: "error", message: msg };
+        return { status: "error", message: "An unknown error occurred while deleting your account." };
     } // end try catch
 } // end deleteAccount
 
@@ -88,7 +90,7 @@ export async function logout() {
         window.location.href = "http://localhost:3000/"
         return { status: "ok", message: "User signed out successfully", };
     } catch (err) {
-        console.error("Error signing out:", err);
+        console.warn("Error signing out:", err);
         return { status: "error", message: "An error occurred while signing out.", };
     } // end try catch
 } // end function logout
@@ -113,17 +115,20 @@ export async function editProfile(username: string, profileDesc: string, textSiz
             updatedData.privateMode = privateMode;
             updatedData.restrictedMode = restrictedMode;
             await updateDoc(userDocRef, updatedData);
-            alert("Profile updated successfully.");
+            console.log("Profile updated successfully.");
+            return { status: "ok", message: "Profile updated successfully." };
         } catch (error) {
             if (error instanceof Error) {
-                alert("Error updating profile: " + error.message);
+                console.log("Error updating profile:", error.message);
+                return { status: "error", message: error.message };
             } else {
-                alert("An unknown error occurred.");
+                console.log("An unknown error occurred while updating profile.");
+                return { status: "error", message: "An unknown error occurred while updating profile." };
             } // end if else
         } // end try catch
     } else {
-        console.error("User not logged in");
-        alert("No user is currently signed in.");
+        console.log("User not logged in");
+        return { status: "error", message: "User not logged in." };
     } // end if else
 } // end function editProfile
 
@@ -151,8 +156,8 @@ export async function uploadProfilePicture(file: File) {
         return publicUrl;
 
     } catch (error) {
-        console.error("Error uploading profile picture:", error);
-        throw error;
+        console.warn("Error uploading profile picture:", error);
+        return null;
     }
 }
 
@@ -170,13 +175,14 @@ export async function verifyEmail() {
         const user = auth.currentUser;
         if (!user) {
             console.log("No user detected.");
-            return;
+            return { status: "error", message: "No user detected." };
         }
         await sendEmailVerification(user);
-        alert("Email verification sent. Check your inbox.")
         console.log("Email verification sent. Check your inbox.");
+        return { status: "ok", message: "Email verification sent. Check your inbox." };
     } catch (error) {
-        console.error("Error verifying email:", error);
+        console.log("Error verifying email:", error);
+        return { status: "error", message: "Error sending email verification." };
     } // end try catch
 } // end function verifyEmail
 
@@ -199,8 +205,8 @@ export async function getFriends(friendRefs: DocumentReference[]): Promise<User[
         // Filter out any missing/null results
         return friendDocs.filter((f): f is User => f !== null);
     } catch (error) {
-        console.error("Error fetching friends:", error);
-        throw error;
+        console.warn("Error fetching friends:", error);
+        return [];
     } // end try catch
 } // end function getFriends
 
@@ -223,7 +229,9 @@ export async function removeFriend(friendId: string) {
             throw new Error("Failed to remove friend");
         }
         console.log("Friend removed successfully.");
+        return { status: "ok", message: "Friend removed successfully." };
     } catch (error) {
-        console.error("Error removing friend:", error);
+        console.warn("Error removing friend:", error);
+        return { status: "error", message: "Error removing friend." };
     } // end try catch
 }

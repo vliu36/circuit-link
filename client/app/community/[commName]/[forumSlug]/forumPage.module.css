@@ -1,3 +1,7 @@
+.main {
+    padding: 0;
+}
+
 .container {
     padding: 40px;
     max-width: 800px;
@@ -68,7 +72,7 @@
     height: 10vh;
     margin-bottom: 10px;
     border-radius: 8px;
-    border: 1px solid #ccc;
+    /* border: 1px solid #ccc; */
     font-size: 14px;
     background-color: #FFFFFF;
     color: #5A5454;
@@ -239,7 +243,7 @@
 }
 
 .cancelButton {
-    background-color: #888;
+    background-color: #DD5555;
     border: none;
     color: white;
     padding: 0.5rem 1rem;
@@ -247,10 +251,12 @@
     cursor: pointer;
     font-family: Inria Sans;
     margin-right: 1rem;
+    margin-left: 1rem;
+    transition: background-color 0.2s ease;
 }
 
 .cancelButton:hover {
-    background-color: #666;
+    background-color: #c9302c;
 }
 
 .deleteButtonPopup {
@@ -585,23 +591,62 @@
 
 .RulesBar {
     width: 100%;
-    height: 45vh;
+    /* height: 45vh; */
+    height: 30vh;
     overflow-y: auto;
     overflow-x: hidden;
     display: flex;
     flex-direction: column;
+    margin-bottom: 1vh;
 }
 
-.usersBar {
-    background-color: rgb(11, 11, 44);
-    display: flex;
-    flex-direction: column;
-    font-family: Inria Sans;
-    color: rgb(255, 255, 255);
-    font-size: 25px;
-    text-indent: 3%;
+.ModeratorsBox {
+    width: 100%;
+    /* height: 45vh; */
+    height: auto;
     overflow-y: auto;
     overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1vh;
+}
+
+.ModeratorsList {
+    margin-left: 3%;
+    color: gray;
+    font-size: 17px;
+}
+
+.ModeratorAvatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: black;
+    margin-right: 2%;
+    flex-shrink: 0;
+    object-fit: cover;
+}
+
+.ModeratorName {
+    font-size: 20px;
+    color: #5A5454;
+}
+
+.ModeratorContent {
+    display: flex;
+    align-items: center;
+}
+
+.ModeratorLink {
+    text-decoration: none;
+    color: inherit;
+}
+
+.ModeratorItem {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* space between avatar, name, role */
+    margin-bottom: 10px; /* optional spacing between rows */
 }
 
 .navBox {
@@ -673,8 +718,10 @@
 }
 
 .serverIcon {
-    width: 130px;
-    height: 130px;
+    /* width: 130px;
+    height: 130px; */
+    width: 7vw;
+    height: 7vw;
     border-radius: 50%;
     margin-top: -2vw;
     margin-left: 1vw;
@@ -816,7 +863,7 @@
     width: 20px;
     border-radius: 1em;
     font-size: 0.8vw;
-    position: absolute;
+    /* position: absolute; */
     top: 90%;
     left: 0%;
 }
@@ -835,6 +882,20 @@
 }
 
 .popupBox {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 1em;
+    width: 400px;
+    box-shadow: 0 5px 10px rgba(154, 160, 185, .05), 0 15px 40px rgba(166, 173, 201, .2);
+    text-align: center;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+.popupBoxModerator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1px;
     background-color: white;
     padding: 2rem;
     border-radius: 1em;
@@ -876,7 +937,7 @@
     padding: 0.5rem;
     margin-top: 0.5rem;
     margin-bottom: 1rem;
-    border: floralwhite 1px solid;
+    border: gray 1px solid;
     border-radius: 0.5em;
     font-family: Inria Sans;
 }
@@ -889,6 +950,7 @@
     border-radius: 0.5em;
     cursor: pointer;
     font-family: Inria Sans;
+    transition: background-color 0.2s ease;
 }
 
 .saveBtn {
@@ -899,6 +961,7 @@
     border-radius: 0.5em;
     cursor: pointer;
     font-family: Inria Sans;
+    transition: background-color 0.2s ease;
 }
 
 .closeBtn:hover {
@@ -969,6 +1032,12 @@
 
 
 .postReportButton {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.postModToolsButton {
     width: 30px;
     height: 30px;
     cursor: pointer;
@@ -1050,12 +1119,35 @@
     cursor: pointer;
     font-family: Inria Sans;
     font-size: 0.8vw;
-    position: absolute;
+    /* position: absolute; */
     top: 90%;
     left: 10%;
+    margin-left: 1vw;
 }
 
+.editCommunityButton {
+    width: 20px;
+    height: 20px;
+    border: none;
+    color: white;
+    border-radius: 1em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    font-size: 0.8vw;
+    margin-left: 1vw;
+}
 
+.blacklistButton {
+    width: 20px;
+    height: 20px;
+    border: none;
+    color: white;
+    border-radius: 1em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    font-size: 0.8vw;
+    margin-left: 1vw;
+}
 
 .utilButtons {
     display: flex;
@@ -1157,12 +1249,168 @@
         align-items: center;
         margin-left: 5%;
     }
-
 }
-
 
 .errorText {
     color: orangered;
     margin-bottom: 1rem;
     font-family: Inria Sans;
+}
+
+.kickUserButton {
+    background-color: #ffffff;
+    border: 1px solid rgb(255, 0, 0);
+    color: rgb(255, 0, 0);
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.kickUserButton:hover {
+    background-color: #ffcccc;
+}
+
+.banUserButton {
+    background-color: #CC0000;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.banUserButton:hover {
+    background-color: #990000;
+}
+
+.promoteModButton {
+    background-color: #0072BB;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.promoteModButton:hover {
+    background-color: #004570;
+}
+
+.demoteModButton {
+    background-color: #DD5555;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.demoteModButton:hover {
+    background-color: #aa4444;
+}
+
+.promoteOwnerButton {
+    background-color: #4CAF50;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.promoteOwnerButton:hover {
+    background-color: #357a38;
+}
+
+.demoteOwnerButton {
+    background-color: #DD5555;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    margin-top: 1rem;
+    transition: background-color 0.2s ease;
+}
+
+.demoteOwnerButton:hover {
+    background-color: #aa4444;
+}
+
+.blacklistText {
+    font-size: 14px;
+    margin-top: 1rem;
+    color: #333333;
+}
+
+/* List wrapper */
+.blacklistList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    max-height: 40vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Each banned user row */
+.blacklistItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+}
+
+/* Username link */
+.blacklistName {
+    font-size: 1rem;
+    color: #4a4a4a;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.blacklistName:hover {
+    text-decoration: underline;
+}
+
+/* Unban button */
+.unbanButton {
+    margin-left: auto;
+    padding: 6px 10px;
+    background: #ff4d4d;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: 0.2s ease;
+}
+
+.unbanButton:hover {
+    background: #e63b3b;
+}
+
+/* For "empty blacklist" message */
+.blacklistEmpty {
+    padding: 10px;
+    text-align: center;
+    color: #ccc;
+    font-size: 0.9rem;
 }
