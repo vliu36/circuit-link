@@ -1047,21 +1047,27 @@ export default function ForumPage({
 
 
                                                     </div>
-
-                                                    <div className={styles.commentsBox}>
-                                                        <div className={styles.commentIcon} style={{ gridArea: "icon" }}>
-                                                            <Image
-                                                                src={commentIcon}
-                                                                width={50}
-                                                                height={50}
-                                                                alt="commentIcon"
-                                                            />
+                                                    
+                                                    <Link href={`/community/${commName}/${forumSlug}/${post.id}`} className={styles.commentsBox}>
+                                                        <div className={styles.commentsBox}>
+                                                            <div className={styles.commentIcon} style={{ gridArea: "icon" }}>
+                                                                {/* <Link href={`/community/${commName}/${forumSlug}/${post.id}`}> */}
+                                                                    <Image
+                                                                        src={commentIcon}
+                                                                        width={50}
+                                                                        height={50}
+                                                                        alt="commentIcon"
+                                                                        style={{ cursor: "pointer" }}
+                                                                    />
+                                                                {/* </Link> */}
+                                                            </div>
+                                                            <div className={styles.ratioScore} style={{ gridArea: "ratio" }}>
+                                                                {/* <Link href={`/community/${commName}/${forumSlug}/${post.id}`}> */}
+                                                                    {post.replyCount}
+                                                                {/* </Link> */}
+                                                            </div>
                                                         </div>
-                                                        <div className={styles.ratioScore} style={{ gridArea: "ratio" }}>
-                                                            {post.replyCount}
-                                                        </div>
-
-                                                    </div>
+                                                    </Link>
                                                     {/* Report button */}
                                                     <div className={styles.utilButtons}>
                                                         <button

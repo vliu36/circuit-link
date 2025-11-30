@@ -116,13 +116,13 @@
     box-shadow: 0 5px 10px rgba(154, 160, 185, .05), 0 15px 40px rgba(166, 173, 201, .2);
     background-color: #FFFFFF;
     color: #5A5454;
-    transition: transform 0.15s ease;
+    transition: background-color 0.15s ease;
     width: 100%;
     min-height: 20vh;
 }
 
 .postCard:hover {
-    background-color: #cecece;
+    background-color: #f3f3f3;
 }
 
 .title {
