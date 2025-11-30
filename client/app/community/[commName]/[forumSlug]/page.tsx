@@ -708,6 +708,12 @@ export default function ForumPage({
         }
     }
 
+    function isVideo(url: string) {
+        if (!url) return false;
+        const ext = url.split('.').pop()?.toLowerCase();
+        return ["mp4", "mov", "avi", "wmv", "flv", "mkv"].includes(ext || "");
+    }
+
     return (
         <main>
             <div className={styles.background}>
@@ -1025,18 +1031,16 @@ export default function ForumPage({
                                                 {post.media && (
                                                     <div className={styles.mediaBackground}>
                                                         <div className={styles.mediaInPost}>
-                                                            {post.media.endsWith(".mp4") ? (
+                                                            {isVideo(post.media) ? (
                                                                 <video controls>
-                                                                    <source src={post.media} type="video/mp4" />
+                                                                    <source src={post.media} />
                                                                 </video>
                                                             ) : (
                                                                 <Image src={post.media} alt="Post Media" width={350} height={350} />
                                                             )}
                                                         </div>
                                                     </div>
-
                                                 )}
-
                                                 <div className={styles.contents}>{post.contents}</div>
 
 
