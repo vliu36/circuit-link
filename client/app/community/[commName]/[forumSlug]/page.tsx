@@ -989,7 +989,7 @@ export default function ForumPage({
                                                                     <source src={post.media} type="video/mp4" />
                                                                 </video>
                                                             ) : (
-                                                                <Image src={post.media} alt="Post Media" width={500} height={500} />
+                                                                <Image src={post.media} alt="Post Media" width={350} height={350} />
                                                             )}
                                                         </div>
                                                     </div>

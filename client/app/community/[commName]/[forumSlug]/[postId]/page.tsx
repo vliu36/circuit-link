@@ -19,7 +19,8 @@ import { fetchTopCommunities, fetchTopUsers, getCommunities } from "@/app/landin
 import { DocumentData } from "firebase/firestore";
 import ServerBar from "../../../../_components/serverBar/serverBar.tsx";
 import YourCommunities from "../../../../_components/yourCommunities/yourCommBar.tsx";
-
+import trashBin from "../../../../../public/trash-solid-full.svg"
+import editButton from "../../../../../public/pencil-solid-full.svg"
 
 
 export default function PostDetail({ params }: { params: Promise<{ commName: string; forumSlug: string; postId: string }> }) {
@@ -309,7 +310,8 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                 className={styles.replyCard}>
                 {/* If editing, show input fields instead */}
                 {editingId === item.id ? (
-                    <div>
+                    <div className={styles.editingCard}>
+                        <h1>You are editing this post</h1>
                         {/* Show title input if not editing a reply */}
                         {!isReply &&
                             <input
@@ -322,23 +324,23 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
 
                         {/* Show content input */}
                         <textarea
-                            className={styles.replyInput}
+                            className={styles.descInput}
                             value={editContent}
                             onChange={(e) => setEditContent(e.target.value)}
                             placeholder="Edit contents"
                         />
                         {/* ---- Buttons ---- */}
-                        <div className={styles.actions}>
+                        <div className={styles.editingButtons}>
                             {/* Save button */}
                             <button
-                                className={styles.editButton}
+                                className={styles.saveButton}
                                 onClick={() => handleEdit(item.id, isReply)}
                             >
                                 Save
                             </button>
                             {/* Cancel button */}
                             <button
-                                className={styles.deleteButton}
+                                className={styles.dontSaveButton}
                                 onClick={() => { setEditingId(null); setEditContent(""); setEditTitle(""); }}
                             >
                                 Cancel
@@ -351,7 +353,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                         {/* Show the author's username and display total yay score */}
                         <div className={styles.meta}>
                             <div className={styles.userIcon}>
-                                <Image src={item.authorPFP} alt={"Profile picture"} width={64} height={64} className={styles.userIcon} />
+                                <Image src={item.authorPFP} alt={"Profile picture"} width={64} height={64} />
                             </div>
                             <div className={styles.userTextAlignPosts}>
                                 <Link href={`/profile/${item.authorId}`}>
@@ -369,15 +371,19 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                         {"media" in item && item.media && (
                             // If media ends with .mp4, render video tag, else render image tag
                             item.media.endsWith(".mp4") ? (
-                                <div className={styles.mediaContainer}>
-                                    <video controls className={styles.postMedia}>
-                                        <source src={item.media} type="video/mp4" />
-                                        Your browser does not support the video tag.
-                                    </video>
+                                <div className={styles.mediaBackground}>
+                                    <div className={styles.mediaInPost}>
+                                        <video controls className = {styles.postMedia}>
+                                            <source src={item.media} type="video/mp4" />
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
                                 </div>
                             ) : (
-                                <div className={styles.mediaContainer}>
-                                    <Image src={item.media} alt="Post media" width={200} height={200} className={styles.postMedia} />
+                                <div className={styles.mediaBackground}>
+                                    <div className={styles.mediaInPost}>
+                                        <Image src={item.media} alt="Post media" width={350} height={350} />
+                                    </div>
                                 </div>
                             )
                         )}
@@ -392,14 +398,13 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                                     className={`${styles.voteButton} ${user?.uid && item.yayList.includes(user.uid) ? styles.yayActive : ""}`}
                                     onClick={() => handleVote(item.id, "yay", isReply)}
                                 >
-                                    <div className={styles.votingIcon}>
                                         <Image
                                             src={user?.uid && item.yayList.includes(user.uid) ? thumbsUpGlow : thumbsUp}
                                             width={40}
                                             height={40}
                                             alt="YAYS"
                                         />
-                                    </div>
+
 
                                 </button>
                                 <div className={styles.yayscore}>{item.yayScore}</div>
@@ -421,13 +426,18 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
 
                             {/* Edit and Delete buttons for posts and replies, only shown if the current user is the author */}
                             {(isOwner || isMod || isAuthor) && (
-                                <div className={styles.utilityButtons}>
+                                <div className={styles.utilButtons}>
                                     {/* Edit button */}
                                     <button
                                         className={styles.editButton}
                                         onClick={() => { setEditingId(item.id); setEditContent(item.contents); if (!isReply) setEditTitle(item.title); }}
                                     >
-                                        Edit
+                                        <Image
+                                            src={editButton}
+                                            height={30}
+                                            width={30}
+                                            alt="edit"
+                                        />
                                     </button>
                                     {/* Delete button */}
                                     <button
@@ -438,7 +448,12 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                                             toggleDeletePostPopup();
                                         }}
                                     >
-                                        Delete
+                                        <Image
+                                            src={trashBin}
+                                            height={30}
+                                            width={30}
+                                            alt="edit"
+                                        />
                                     </button>
                                 </div>
                             )}
@@ -480,7 +495,7 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
 
                 {/* Render nested replies, if any */}
                 {"listOfReplies" in item && item.listOfReplies.length > 0 && (
-                    <div style={{ marginLeft: "2vw", width: "96%" }}>
+                    <div style={{ marginLeft: "0.5vw", width: "96%" }}>
                         {item.listOfReplies.map((r) => renderPostOrReply(r, depth + 1))}
                     </div>
                 )}
