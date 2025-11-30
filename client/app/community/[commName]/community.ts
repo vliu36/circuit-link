@@ -231,15 +231,18 @@ export async function leaveCommunity(commName: string): Promise<{ status: string
         const data = await res.json();
         if (!res.ok) {
             console.log(data.message);
-            alert(data.message);
+            
             return {
-                status: data.statusText,
+                status: "error",
                 message: data.message
             };
         }
 
         console.log("Left community successfully:", data);
-        return data;
+        return {
+            status: "ok",
+            message: data.message
+        };
     } catch (err) {
         console.log("Error leaving community:", err);
         return {
@@ -446,7 +449,10 @@ export async function changeCommunityIcon(file: File, commId: string) {
         await updateDoc(commDocRef, { icon: publicUrl });
 
         console.log("Community icon updated successfully:", publicUrl);
-        return publicUrl;
+        return {
+            status: "ok",
+            message: publicUrl,
+        };
 
     } catch (error) {
         console.log("Error uploading profile picture:", error);
@@ -473,7 +479,10 @@ export async function changeCommunityBanner(file: File, commId: string) {
         const commDocRef = doc(db, "Communities", commId);
         await updateDoc(commDocRef, { banner: publicUrl });
         console.log("Community banner updated successfully:", publicUrl);
-        return publicUrl;
+        return {
+            status: "ok",
+            message: publicUrl,
+        };
 
     } catch (error) {
         console.log("Error uploading profile picture:", error);

@@ -136,7 +136,7 @@ export async function getMediaUrl(mediaFile: File | null) {
                 fileName = await uploadVideo(mediaFile) as string;
                 mediaUrl += `videos/${fileName}`;
             } else {
-                alert("Unsupported media type. Please upload an image or video.");
+                console.log("Unsupported media type. Please upload an image or video.");
                 return { status: "error", message: "Unsupported media type.", media: null };
             } // end if else
         } else {

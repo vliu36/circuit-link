@@ -11,9 +11,9 @@ export default function AuthButtons({ user }: { user: User | null}) {
         <div>
             {user ? (
                 <div className = {Styles.logInInfo}>
-                    <Link className = {Styles.logInSignUpButton} href="./signin" replace> Log In </Link>
+                    <Link className = {Styles.logInSignUpButton} href="/signin"> Log In </Link>
                     <h1 className = {Styles.orText}> or </h1>
-                    <Link className = {Styles.logInSignUpButton} href="./register" replace> Sign Up </Link>
+                    <Link className = {Styles.logInSignUpButton} href="/register"> Sign Up </Link>
                 </div>
             ) : (
                 <div className = {Styles.logInInfo}>
