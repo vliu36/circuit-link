@@ -5,12 +5,13 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState, useRef } from "react";
 import { User } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore"; // <-- ADDED: For fetching user document
+import { arrayRemove, deleteDoc, doc, getDoc, updateDoc } from "firebase/firestore"; // <-- ADDED: For fetching user document
 import { db } from "@/app/_firebase/firebase"; // <-- ADDED: Reference to Firestore DB
 import { authStateCallback } from "@/app/_firebase/auth-observer.ts";
 import { logout } from '../../OldDefault/landing.ts';
 import HomeLogo from '../../../public/CircuitLinkHomeLogo.svg'
-import { getNotifications, NotificationData, respondToFriendRequest } from "../../profile/notifications/notifications.ts";
+import { getNotifications, NotificationData, respondToFriendRequest, fetchFriendRequestStatus } from "../../profile/notifications/notifications.ts";
+import notifalert from "../../../public/notifalerter.png"
 
 export default function NavBar() {
     const [user, setUser] = useState<User | null>(null);
@@ -22,6 +23,7 @@ export default function NavBar() {
     // ADDED STATE: To hold notification data
     const [notifications, setNotifications] = useState<NotificationData[]>([]);
     const [requestStatus, setRequestStatus] = useState<{ [key: string]: string }>({});
+    const friendRequestCount = notifications.filter(n => n.type === "friend_request").length;
 
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -103,22 +105,42 @@ export default function NavBar() {
 
     // ADDED HANDLER: Logic for accepting/declining requests
     const handleRespondToRequest = async (notifId: string, accept: boolean, userId: string) => {
-        // Find the specific notification object to get the DocRef needed for the backend
         const targetNotif = notifications.find(n => n.id === notifId);
 
-        if (targetNotif && targetNotif.relatedDocRef) {
-            // Update UI immediately (optimistic update)
-            setRequestStatus(prev => ({ ...prev, [notifId]: accept ? 'accepted' : 'rejected' }));
+        if (!targetNotif || !targetNotif.relatedDocRef) return;
 
-            try {
-                // Call the backend function using the DocumentReference
-                await respondToFriendRequest(targetNotif.relatedDocRef, accept, userId);
-            } catch (error) {
-                console.error("Failed to respond:", error);
-                setRequestStatus(prev => ({ ...prev, [notifId]: 'pending' })); // Revert status on failure
-            }
+        // UI optimistic update
+        setRequestStatus(prev => ({
+            ...prev,
+            [notifId]: accept ? "accepted" : "rejected"
+        }));
+
+        try {
+            // 1. Notify backend (optional)
+            await respondToFriendRequest(targetNotif.relatedDocRef, accept, userId);
+
+            // 2. DELETE FriendRequest document
+            await deleteDoc(targetNotif.relatedDocRef);
+
+            // 3. DELETE Notification document
+            const notifRef = doc(db, "Notifs", notifId);
+            await deleteDoc(notifRef);
+
+            // 4. REMOVE notification reference from user.notifications
+            const userRef = doc(db, "Users", userId);
+            await updateDoc(userRef, {
+                notifications: arrayRemove(notifRef),
+            });
+
+            // 5. Remove from UI
+            setNotifications(prev => prev.filter(n => n.id !== notifId));
+
+        } catch (error) {
+            console.error("Failed to respond:", error);
+            setRequestStatus(prev => ({ ...prev, [notifId]: "pending" }));
         }
     };
+
 
     const toggleNotif = () => {
         setIsNotifOpen(prev => !prev);
@@ -144,7 +166,7 @@ export default function NavBar() {
                     <div className={Styles.orText}> or </div>
                     <Link className={Styles.logInSignUpButton} href="./register"> Sign Up </Link>
                 </div>
-                
+
             </div>
         )
             : (
@@ -158,7 +180,16 @@ export default function NavBar() {
 
                     <div className={Styles.rightIcons} ref={notifRef} style={{ gridArea: 'notification' }}>
                         <button onClick={() => setIsNotifOpen(prev => !prev)}>
-                            <Image src="/notification.svg" alt="Info" className={Styles.notificationButton} width={10} height={10}></Image>
+                            <Image
+                                src="/notification.svg"
+                                alt="Info"
+                                className={Styles.notificationButton}
+                                width={10}
+                                height={10}
+                            ></Image>
+                            {friendRequestCount > 0 && (
+                                <div className={Styles.redDot}></div>
+                            )}
                         </button>
                         {isNotifOpen && (
                             <div className={Styles.notifDropdownMenu}>
