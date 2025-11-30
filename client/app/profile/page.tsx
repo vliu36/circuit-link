@@ -330,7 +330,9 @@ export default function Profile() {
                 />
 
                 <label className={styles.label}>Text Size:</label>
-                <input
+                
+                {/* // ! -------- Commented out because not in use -------- // */}
+                {/* <input
                     type="number"
                     name="textSize"
                     defaultValue={userData?.textSize}
@@ -389,7 +391,7 @@ export default function Profile() {
                         onChange={(e) => setRestrictedMode(e.target.checked)}
                     />
                 </label>
-                <em> - effect to be implemented</em>
+                <em> - effect to be implemented</em> */}
 
                 <button type="submit" className={styles.submitBtn}>
                     Save Changes
