@@ -25,7 +25,6 @@ export async function login(email: string, password: string) {
 
         if (!res.ok) {
             console.log("Login failed.");
-            // alert("Login failed after registration.");
             return { status: "error", message: "Login failed after registration" };
         }
 
@@ -39,16 +38,13 @@ export async function login(email: string, password: string) {
                 error.code === "auth/invalid-credential" || 
                 error.code === "auth/user-not-found"
             ) {
-                alert("Invalid email or password.");
                 msg = "Invalid email or password.";
             } else {
-                alert("An unexpected error occurred: " + error.message);
                 msg = "An unexpected error occurred: " + error.message;
             } // end if else
-            console.error(error);
+            console.log(error);
         } else {
-            console.error("Unknown error: ", error);
-            alert("An unexpected error occurred.");
+            console.log("Unknown error: ", error);
             msg = "Unknown error: " + error;
         } // end if else
         return { status: "error", message: msg };
@@ -75,8 +71,6 @@ export async function loginWithGoogle() {
         const data = await res.json();
         if (!res.ok) {
             console.error("Google sign in failed:", data);
-
-            // alert(data.message || "Failed to sign in user with Google.");
             return { status: "error", message: data.message || "Failed to sign in user with Google" };
         } // end if
         console.log("Google user signed in successfully:", data);
@@ -84,8 +78,6 @@ export async function loginWithGoogle() {
         return { status: "ok", message: "Google login successful", user};
         
     } catch (error) {
-        // console.error("Error during Google sign-in:", error.code, error.message);
-        // alert("Google sign-in failed: " + error.message);
         if (error instanceof FirebaseError) {
             const errorCode = error.code;
             const errorMessage = error.message;
@@ -93,10 +85,9 @@ export async function loginWithGoogle() {
             const credential = GoogleAuthProvider.credentialFromError(error); // AuthCredential type that was used
             
             console.error("Error during Google sign-in:", errorCode, errorMessage, email, credential);
-            // alert("Error during Google sign-in: " + errorMessage);
+
         } else {
             console.error("Unexpected error during Google sign-in:", error);
-            // alert("An unexpected error occurred during sign-in.");
         }
         return { status: "error", message: "Google sign-in failed" };
     } // end try catch
@@ -106,14 +97,17 @@ export async function loginWithGoogle() {
 export async function forgotPassword(email: string) {
     try {
         await sendPasswordResetEmail(auth, email);
-        alert("Password reset link sent to " + email);  // TODO: Redirect to our own page and enforce password rules
+        console.log("Password reset email sent to:", email);
+        return { status: "ok", message: `Password reset email sent to ${email}` };
     } catch (error) {
         if (error instanceof FirebaseError) {
             const errorCode = error.code;
             const errorMessage = error.message;
-            console.error(errorCode, errorMessage);
+            console.log(errorCode, errorMessage);
+            return { status: "error", message: "Failed to send password reset email: " + errorMessage };
         } else {
-            console.error("Unexpected error during password reset: ", error);
+            console.log("Unexpected error during password reset: ", error);
+            return { status: "error", message: "An unexpected error occurred during password reset." };
         } // end if else 
     } // end try catch
 } // end function forgotPassword

@@ -1219,7 +1219,7 @@ export default function ForumPage({
                                 Close
                             </button>
 
-                            {message && <p>{message}</p>}
+                            {message && <p className={styles.errorText}>{message}</p>}
                         </div>
                     </div>
                 )}

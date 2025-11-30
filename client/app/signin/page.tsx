@@ -12,11 +12,20 @@ export default function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPass, setShowPass] = useState(false);
-    // const [error, setError] = useState("");
     const [isOpen, setIsOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState("");
+    const [alertStatus, setAlertStatus] = useState("");
+    const [alertPopup, setAlertPopup] = useState(false);
+    const [resetEmail, setResetEmail] = useState("");
 
+    // Toggle forgot password popup
     const togglePopup = () => {
         setIsOpen(!isOpen);
+    }
+
+    // Toggle alert popup
+    const toggleAlertPopup = () => {
+        setAlertPopup(!alertPopup);
     }
 
     // handleSubmit function for login
@@ -24,35 +33,59 @@ export default function Login() {
         e.preventDefault();
         const cleanMail = email.trim();
         const cleanPass = password.trim();
-
-        await login(cleanMail, cleanPass);
+        try {
+            const res = await login(cleanMail, cleanPass);
+            if (res.status === "error") {
+                setAlertMessage(res.message);
+                setAlertStatus("Error");
+                toggleAlertPopup();
+            }
+        } catch (error) {
+            console.log("Login error:", error);
+            setAlertMessage("An unexpected error occurred during login.");
+            setAlertStatus("Error");
+            toggleAlertPopup();
+        }
     } // end handleSubmitLog
 
     // handleSubmit for forgot password
     async function handleSubmitForgotPassword(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
-        const cleanMail = email.trim();
-        await forgotPassword(cleanMail);
+        const cleanMail = resetEmail.trim();
+        try {
+            const res = await forgotPassword(cleanMail);
+            if (res.status === "ok") {
+                setAlertMessage(res.message);
+                setAlertStatus("Success");
+                toggleAlertPopup();
+                return;
+            } else {
+                setAlertMessage(res.message);
+                setAlertStatus("Error");
+                toggleAlertPopup();
+                return;
+            }
+        } catch (error) {
+            console.log("Forgot password error:", error);
+            setAlertMessage("An unexpected error occurred during password reset.");
+            setAlertStatus("Error");
+            toggleAlertPopup();
+        }
     }
 
     // ---- HTML ---- //
     return (
         <div>
-
             <main>
-
                 <div className={Styles.background}>
                     <div>
                         <NavBar />
                     </div>
                     <div className={Styles.loginContainer}>
-
                         {/* Title */}
                         <h1 className={Styles.title}>Log in</h1>
-
                         {/* FORM */}
                         <form onSubmit={handleSubmitLog}>
-
                             {/* EMAIL */}
                             <div className={Styles.emailBox}>
                                 <label>Email</label>
@@ -63,7 +96,6 @@ export default function Login() {
                                     onChange={(e) => setEmail(e.target.value)}
                                 />
                             </div>
-
                             {/* PASSWORD */}
                             <div className={Styles.passwordBox}>
                                 <label>Password</label>
@@ -74,7 +106,6 @@ export default function Login() {
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
                             </div>
-
                             {/* Show password + forgot */}
                             <div className={Styles.showpasswordSection}>
                                 <label>
@@ -85,7 +116,6 @@ export default function Login() {
                                     />
                                     Show password
                                 </label>
-
                                 <button
                                     type="button"
                                     className={Styles.forgotPasswordBtn}
@@ -94,17 +124,11 @@ export default function Login() {
                                     Forgot password?
                                 </button>
                             </div>
-
-                           
                             {/* Login button */}
                             <div className={Styles.centerButton}>
                                 <button className={Styles.loginButton} type="submit">Log in</button>
                             </div>
-
                         </form>
-
-                         
-
                         {/* Divider */}
                         <div className={Styles.lineBox}>
                             <span className={Styles.line}></span>
@@ -134,25 +158,43 @@ export default function Login() {
                 {/* Moved this outside because overlay wasn't working properly; only darkened the background for the login box */}
                 {/* This is a popup form that appears when the user clicks "Forgot Password?" */}
                 {isOpen && (
-                    <div className={Styles.popupOverlay} onClick={togglePopup}>
-                        <div className={Styles.popupBox} onClick={(e) => e.stopPropagation()}>
-                            <h2 className={Styles.popupText}>Reset Password</h2>
+                    <div className={Styles.confirmOverlay} onClick={togglePopup}>
+                        <div className={Styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+                            
+                            <h2 className={Styles.confirmModalTitle}>Reset Password</h2>
+
                             <form onSubmit={handleSubmitForgotPassword}>
                                 <input
                                     type="email"
-                                    className={Styles.popupText}
+                                    className={Styles.confirmModalTextbox}
                                     placeholder="Enter your email"
-                                    onChange={(e) => setEmail(e.target.value)}
+                                    onChange={(e) => setResetEmail(e.target.value)}
                                     required
                                 />
-                                <button type="submit" className={Styles.popupText}>
+
+                                <button type="submit" className={Styles.resetSubmitBtn}>
                                     Send Reset Link
                                 </button>
                             </form>
 
-                            <button className={` ${Styles.closeBtn} ${Styles.popupText}`} onClick={togglePopup}>
+                            <button className={Styles.closeBtn} onClick={togglePopup}>
                                 Close
                             </button>
+
+                        </div>
+                    </div>
+                )}
+                {alertPopup && (
+                    <div className={Styles.confirmOverlay} onClick={toggleAlertPopup}>
+                        <div className={Styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+                            <h2 className={Styles.confirmModalTitle}>{alertStatus || "Alert"}</h2>
+                            {alertMessage && <p>{alertMessage}</p>}
+
+                            <div className={Styles.confirmActions}>
+                                <button className={Styles.btnConfirm} onClick={toggleAlertPopup}>
+                                    Close
+                                </button>
+                            </div>
                         </div>
                     </div>
                 )}

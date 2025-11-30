@@ -228,13 +228,25 @@
   margin-bottom: 12px;
 }
 
+
+/* Close button */
 .closeBtn {
-  background-color: #555;
-  border: none;
-  padding: 8px 16px;
-  color: white;
-  border-radius: 8px;
-  cursor: pointer;
+    margin-top: 12px;
+    background-color: #FF5C5C;
+    border: none;
+    padding: 8px 16px;
+    color: white !important;
+    font-family: 'Jura';
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    display: block;
+    margin: 12px auto 0 auto;
+}
+
+.closeBtn:hover {
+    background-color: #FF3B3B;
+    transform: scale(1.05);
 }
 
 .centerButton {
@@ -243,3 +255,108 @@
   justify-content: center;
   margin-top: 10px;
 }
+
+/* Delete button confirmation */
+/* overlay */
+.confirmOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+}
+
+/* modal card */
+.confirmModal {
+    max-width: 420px;
+    background: var(--card-bg, #fff);
+    color: var(--text, #111827);
+    border-radius: 12px;
+    padding: 1.25rem 1.25rem;
+    box-shadow: 0 10px 30px rgba(2,6,23,0.35);
+    transform-origin: center;
+    animation: fadeScaleIn 220ms ease-out;
+}
+
+/* fade + slight scale */
+@keyframes fadeScaleIn {
+    from { opacity: 0; transform: translateY(8px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* modal title and text */
+.confirmModalTitle {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.125rem;
+}
+
+/* Email input (same style system as login inputs) */
+.confirmModalTextbox {
+    width: 100%;
+    height: 38px;
+    border-radius: 20px;
+    border: none;
+    background-color: #F0F0F0;
+    padding-left: 12px;
+    font-family: 'Jura';
+    color: #5A5454;
+    font-size: 14px;
+    margin-bottom: 14px;
+}
+
+/* Send Reset Link button */
+.resetSubmitBtn {
+    width: 75%;
+    height: 40px;
+    border-radius: 15px;
+    font-family: 'Jura';
+    font-size: 14px;
+    color: #FFF;
+    background-color: #5193df;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.resetSubmitBtn:hover {
+    background-color: #72b1f8;
+    transform: scale(1.03);
+}
+
+/* buttons row */
+.confirmActions {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+/* neutral cancel */
+.btnCancel {
+    background: none;
+    border: 1px solid #cbd5e1;
+    color: #0f172a;
+    padding: 0.45rem 0.8rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* destructive confirm */
+.btnConfirm {
+    background: #dc3545; /* red */
+    color: white;
+    border: none;
+    padding: 0.45rem 0.9rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.2s, filter 0.2s;
+}
+
+/* hover states */
+.btnCancel:hover { background: rgba(0,0,0,0.03); }
+.btnConfirm:hover { filter: brightness(0.9); }
