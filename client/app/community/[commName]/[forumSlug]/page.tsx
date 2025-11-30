@@ -29,6 +29,7 @@ import editButton from "../../../../public/pencil-solid-full.svg"
 import chatutton from "../../../../public/message-solid-full.svg"
 import trashBin from "../../../../public/trash-solid-full.svg"
 import reportIcon from "../../../../public/flag-solid-full.svg"
+import cogwheel from "../../../../public/gear.svg"
 
 export default function ForumPage({
     params,
@@ -36,67 +37,68 @@ export default function ForumPage({
     params: Promise<{ commName: string; forumSlug: string }>;
 }) {
     const { commName, forumSlug } = use(params);
-    const { user } = useAuth();
-    const { userData } = useAuth();
-    const [community, setCommunity] = useState<Community | null | undefined>(undefined);
-    const [posts, setPosts] = useState<Post[]>([]);
-    const [title, setTitle] = useState("");
-    const [contents, setContents] = useState("");
-    const [editingPostId, setEditingPostId] = useState<string | null>(null);
-    const [editTitle, setEditTitle] = useState("");
-    const [editContents, setEditContents] = useState("");
-    const [error, setError] = useState<string | null>(null);
-    const [groupName, setGroupName] = useState("");
-    const [groupMessage, setGroupMessage] = useState("");
-    const [sortMode, setSortMode] = useState<string>("newest"); // "newest" | "oldest" | "mostYays" | "alphabetical"
-    const [forumInputs, setForumInputs] = useState<{ [groupId: string]: { name: string; description: string; message: string } }>({});
-    const [editGroupOpen, setEditGroupOpen] = useState(false);
-    const [forum, setForum] = useState<Forum | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [editGroupId, setEditGroupId] = useState<string>("");
-    const [editPopup, setEditPopup] = useState(false);
-    const [message, setMessage] = useState<string | null>(null);
-    const [mediaFile, setMediaFile] = useState<File | null>(null);
-    const [mediaPreview, setMediaPreview] = useState<string | null>(null);
-    const fileInputRef = useRef<HTMLInputElement | null>(null);
-    const router = useRouter();
+    const { user, userData } = useAuth();
+    const [community, setCommunity] = useState<Community | null | undefined>(undefined);    // Community data
+    const [posts, setPosts] = useState<Post[]>([]);                                         // All posts in the forum
+    const [title, setTitle] = useState("");                                                 // Title for new post
+    const [contents, setContents] = useState("");                                           // Contents for new post
+    const [editingPostId, setEditingPostId] = useState<string | null>(null);                // ID of the post being edited
+    const [editTitle, setEditTitle] = useState("");                                         // Title for editing post
+    const [editContents, setEditContents] = useState("");                                   // Contents for editing post
+    const [error, setError] = useState<string | null>(null);                                // Error message    
+    const [groupName, setGroupName] = useState("");                                         // New group name                
+    const [groupMessage, setGroupMessage] = useState("");                                   // Message for group creation
+    const [sortMode, setSortMode] = useState<string>("newest");                             // Sorting mode, either: "newest" | "oldest" | "mostYays" | "alphabetical"
+    const [forumInputs, setForumInputs] = useState<{ [groupId: string]: { name: string; description: string; message: string } }>({}); // Inputs for creating forums
+    const [editGroupOpen, setEditGroupOpen] = useState(false);                              // Edit group popup state
+    const [forum, setForum] = useState<Forum | null>(null);                                 // Current forum data
+    const [loading, setLoading] = useState(true);                                           // Loading state
+    // const [editGroupId, setEditGroupId] = useState<string>(""); // ! Moved to server bar
+    const [editPopup, setEditPopup] = useState(false);                                      // Edit forum popup state
+    const [message, setMessage] = useState<string | null>(null);                            // Message for popups
+    const [mediaFile, setMediaFile] = useState<File | null>(null);                          // Media file for new post
+    const [mediaPreview, setMediaPreview] = useState<string | null>(null);                  // Preview URL for media file
+    const fileInputRef = useRef<HTMLInputElement | null>(null);                             // Ref for file input
+    const router = useRouter();                                                             // Next.js router
     // const [showCreateForum, setShowCreateForum] = useState<{ [key: string]: boolean }>({});
-    const [showCreateForum, setShowCreateForum] = useState(false);
-    const [reportPopup, setReportPopup] = useState(false);
-    const [reportReason, setReportReason] = useState("");
-    const [postId, setPostId] = useState<string>("");
-    const [userCommunities, setUserCommunities] = useState<DocumentData[]>([]);
-    const [dataLoading, setDataLoading] = useState(true);
-    const [confirmDeleteForum, setConfirmDeleteForum] = useState(false);
-    const [deleteForumId, setDeleteForumId] = useState<string>("");
-    const [deleteForumName, setDeleteForumName] = useState<string>("");
-    const [confirmDeleteGroup, setConfirmDeleteGroup] = useState(false);
-    const [deleteGroupId, setDeleteGroupId] = useState<string>("");
-    const [deleteGroupName, setDeleteGroupName] = useState<string>("");
-    const [searchQuery, setSearchQuery] = useState<string>("");
+    const [showCreateForum, setShowCreateForum] = useState(false);                          // Show create forum state
+    const [reportPopup, setReportPopup] = useState(false);                                  // Report popup state
+    const [reportReason, setReportReason] = useState("");                                   // Reason for reporting
+    const [postId, setPostId] = useState<string>("");                                       // ID of the post being reported
+    const [userCommunities, setUserCommunities] = useState<DocumentData[]>([]);             // User's communities
+    const [dataLoading, setDataLoading] = useState(true);                                   // Data loading state
+    const [confirmDeleteForum, setConfirmDeleteForum] = useState(false);                    // Confirm delete forum popup state
+    const [deleteForumId, setDeleteForumId] = useState<string>("");                         // ID of the forum to delete
+    const [deleteForumName, setDeleteForumName] = useState<string>("");                     // Name of the forum to delete
+    const [confirmDeleteGroup, setConfirmDeleteGroup] = useState(false);                    // Confirm delete group popup state
+    const [deleteGroupId, setDeleteGroupId] = useState<string>("");                         // ID of the group to delete
+    const [deleteGroupName, setDeleteGroupName] = useState<string>("");                     // Name of the group to delete
+    const [searchQuery, setSearchQuery] = useState<string>("");                             // Search query
 
-    const [createPostOpen, setCreatePostOpen] = useState(false);
+    const [createPostOpen, setCreatePostOpen] = useState(false);                            // Create post popup state
 
     // --- Delete Post State Variables---
-    const [deletePostOpen, setDeletePostOpen] = useState(false);
-    const [deletePostId, setDeletePostId] = useState<string>("");
+    const [deletePostOpen, setDeletePostOpen] = useState(false);                            // Delete post popup state
+    const [deletePostId, setDeletePostId] = useState<string>("");                           // ID of the post to delete
 
     const [groupId, setGroupId] = useState<string>("");
 
-    const [createGroupOpen, setCreateGroupOpen] = useState(false);
+    const [createGroupOpen, setCreateGroupOpen] = useState(false);                          // Create group popup state
 
-    const [iconOpen, setIconOpen] = useState(false);
-    const [bannerOpen, setBannerOpen] = useState(false);
-    const [modOptionsOpen, setModOptionsOpen] = useState(false);
-    const [blacklistOpen, setBlacklistOpen] = useState(false);
+    const [iconOpen, setIconOpen] = useState(false);                                        // Icon edit popup state
+    const [bannerOpen, setBannerOpen] = useState(false);                                    // Banner edit popup state
+    const [modOptionsOpen, setModOptionsOpen] = useState(false);                            // Moderator options popup state
+    const [blacklistOpen, setBlacklistOpen] = useState(false);                              // Blacklist popup state
 
-    const [iconFile, setIconFile] = useState<File | null>(null);
-    const [iconPreview, setIconPreview] = useState<string | null>(null);
-    const [bannerFile, setBannerFile] = useState<File | null>(null);
-    const [bannerPreview, setBannerPreview] = useState<string | null>(null);
+    const [iconFile, setIconFile] = useState<File | null>(null);                            // Icon file for community
+    const [iconPreview, setIconPreview] = useState<string | null>(null);                    // Icon preview URL
+    const [bannerFile, setBannerFile] = useState<File | null>(null);                        // Banner file for community
+    const [bannerPreview, setBannerPreview] = useState<string | null>(null);                // Banner preview URL
     const [targetUserId, setTargetUserId] = useState<string>("");
 
-    const [alertOpen, setAlertOpen] = useState(false);
+    const [alertOpen, setAlertOpen] = useState(false);                                      // Alert popup state
+
+    const [editCommPopup, setEditCommPopup] = useState(false);                              // Edit community popup state
 
     // --- Toggle popups ---
     const toggleCreatePostPopup = () => {
@@ -144,6 +146,11 @@ export default function ForumPage({
 
     const toggleAlertPopup = () => {
         setAlertOpen(!alertOpen);
+    };
+
+    const toggleEditCommPopup = () => {
+        setEditCommPopup(!editCommPopup);
+        setError(null);
     };
 
     useEffect(() => {
@@ -257,6 +264,32 @@ export default function ForumPage({
             }
         } catch (err) {
             console.error("Error deleting group:", err);
+        }
+    };
+
+    // --- EDIT COMMUNITY ---
+    const handleEditCommunity = async (newName?: string, description?: string, isPublic?: boolean, rules?: string) => {
+        try {
+            const namePattern = /^[a-zA-Z0-9_-]{1,24}$/;
+            if (newName && !namePattern.test(newName)) {
+                setError("Community name must be 1-24 characters long and can only contain letters, numbers, underscores, and hyphens.");
+                return;
+            }
+            const res = await commApi.editCommunity(commName, newName, description, isPublic, rules);
+            console.log(res.message);
+            setError(res.message || null);
+            if (res.status === "ok" && newName && newName.toLowerCase() !== commName.toLowerCase()) {
+                router.push(`/community/${newName}`);
+            } else if (res.status === "ok") {
+                // Close the edit popup after a brief delay only if the name hasn't changed
+                setTimeout(() => {
+                    toggleEditCommPopup();
+                }, 2000);
+                await refreshCommunity();
+            }
+        } catch (err) {
+            setError("Failed to edit community. Please try again.");
+            console.error("Error editing community:", err);
         }
     };
 
@@ -764,6 +797,8 @@ export default function ForumPage({
                                 <input
                                     placeholder="Post Title"
                                     value={title}
+                                    minLength={1}
+                                    maxLength={100}
                                     onChange={(e) => setTitle(e.target.value)}
                                     className={`${styles.popupText} ${styles.inputField}`}
                                     style={{ marginBottom: "1rem" }}
@@ -792,6 +827,8 @@ export default function ForumPage({
                                 <textarea
                                     placeholder="Post Contents"
                                     value={contents}
+                                    minLength={1}
+                                    maxLength={1000}
                                     onChange={(e) => setContents(e.target.value)}
                                     className={`${styles.popupText} ${styles.inputField}`}
                                     style={{ height: "120px" }}
@@ -882,14 +919,16 @@ export default function ForumPage({
                             <div className={styles.titleText}>
                                 {commName}
                                 {/* Button that toggles edit forum popup */}
-                                <button className={styles.editForumButton} onClick={() => setEditPopup(true)}>
-                                    <Image
-                                        src={editButton}
-                                        height={40}
-                                        width={40}
-                                        alt="edit"
-                                    />
-                                </button>
+                                {(isMod || isOwner) && (
+                                    <button className={styles.editForumButton} onClick={() => setEditPopup(true)}>
+                                        <Image
+                                            src={editButton}
+                                            height={40}
+                                            width={40}
+                                            alt="edit"
+                                        />
+                                    </button>
+                                )}
                                 {/* Show link to chat if user is member */}
                                 {isMember && (
                                     <button className={styles.chatLink}>
@@ -903,6 +942,16 @@ export default function ForumPage({
                                         </Link>
                                     </button>
 
+                                )}
+                                {isOwner && (
+                                    <button className={styles.editCommunityButton} onClick={toggleEditCommPopup}>
+                                        <Image
+                                            src={cogwheel}
+                                            height={40}
+                                            width={40}
+                                            alt="mod options"
+                                        />
+                                    </button>
                                 )}
                                 {/* Drop down menu to change sort mode */}
                                 <div className={styles.sortDropdown}>
@@ -977,7 +1026,11 @@ export default function ForumPage({
                                             <Link className={styles.user} href={`/profile/${post.authorId}`}>
                                                 <Image src={post.authorPFP} alt={`${post.authorUsername}'s profile picture`} width={20} height={20} className={styles.userProfile} />
                                                 <div className={styles.authorText}>
-                                                    {post.authorUsername} {authorIsMod && "[MOD]"} {authorIsOwner && "[ADMIN]"}
+                                                    {post.authorUsername} {authorIsOwner
+                                                                            ? " [OWNER]"
+                                                                            : authorIsMod
+                                                                                ? " [MOD]"
+                                                                                : ""}
                                                 </div>
 
                                             </Link>
@@ -1256,6 +1309,7 @@ export default function ForumPage({
                     </div>
                 )}
             </div>
+            {/* Delete forum confirmation popup */}
             {confirmDeleteForum && (
                 <div className={styles.popupOverlay} onClick={toggleConfirmDeleteForum}>
                     <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
@@ -1267,6 +1321,7 @@ export default function ForumPage({
                     </div>
                 </div>
             )}
+            {/* Delete group confirmation popup */}
             {confirmDeleteGroup && (
                 <div className={styles.popupOverlay} onClick={toggleConfirmDeleteGroup}>
                     <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
@@ -1277,6 +1332,7 @@ export default function ForumPage({
                     </div>
                 </div>
             )}
+            {/* Delete post confirmation popup */}
             {deletePostOpen && (
                 <div className={styles.popupOverlay} onClick={toggleDeletePostPopup}>
                     <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
@@ -1441,6 +1497,75 @@ export default function ForumPage({
                             Close
                         </button>
                     </div>
+                </div>
+            )}
+            {/* --- EDIT COMMUNITY POPUP --- */}
+            {editCommPopup && (
+                <div className={styles.popupOverlay} onClick={toggleEditCommPopup}>
+                <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                    <h2 className={styles.popupText}>Edit Community</h2>
+                    {/* Form for editing the communiuty */}
+                    <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.currentTarget);
+                    const newName = formData.get("newName") as string;
+                    const description = formData.get("description") as string;
+                    const isPublic = formData.get("isPublic") === "on" ? true : false;
+                    const rules = formData.get("rules") as string;
+                    await handleEditCommunity(newName || undefined, description || undefined, isPublic, rules || undefined);
+                    }}>
+                    <label className={styles.popupText}>
+                        New Name: <br />
+                        <input
+                        type="text"
+                        name="newName"
+                        defaultValue={community.name}
+                        className={`${styles.popupText} ${styles.inputField}`}
+                        maxLength={24}
+                        pattern="^[a-zA-Z0-9_-]+$"
+                        title="24 characters max. Name can only contain letters, numbers, underscores, and hyphens."
+                        />
+                    </label>
+                    <br /><br />
+                    <label className={styles.popupText}>
+                        Description: <br />
+                        <textarea
+                        name="description"
+                        className={`${styles.popupText} ${styles.inputField}`}
+                        defaultValue={community.description}
+                        maxLength={100}
+                        title="100 characters max."
+                        />
+                    </label>
+                    <br /><br />
+                    <label className={styles.popupText}>
+                        Rules: <br />
+                        <textarea
+                        name="rules"
+                        className={`${styles.popupText} ${styles.inputField}`}
+                        defaultValue={community.rules}
+                        maxLength={200}
+                        title="200 characters max."
+                        />
+                    </label>
+                    <br /><br />
+                    <label className={styles.popupText}>
+                        Public:{" "}
+                        <input
+                        type="checkbox"
+                        name="isPublic"
+                        defaultChecked={community.public}
+                        />
+                    </label>
+                    <br /><br />
+                    {error && <p className={styles.errorText}>{error}</p>}
+                    <br />
+                    <button type="submit" className={`${styles.popupText} ${styles.saveBtn}`}>Save Changes</button>
+                    </form>
+                    <button className={` ${styles.closeBtn} ${styles.popupText}`} onClick={toggleEditCommPopup}>
+                    Close
+                    </button>
+                </div>
                 </div>
             )}
             {/* --- ALERT POPUP --- */}

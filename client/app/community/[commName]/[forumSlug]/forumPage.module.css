@@ -68,7 +68,7 @@
     height: 10vh;
     margin-bottom: 10px;
     border-radius: 8px;
-    border: 1px solid #ccc;
+    /* border: 1px solid #ccc; */
     font-size: 14px;
     background-color: #FFFFFF;
     color: #5A5454;
@@ -673,8 +673,10 @@
 }
 
 .serverIcon {
-    width: 130px;
-    height: 130px;
+    /* width: 130px;
+    height: 130px; */
+    width: 7vw;
+    height: 7vw;
     border-radius: 50%;
     margin-top: -2vw;
     margin-left: 1vw;
@@ -816,7 +818,7 @@
     width: 20px;
     border-radius: 1em;
     font-size: 0.8vw;
-    position: absolute;
+    /* position: absolute; */
     top: 90%;
     left: 0%;
 }
@@ -876,7 +878,7 @@
     padding: 0.5rem;
     margin-top: 0.5rem;
     margin-bottom: 1rem;
-    border: floralwhite 1px solid;
+    border: gray 1px solid;
     border-radius: 0.5em;
     font-family: Inria Sans;
 }
@@ -1050,12 +1052,23 @@
     cursor: pointer;
     font-family: Inria Sans;
     font-size: 0.8vw;
-    position: absolute;
+    /* position: absolute; */
     top: 90%;
     left: 10%;
+    margin-left: 1vw;
 }
 
-
+.editCommunityButton {
+    width: 20px;
+    height: 20px;
+    border: none;
+    color: white;
+    border-radius: 1em;
+    cursor: pointer;
+    font-family: Inria Sans;
+    font-size: 0.8vw;
+    margin-left: 1vw;
+}
 
 .utilButtons {
     display: flex;
