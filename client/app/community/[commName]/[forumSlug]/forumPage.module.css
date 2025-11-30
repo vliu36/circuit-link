@@ -693,6 +693,16 @@
     border-radius: 1em;
 }
 
+.centerPage::-webkit-scrollbar {
+    width: 6px;
+}
+
+.centerPage::-webkit-scrollbar-thumb {
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    border: 2px solid transparent;
+}
+
 .descText {
     margin-left: 10%;
     margin-top: 1vh;

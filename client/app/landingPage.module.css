@@ -222,6 +222,10 @@
     width: 30px;
 }
 
+.notLoggedInContainer {
+    color: #5A5454;
+}
+
 /* Mobile View */
 @media only screen and (max-width: 768px) {
     .background {

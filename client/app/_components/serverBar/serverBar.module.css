@@ -15,6 +15,20 @@
     height: 100%;
 }
 
+.serverBar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.serverBar::-webkit-scrollbar-thumb {
+    background-color: #FFFFFF;
+    border-radius: 10px;
+}
+
+.serverBar::-webkit-scrollbar-track {
+    background-color: #D9D9D9;
+    border-radius: 12px;
+}
+
 .commName{
     width:90%;
     height:90%;

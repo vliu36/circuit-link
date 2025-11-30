@@ -4,11 +4,14 @@
     display: flex;
     flex-direction: column;
     font-family: Jura;
+    font-weight: bold;
     color: #5A5454;
     overflow-x: hidden;
     white-space: nowrap;
     height: 100%;
     width: 100%;
+    text-indent: 3%;
+    box-shadow: 0 5px 10px rgba(154, 160, 185, 0.5), 0 15px 40px rgba(166, 173, 201, 0.2);
 }
 
 .communitiesButtons{
