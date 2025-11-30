@@ -92,12 +92,13 @@ export default function Profile() {
     const submitImage = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!file) {
-            alert("Please select a file to upload.");
             return;
         }
         // Check file size 
         if (file.size > MAX_BYTES) {
-            alert(`File size exceeds the maximum allowed limit: ${MAX_KB}.`);
+            // alert(`File size exceeds the maximum allowed limit: ${MAX_KB}.`);
+            setError(`File size exceeds the maximum allowed limit: ${MAX_KB} KB.`);
+            console.log("File size exceeds the maximum allowed limit.");
             return;
         }
         try {

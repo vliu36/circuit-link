@@ -297,6 +297,12 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
         // TODO : Add request to join functionality
     }
 
+    function isVideo(url: string) {
+        if (!url) return false;
+        const ext = url.split('.').pop()?.toLowerCase();
+        return ["mp4", "mov", "avi", "wmv", "flv", "mkv"].includes(ext || "");
+    }
+
     // Recursive rendering function for posts and replies
     const renderPostOrReply = (item: Post | Reply, depth = 0) => {
         if (depth >= MAX_DEPTH) return null;
@@ -370,11 +376,11 @@ export default function PostDetail({ params }: { params: Promise<{ commName: str
                         {/* If the item has media (only posts have this) display media */}
                         {"media" in item && item.media && (
                             // If media ends with .mp4, render video tag, else render image tag
-                            item.media.endsWith(".mp4") ? (
+                            isVideo(item.media) ? (
                                 <div className={styles.mediaBackground}>
                                     <div className={styles.mediaInPost}>
                                         <video controls className = {styles.postMedia}>
-                                            <source src={item.media} type="video/mp4" />
+                                            <source src={item.media} />
                                             Your browser does not support the video tag.
                                         </video>
                                     </div>
