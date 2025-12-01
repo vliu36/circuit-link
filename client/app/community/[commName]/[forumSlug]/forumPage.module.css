@@ -103,14 +103,14 @@
 }
 
 .postCard {
-    border: 1px solid #999;
+    /* border: 1px solid #999; */
     white-space: pre-wrap;
     word-wrap: break-word;
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 20px;
     box-shadow: 0 5px 10px rgba(154, 160, 185, .05), 0 15px 40px rgba(166, 173, 201, .2);
-    background-color: #FFFFFF;
+    background-color: #F5f5f5;
     color: #5A5454;
     transition: background-color 0.15s ease;
     width: 100%;
@@ -118,7 +118,7 @@
 }
 
 .postCard:hover {
-    background-color: #f3f3f3;
+    background-color: #ffffff;
 }
 
 .title {
@@ -675,7 +675,7 @@
     position: sticky;
     top: 1rem;
     /* Keep it visible */
-    left: 80%;
+    left: 68%;
     /* Keep near the right edge */
     width: 15vw;
     z-index: 99999;
@@ -1025,7 +1025,7 @@
     flex-direction: column;
     background-color: #F5F5F5;
     margin-bottom: 1vw;
-    border-radius: 1em;
+    border-radius: 0.5em;
     box-shadow: 0 5px 10px rgba(154, 160, 185, .05), 0 15px 40px rgba(166, 173, 201, .2);
     position: relative;
 }

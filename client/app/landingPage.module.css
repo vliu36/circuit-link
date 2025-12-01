@@ -59,7 +59,10 @@
     padding: 0; 
 }
 
-
+.sectionTitle {
+    font-family: Jura;
+    font-weight: 550;
+}
 
 
 
@@ -197,6 +200,7 @@
     display: flex;
     width: 89.5%;
     margin-left: 2.5%;
+    margin-bottom: 1%;
 }
 
 
