@@ -1071,7 +1071,7 @@
     height: 4vh;
     border-radius: 1em;
     position: relative;
-    bottom: 5%;
+    top: 7%;
     left: 20%;
     color: #5A5454;
     text-indent: 5%;
@@ -1086,7 +1086,7 @@
     text-align: center;
     position: relative;
     left: 75%;
-    bottom: 14.5%;
+    top: -2.5%;
     font-size: 14px;
 }
 
