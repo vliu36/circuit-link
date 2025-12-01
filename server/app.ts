@@ -10,7 +10,7 @@ import messagesRouter from "./routes/messages.ts";
 
 const app = express();
 app.use(cors({
-    origin: "http://localhost:3000",
+    origin: "https://circuitlink-160321257010.us-west2.run.app",
     credentials: true,
 }));
 app.use(express.json());

@@ -243,7 +243,7 @@ export default function NavBar() {
                                     ))
                                 )}
                                 <Link
-                                    href="http://localhost:3000/profile/notifications"
+                                    href="https://circuitlink-160321257010.us-west2.run.app/profile/notifications"
                                     style={{ fontSize: '0.8rem', color: '#3F6DA1', marginTop: '10px', marginBottom: '5px', textDecoration: 'underline' }}
                                     replace
                                 >
@@ -259,7 +259,7 @@ export default function NavBar() {
                             {isDropdownOpen && (
                                 <div className={Styles.dropdownMenu}>
                                     <div className={Styles.buttonBox}>
-                                        <Link href="http://localhost:3000/profile" replace>Profile</Link>
+                                        <Link href="https://circuitlink-160321257010.us-west2.run.app/profile" replace>Profile</Link>
                                     </div>
                                     <div className={Styles.buttonBox}>
                                         <button style={{ color: 'black' }}>Settings</button>
