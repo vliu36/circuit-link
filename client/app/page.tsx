@@ -206,10 +206,10 @@ export default function Landing() {
                 </div>
 
 
+               
 
                 <div className={Styles.friendsBox} style={{ gridArea: "friendReq" }}>
-                    <h2 className={Styles.sectionTitle}>Your Friends</h2>
-
+                     <h2 className={Styles.sectionTitle}>Your Friends</h2>
                     {friends.length === 0 ? (
                         <p className={Styles.noFriendsText}>You have no friends yet.</p>
                     ) : (
