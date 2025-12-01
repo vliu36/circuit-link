@@ -181,7 +181,7 @@ export async function deleteCommunity(commName: string) {
             return;
         }
         console.log(data.message);
-        window.location.href = "/landing";
+        window.location.href = "/";
         return;
     } catch (err) {
         console.log("Error deleting community: ", err);

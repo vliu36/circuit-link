@@ -104,7 +104,7 @@ export default function ForumPage({
     const [editCommPopup, setEditCommPopup] = useState(false);                              // Edit community popup state
 
     const [modPopup, setModPopup] = useState(false);                                        // Moderator options popup state
-    
+
 
     // --- Toggle popups ---
     const toggleCreatePostPopup = () => {
@@ -628,6 +628,17 @@ export default function ForumPage({
         }
     };
 
+    // --- DELETE COMMUNITY ---
+    const handleDeleteComm = async (commName: string) => {
+        if (!confirm(`Are you sure you want to delete "${commName}"? This action cannot be undone.`)) {
+            return;
+        }
+
+        await commApi.deleteCommunity(commName);
+        console.log("Community successfully deleted.");
+        router.push("/");
+    }
+
     if (loading) return <div>Loading forum...</div>;
     if (community === undefined) return <div>Loading community...</div>;
     if (community === null) return <div>Community not found.</div>;
@@ -668,7 +679,7 @@ export default function ForumPage({
             setMessage("Please provide a reason for the report.");
             return;
         }
-        
+
         try {
             const res = await reportPost(commName, postId, reportReason);
             console.log(res.message);
@@ -1125,10 +1136,10 @@ export default function ForumPage({
                                 </div>
                             </div>
                             {!isMember ? (
-                                    <button className={styles.joinCommunityButton} onClick={handleJoin}>Join Community</button>
-                                ) : (
-                                    <button className={styles.joinCommunityButton} onClick={handleLeave}>Leave Community</button>
-                                )}
+                                <button className={styles.joinCommunityButton} onClick={handleJoin}>Join Community</button>
+                            ) : (
+                                <button className={styles.joinCommunityButton} onClick={handleLeave}>Leave Community</button>
+                            )}
                         </div>
 
                         <input
@@ -1170,7 +1181,7 @@ export default function ForumPage({
 
                                 // Check if the post's author is a mod or owner, and a member of the community
                                 const authorIsMod = community.modList.some(m => m.id === post.authorId);
-                                const authorIsOwner = community.ownerList.some(o => o.id === post.authorId); 
+                                const authorIsOwner = community.ownerList.some(o => o.id === post.authorId);
                                 const authorIsMember = community.userList.some(member => member.id === post.authorId);
 
                                 return (
@@ -1182,12 +1193,12 @@ export default function ForumPage({
                                                 <Image src={post.authorPFP} alt={`${post.authorUsername}'s profile picture`} width={20} height={20} className={styles.userProfile} />
                                                 <div className={styles.authorText}>
                                                     {post.authorUsername} {authorIsOwner
-                                                                            ? " [OWNER]"
-                                                                            : authorIsMod
-                                                                                ? " [MOD]"
-                                                                                : authorIsMember
-                                                                                    ? " [MEMBER]"
-                                                                                    : ""}
+                                                        ? " [OWNER]"
+                                                        : authorIsMod
+                                                            ? " [MOD]"
+                                                            : authorIsMember
+                                                                ? " [MEMBER]"
+                                                                : ""}
                                                 </div>
                                             </Link>
                                             {/* Time post was created, and if it was edited */}
@@ -1300,23 +1311,23 @@ export default function ForumPage({
 
 
                                                     </div>
-                                                    
+
                                                     <Link href={`/community/${commName}/${forumSlug}/${post.id}`} className={styles.commentsBox}>
                                                         <div className={styles.commentsBox}>
                                                             <div className={styles.commentIcon} style={{ gridArea: "icon" }}>
                                                                 {/* <Link href={`/community/${commName}/${forumSlug}/${post.id}`}> */}
-                                                                    <Image
-                                                                        src={commentIcon}
-                                                                        width={50}
-                                                                        height={50}
-                                                                        alt="commentIcon"
-                                                                        style={{ cursor: "pointer" }}
-                                                                    />
+                                                                <Image
+                                                                    src={commentIcon}
+                                                                    width={50}
+                                                                    height={50}
+                                                                    alt="commentIcon"
+                                                                    style={{ cursor: "pointer" }}
+                                                                />
                                                                 {/* </Link> */}
                                                             </div>
                                                             <div className={styles.ratioScore} style={{ gridArea: "ratio" }}>
                                                                 {/* <Link href={`/community/${commName}/${forumSlug}/${post.id}`}> */}
-                                                                    {post.replyCount}
+                                                                {post.replyCount}
                                                                 {/* </Link> */}
                                                             </div>
                                                         </div>
@@ -1337,13 +1348,13 @@ export default function ForumPage({
                                                                 alt="edit"
                                                             />
                                                         </button>
-                                                        
+
                                                         {/* Moderator tools button; display if owner or mod */}
                                                         {/* Do not show if: */}
                                                         {/* User is a mod, but post user is an owner/mod */}
                                                         {/* Post user is not a member */}
                                                         {/* Post user is the user */}
-                                                        {( (isMod && (!authorIsMod && !authorIsOwner)) || isOwner ) && authorIsMember && !isAuthor ? (
+                                                        {((isMod && (!authorIsMod && !authorIsOwner)) || isOwner) && authorIsMember && !isAuthor ? (
                                                             <button
                                                                 className={styles.postModToolsButton}
                                                                 onClick={() => {
@@ -1493,7 +1504,7 @@ export default function ForumPage({
                         <p className={styles.popupText}>Are you sure you want to delete forum &quot;{deleteForumName}&quot;? <br /> This action cannot be undone.</p>
                         {error && <p className={styles.errorText}>{error}</p>}
                         <button onClick={toggleConfirmDeleteForum} className={styles.cancelButton}>Cancel</button>
-                        <button onClick={() => {handleDeleteForum(deleteForumId)}} className={styles.deleteButtonPopup}>Delete</button>
+                        <button onClick={() => { handleDeleteForum(deleteForumId) }} className={styles.deleteButtonPopup}>Delete</button>
                     </div>
                 </div>
             )}
@@ -1678,70 +1689,78 @@ export default function ForumPage({
             {/* --- EDIT COMMUNITY POPUP --- */}
             {editCommPopup && (
                 <div className={styles.popupOverlay} onClick={toggleEditCommPopup}>
-                <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
-                    <h2 className={styles.popupText}>Edit Community</h2>
-                    {/* Form for editing the communiuty */}
-                    <form onSubmit={async (e) => {
-                    e.preventDefault();
-                    const formData = new FormData(e.currentTarget);
-                    const newName = formData.get("newName") as string;
-                    const description = formData.get("description") as string;
-                    const isPublic = formData.get("isPublic") === "on" ? true : false;
-                    const rules = formData.get("rules") as string;
-                    await handleEditCommunity(newName || undefined, description || undefined, isPublic, rules || undefined);
-                    }}>
-                    <label className={styles.popupText}>
-                        New Name: <br />
-                        <input
-                        type="text"
-                        name="newName"
-                        defaultValue={community.name}
-                        className={`${styles.popupText} ${styles.inputField}`}
-                        maxLength={24}
-                        pattern="^[a-zA-Z0-9_-]+$"
-                        title="24 characters max. Name can only contain letters, numbers, underscores, and hyphens."
-                        />
-                    </label>
-                    <br /><br />
-                    <label className={styles.popupText}>
-                        Description: <br />
-                        <textarea
-                        name="description"
-                        className={`${styles.popupText} ${styles.inputField}`}
-                        defaultValue={community.description}
-                        maxLength={100}
-                        title="100 characters max."
-                        />
-                    </label>
-                    <br /><br />
-                    <label className={styles.popupText}>
-                        Rules: <br />
-                        <textarea
-                        name="rules"
-                        className={`${styles.popupText} ${styles.inputField}`}
-                        defaultValue={community.rules}
-                        maxLength={200}
-                        title="200 characters max."
-                        />
-                    </label>
-                    <br /><br />
-                    <label className={styles.popupText}>
-                        Public:{" "}
-                        <input
-                        type="checkbox"
-                        name="isPublic"
-                        defaultChecked={community.public}
-                        />
-                    </label>
-                    <br /><br />
-                    {error && <p className={styles.errorText}>{error}</p>}
-                    <br />
-                    <button type="submit" className={`${styles.popupText} ${styles.saveBtn}`}>Save Changes</button>
-                    </form>
-                    <button className={` ${styles.closeBtn} ${styles.popupText}`} onClick={toggleEditCommPopup}>
-                    Close
-                    </button>
-                </div>
+                    <div className={styles.popupBox} onClick={(e) => e.stopPropagation()}>
+                        <h2 className={styles.popupText}>Edit Community</h2>
+                        {/* Form for editing the communiuty */}
+                        <form onSubmit={async (e) => {
+                            e.preventDefault();
+                            const formData = new FormData(e.currentTarget);
+                            const newName = formData.get("newName") as string;
+                            const description = formData.get("description") as string;
+                            const isPublic = formData.get("isPublic") === "on" ? true : false;
+                            const rules = formData.get("rules") as string;
+                            await handleEditCommunity(newName || undefined, description || undefined, isPublic, rules || undefined);
+                        }}>
+                            <label className={styles.popupText}>
+                                New Name: <br />
+                                <input
+                                    type="text"
+                                    name="newName"
+                                    defaultValue={community.name}
+                                    className={`${styles.popupText} ${styles.inputField}`}
+                                    maxLength={24}
+                                    pattern="^[a-zA-Z0-9_-]+$"
+                                    title="24 characters max. Name can only contain letters, numbers, underscores, and hyphens."
+                                />
+                            </label>
+                            <br /><br />
+                            <label className={styles.popupText}>
+                                Description: <br />
+                                <textarea
+                                    name="description"
+                                    className={`${styles.popupText} ${styles.inputField}`}
+                                    defaultValue={community.description}
+                                    maxLength={100}
+                                    title="100 characters max."
+                                />
+                            </label>
+                            <br /><br />
+                            <label className={styles.popupText}>
+                                Rules: <br />
+                                <textarea
+                                    name="rules"
+                                    className={`${styles.popupText} ${styles.inputField}`}
+                                    defaultValue={community.rules}
+                                    maxLength={200}
+                                    title="200 characters max."
+                                />
+                            </label>
+                            <br /><br />
+                            <label className={styles.popupText}>
+                                Public:{" "}
+                                <input
+                                    type="checkbox"
+                                    name="isPublic"
+                                    defaultChecked={community.public}
+                                />
+                            </label>
+                            <br /><br />
+                            {error && <p className={styles.errorText}>{error}</p>}
+                            <br />
+                            <button type="submit" className={`${styles.popupText} ${styles.saveBtn}`}>Save Changes</button>
+                        </form>
+                        <button className={` ${styles.closeBtn} ${styles.popupText}`} onClick={toggleEditCommPopup}>
+                            Close
+                        </button>
+
+                        {isOwner && (
+                            <div className={` ${styles.closeBtn} ${styles.popupText}`}>
+                                <button onClick={() => handleDeleteComm(community.name)}>
+                                    DELETE COMMUNITY
+                                </button>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
             {/* --- ALERT POPUP --- */}

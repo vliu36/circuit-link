@@ -76,6 +76,7 @@
   flex-direction: column;
   box-sizing: border-box;
   font-size: 15px;
+  position: relative;
 }
 
 .resultText {
