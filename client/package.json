@@ -15,7 +15,7 @@
     "dotenv": "^17.2.3",
     "firebase": "^12.6.0",
     "imagetracerjs": "^1.2.6",
-    "next": "15.5.7",
+    "next": "15.5.9",
     "potrace": "^2.1.8",
     "react": "19.1.2",
     "react-dom": "19.1.2",
