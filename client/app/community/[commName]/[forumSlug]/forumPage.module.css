@@ -645,8 +645,10 @@
 .ModeratorItem {
     display: flex;
     align-items: center;
-    gap: 8px; /* space between avatar, name, role */
-    margin-bottom: 10px; /* optional spacing between rows */
+    gap: 8px;
+    /* space between avatar, name, role */
+    margin-bottom: 10px;
+    /* optional spacing between rows */
 }
 
 .navBox {
@@ -860,6 +862,7 @@
     margin-left: 30%;
     position: absolute;
     left: 45%;
+    cursor: pointer;
 }
 
 .editForumButton {
@@ -992,6 +995,7 @@
 .mediaInPost {
     overflow: hidden;
     max-width: 500px;
+    max-height: 500px;
     margin: 0 auto;
     /* Centers horizontally */
     flex-shrink: 0;
@@ -1241,7 +1245,7 @@
 
     .mediaInPost {
         overflow: hidden;
-        max-width: 300px;
+        max-width: 400px;
         margin: 0 auto;
         /* Centers horizontally */
         flex-shrink: 0;
@@ -1258,6 +1262,30 @@
         justify-content: center;
         align-items: center;
         margin-left: 5%;
+    }
+
+    .editForumButton {
+        position: absolute;
+        top: 80%;
+        left: 35%;
+    }
+
+    .chatLink{
+        position: absolute;
+        top: 80%;
+        left: 45%;
+    }
+
+    .editCommunityButton{
+        position: absolute;
+        top: 80%;
+        left: 55%;
+    }
+
+    .blacklistButton{
+        position: absolute;
+        top: 80%;
+        left: 65%;
     }
 }
 
