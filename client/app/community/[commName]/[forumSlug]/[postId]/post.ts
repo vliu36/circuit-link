@@ -40,7 +40,7 @@ export type Post = {
 export const useReplies = (postId: string, userId?: string) => {
     const [post, setPost] = useState<Post | null>(null);
     const [loading, setLoading] = useState(true);
-    const BASE_URL = "http://localhost:2400/api";
+    const BASE_URL = "https://api-circuit-link-160321257010.us-west2.run.app/api";
 
     // --- Fetch post and its replies ---
     const fetchPost = useCallback(async () => {

@@ -1,6 +1,6 @@
 // Functions for viewing other user's profile
 
-const BASE_URL = "http://localhost:2400/api/users";
+const BASE_URL = "https://api-circuit-link-160321257010.us-west2.run.app/api/users";
 
 export interface OtherUserData {
     user: {

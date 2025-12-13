@@ -2,7 +2,7 @@
 
 import { uploadImage } from "./mediaUpload";
 
-const SERVER_URI = "http://localhost:2400/api/messages";
+const SERVER_URI = "https://api-circuit-link-160321257010.us-west2.run.app/api/messages";
 
 // Calls backend to create and send messages
 export async function sendMessage(author: string, contents: string, media: string | null, receiver: string, isDirect: number ) {
