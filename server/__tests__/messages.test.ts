@@ -14,6 +14,7 @@ describe("Messages API Test", () => {
         expect(res.status).toHaveBeenCalledWith(200);
     });
 
+    // addMessage: Test with missing fields
     it("should fail with status 400 Bad Request", async () => {
         const req = {
             // Receiver is not given
