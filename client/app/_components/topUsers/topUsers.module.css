@@ -44,6 +44,10 @@
     width: 100%;
 }
 
+.topUserItem:hover {
+    background-color: #ffffff;
+}
+
 .topUserIcon {
     flex-shrink: 0;          
     width: 40px;

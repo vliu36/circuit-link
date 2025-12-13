@@ -547,6 +547,10 @@ I dont think we need this
     background-color: rgb(15, 68, 167);
 }
 
+.joinCommunityButton:hover {
+    background-color: rgb(15, 68, 167);
+}
+
 .editCommunityButton{
     margin-left: 2%;
     height: 4vh;
