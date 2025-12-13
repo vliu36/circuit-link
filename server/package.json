@@ -5,7 +5,8 @@
   "main": "index.ts",
   "type": "module",
   "scripts": {
-    "start": "npx tsx index.ts"
+    "start": "npx tsx index.ts",
+    "test": "jest --coverage"
   },
   "dependencies": {
     "@google-cloud/storage": "^7.16.0",
@@ -20,7 +21,12 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/fluent-ffmpeg": "^2.1.27",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.0.13",
+    "@types/supertest": "^6.0.3",
+    "jest": "^30.2.0",
+    "supertest": "^7.1.4",
+    "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "tsx": "^4.20.5",
     "typescript": "^5.8.3"

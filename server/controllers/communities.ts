@@ -13,7 +13,7 @@ const getAllDocuments = async (req: Request, res: Response) => {
         const communitiesRef = db.collection("Communities");
         const snapshot = await communitiesRef.get();
         
-        res.status(200).send({
+        res.status(200).json({
             status: "OK",
             message: snapshot.docs.map(doc => doc.data())
         })
@@ -31,14 +31,10 @@ const addDoc = async (req: Request, res: Response) => {
     try {
         const { name, description, isPublic }: { name: string; description: string; isPublic: boolean } = req.body;
 
-        // ! DEPRECATED: Use ID token from Authorization header instead of session cookie
-        // // Get userId from sessionCookie
-        // const userId = await genUtil.getUserIdFromAuthHeader(req);
-
         // Get userId from ID token in Authorization header
         const idToken = req.headers.authorization?.split("Bearer ")[1];
         if (!idToken) {
-            return res.status(401).send({
+            return res.status(401).json({
                 status: "Unauthorized",
                 message: "No ID token provided in Authorization header",
             });
@@ -57,7 +53,7 @@ const addDoc = async (req: Request, res: Response) => {
         const snapshotLower = await communitiesRef.where("nameLower", "==", cleanName.toLowerCase()).get();
         if (!snapshot.empty || !snapshotLower.empty) {
             console.log("Error: Community already exists.");
-            return res.status(400).send({
+            return res.status(400).json({
                 status: "Bad Request",
                 message: "Community already exists!"
             });
@@ -138,7 +134,7 @@ const addDoc = async (req: Request, res: Response) => {
         });
     } catch (err) {
         console.log("Failed to add document to Communities");
-        res.status(500).send({
+        res.status(500).json({
             status: "Backend error: Could not add document to Communities",
             message: `Error: ${err instanceof Error ? err.message : String(err)}`,
         });
@@ -663,7 +659,7 @@ const prefixSearch = async (req: Request, res: Response) => {
     try {
         const query = req.params.query.toLowerCase();
         if (!query) {
-            res.status(400).send({
+            res.status(400).json({
                 status: "Bad Request",
                 message: "Empty query!"
             })
@@ -672,13 +668,13 @@ const prefixSearch = async (req: Request, res: Response) => {
         const communitiesRef = db.collection("Communities").where("nameLower", ">=", query).where("nameLower", "<=", query + "\uf8ff");
         const snapshot = await communitiesRef.get();
         
-        res.status(200).send({
+        res.status(200).json({
             status: "OK",
             message: snapshot.docs.map(doc => doc.data())
         });
     }
     catch (err) {
-        res.status(500).send({
+        res.status(500).json({
             status: "Backend error",
             message: err
         })

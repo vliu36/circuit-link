@@ -26,14 +26,14 @@ const getAllDocuments = async (req: Request, res: Response) => {
         const usersRef = db.collection("Users");
         const snapshot = await usersRef.get();
         
-        res.status(200).send({
+        res.status(200).json({
             status: "OK",
             message: snapshot.docs.map(doc => doc.data())
         })
     }
     catch (err) {
         console.log(err);
-        res.status(500).send({
+        res.status(500).json({
             status: "backend error",
             message: err
         })
@@ -83,7 +83,7 @@ const userRegistration = async (req: Request, res: Response) => {
     } 
     catch (err) {
         console.error("Error creating user:", err);
-        res.status(500).send({ 
+        res.status(500).json({ 
             status: "backend error",
             message: "Failed to register user.\n" + err
         }); 

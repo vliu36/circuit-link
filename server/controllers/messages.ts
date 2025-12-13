@@ -12,13 +12,13 @@ const getAllMessages = async (req: Request, res: Response) => {
         const messagesRef = db.collection("Messages");
         const snapshot = await messagesRef.get();
         
-        res.status(200).send({
+        res.status(200).json({
             status: "OK",
             message: snapshot.docs.map(doc => doc.data())
         })
     }
     catch (err) {
-        res.status(500).send({
+        res.status(500).json({
             status: "backend error",
             message: err
         })
@@ -31,13 +31,13 @@ const addMessage = async (req: Request, res: Response) => {
         const { author, contents, media, receiver, isDirect} = req.body;
 
         if (!author || !contents || !receiver) {
-            res.status(400).send({
+            res.status(400).json({
                 status: "Bad Request",
                 message: "ERROR: Missing required fields"
             });
         }
         if (!(isDirect == 0 || isDirect == 1)) {
-            res.status(400).send({
+            res.status(400).json({
                 status: "Bad Request",
                 message: "ERROR: isDirect must be 0 (false) or 1 (true)"
             });
@@ -62,13 +62,13 @@ const addMessage = async (req: Request, res: Response) => {
         const messagesRef = db.collection("Messages");
         const newMessageRef = await messagesRef.add(newMessage);
 
-        res.status(201).send({
+        res.status(201).json({
             status: "Created",
             message: newMessageRef
         });
     }
     catch (err) {
-        res.status(500).send({
+        res.status(500).json({
             status: "Backend Error",
             message: err
         })
@@ -221,11 +221,6 @@ const deleteMessageById = async (req: Request, res: Response) => {
             message: err
         });
     }
-}
-
-// Deletes all messages by a user id inside a specific community or direct message
-const deleteChatByUser = async (req: Request, res: Response) => {
-
 }
 
 export {

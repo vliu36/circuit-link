@@ -48,10 +48,10 @@ const getAllDocuments = async (req: Request, res: Response) => {
             })
         );
 
-        res.status(200).send({ message: posts });
+        res.status(200).json({ message: posts });
     } catch (err) {
         console.error(err);
-        res.status(500).send({
+        res.status(500).json({
             status: "backend error",
             message: err,
         });
@@ -59,10 +59,9 @@ const getAllDocuments = async (req: Request, res: Response) => {
 };
 
 // Creates and adds a document in Posts
-const addDoc = async (req: Request, res: Response) => {         // TODO: Split this function into smaller helper functions
+const addDoc = async (req: Request, res: Response) => { 
     try {
         const {
-            // author,     // User ID of post author // ! DEPRECATED - now derived from session cookie
             title,
             contents,
             commName,   // Community name
@@ -77,7 +76,7 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
 
         // Validate required fields
         if (!authorId || !title || !contents || !commName || !forumSlug) {
-            return res.status(400).send({
+            return res.status(400).json({
                 status: "Bad Request",
                 message: "Missing required fields: author, title, contents, commName, or forumSlug",
             });
@@ -130,14 +129,14 @@ const addDoc = async (req: Request, res: Response) => {         // TODO: Split t
             yayScore: FieldValue.increment(1),
         });
 
-        return res.status(201).send({
+        return res.status(201).json({
             status: "OK",
             message: `Successfully added post ${newPostRef.id}`,
             docId: newPostRef.id,
         });
     } catch (err) {
         console.error("Error creating post:", err);
-        res.status(500).send({
+        res.status(500).json({
             status: "Backend error: Could not add document to Posts",
             message: err instanceof Error ? err.message : err,
         });

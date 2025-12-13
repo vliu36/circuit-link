@@ -14,14 +14,14 @@ const getAllDocuments = async (req: Request, res: Response) => {
         const forumsRef = db.collection("Forums");
         const snapshot = await forumsRef.get();
         
-        res.status(200).send({
+        res.status(200).json({
             status: "OK",
             message: snapshot.docs.map(doc => doc.data())
         })
     }
     catch (err) {
         console.log(err);
-        res.status(500).send({
+        res.status(500).json({
             status: "backend error",
             message: err
         })
@@ -56,7 +56,7 @@ const addDoc = async (req: Request, res: Response) => {
         // Check for duplicate forums
         const isDuplicate = await forumUtils.checkDuplicateForum(name, slug, commRef);
         if (isDuplicate) {
-            return res.status(400).send({
+            return res.status(400).json({
                 status: "Bad Request",
                 message: "Forum already exists!",
             });
@@ -65,7 +65,7 @@ const addDoc = async (req: Request, res: Response) => {
         // Check if the slug is named "chat" which is reserved
         if (slug === "chat") {
             console.log("Bad Request: Attempted to create forum with reserved name 'chat'");
-            return res.status(400).send({
+            return res.status(400).json({
                 status: "Bad Request",
                 message: 'Forum name cannot be "chat" as it is a reserved word.',
             });
@@ -94,7 +94,7 @@ const addDoc = async (req: Request, res: Response) => {
             }),
         ]);
 
-        res.status(201).send({
+        res.status(201).json({
             status: "OK",
             message: `Successfully created Forum ${forumRef.id}`,
             docId: forumRef.id,
@@ -102,7 +102,7 @@ const addDoc = async (req: Request, res: Response) => {
         });
     } catch (err) {
         console.error("Error creating forum:", err);
-        res.status(500).send({
+        res.status(500).json({
             status: "Backend error: Could not add document to Communities",
             message: err instanceof Error ? err.message : err,
         });
